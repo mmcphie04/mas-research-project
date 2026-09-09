@@ -172,12 +172,34 @@ and dated into `docs/preregistration.md`.
 > | 0.85 | 0.25 | +1.11 | 52 | 0.70 |
 > | 0.90 | 0.32 | +1.59 | 64 | 1.00 |
 >
-> The reason is structural, not a simulation artefact: beneficial revisions outnumber harmful ones
-> (B ≈ 658 vs H ≈ 529 per 3,000 questions), so **accepting every revision is already net-positive**
-> and the gate has to clear a bar that ungated debate has set for it. A validated threshold on a
-> moderate-AUROC probe is therefore nearly degenerate — it accepts almost everything and barely
-> deviates from standard MAD. A +3-point panel gain would need AUROC ≈ 0.95, which is not a
-> plausible target. Reproduce with `mad power --by-auroc 0.65 0.75 0.85 --expect-n 3000`.
+> The reason is structural, not a simulation artefact: under these assumed parameters beneficial
+> revisions outnumber harmful ones (B ≈ 658 vs H ≈ 529 per 3,000 questions), so **accepting every
+> revision is already net-positive** and the gate must beat a baseline that is already winning.
+>
+> **But that assumption is the whole ballgame, and it is unmeasured.** Re-running the simulation
+> across regimes for the sign of B − H:
+>
+> | regime | B − H | debate gain over round-0 | panel headroom | gate @ AUROC 0.70 | power |
+> |---|---|---|---|---|---|
+> | debate helps (B > H) | +129 | **+6.2 pts** | +3.3 pts | +0.21 pts | 0.13 |
+> | roughly neutral | −305 | +1.2 pts | +6.0 pts | +1.51 pts | 0.80 |
+> | debate hurts (H > B) | −769 | **−5.2 pts** | +9.6 pts | +4.54 pts | 1.00 |
+>
+> The project succeeds in exactly the regime its own premise predicts. If Gemma shows real peer
+> conformity — abandoning correct answers under peer pressure — then H > B, one-round debate
+> *underperforms* the round-0 plurality, and the gate wins comfortably at ordinary probe quality.
+> The condition is not even "debate must hurt": a debate gain of ≈ +1 point already yields
+> +1.5 points from the gate at 80% power.
+>
+> **The single most decision-relevant pilot number is therefore whether standard MAD beats the
+> round-0 plurality** — pilot statistic #3, not the oracle ceiling. A large positive debate gain is
+> bad news for this project.
+>
+> Note that **G5 (panel headroom ≥ 4 points) discriminates these regimes correctly**: it fails at
+> 3.3 in the unfavourable regime and passes at 6.0 and 9.6 in the favourable ones. The threshold
+> was chosen before this simulation and turns out to be well placed.
+>
+> Reproduce with `mad power --by-auroc 0.70 0.80 --expect-n 3000 --p 0.42 --r-c 0.30 --r-i 0.20 --s 0.35`.
 
 This lets the framing adapt to evidence without letting it adapt to the test set. Choosing the
 primary endpoint after seeing results is the standard mechanism for producing an unreproducible
