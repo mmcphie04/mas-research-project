@@ -1,0 +1,17 @@
+# Tier 0 variant: the signal is ENTIRELY question-level. A probe will score well marginally and
+# at chance conditionally -- this is the difficulty-detector shortcut, planted on purpose so the
+# diagnostic that catches it can itself be tested (docs/RISKS.md risk 1).
+run_id: smoke-stub-difficulty
+model:
+  backend: stub
+data:
+  dataset: synthetic
+  n_questions: 120
+stub:
+  n_layers: 8
+  d_model: 64
+  probe_signal: 0.0
+  difficulty_leak: 3.0
+  # a wide difficulty band, or the shortcut is not detectable even in principle
+  base_accuracy: 0.5
+  accuracy_spread: 0.9

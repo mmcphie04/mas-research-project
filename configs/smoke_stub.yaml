@@ -1,0 +1,18 @@
+# Tier 0: no model at all. Planted ground truth; runs in milliseconds.
+run_id: smoke-stub
+model:
+  backend: stub
+data:
+  dataset: synthetic
+  n_questions: 120
+stub:
+  base_accuracy: 0.42
+  accuracy_spread: 0.30
+  revision_rate_correct: 0.14
+  revision_rate_incorrect: 0.28
+  switch_to_correct: 0.45
+  conformity: 0.60
+  n_layers: 8
+  d_model: 64
+  probe_signal: 1.2
+  difficulty_leak: 0.0

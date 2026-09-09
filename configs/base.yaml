@@ -1,0 +1,36 @@
+run_id: dev
+out_dir: runs
+seed: 20260909
+
+model:
+  backend: stub
+  repo_id: stub-tiny
+  dtype: float16
+  device: cpu
+  max_new_tokens: 512
+  temperature: 0.7
+  top_p: 0.95
+  batch_size: 8
+
+debate:
+  n_agents: 3
+  n_rounds: 1
+  condition: debate
+  tie_break: round0_plurality
+  ask_verbalized_confidence: true
+
+data:
+  dataset: TIGER-Lab/MMLU-Pro
+  split: test
+  n_questions: 300
+  stratify: true
+  permutation_seed: 12345
+  split_fracs: [0.5, 0.2, 0.3]
+  split_seed: 20260909
+  sample_seed: 7
+
+activations:
+  layers: all
+  positions: [readout_last]
+  dtype: float16
+  shard_size: 500

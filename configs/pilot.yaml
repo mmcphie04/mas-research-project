@@ -1,0 +1,14 @@
+# Stage 1 pilot: 300 MMLU-Pro questions + a 150-question self-reconsideration control.
+run_id: pilot-01
+model:
+  backend: vllm
+  repo_id: google/gemma-3-12b-it
+  device: cuda
+  dtype: bfloat16
+  max_new_tokens: 768
+  batch_size: 32
+data:
+  dataset: TIGER-Lab/MMLU-Pro
+  n_questions: 300
+activations:
+  shard_size: 250
