@@ -36,21 +36,16 @@ Question: {question}
 Options:
 {options}"""
 
-PEER_BLOCK = """Here is your previous response:
-
-{own}
-
-Here are the responses from the other members of your panel:
+# The agent's own round-0 response is carried as a real assistant turn rather than quoted back
+# inside a user turn: chat templates for Gemma (and others) require strictly alternating
+# user/assistant roles, and an assistant turn is the faithful representation anyway.
+PEER_BLOCK = """Here are the responses from the other members of your panel:
 
 {peers}
 
 Reconsider the question in light of these responses. You may keep your answer or change it. Give your reasoning, then end with the same two lines (Answer / Confidence)."""
 
-SELF_BLOCK = """Here is your previous response:
-
-{own}
-
-Reconsider the question carefully on your own. You may keep your answer or change it. Give your reasoning, then end with the same two lines (Answer / Confidence)."""
+SELF_BLOCK = """Reconsider the question carefully on your own. You may keep your answer or change it. Give your reasoning, then end with the same two lines (Answer / Confidence)."""
 
 PEER_ENTRY = """--- Panel member {idx} ---
 {text}"""
@@ -95,15 +90,22 @@ def round1_messages(
     own_response: str,
     peer_responses: list[str] | None,
 ) -> list[Message]:
-    """Round-1 turn. ``peer_responses=None`` produces the self-reconsideration control."""
+    """Round-1 turn. ``peer_responses=None`` produces the self-reconsideration control.
+
+    Shape: [...round-0 turns..., assistant(own round-0 response), user(reconsider prompt)].
+    """
     if peer_responses is None:
-        block = SELF_BLOCK.format(own=own_response.strip())
+        block = SELF_BLOCK
     else:
         peers = "\n\n".join(
             PEER_ENTRY.format(idx=i + 1, text=r.strip()) for i, r in enumerate(peer_responses)
         )
-        block = PEER_BLOCK.format(own=own_response.strip(), peers=peers)
-    return [*base, {"role": "user", "content": block}]
+        block = PEER_BLOCK.format(peers=peers)
+    return [
+        *base,
+        {"role": "assistant", "content": own_response.strip()},
+        {"role": "user", "content": block},
+    ]
 
 
 def letter_tokens(n_options: int) -> list[str]:

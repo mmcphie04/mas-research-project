@@ -35,7 +35,7 @@ The model sits behind a config value, so code correctness is decoupled from GPU 
 | Tier | `model.backend` | What it is | Speed | What it validates |
 |---|---|---|---|---|
 | 0 | `stub` | No model. Planted ground truth: a closed-form B/H/U distribution and an activation signal of configurable strength. | ms | Schemas, storage, and the entire analysis layer against a known answer |
-| 1 | `hf` | A real but tiny model on CPU. Defaults to the ungated `SmolLM2-135M-Instruct`. | ~30 s/question | Prompt rendering, readout token indexing, letter logits, activation shapes |
+| 1 | `hf` | A real but tiny model on CPU. Defaults to `google/gemma-3-270m-it` (18 layers x 640). | ~8 s/question | Prompt rendering, readout token indexing, letter logits, activation shapes |
 | 2 | `vllm` / `hf` | `google/gemma-3-12b-it` on a GPU. | hours | The actual experiment |
 
 ```bash
@@ -43,8 +43,24 @@ uv sync --extra dev --extra hf
 uv run mad run --config configs/base.yaml configs/smoke_tiny.yaml     # tier 1, CPU
 ```
 
-Gemma is gated. To use `google/gemma-3-270m-it` (tier 1) or `google/gemma-3-12b-it` (tier 2),
-accept the licence on the model page and run `huggingface-cli login`, then change `model.repo_id`.
+Gemma is gated: accept the licence on the model page and run `huggingface-cli login`. The token
+lands in `~/.cache/huggingface/token` and `transformers` reads it automatically -- it never needs to
+appear in a config file. Without it, set `model.repo_id` to the ungated
+`HuggingFaceTB/SmolLM2-135M-Instruct`.
+
+Confirmed shapes, which the storage arithmetic depends on:
+
+| model | layers | d_model | bytes/state |
+|---|---|---|---|
+| `google/gemma-3-270m-it` | 18 | 640 | 24 KB |
+| `google/gemma-2-9b-it` | 42 | 3584 | 308 KB |
+| `google/gemma-3-12b-it` | 48 | 3840 | 376 KB |
+
+Two Gemma-specific things the backend handles: vision-capable Gemma 3 checkpoints (`gemma3`, 4b and
+up) nest their shape under `config.text_config` and only load via the image-text class, and Gemma's
+chat template forbids a system role while requiring strictly alternating user/assistant turns -- so
+the system prompt is merged into the first user turn and the agent's own round-0 response is carried
+as a real assistant turn.
 
 ### Tier 0 is the instrument, not a placeholder
 

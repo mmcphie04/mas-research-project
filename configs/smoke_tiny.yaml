@@ -1,10 +1,11 @@
 # Tier 1: a real (tiny, ungated) model on CPU. Validates prompt rendering, readout token
 # indexing, letter logits and activation shapes -- not science.
-# Switch repo_id to google/gemma-3-270m-it once its licence is accepted (huggingface-cli login).
+# Gemma is gated: accept the licence on the model page, then `huggingface-cli login`.
+# Ungated fallback if that is not done: HuggingFaceTB/SmolLM2-135M-Instruct
 run_id: smoke-tiny
 model:
   backend: hf
-  repo_id: HuggingFaceTB/SmolLM2-135M-Instruct
+  repo_id: google/gemma-3-270m-it
   device: cpu
   dtype: float32
   max_new_tokens: 96

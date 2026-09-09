@@ -24,7 +24,7 @@ class HFBackend(Backend):
 
     def __init__(self, cfg):
         import torch
-        from transformers import AutoModelForCausalLM, AutoTokenizer
+        from transformers import AutoTokenizer
 
         self.torch = torch
         self.cfg = cfg
@@ -37,14 +37,45 @@ class HFBackend(Backend):
         self.tokenizer = AutoTokenizer.from_pretrained(mc.repo_id, revision=mc.revision)
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
-        self.model = AutoModelForCausalLM.from_pretrained(
-            mc.repo_id, revision=mc.revision, dtype=compute_dtype
-        ).to(self.device)
+        self.model = self._load_model(mc, compute_dtype)
         self.model.eval()
 
-        self.n_layers = self.model.config.num_hidden_layers
-        self.d_model = self.model.config.hidden_size
+        # Vision-capable Gemma 3 checkpoints (4b and larger, model_type "gemma3") nest the
+        # language model's shape under text_config; the text-only variants do not.
+        cfg_obj = self.model.config
+        text_cfg = getattr(cfg_obj, "text_config", cfg_obj)
+        self.n_layers = text_cfg.num_hidden_layers
+        self.d_model = text_cfg.hidden_size
         self._letter_ids = self._resolve_letter_ids()
+        self._supports_system = self._probe_system_role()
+
+    @staticmethod
+    def _load_model(mc, compute_dtype):
+        from transformers import AutoModelForCausalLM, AutoModelForImageTextToText
+
+        try:
+            return AutoModelForCausalLM.from_pretrained(
+                mc.repo_id, revision=mc.revision, dtype=compute_dtype
+            ).to(mc.device)
+        except (ValueError, KeyError, OSError):
+            # gemma-3-12b-it and friends only register under the image-text class
+            return AutoModelForImageTextToText.from_pretrained(
+                mc.repo_id, revision=mc.revision, dtype=compute_dtype
+            ).to(mc.device)
+
+    def _probe_system_role(self) -> bool:
+        """Gemma's chat template rejects a system turn; detect that once and merge instead."""
+        if not getattr(self.tokenizer, "chat_template", None):
+            return True
+        try:
+            self.tokenizer.apply_chat_template(
+                [{"role": "system", "content": "x"}, {"role": "user", "content": "y"}],
+                tokenize=False,
+                add_generation_prompt=True,
+            )
+            return True
+        except Exception:
+            return False
 
     def _resolve_letter_ids(self) -> list[int]:
         """Token id for each option letter as it appears immediately after ``(``."""
@@ -62,14 +93,25 @@ class HFBackend(Backend):
         return ids
 
     def render(self, messages: list[Message], add_generation_prompt: bool = True) -> str:
-        if getattr(self.tokenizer, "chat_template", None):
-            return self.tokenizer.apply_chat_template(
-                messages, tokenize=False, add_generation_prompt=add_generation_prompt
-            )
-        parts = [f"{m['role']}: {m['content']}" for m in messages]
-        if add_generation_prompt:
-            parts.append("assistant:")
-        return "\n\n".join(parts)
+        if not getattr(self.tokenizer, "chat_template", None):
+            parts = [f"{m['role']}: {m['content']}" for m in messages]
+            if add_generation_prompt:
+                parts.append("assistant:")
+            return "\n\n".join(parts)
+        if not self._supports_system:
+            messages = self._merge_system(messages)
+        return self.tokenizer.apply_chat_template(
+            messages, tokenize=False, add_generation_prompt=add_generation_prompt
+        )
+
+    @staticmethod
+    def _merge_system(messages: list[Message]) -> list[Message]:
+        """Fold system content into the first user turn, for templates that forbid a system role."""
+        system = "\n\n".join(m["content"] for m in messages if m["role"] == "system")
+        rest = [m for m in messages if m["role"] != "system"]
+        if system and rest and rest[0]["role"] == "user":
+            rest = [{"role": "user", "content": f"{system}\n\n{rest[0]['content']}"}, *rest[1:]]
+        return rest
 
     def generate(
         self, prompts: list[str], seed: int, meta: list[dict] | None = None
