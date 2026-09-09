@@ -27,35 +27,60 @@ def simulate_events(
     s: float = 0.45,
     n_agents: int = 3,
     n_options: int = 10,
+    peer_influence: float = 0.0,
     seed: int = 0,
     condition: str = "debate",
 ) -> pd.DataFrame:
-    """Generate an events frame with the planted revision distribution."""
+    """Generate an events frame with the planted revision distribution.
+
+    ``peer_influence`` in [0, 1] blends between a peer-independent revision rate (0) and one
+    proportional to the fraction of peers who disagree with you (1), normalised so the marginal
+    revision rate stays at r_C / r_I either way. It matters for any question about *selective*
+    debate: if revisions only happen when peers disagree, then skipping unanimous panels is free.
+    """
     rng = np.random.default_rng(seed)
+    gold = rng.integers(n_options, size=n_questions)
+
+    # round 0
+    pre = np.empty((n_questions, n_agents), dtype=int)
+    pre_correct = rng.random((n_questions, n_agents)) < p
+    for q in range(n_questions):
+        for a in range(n_agents):
+            pre[q, a] = (
+                gold[q]
+                if pre_correct[q, a]
+                else rng.choice([i for i in range(n_options) if i != gold[q]])
+            )
+
+    # fraction of peers disagreeing with each agent, and its mean (for rate normalisation)
+    disagree = np.empty((n_questions, n_agents))
+    for q in range(n_questions):
+        for a in range(n_agents):
+            peers = [pre[q, b] for b in range(n_agents) if b != a]
+            disagree[q, a] = np.mean([x != pre[q, a] for x in peers]) if peers else 0.0
+    mean_disagree = disagree.mean() if disagree.mean() > 0 else 1.0
+
     rows = []
     for q in range(n_questions):
-        gold = int(rng.integers(n_options))
         for a in range(n_agents):
-            pre_correct = rng.random() < p
-            pre = (
-                gold if pre_correct else int(rng.choice([i for i in range(n_options) if i != gold]))
-            )
-            rate = r_C if pre_correct else r_I
-            post = pre
+            base = r_C if pre_correct[q, a] else r_I
+            mult = (1 - peer_influence) + peer_influence * disagree[q, a] / mean_disagree
+            rate = float(np.clip(base * mult, 0.0, 1.0))
+            post = int(pre[q, a])
             if rng.random() < rate:
-                if pre_correct:
-                    post = int(rng.choice([i for i in range(n_options) if i != pre]))
+                if pre_correct[q, a]:
+                    post = int(rng.choice([i for i in range(n_options) if i != post]))
                 elif rng.random() < s:
-                    post = gold
+                    post = int(gold[q])
                 else:
-                    others = [i for i in range(n_options) if i not in (pre, gold)]
-                    post = int(rng.choice(others)) if others else pre
-            post_correct = post == gold
-            revised = int(pre != post)
+                    others = [i for i in range(n_options) if i not in (post, gold[q])]
+                    post = int(rng.choice(others)) if others else post
+            post_correct = post == gold[q]
+            revised = int(post != pre[q, a])
             label = (
                 NONE
                 if not revised
-                else (BENEFICIAL if post_correct else (HARMFUL if pre_correct else UNHELPFUL))
+                else (BENEFICIAL if post_correct else (HARMFUL if pre_correct[q, a] else UNHELPFUL))
             )
             rows.append(
                 {
@@ -65,13 +90,14 @@ def simulate_events(
                     "agent_id": a,
                     "subject": "sim",
                     "n_options": n_options,
-                    "gold_display": gold,
-                    "pre_answer": pre,
+                    "gold_display": int(gold[q]),
+                    "pre_answer": int(pre[q, a]),
                     "post_answer": post,
-                    "pre_correct": int(pre_correct),
+                    "pre_correct": int(pre_correct[q, a]),
                     "post_correct": int(post_correct),
                     "pre_confidence": float(rng.uniform(0.3, 0.95)),
                     "post_confidence": float(rng.uniform(0.3, 0.95)),
+                    "peer_disagree_frac": float(disagree[q, a]),
                     "revised": revised,
                     "label": label,
                 }
