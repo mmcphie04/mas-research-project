@@ -12,6 +12,8 @@ Two details are load-bearing:
 
 from __future__ import annotations
 
+import time
+
 import numpy as np
 
 from mad.backends.base import Backend, Generation, Message, Readout
@@ -153,7 +155,15 @@ class HFBackend(Backend):
         torch, mc = self.torch, self.cfg.model
         self.tokenizer.padding_side = "left"  # so index -1 is always the readout token
         out: list[Readout] = []
+        t0 = time.time()
         for start in range(0, len(texts), mc.batch_size):
+            if start and start % (mc.batch_size * 10) == 0:
+                rate = start / max(time.time() - t0, 1e-9)
+                eta = (len(texts) - start) / max(rate, 1e-9)
+                print(
+                    f"  readout {start}/{len(texts)}  {rate:.1f} states/s  eta {eta / 60:.1f} min",
+                    flush=True,
+                )
             chunk = [t + READOUT_SUFFIX for t in texts[start : start + mc.batch_size]]
             enc = self.tokenizer(
                 chunk, return_tensors="pt", padding=True, add_special_tokens=False

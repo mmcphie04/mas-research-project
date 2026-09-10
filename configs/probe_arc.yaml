@@ -1,0 +1,19 @@
+# Milestone A: a real-activation correctness probe on CPU.
+# Readout-only (no generation), 4-option benchmark so a small model sits near 50% accuracy
+# where label variance is greatest. Three permutation variants per question give within-question
+# variation, which is what makes conditional AUROC -- the difficulty-detector guard -- computable.
+run_id: probe-arc
+model:
+  backend: hf
+  repo_id: google/gemma-3-1b-it
+  device: cpu
+  dtype: float32
+  batch_size: 8
+data:
+  dataset: allenai/ai2_arc
+  dataset_revision: ARC-Easy   # reused as the HF dataset *config* name for this loader
+  split: test
+  n_questions: 800
+  permutation_seed: 12345
+activations:
+  shard_size: 512

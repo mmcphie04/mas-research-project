@@ -68,6 +68,41 @@ def load_mmlu_pro(cfg) -> list[Question]:
     return out
 
 
+def load_mc_dataset(
+    name: str = "allenai/ai2_arc",
+    config: str | None = "ARC-Easy",
+    split: str = "test",
+) -> list[Question]:
+    """Generic loader for simple 4-option multiple-choice sets (ARC, OpenBookQA).
+
+    Used for the CPU-scale probe validation: MMLU-Pro's ten options put a 1B model at chance,
+    which leaves a correctness probe nothing to learn. A 4-option set puts accuracy near 50%,
+    where label variance -- and therefore probe signal -- is greatest.
+    """
+    from datasets import load_dataset
+
+    ds = load_dataset(name, config, split=split) if config else load_dataset(name, split=split)
+    out: list[Question] = []
+    for row in ds:
+        choices = row.get("choices") or {}
+        options = list(choices.get("text", []))
+        labels = [str(x) for x in choices.get("label", [])]
+        key = str(row.get("answerKey", "")).strip()
+        if not options or key not in labels:
+            continue  # a handful of ARC rows have a malformed answer key
+        question = row.get("question") or row.get("question_stem") or ""
+        out.append(
+            Question(
+                question_id=str(row.get("id")),
+                subject=config or name.split("/")[-1],
+                question=str(question),
+                options=tuple(str(o) for o in options),
+                gold_index=labels.index(key),
+            )
+        )
+    return out
+
+
 def synthetic_questions(
     n: int, subjects: list[str] | None = None, n_options: int = 10, seed: int = 0
 ) -> list[Question]:

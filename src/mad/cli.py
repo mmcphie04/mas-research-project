@@ -9,25 +9,48 @@ from pathlib import Path
 import pandas as pd
 
 from mad.config import load_config
-from mad.data import load_mmlu_pro, make_splits, save_splits, stratified_sample, synthetic_questions
+from mad.data import (
+    load_mc_dataset,
+    load_mmlu_pro,
+    make_splits,
+    save_splits,
+    stratified_sample,
+    synthetic_questions,
+)
 from mad.debate import ROWS_FILE, run_debate
 
 
 def _questions(cfg):
     if cfg.data.dataset == "synthetic":
         pool = synthetic_questions(max(cfg.data.n_questions * 2, 50), seed=cfg.data.sample_seed)
-    else:
+    elif "MMLU-Pro" in cfg.data.dataset:
         pool = load_mmlu_pro(cfg)
+    else:
+        pool = load_mc_dataset(cfg.data.dataset, cfg.data.dataset_revision, cfg.data.split)
     return stratified_sample(pool, cfg.data.n_questions, cfg.data.sample_seed, cfg.data.subjects)
 
 
-def cmd_run(args) -> None:
-    overrides = dict(kv.split("=", 1) for kv in args.set or [])
-    overrides = {
+def cmd_collect(args) -> None:
+    from mad.collect import collect_states
+
+    cfg = load_config(*args.config, **_overrides(args.set))
+    questions = _questions(cfg)
+    result = collect_states(cfg, questions, n_variants=args.variants)
+    acc = result.rows["correct"].mean()
+    print(f"{result.n_states} states from {len(questions)} questions x {args.variants} variants")
+    print(f"accuracy {acc:.4f}   run dir: {result.run_dir}")
+
+
+def _overrides(pairs):
+    raw = dict(kv.split("=", 1) for kv in pairs or [])
+    return {
         k: json.loads(v) if v[:1] in '[{"0123456789-' or v in ("true", "false", "null") else v
-        for k, v in overrides.items()
+        for k, v in raw.items()
     }
-    cfg = load_config(*args.config, **overrides)
+
+
+def cmd_run(args) -> None:
+    cfg = load_config(*args.config, **_overrides(args.set))
     questions = _questions(cfg)
     result = run_debate(cfg, questions)
     print(f"wrote {result.n_states} activation states and {len(result.rows)} agent-state rows")
@@ -90,6 +113,12 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--config", nargs="+", required=True)
     p.add_argument("--set", nargs="*", help="dotted overrides, e.g. data.n_questions=50")
     p.set_defaults(func=cmd_run)
+
+    p = sub.add_parser("collect", help="readout-only state collection (no generation)")
+    p.add_argument("--config", nargs="+", required=True)
+    p.add_argument("--set", nargs="*")
+    p.add_argument("--variants", type=int, default=3, help="permutation variants per question")
+    p.set_defaults(func=cmd_collect)
 
     p = sub.add_parser("splits", help="freeze the grouped train/val/test split")
     p.add_argument("--config", nargs="+", required=True)
