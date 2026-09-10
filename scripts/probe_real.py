@@ -20,7 +20,7 @@ import numpy as np
 import pandas as pd
 
 from mad.analysis.calibrate import PlattScaler, brier, expected_calibration_error
-from mad.analysis.probes import DEFAULT_C_GRID, fit_probe, grouped_oof, mass_mean_probe
+from mad.analysis.probes import fit_probe, grouped_oof, mass_mean_oof
 from mad.analysis.stats import (
     auroc,
     bootstrap_auroc,
@@ -81,7 +81,8 @@ def main(run_dir: str):
     sweep = []
     for layer in store.layer_range():
         X = store.load_layer(layer)[order]
-        pr = fit_probe(X, y, groups, layer=layer, C_grid=DEFAULT_C_GRID)
+        # coarse grid across layers; the full grid is swept only at the winning layer
+        pr = fit_probe(X, y, groups, layer=layer, C_grid=(0.001, 0.1))
         ok = ~np.isnan(pr.oof)
         cond, _, _ = conditional_auroc(y[ok], pr.oof[ok], groups[ok])
         sweep.append({"layer": layer, "cv_auroc": pr.cv_auroc, "cond_auroc": cond, "C": pr.best_C})
@@ -101,8 +102,9 @@ def main(run_dir: str):
     report_pair("logit confidence", y, conf, groups)
     report_pair(f"linear probe (L{best_layer})", y[ok], probe.oof[ok], groups[ok])
 
-    mm_dir = mass_mean_probe(X, y)
-    report_pair("mass-mean probe", y, X @ mm_dir, groups)
+    mm = mass_mean_oof(X, y, groups)
+    okm = ~np.isnan(mm)
+    report_pair("mass-mean probe", y[okm], mm[okm], groups[okm])
 
     both = np.column_stack([conf, probe.oof])
     both_oof = grouped_oof(both[ok], y[ok], groups[ok], C=1.0)
@@ -116,6 +118,18 @@ def main(run_dir: str):
     print(f"  delta AUROC (probe - confidence): {d}")
     print(f"  {'PROBE WINS' if d.lo > 0 else 'NOT SIGNIFICANT' if d.hi > 0 else 'CONFIDENCE WINS'}"
           "  (95% cluster-bootstrap CI excludes 0?)")
+
+    print("\n" + "-" * 92)
+    print("IS THE PROBE JUST READING ANSWER POSITION?")
+    print("-" * 92)
+    pos = rows["gold_display"].to_numpy()[ok]
+    print(f"  probe AUROC for predicting 'gold is in slot 0': "
+          f"{auroc((pos == 0).astype(int), probe.oof[ok]):.4f}   (0.5 = no positional leakage)")
+    for slot in sorted(set(pos)):
+        m = pos == slot
+        if m.sum() > 20 and len(set(y[ok][m])) > 1:
+            print(f"  correctness AUROC within slot {slot} only (n={int(m.sum())}): "
+                  f"{auroc(y[ok][m], probe.oof[ok][m]):.4f}")
 
     print("\n" + "-" * 92)
     print("CONTROLS")

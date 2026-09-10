@@ -12,6 +12,7 @@ Two details are load-bearing:
 
 from __future__ import annotations
 
+import os
 import time
 
 import numpy as np
@@ -28,6 +29,9 @@ class HFBackend(Backend):
         import torch
         from transformers import AutoTokenizer
 
+        if cfg.model.device == "cpu":
+            # torch defaults to physical cores; on this box that left ~half the machine idle
+            torch.set_num_threads(os.cpu_count() or 1)
         self.torch = torch
         self.cfg = cfg
         mc = cfg.model

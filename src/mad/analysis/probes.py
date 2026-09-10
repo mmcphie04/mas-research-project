@@ -153,6 +153,27 @@ def mass_mean_probe(X: np.ndarray, y: np.ndarray, ridge: float = 1.0) -> np.ndar
     return np.linalg.solve(cov, direction)
 
 
+def mass_mean_oof(
+    X: np.ndarray, y: np.ndarray, groups: np.ndarray, ridge: float = 1.0, n_splits: int = 5
+) -> np.ndarray:
+    """Out-of-fold mass-mean scores under GroupKFold.
+
+    Scoring a mass-mean direction in-sample is meaningless whenever d > n: the difference of
+    means separates the training rows perfectly by construction and reports AUROC 1.0.
+    """
+    y = np.asarray(y).astype(int)
+    out = np.full(len(y), np.nan)
+    n_splits = min(n_splits, len(np.unique(groups)))
+    for tr, te in GroupKFold(n_splits=n_splits).split(X, y, groups):
+        if len(np.unique(y[tr])) < 2:
+            continue
+        mu = X[tr].mean(axis=0)
+        sd = X[tr].std(axis=0) + 1e-8
+        direction = mass_mean_probe((X[tr] - mu) / sd, y[tr], ridge=ridge)
+        out[te] = ((X[te] - mu) / sd) @ direction
+    return out
+
+
 def layer_sweep(
     bank: FeatureBank,
     y: np.ndarray,
