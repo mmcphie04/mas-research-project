@@ -10,6 +10,8 @@ all layers at a handful of canonical positions is fine, one layer at all token p
 
 from __future__ import annotations
 
+import json
+import time
 from pathlib import Path
 
 import numpy as np
@@ -110,3 +112,57 @@ class ActivationStore:
 
     def layer_range(self) -> range:
         return range(self.n_layers + 1)
+
+
+def merge_runs(run_dirs: list[str | Path], out_dir: str | Path, rows_file: str) -> pd.DataFrame:
+    """Concatenate several chunk runs into one logical run directory.
+
+    Chunked collection is what makes an overnight job survivable: each chunk writes its own
+    completion record, so a crash costs one chunk rather than the night. Shard files are copied
+    and renumbered rather than re-read, so merging is IO-bound and quick.
+    """
+    import shutil
+
+    run_dirs = [Path(d) for d in run_dirs]
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    metas = [pd.read_parquet(d / "activation_meta.parquet").iloc[0] for d in run_dirs]
+    n_layers = {int(m["n_layers"]) for m in metas}
+    d_model = {int(m["d_model"]) for m in metas}
+    if len(n_layers) != 1 or len(d_model) != 1:
+        raise ValueError(f"cannot merge runs with differing shapes: layers={n_layers} d={d_model}")
+
+    indices, frames, next_shard = [], [], 0
+    for d in run_dirs:
+        idx = pd.read_parquet(d / INDEX_FILE).sort_values(["shard", "offset"])
+        remap = {}
+        for old in sorted(idx["shard"].unique()):
+            shutil.copy2(d / SHARD_FMT.format(shard=int(old)), out_dir / SHARD_FMT.format(shard=next_shard))
+            remap[int(old)] = next_shard
+            next_shard += 1
+        idx["shard"] = idx["shard"].map(remap)
+        indices.append(idx)
+        frames.append(pd.read_parquet(d / rows_file))
+
+    index = pd.concat(indices, ignore_index=True)
+    rows = pd.concat(frames, ignore_index=True)
+    index.to_parquet(out_dir / INDEX_FILE, index=False)
+    pd.DataFrame(
+        [{"n_layers": n_layers.pop(), "d_model": d_model.pop(), "n_states": len(index)}]
+    ).to_parquet(out_dir / "activation_meta.parquet", index=False)
+    rows.to_parquet(out_dir / rows_file, index=False)
+    shutil.copy2(run_dirs[0] / "manifest.json", out_dir / "manifest.json")
+    (out_dir / "completion.json").write_text(
+        json.dumps(
+            {
+                "timestamp_end": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
+                "row_counts": {"states": len(rows), "activations": len(index)},
+                "merged_from": [str(d) for d in run_dirs],
+                "shard_sha256": {},
+                "errors": [],
+            },
+            indent=2,
+        )
+    )
+    return rows

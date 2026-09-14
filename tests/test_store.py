@@ -70,3 +70,56 @@ def test_storage_arithmetic_matches_the_plan():
     # the same states with every token position stored would be three orders of magnitude worse
     tb = storage_bytes(18_000, 48, 3840, n_positions=800) / 1e12
     assert tb > 5.0
+
+
+def test_merge_runs_concatenates_chunks(tmp_path):
+    """Chunked overnight collection is only survivable if the chunks recombine exactly."""
+    import pandas as pd
+    from conftest import make_cfg
+
+    from mad.collect import STATES_FILE, collect_states
+    from mad.data import Question
+    from mad.store import merge_runs
+
+    def qs(lo, hi):
+        return [
+            Question(f"q{i}", "s", f"Q{i}?", tuple(f"o{j}" for j in range(4)), i % 4)
+            for i in range(lo, hi)
+        ]
+
+    dirs = []
+    for i, (lo, hi) in enumerate([(0, 10), (10, 20), (20, 26)]):
+        cfg = make_cfg(tmp_path, run_id=f"chunk{i}")
+        dirs.append(collect_states(cfg, qs(lo, hi), n_variants=2).run_dir)
+
+    merged = merge_runs(dirs, tmp_path / "merged", STATES_FILE)
+    assert len(merged) == 26 * 2
+    assert merged.question_id.nunique() == 26
+
+    store = ActivationStore(tmp_path / "merged")
+    assert len(store) == 52
+    # every chunk's activations must survive the shard renumbering bit-exactly
+    per_chunk = [ActivationStore(d).load_layer(3) for d in dirs]
+    expected = np.concatenate(per_chunk, axis=0)
+    assert np.array_equal(store.load_layer(3), expected)
+    assert pd.read_parquet(tmp_path / "merged" / STATES_FILE).shape[0] == 52
+
+
+def test_merge_refuses_mismatched_shapes(tmp_path):
+    from conftest import make_cfg
+
+    from mad.collect import STATES_FILE, collect_states
+    from mad.data import Question
+    from mad.store import merge_runs
+
+    q = [Question("q0", "s", "Q?", ("a", "b", "c", "d"), 0)]
+    a = collect_states(make_cfg(tmp_path, run_id="a"), q, n_variants=1).run_dir
+    cfg_b = make_cfg(tmp_path, run_id="b")
+    cfg_b.stub.d_model = 32  # different width
+    b = collect_states(cfg_b, q, n_variants=1).run_dir
+    try:
+        merge_runs([a, b], tmp_path / "bad", STATES_FILE)
+    except ValueError as exc:
+        assert "differing shapes" in str(exc)
+    else:
+        raise AssertionError("merging runs with different d_model must fail loudly")
