@@ -153,6 +153,12 @@ class HFBackend(Backend):
                 )
         return out
 
+    def estimated_readout_gb(self, batch: int, seq: int) -> float:
+        """Peak activation memory for one readout batch, with logits_to_keep=1."""
+        hidden = (self.n_layers + 1) * batch * seq * self.d_model * 4
+        logits = batch * 1 * self.model.config.get_text_config().vocab_size * 4
+        return (hidden + logits) / 1e9
+
     def readout(
         self, texts: list[str], n_options: list[int], meta: list[dict] | None = None
     ) -> list[Readout]:
@@ -173,10 +179,15 @@ class HFBackend(Backend):
                 chunk, return_tensors="pt", padding=True, add_special_tokens=False
             ).to(self.device)
             with torch.no_grad():
-                res = self.model(**enc, output_hidden_states=True)
+                # logits_to_keep=1 is not an optimisation, it is a hard requirement. Gemma 3 has
+                # a 262,144-token vocabulary, so the default full-sequence logits tensor is
+                # batch x seq x 262144 x 4 bytes -- 22.6 GB at batch 24 over a 900-token debate
+                # transcript, which OOM-killed an overnight run. Only the last position is ever
+                # read, and keeping just that costs 25 MB.
+                res = self.model(**enc, output_hidden_states=True, logits_to_keep=1)
             # hidden_states is a tuple of (n_layers + 1) tensors, each (batch, seq, d_model)
             stacked = torch.stack([h[:, -1, :] for h in res.hidden_states], dim=1)  # (b, L+1, d)
-            logits = res.logits[:, -1, :]
+            logits = res.logits[:, -1, :]  # seq dim is length 1
             for i in range(len(chunk)):
                 n = n_options[start + i]
                 letter_logits = logits[i, self._letter_ids[:n]].float()

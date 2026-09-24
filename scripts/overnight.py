@@ -74,15 +74,15 @@ JOBS = [
     #    beneficial/harmful revisions to learn from? This answers the regime question with
     #    real data instead of simulation, so it runs first.
     {
-        "kind": "debate", "run_id": "night-debate", "dataset": "ARC-Challenge", "n": 300,
+        "kind": "debate", "run_id": "night-debate", "dataset": "ARC-Challenge", "n": 400,
         "chunk": 25, "condition": "debate",
-        "overrides": {"model.max_new_tokens": 64, "model.batch_size": 24},
+        "overrides": {"model.max_new_tokens": 64, "model.batch_size": 16},
     },
     # 2. the control that separates peer influence from ordinary answer instability
     {
-        "kind": "debate", "run_id": "night-control", "dataset": "ARC-Challenge", "n": 300,
+        "kind": "debate", "run_id": "night-control", "dataset": "ARC-Challenge", "n": 400,
         "chunk": 25, "condition": "self_reconsider",
-        "overrides": {"model.max_new_tokens": 64, "model.batch_size": 24},
+        "overrides": {"model.max_new_tokens": 64, "model.batch_size": 16},
     },
     # 3. cross-dataset transfer: train the probe on ARC-Challenge, test on ARC-Easy. This is
     #    the best-documented failure mode of probing claims and nobody has told us the answer.
