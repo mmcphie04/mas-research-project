@@ -1,0 +1,24 @@
+==============================================================================
+1. PEER ATTRIBUTION  (debate vs self-reconsideration)
+==============================================================================
+  debate (sees peers)    revision 0.316  r_C 0.200  r_I 0.398   B=138 H=99 U=142
+  control (no peers)     revision 0.274  r_C 0.167  r_I 0.349   B=111 H=83 U=135
+
+  peer-attributable share of revisions: 13.2%   (baseline instability accounts for 86.8%)
+  harmful per 1200 events: debate 99  control 83   -> peers add 16
+  beneficial per 1200 events: debate 138  control 111   -> peers add 27
+
+==============================================================================
+2. MODEL SCALE  (same questions, ARC-Challenge readout)
+==============================================================================
+  gemma-3-270m (18 layers, d=640)    acc 0.258  probe 0.5491  conf 0.5140  delta +0.0351 [-0.0181,+0.0811]  cond 0.5218
+  gemma-3-1b  (26 layers, d=1152)    acc 0.497  probe 0.6879  conf 0.6506  delta +0.0373 [-0.0000,+0.0693]  cond 0.6429
+
+==============================================================================
+3. CROSS-DATASET TRANSFER  (train ARC-Challenge -> test ARC-Easy)
+==============================================================================
+  ARC-Easy accuracy 0.627   (in-domain ARC-Challenge probe was 0.6879)
+  transferred probe AUROC 0.7362   conditional 0.6147
+  ARC-Easy confidence AUROC 0.7148
+  transferred probe - confidence  +0.0214 [-0.0084, +0.0498]
+  retention: 107.0% of in-domain AUROC

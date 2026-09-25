@@ -1,0 +1,177 @@
+{
+  "n_questions": 400,
+  "n_agent_states": 2400,
+  "revision_rates": {
+    "revision_rate": 0.31583333333333335,
+    "r_C": 0.19959677419354838,
+    "r_I": 0.3977272727272727,
+    "base_accuracy": 0.41333333333333333,
+    "s_switch_to_correct": 0.4928571428571429
+  },
+  "label_counts": {
+    "beneficial": 138,
+    "harmful": 99,
+    "unhelpful": 142,
+    "none": 821
+  },
+  "label_shares": {
+    "beneficial": 0.3641160949868074,
+    "harmful": 0.2612137203166227,
+    "unhelpful": 0.37467018469656993
+  },
+  "agreement_round0": {
+    "unanimous": 0.525,
+    "majority": 0.4275,
+    "split": 0.0475
+  },
+  "conformity": {
+    "p_switch_given_peers_disagree": 0.6973684210526315,
+    "p_switch_given_peers_agree": 0.22633744855967078,
+    "p_lands_on_peer_majority_given_switch": 0.2796833773087071
+  },
+  "parsing": {
+    "freetext_parse_failure_rate": 0.6950000000000001,
+    "freetext_readout_disagreement_rate": 0.0
+  },
+  "confidence_auroc": {
+    "readout_conf_auroc_pre": 0.6154119318181819,
+    "readout_conf_auroc_post": 0.6167367015670017
+  },
+  "headroom": {
+    "panel_mad": 0.455,
+    "panel_round0": 0.4075,
+    "panel_oracle_full": 0.5275,
+    "panel_oracle_panel_optimal": 0.5275,
+    "panel_oracle_reject_harmful": 0.525,
+    "panel_headroom_full": 0.07249999999999995,
+    "panel_headroom_optimal": 0.07249999999999995,
+    "panel_headroom_reject_harmful": 0.07,
+    "agent_mad": 0.4458333333333333,
+    "agent_oracle_full": 0.5283333333333333,
+    "agent_headroom_full": 0.08250000000000002,
+    "debate_gain_over_round0": 0.04750000000000004,
+    "panel_flip_rate_f": 0.165,
+    "oracle_discordant_questions": 29
+  },
+  "policies": [
+    {
+      "policy": "mad_standard",
+      "panel_accuracy": 0.455,
+      "agent_accuracy": 0.4458333333333333,
+      "n_questions": 400,
+      "n_revisions": 379,
+      "n_accepted": 379,
+      "acceptance_rate": 1.0,
+      "tie_rate": 0.0175
+    },
+    {
+      "policy": "round0_plurality",
+      "panel_accuracy": 0.4075,
+      "agent_accuracy": 0.41333333333333333,
+      "n_questions": 400,
+      "n_revisions": 379,
+      "n_accepted": 0,
+      "acceptance_rate": 0.0,
+      "tie_rate": 0.0475
+    },
+    {
+      "policy": "oracle_full",
+      "panel_accuracy": 0.5275,
+      "agent_accuracy": 0.5283333333333333,
+      "n_questions": 400,
+      "n_revisions": 379,
+      "n_accepted": 138,
+      "acceptance_rate": 0.3641160949868074,
+      "tie_rate": 0.0225
+    },
+    {
+      "policy": "oracle_reject_harmful",
+      "panel_accuracy": 0.525,
+      "agent_accuracy": 0.5283333333333333,
+      "n_questions": 400,
+      "n_revisions": 379,
+      "n_accepted": 280,
+      "acceptance_rate": 0.7387862796833773,
+      "tie_rate": 0.02
+    },
+    {
+      "policy": "oracle_reject_unhelpful",
+      "panel_accuracy": 0.455,
+      "agent_accuracy": 0.4458333333333333,
+      "n_questions": 400,
+      "n_revisions": 379,
+      "n_accepted": 237,
+      "acceptance_rate": 0.6253298153034301,
+      "tie_rate": 0.02
+    },
+    {
+      "policy": "oracle_panel_optimal",
+      "panel_accuracy": 0.5275,
+      "agent_accuracy": 0.4566666666666667,
+      "n_questions": 400,
+      "n_revisions": 379,
+      "n_accepted": 52,
+      "acceptance_rate": 0.13720316622691292,
+      "tie_rate": 0.0175
+    }
+  ],
+  "probe_auroc_pre_correctness": null,
+  "gates": {
+    "G1_base_accuracy": {
+      "value": 0.41333333333333333,
+      "pass": true,
+      "threshold": [
+        0.25,
+        0.7
+      ]
+    },
+    "G2_non_unanimous_round0": {
+      "value": 0.475,
+      "pass": true,
+      "threshold": [
+        0.35,
+        null
+      ]
+    },
+    "G3_revision_rate": {
+      "value": 0.31583333333333335,
+      "pass": true,
+      "threshold": [
+        0.1,
+        null
+      ]
+    },
+    "G4_harmful_share": {
+      "value": 0.2612137203166227,
+      "pass": true,
+      "threshold": [
+        0.08,
+        null
+      ]
+    },
+    "G4_beneficial_share": {
+      "value": 0.3641160949868074,
+      "pass": true,
+      "threshold": [
+        0.15,
+        null
+      ]
+    },
+    "G5_panel_headroom": {
+      "value": 0.07249999999999995,
+      "pass": true,
+      "threshold": [
+        0.04,
+        null
+      ]
+    },
+    "G7_probe_auroc": {
+      "value": null,
+      "pass": null,
+      "threshold": [
+        0.6,
+        null
+      ]
+    }
+  }
+}
