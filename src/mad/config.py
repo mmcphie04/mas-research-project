@@ -63,13 +63,11 @@ class DebateConfig:
     n_rounds: int = 1
     condition: Condition = "debate"
     tie_break: str = "round0_then_agent0"  # round0_then_agent0 | round0_then_confidence | agent0
-    personas: list[str] = field(
-        default_factory=lambda: [
-            "You are a careful, methodical reasoner.",
-            "You are a sceptical reasoner who checks assumptions.",
-            "You are a concise reasoner who focuses on the decisive step.",
-        ]
-    )
+    # One persona for every agent. Distinct personas made the agents the same weights but
+    # different policies, which contradicts the homogeneous-agent framing and interacted badly
+    # with a tie-break that falls back to agent 0. Diversity now comes from sampling alone.
+    personas: list[str] = field(default_factory=lambda: ["You are a careful, methodical reasoner."])
+    peer_shows_confidence: bool = False
     ask_verbalized_confidence: bool = True
 
 

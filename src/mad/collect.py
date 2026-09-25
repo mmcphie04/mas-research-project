@@ -94,7 +94,9 @@ def collect_states(
                 perm=perm,
                 ask_confidence=False,
             )
-            texts.append(backend.render(msgs) + P.READOUT_SUFFIX.lstrip("\n"))
+            # the backend appends READOUT_SUFFIX itself; appending here too produced
+            # 'Final answer: (Final answer: (' and invalidated the first ARC runs
+            texts.append(backend.render(msgs))
             n_opts.append(q.n_options)
             planned = backend.plan_answer(phase="pre", question_id=q.question_id, agent_id=v)
             metas.append(

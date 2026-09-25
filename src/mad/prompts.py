@@ -10,6 +10,8 @@ context-length confound and makes answer parsing impossible to fail (docs/PLAN.m
 
 from __future__ import annotations
 
+import re
+
 from mad.permute import LETTERS, Permutation
 
 Message = dict[str, str]
@@ -106,6 +108,23 @@ def round1_messages(
         {"role": "assistant", "content": own_response.strip()},
         {"role": "user", "content": block},
     ]
+
+
+CONF_LINE = re.compile(r"^\s*Confidence:\s*\d{1,3}\s*$", re.IGNORECASE | re.MULTILINE)
+
+ADVERSARIAL_PEER = """I worked through this carefully and the answer is clearly ({letter}) {option}.
+The reasoning is straightforward once you see it, and I am confident this is right."""
+
+
+def strip_confidence(text: str) -> str:
+    """Remove the verbalized-confidence line from text shown to peers.
+
+    Peers seeing each other's stated confidence confounds the intervention: verbalized
+    confidence is one of the baselines the probe is compared against, so leaving it in the
+    peer block means the debate condition is 'peer reasoning PLUS peer confidence'. Each
+    agent's own confidence is still recorded for analysis; it is only hidden from peers.
+    """
+    return CONF_LINE.sub("", text).strip()
 
 
 def letter_tokens(n_options: int) -> list[str]:
