@@ -1,0 +1,14 @@
+{
+  "n_events": 1050,
+  "n_revisions": 401,
+  "n_questions": 350,
+  "n_reps": 8,
+  "layers_considered": [
+    6,
+    13,
+    16,
+    20,
+    23,
+    26
+  ]
+}

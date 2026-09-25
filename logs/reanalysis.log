@@ -1,0 +1,44 @@
+output baseline enriched with 6 recovered distribution features
+events 1050  revisions 401  questions 350  base rate y_post 0.361
+  rep 0 done
+  rep 1 done
+  rep 2 done
+  rep 3 done
+  rep 4 done
+  rep 5 done
+  rep 6 done
+  rep 7 done
+
+=== ALL EVENTS, target = proposed answer correct ===
+                             auroc           brier             ece         sd_pred        
+                              mean     std    mean     std    mean     std    mean     std
+family      representation                                                                
+activation  post            0.6067  0.0208  0.2264  0.0053  0.0814  0.0275  0.1324  0.0376
+            pre             0.6329  0.0420  0.2271  0.0245  0.1200  0.0530  0.2072  0.0727
+            pre_diff        0.6552  0.0409  0.2205  0.0156  0.1036  0.0396  0.2143  0.0529
+            pre_post        0.6527  0.0342  0.2215  0.0167  0.1154  0.0405  0.2128  0.0481
+combined    act+output      0.6700  0.0398  0.2092  0.0055  0.0825  0.0204  0.1780  0.0107
+constant    base_rate       0.5000  0.0000  0.2308  0.0091  0.0406  0.0243  0.0000  0.0000
+output_only output          0.6415  0.0416  0.2184  0.0055  0.0797  0.0231  0.1439  0.0148
+
+=== by subset (activation, pre_post) ===
+                 auroc           brier             ece         sd_pred        
+                  mean     std    mean     std    mean     std    mean     std
+subset                                                                        
+all             0.6527  0.0342  0.2215  0.0167  0.1154  0.0405  0.2128  0.0481
+init_correct    0.6837  0.0619  0.2838  0.0383  0.2869  0.0540  0.2327  0.0480
+init_incorrect  0.5420  0.0638  0.1822  0.0213  0.1825  0.0423  0.1851  0.0475
+revised         0.5323  0.0645  0.2185  0.0237  0.1577  0.0521  0.1786  0.0526
+
+=== OLD vs NEW gating (mean over reps) ===
+           agent_acc         panel_acc        
+                mean     std      mean     std
+source                                        
+accept_all    0.3575  0.0346    0.3738  0.0383
+combined      0.4024  0.0448    0.4190  0.0435
+oracle        0.4702  0.0367    0.4798  0.0444
+output        0.4071  0.0386    0.4202  0.0409
+pre_post      0.4036  0.0427    0.4155  0.0416
+reject_all    0.3738  0.0466    0.3619  0.0494
+
+wrote docs/reanalysis_events.csv, docs/reanalysis_gating.csv, docs/reanalysis_results.json

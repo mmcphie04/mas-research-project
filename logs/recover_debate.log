@@ -1,2 +1,17 @@
 Loading weights:   0%|          | 0/340 [00:00<?, ?it/s]Loading weights:   0%|          | 1/340 [00:00<02:32,  2.22it/s]Loading weights:  16%|█▋        | 56/340 [00:00<00:02, 130.18it/s]Loading weights:  27%|██▋       | 91/340 [00:00<00:01, 178.77it/s]Loading weights:  36%|███▌      | 121/340 [00:00<00:01, 192.42it/s]Loading weights:  44%|████▎     | 148/340 [00:00<00:00, 192.51it/s]Loading weights:  51%|█████     | 173/340 [00:01<00:00, 184.47it/s]Loading weights:  59%|█████▊    | 199/340 [00:01<00:00, 181.54it/s]Loading weights:  66%|██████▌   | 225/340 [00:01<00:00, 196.99it/s]Loading weights:  74%|███████▍  | 251/340 [00:01<00:00, 200.16it/s]Loading weights:  84%|████████▎ | 284/340 [00:01<00:00, 232.58it/s]Loading weights:  91%|█████████ | 309/340 [00:01<00:00, 234.65it/s]Loading weights:  98%|█████████▊| 334/340 [00:01<00:00, 230.18it/s]Loading weights: 100%|██████████| 340/340 [00:01<00:00, 188.91it/s]
 replaying readout for 2100 states
+  readout 160/2100  0.5 states/s  eta 65.3 min
+  readout 320/2100  0.5 states/s  eta 61.8 min
+  readout 480/2100  0.5 states/s  eta 57.5 min
+  readout 640/2100  0.5 states/s  eta 52.2 min
+  readout 800/2100  0.5 states/s  eta 46.7 min
+  readout 960/2100  0.5 states/s  eta 40.5 min
+  readout 1120/2100  0.5 states/s  eta 34.6 min
+  readout 1280/2100  0.5 states/s  eta 28.8 min
+  readout 1440/2100  0.5 states/s  eta 23.1 min
+  readout 1600/2100  0.5 states/s  eta 17.4 min
+  readout 1760/2100  0.5 states/s  eta 11.8 min
+  readout 1920/2100  0.5 states/s  eta 6.3 min
+  readout 2080/2100  0.5 states/s  eta 0.7 min
+wrote runs/night2-debate/readout_full.parquet  rows=2100
+replay reproduces the original answer on 1.0000 of 2100 states  <- must be ~1.0 or the reconstruction is wrong
