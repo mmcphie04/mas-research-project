@@ -158,6 +158,12 @@ class StubBackend(Backend):
             entry = self.oracle[qid]
             # the readout is a forward pass, not a parse: take the planted answer directly
             answer = m["planned_answer"]
+            if m.get("phase") == "peer_exposure" and "pre_answer" in m:
+                # partway between the original and the revision: the agent has read the peers
+                # but has not generated its new response yet
+                committed = _seed("pe", qid, m["agent_id"], self.run_seed).random()
+                if committed >= self.s.peer_exposure_commit:
+                    answer = m["pre_answer"]
             correct = answer == entry.gold_display_index
             rng = _seed(
                 "acts", qid, m["agent_id"], m["phase"], m.get("condition", "debate"), self.run_seed

@@ -31,7 +31,16 @@ from mad.permute import LETTERS, make_permutation
 from mad.provenance import prompt_hashes, sha256_file, write_completion, write_manifest
 from mad.store import ActivationWriter
 
-KINDS = ("self_reconsider", "debate", "debate_conf", "adversarial")
+
+class _NullGen:
+    """Placeholder for the peer_exposure state, which has no generated text of its own."""
+
+    text = ""
+    n_prompt_tokens = 0
+    n_completion_tokens = 0
+
+
+KINDS = ("self_reconsider", "debate", "debate_conf", "adversarial", "misleading_one")
 
 
 def adversarial_answer(gold: int, pre: int, n_options: int) -> int:
@@ -111,6 +120,18 @@ def run_conditions(
                 peers = [pre_answer[(qid, b)] for b in range(n_agents) if b != a]
                 if kind == "self_reconsider":
                     peer_texts, maj = None, None
+                elif kind == "misleading_one":
+                    # One dissenting peer, restrained wording, the other peer genuine. Two
+                    # emphatic fabricated peers produced 99% adoption, which measures whether
+                    # the model copies a confident assertion rather than anything about
+                    # conformity. One hedged dissenter should land in an informative range.
+                    adv = adversarial_answer(gold[qid], pre, q.n_options)
+                    shown = perms[qid].display_options(list(q.options))[adv]
+                    other = [b for b in range(n_agents) if b != a][0]
+                    peer_texts = [P.MILD_PEER.format(letter=LETTERS[adv], option=shown),
+                                  P.strip_confidence(own_text[(qid, other)])]
+                    peers = [adv, pre_answer[(qid, other)]]
+                    maj = peer_majority(peers)
                 elif kind == "adversarial":
                     adv = adversarial_answer(gold[qid], pre, q.n_options)
                     shown = perms[qid].display_options(list(q.options))[adv]
@@ -131,6 +152,20 @@ def run_conditions(
                                "n_peers_agree_pre": sum(1 for p in peers if p == pre),
                                "peers_agree_each_other": int(len(set(peers)) == 1),
                                "peer_unanimous": int(len(set(peers)) == 1)})
+
+        # Third state: after the agent has seen the intervention but BEFORE it commits to a
+        # revision. Everything measured so far is the post-answer state, which exists only once
+        # the answer is decided, so it may be reading a decision rather than predicting one.
+        metas_pe = [{**m, "phase": "peer_exposure",
+                     "pre_answer": pre_answer[(m["question_id"], m["agent_id"])]}
+                    for m in metas1]
+        reads_pe = backend.readout(prompts1, [n_opts[m["question_id"]] for m in metas1], meta=metas_pe)
+        for m, read in zip(metas_pe, reads_pe, strict=True):
+            row = _row(cfg, m, _NullGen(), read, n_opts[m["question_id"]], gold, perms)
+            row["post_equals_peer_majority"] = int(read.answer_index == m["peer_majority"])
+            row["peers_agree_each_other"] = m["peers_agree_each_other"]
+            rows.append(row)
+            writer.add(_akey(cfg, m), read.hidden)
 
         gens1 = backend.generate(prompts1, seed=cfg.seed + 1, meta=metas1)
         texts1 = [p + g.text for p, g in zip(prompts1, gens1, strict=True)]

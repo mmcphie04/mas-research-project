@@ -13,6 +13,7 @@ CONDS = [
     {"name": "debate", "kind": "debate", "run_id": "m-deb", "peer_confidence": False},
     {"name": "debate_conf", "kind": "debate_conf", "run_id": "m-debc", "peer_confidence": True},
     {"name": "adversarial", "kind": "adversarial", "run_id": "m-adv"},
+    {"name": "misleading_one", "kind": "misleading_one", "run_id": "m-mild"},
 ]
 
 
@@ -30,10 +31,12 @@ def multi(tmp_path_factory):
 
 def test_all_conditions_produced(multi):
     res, _ = multi
-    assert set(res) == {"self_reconsider", "debate", "debate_conf", "adversarial"}
+    assert set(res) == {"self_reconsider", "debate", "debate_conf", "adversarial", "misleading_one"}
     for r in res.values():
-        assert len(r.rows) == 20 * 3 * 2
-        assert r.n_states == 120
+        # three states per agent now: pre, peer_exposure, post
+        assert len(r.rows) == 20 * 3 * 3
+        assert r.n_states == 180
+        assert set(r.rows.phase) == {"pre", "peer_exposure", "post"}
 
 
 def test_round0_is_byte_identical_across_conditions(multi):
@@ -53,6 +56,38 @@ def test_conditions_actually_diverge_after_round0(multi):
     post = {n: r.rows[r.rows.phase == "post"].sort_values(["question_id", "agent_id"])
             .readout_answer.tolist() for n, r in res.items()}
     assert post["adversarial"] != post["self_reconsider"], "adversarial peers changed nothing"
+
+
+def test_peer_exposure_state_precedes_the_revision(multi):
+    """The pre-revision state must be a readout on the round-1 PROMPT, with no revision text."""
+    res, _ = multi
+    r = res["debate"].rows
+    pe = r[r.phase == "peer_exposure"]
+    post = r[r.phase == "post"]
+    assert len(pe) == len(post)
+    # it carries no generated text of its own
+    assert (pe.rationale_chars == 0).all()
+    assert (pe.n_completion_tokens == 0).all()
+    # but it is a real answer-bearing state
+    assert pe.readout_answer.between(0, 3).all()
+    assert (pe.readout_confidence > 0).all()
+
+
+def test_peer_exposure_differs_from_the_committed_answer_sometimes(multi):
+    res, _ = multi
+    r = res["debate"].rows
+    k = ["question_id", "agent_id"]
+    pe = r[r.phase == "peer_exposure"].set_index(k).readout_answer
+    post = r[r.phase == "post"].set_index(k).readout_answer
+    assert not pe.equals(post), "pre-revision and post-revision states are identical; the readout is not being taken before generation"
+
+
+def test_misleading_one_uses_a_single_dissenter(multi):
+    res, _ = multi
+    assert "misleading_one" in res
+    post = res["misleading_one"].rows.query("phase == 'post'")
+    # one fabricated dissenter plus one genuine peer, so they rarely agree with each other
+    assert post.peers_agree_each_other.mean() < 0.9
 
 
 def test_adversarial_peers_assert_one_wrong_answer_the_focal_agent_did_not_give():

@@ -52,6 +52,7 @@ class StubConfig:
     probe_signal: float = 1.2  # instance-level correctness signal (std units)
     difficulty_leak: float = 0.0  # question-level signal; drives the difficulty-detector shortcut
     signal_peak_layer: float = 0.6  # fractional depth at which the signal is strongest
+    peer_exposure_commit: float = 0.6  # P(pre-revision state already holds the revised answer)
     freetext_noise: float = 0.03  # P(prose states a different letter than the readout commits to)
     confidence_signal: float = 0.55  # readout-confidence separation; tuned for AUROC ~0.68
     confidence_noise: float = 1.1
