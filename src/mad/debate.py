@@ -17,6 +17,7 @@ from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 from mad import prompts as P
@@ -237,6 +238,17 @@ def _row(cfg, meta, gen, read, n_options, gold_display, perms) -> dict:
         "readout_answer": read.answer_index,
         "readout_confidence": read.confidence,
         "readout_logprob_top": float(read.letter_logprobs.max()),
+        # full distribution, so entropy / top-two margin / the whole vector are available to
+        # output-only baselines later without another forward pass
+        "readout_logprobs": ",".join(f"{v:.5f}" for v in read.letter_logprobs),
+        "readout_margin": float(
+            np.sort(read.letter_logprobs)[-1] - np.sort(read.letter_logprobs)[-2]
+        )
+        if len(read.letter_logprobs) > 1
+        else 0.0,
+        "readout_entropy": float(
+            -(np.exp(read.letter_logprobs) * read.letter_logprobs).sum()
+        ),
         "correct": int(read.answer_index == gold),
         "freetext_answer": ft_idx,
         "freetext_parse_ok": int(ft_ok),

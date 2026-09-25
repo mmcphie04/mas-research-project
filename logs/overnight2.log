@@ -36,3 +36,11 @@
 Loading weights:   0%|          | 0/340 [00:00<?, ?it/s]Loading weights:  41%|████      | 138/340 [00:00<00:00, 1379.22it/s]Loading weights:  81%|████████  | 276/340 [00:00<00:00, 1363.84it/s]Loading weights: 100%|██████████| 340/340 [00:00<00:00, 1339.24it/s]
 [07:15:08]   c011: 25 questions x 4 conditions in 1980s
 Loading weights:   0%|          | 0/340 [00:00<?, ?it/s]Loading weights:  16%|█▌        | 55/340 [00:00<00:00, 549.51it/s]Loading weights:  51%|█████     | 173/340 [00:00<00:00, 899.92it/s]Loading weights:  89%|████████▉ | 303/340 [00:00<00:00, 1074.95it/s]Loading weights: 100%|██████████| 340/340 [00:00<00:00, 1057.57it/s]
+[07:49:38]   c012: 25 questions x 4 conditions in 2070s
+Loading weights:   0%|          | 0/340 [00:00<?, ?it/s]Loading weights:   0%|          | 1/340 [00:00<05:32,  1.02it/s]Loading weights:  47%|████▋     | 159/340 [00:01<00:00, 197.51it/s]Loading weights:  70%|███████   | 239/340 [00:01<00:00, 213.71it/s]Loading weights:  86%|████████▋ | 294/340 [00:01<00:00, 237.10it/s]Loading weights: 100%|██████████| 340/340 [00:01<00:00, 241.96it/s]Loading weights: 100%|██████████| 340/340 [00:01<00:00, 191.16it/s]
+[08:25:10]   c013: 25 questions x 4 conditions in 2132s
+[08:25:11] DONE self_reconsider: merged 14/14 chunks -> runs/night2-self_reconsider
+[08:25:12] DONE debate: merged 14/14 chunks -> runs/night2-debate
+[08:25:13] DONE debate_conf: merged 14/14 chunks -> runs/night2-debate_conf
+[08:25:14] DONE adversarial: merged 14/14 chunks -> runs/night2-adversarial
+[08:25:14] finished

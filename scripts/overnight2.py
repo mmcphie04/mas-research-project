@@ -42,7 +42,8 @@ def job_probe_rerun():
     """Milestone A again with the double readout suffix removed."""
     out = Path("runs/probe-arcc-fixed")
     if is_complete(out):
-        log("SKIP probe rerun"); return
+        log("SKIP probe rerun")
+        return
     qs = questions("ARC-Challenge", 400)
     dirs = []
     for i in range(0, len(qs), 200):

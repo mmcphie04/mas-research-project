@@ -21,6 +21,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 from mad import prompts as P
@@ -126,6 +127,15 @@ def collect_states(
                 "readout_answer": read.answer_index,
                 "readout_confidence": read.confidence,
                 "readout_logprob_top": float(read.letter_logprobs.max()),
+                "readout_logprobs": ",".join(f"{v:.5f}" for v in read.letter_logprobs),
+                "readout_margin": float(
+                    np.sort(read.letter_logprobs)[-1] - np.sort(read.letter_logprobs)[-2]
+                )
+                if len(read.letter_logprobs) > 1
+                else 0.0,
+                "readout_entropy": float(
+                    -(np.exp(read.letter_logprobs) * read.letter_logprobs).sum()
+                ),
                 "correct": int(read.answer_index == meta["gold_display"]),
                 "n_readout_tokens": read.n_tokens,
             }

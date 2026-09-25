@@ -71,3 +71,42 @@ analysis that gets cut off before stating an answer, which is why the free-text 
 ~20%. Agents are exchanging partial reasoning that never reaches a conclusion. The forced readout
 still yields a valid answer, so the data is usable, but the debate is weaker than intended. Raise
 the budget to ~192 tokens for any run that matters.
+
+---
+
+# Final numbers (all 350 questions)
+
+Shared round 0 verified byte-identical across all four conditions.
+
+| condition | rev rate | B | H | U | B−H | round-0 | final | gain | ceiling |
+|---|---|---|---|---|---|---|---|---|---|
+| self_reconsider | 0.361 | 121 | 92 | 166 | **+29** | 0.3714 | **0.4171** | **+4.57** | 0.4914 |
+| debate | 0.382 | 101 | 122 | 178 | −21 | 0.3714 | 0.3771 | +0.57 | 0.4800 |
+| debate_conf | 0.383 | 101 | 123 | 178 | −22 | 0.3714 | 0.3771 | +0.57 | 0.4800 |
+| adversarial | 0.988 | 3 | 395 | 639 | −392 | 0.3714 | 0.0086 | −36.29 | 0.3743 |
+
+**Matched peer attribution** (same agent, same starting answer):
+
+| | peer-induced harm | peer-induced benefit | net |
+|---|---|---|---|
+| debate | 76 | 52 | **−24** |
+| adversarial | 303 | 3 | −300 |
+
+**Peer configuration gradient** (debate):
+
+| round-0 configuration | n | switch rate |
+|---|---|---|
+| both peers agree with focal | 708 | 0.270 |
+| split | 239 | 0.577 |
+| both oppose focal and agree with each other | 103 | **0.699** |
+
+Canonical conformity (focal right, peers agree on one wrong answer, focal adopts it):
+**16 / 31 = 51.6%**.
+
+## Storage gap found and fixed
+
+The full answer-choice log-probability vector was never persisted — only the top probability — so
+entropy, top-two margin and the full-vector baseline the review asked for cannot be computed on
+existing runs without redoing the readout pass. `readout_logprobs`, `readout_margin` and
+`readout_entropy` are now written by both collectors. Output-only baselines on the current data
+are therefore limited to top probability plus row metadata.
