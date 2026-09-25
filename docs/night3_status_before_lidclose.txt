@@ -1,0 +1,31 @@
+SNAPSHOT 2026-09-25 16:03:49 EDT
+
+job pid/ppid/elapsed:
+  46821     308    01:40:20 uv run python scripts/overnight3.py
+  46824   46821    01:40:19 /home/mmcph/projects/mas_research_project/.venv/bin/python3 scripts/overnight3.py
+
+wsl boot   : 2026-09-24 16:04:40   up up 23 hours, 59 minutes
+keepalive  : 3 process(es)
+oom events : 0
+mem        : 
+
+log so far:
+[14:23:29] === night3: 160 questions x 3 conditions, 192 tokens ===
+[15:37:02]   c000: 20 questions x 3 conditions in 4411s
+[15:37:02]     c000 pre: parse-ok 0.133  hit-cap 0.767  median tokens 192
+[15:37:02]     c000 post: parse-ok 0.517  hit-cap 0.283  median tokens 109
+
+chunk dirs: 5  complete: 4
+git HEAD   : fa195f6 Add the pre-revision peer_exposure state and a non-saturating misleading peer
+uncommitted: 2
+
+TOKEN BUDGET DIAGNOSTIC (chunk 000) -- the 192-token budget is STILL too small
+  round 0: parse-ok 0.133   hit-cap 0.767   median 192 tokens
+  round 1: parse-ok 0.517   hit-cap 0.283   median 109 tokens
+Review target was <5% cap-hit and >95% parse. Round 0 is at 77% cap-hit.
+The model writes long analysis and never reaches "Answer: (X)". More tokens is the wrong
+fix -- chunk 000 already took 4411s for 20 questions (220 s/question), so 160 questions is
+~9.8h and doubling the budget would make it ~20h. The right fix is a brevity instruction in
+the prompt, which needs a restart. Letting this run finish: the data is still usable because
+the forced readout is canonical and never fails, but agents are exchanging truncated
+reasoning and that limitation must be stated in any writeup.
