@@ -153,6 +153,12 @@ def merge_runs(run_dirs: list[str | Path], out_dir: str | Path, rows_file: str) 
     ).to_parquet(out_dir / "activation_meta.parquet", index=False)
     rows.to_parquet(out_dir / rows_file, index=False)
     shutil.copy2(run_dirs[0] / "manifest.json", out_dir / "manifest.json")
+    tr = [pd.read_json(d / "transcripts.jsonl", lines=True)
+          for d in run_dirs if (d / "transcripts.jsonl").exists()]
+    if tr:  # transcripts are what make a readout re-run possible without regenerating
+        pd.concat(tr, ignore_index=True).to_json(
+            out_dir / "transcripts.jsonl", orient="records", lines=True
+        )
     (out_dir / "completion.json").write_text(
         json.dumps(
             {

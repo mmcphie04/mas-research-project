@@ -1,0 +1,32 @@
+====================================================================================
+A. DID THE DOUBLE-SUFFIX BUG MATTER?  (Milestone A, same questions, same model)
+====================================================================================
+  buggy  (suffix twice)    n=1200 acc=0.497  probe 0.6908  conf 0.6506  delta +0.0402 [+0.0065,+0.0724]
+  fixed  (suffix once)     n=1200 acc=0.496  probe 0.7129  conf 0.6597  delta +0.0532 [+0.0236,+0.0857]
+
+====================================================================================
+B. DEBATE PROBE with honest layer selection (train+val pick the layer, test scores once)
+====================================================================================
+  revision events: 294 train+val, 107 test
+  layer chosen on train+val only: 8  (val AUROC 0.5287)
+
+  paired-representation variants, scored ONCE on held-out test:
+    pre        test AUROC 0.4337   conditional 0.3333 (12 pairs)
+    post       test AUROC 0.5205   conditional 0.5000 (12 pairs)
+    diff       test AUROC 0.4795   conditional 0.4167 (12 pairs)
+    pre_post   test AUROC 0.5249   conditional 0.3333 (12 pairs)
+    pre_diff   test AUROC 0.4956   conditional 0.4167 (12 pairs)
+    paired     test AUROC 0.5024   conditional 0.4167 (12 pairs)
+
+====================================================================================
+C. OUTPUT-ONLY BASELINE, given the same supervised fit as the probe
+====================================================================================
+  raw top-probability          test AUROC 0.5090
+  supervised output-only       test AUROC 0.4317
+  probe (best paired variant)  test AUROC 0.4956
+  probe - supervised output-only  0.0639 [-0.1070, 0.2367] (n=65)
+
+  calibration, both fitted on train+val and measured on test:
+    probe  ECE 0.0220
+    output ECE 0.0694
+    raw top-probability ECE 0.7572
