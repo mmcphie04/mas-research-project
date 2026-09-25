@@ -1,2 +1,38 @@
 [00:25:39] === probe rerun (suffix fix) ===
 Loading weights:   0%|          | 0/340 [00:00<?, ?it/s]Loading weights:   0%|          | 1/340 [00:00<02:08,  2.64it/s]Loading weights:  13%|█▎        | 44/340 [00:00<00:02, 104.43it/s]Loading weights:  21%|██▏       | 73/340 [00:00<00:01, 150.52it/s]Loading weights:  32%|███▏      | 108/340 [00:00<00:01, 202.90it/s]Loading weights:  40%|███▉      | 135/340 [00:00<00:01, 202.25it/s]Loading weights:  50%|████▉     | 169/340 [00:00<00:00, 227.38it/s]Loading weights:  57%|█████▋    | 195/340 [00:01<00:00, 228.63it/s]Loading weights:  65%|██████▌   | 221/340 [00:01<00:00, 232.38it/s]Loading weights:  72%|███████▏  | 246/340 [00:01<00:00, 234.94it/s]Loading weights:  80%|███████▉  | 271/340 [00:01<00:00, 238.87it/s]Loading weights:  87%|████████▋ | 297/340 [00:01<00:00, 243.99it/s]Loading weights:  95%|█████████▍| 322/340 [00:01<00:00, 218.36it/s]Loading weights: 100%|██████████| 340/340 [00:01<00:00, 203.36it/s]
+  readout 160/600  1.5 states/s  eta 4.8 min
+  readout 320/600  1.5 states/s  eta 3.1 min
+  readout 480/600  1.5 states/s  eta 1.3 min
+[00:32:15]   probe-arcc-fixed-c000: 200 questions in 395s
+Loading weights:   0%|          | 0/340 [00:00<?, ?it/s]Loading weights:  14%|█▍        | 47/340 [00:00<00:00, 469.93it/s]Loading weights:  39%|███▉      | 134/340 [00:00<00:00, 672.79it/s]Loading weights:  59%|█████▉    | 201/340 [00:00<00:00, 663.19it/s]Loading weights:  79%|███████▊  | 267/340 [00:00<00:00, 625.05it/s]Loading weights:  97%|█████████▋| 330/340 [00:00<00:00, 603.34it/s]Loading weights: 100%|██████████| 340/340 [00:00<00:00, 631.87it/s]
+  readout 160/600  1.5 states/s  eta 4.7 min
+  readout 320/600  1.6 states/s  eta 2.9 min
+  readout 480/600  1.6 states/s  eta 1.2 min
+[00:38:28]   probe-arcc-fixed-c001: 200 questions in 373s
+[00:38:28] DONE probe rerun -> runs/probe-arcc-fixed
+[00:38:28] === four-condition debate ===
+Loading weights:   0%|          | 0/340 [00:00<?, ?it/s]Loading weights:  20%|█▉        | 67/340 [00:00<00:00, 669.68it/s]Loading weights:  44%|████▎     | 148/340 [00:00<00:00, 746.69it/s]Loading weights:  76%|███████▋  | 260/340 [00:00<00:00, 910.29it/s]Loading weights: 100%|██████████| 340/340 [00:00<00:00, 827.68it/s]
+[01:12:27]   c000: 25 questions x 4 conditions in 2038s
+Loading weights:   0%|          | 0/340 [00:00<?, ?it/s]Loading weights:   0%|          | 1/340 [00:00<01:04,  5.26it/s]Loading weights:  43%|████▎     | 147/340 [00:00<00:00, 625.85it/s]Loading weights:  70%|███████   | 238/340 [00:00<00:00, 728.35it/s]Loading weights:  96%|█████████▌| 325/340 [00:00<00:00, 720.21it/s]Loading weights: 100%|██████████| 340/340 [00:00<00:00, 632.55it/s]
+[01:47:11]   c001: 25 questions x 4 conditions in 2085s
+Loading weights:   0%|          | 0/340 [00:00<?, ?it/s]Loading weights:   0%|          | 1/340 [00:00<00:42,  7.95it/s]Loading weights:  44%|████▎     | 148/340 [00:00<00:00, 737.59it/s]Loading weights:  81%|████████  | 276/340 [00:00<00:00, 948.02it/s]Loading weights: 100%|██████████| 340/340 [00:00<00:00, 835.63it/s]
+[02:21:51]   c002: 25 questions x 4 conditions in 2080s
+Loading weights:   0%|          | 0/340 [00:00<?, ?it/s]Loading weights:  23%|██▎       | 78/340 [00:00<00:00, 747.59it/s]Loading weights:  51%|█████     | 173/340 [00:00<00:00, 833.81it/s]Loading weights:  77%|███████▋  | 263/340 [00:00<00:00, 827.99it/s]Loading weights: 100%|██████████| 340/340 [00:00<00:00, 873.58it/s]
+[02:54:23]   c003: 25 questions x 4 conditions in 1952s
+Loading weights:   0%|          | 0/340 [00:00<?, ?it/s]Loading weights:  24%|██▍       | 82/340 [00:00<00:00, 815.60it/s]Loading weights:  58%|█████▊    | 196/340 [00:00<00:00, 994.48it/s]Loading weights:  87%|████████▋ | 296/340 [00:00<00:00, 963.79it/s]Loading weights: 100%|██████████| 340/340 [00:00<00:00, 981.41it/s]
+[03:27:21]   c004: 25 questions x 4 conditions in 1978s
+Loading weights:   0%|          | 0/340 [00:00<?, ?it/s]Loading weights:  36%|███▌      | 122/340 [00:00<00:00, 1205.29it/s]Loading weights:  71%|███████▏  | 243/340 [00:00<00:00, 1148.00it/s]Loading weights: 100%|██████████| 340/340 [00:00<00:00, 1268.62it/s]
+[03:59:20]   c005: 25 questions x 4 conditions in 1918s
+Loading weights:   0%|          | 0/340 [00:00<?, ?it/s]Loading weights:   0%|          | 1/340 [00:00<00:49,  6.80it/s]Loading weights:  51%|█████     | 172/340 [00:00<00:00, 829.73it/s]Loading weights:  79%|███████▉  | 269/340 [00:00<00:00, 885.02it/s]Loading weights: 100%|██████████| 340/340 [00:00<00:00, 834.96it/s]
+[04:32:41]   c006: 25 questions x 4 conditions in 2002s
+Loading weights:   0%|          | 0/340 [00:00<?, ?it/s]Loading weights:   6%|▌         | 20/340 [00:00<00:01, 199.97it/s]Loading weights:  52%|█████▏    | 176/340 [00:00<00:00, 998.91it/s]Loading weights:  82%|████████▏ | 279/340 [00:00<00:00, 1013.05it/s]Loading weights: 100%|██████████| 340/340 [00:00<00:00, 973.68it/s] 
+[05:05:30]   c007: 25 questions x 4 conditions in 1968s
+Loading weights:   0%|          | 0/340 [00:00<?, ?it/s]Loading weights:  42%|████▏     | 143/340 [00:00<00:00, 1410.21it/s]Loading weights:  84%|████████▍ | 285/340 [00:00<00:00, 1266.54it/s]Loading weights: 100%|██████████| 340/340 [00:00<00:00, 1273.76it/s]
+[05:38:10]   c008: 25 questions x 4 conditions in 1961s
+Loading weights:   0%|          | 0/340 [00:00<?, ?it/s]Loading weights:  24%|██▍       | 81/340 [00:00<00:00, 805.48it/s]Loading weights:  58%|█████▊    | 198/340 [00:00<00:00, 984.52it/s]Loading weights:  89%|████████▉ | 302/340 [00:00<00:00, 958.50it/s]Loading weights: 100%|██████████| 340/340 [00:00<00:00, 989.98it/s]
+[06:09:41]   c009: 25 questions x 4 conditions in 1891s
+Loading weights:   0%|          | 0/340 [00:00<?, ?it/s]Loading weights:   0%|          | 1/340 [00:00<01:03,  5.33it/s]Loading weights:  55%|█████▌    | 188/340 [00:00<00:00, 811.09it/s]Loading weights:  97%|█████████▋| 329/340 [00:00<00:00, 1032.68it/s]Loading weights: 100%|██████████| 340/340 [00:00<00:00, 872.04it/s] 
+[06:42:08]   c010: 25 questions x 4 conditions in 1947s
+Loading weights:   0%|          | 0/340 [00:00<?, ?it/s]Loading weights:  41%|████      | 138/340 [00:00<00:00, 1379.22it/s]Loading weights:  81%|████████  | 276/340 [00:00<00:00, 1363.84it/s]Loading weights: 100%|██████████| 340/340 [00:00<00:00, 1339.24it/s]
+[07:15:08]   c011: 25 questions x 4 conditions in 1980s
+Loading weights:   0%|          | 0/340 [00:00<?, ?it/s]Loading weights:  16%|█▌        | 55/340 [00:00<00:00, 549.51it/s]Loading weights:  51%|█████     | 173/340 [00:00<00:00, 899.92it/s]Loading weights:  89%|████████▉ | 303/340 [00:00<00:00, 1074.95it/s]Loading weights: 100%|██████████| 340/340 [00:00<00:00, 1057.57it/s]
