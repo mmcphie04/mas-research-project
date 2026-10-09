@@ -5,14 +5,25 @@ project is looking for needs roughly 600 to 4,000 questions, depending on the ef
 whether only changed answers count, so on the laptop it takes days. Colab Pro for Education
 provides an A100 with 40 GB, which fits Gemma-3-12B, the model the plan was written for.
 
-## Division of labour
+## Two ways to run
 
-Colab needs a browser session to run, and tunnelling into a Colab runtime from outside violates its
-terms of use, so this is not set up. Instead:
+**Google's official Colab CLI (preferred).** `google-colab-cli` from the `googlecolab` organisation
+drives a Colab runtime from the laptop: `colab new -s mas --gpu A100`, `colab upload`,
+`colab exec -f script.py`, `colab download`, `colab usage`, `colab stop`. This is the sanctioned way
+to control Colab from outside a browser; unofficial tunnels into a runtime are what Colab's terms
+prohibit. Installed in WSL with `uv tool install google-colab-cli`, and it signs in through
+Application Default Credentials (needs `gcloud`, installed user-locally at `~/google-cloud-sdk`).
+Pass `--auth=adc` explicitly — the CLI's own help and its bundled docs disagree about the default.
 
-1. Code changes are made and pushed to GitHub from the laptop.
-2. **You** open `notebooks/colab_runner.ipynb` in Colab and run all cells.
-3. Results land in Google Drive under `MyDrive/mas_runs/`.
+Known limits, from the CLI's bundled agent guide (`colab skill`):
+- `colab exec -f script.py` sends one file. The `mad` package must be uploaded as well.
+- `colab drivemount` and `colab auth` need a person at the terminal, so unattended runs should
+  download finished chunks to the laptop rather than depend on Drive.
+- Whether a job keeps running after the local command disconnects is not documented. Long runs
+  should launch as a background process on the runtime and be checked with short commands.
+
+**The notebook (fallback).** Open `notebooks/colab_runner.ipynb` in Colab and run all cells; results
+go to Google Drive under `MyDrive/mas_runs/`. Instructions follow.
 
 ## One-time setup
 
