@@ -4,3 +4,25 @@
 [15:37:02]     c000 pre: parse-ok 0.133  hit-cap 0.767  median tokens 192
 [15:37:02]     c000 post: parse-ok 0.517  hit-cap 0.283  median tokens 109
 Loading weights:   0%|          | 0/340 [00:00<?, ?it/s]Loading weights:   0%|          | 1/340 [00:03<19:24,  3.44s/it]Loading weights:  60%|██████    | 205/340 [00:03<00:01, 81.64it/s]Loading weights:  95%|█████████▍| 322/340 [00:04<00:00, 81.72it/s]Loading weights: 100%|██████████| 340/340 [00:05<00:00, 64.00it/s]
+[16:44:02]   c001: 20 questions x 3 conditions in 4020s
+Loading weights:   0%|          | 0/340 [00:00<?, ?it/s]Loading weights:   0%|          | 1/340 [00:03<21:06,  3.74s/it]Loading weights:  61%|██████▏   | 209/340 [00:03<00:01, 76.53it/s]Loading weights:  94%|█████████▍| 320/340 [00:06<00:00, 53.91it/s]Loading weights: 100%|██████████| 340/340 [00:06<00:00, 50.56it/s]
+[17:53:20]   c002: 20 questions x 3 conditions in 4158s
+Loading weights:   0%|          | 0/340 [00:00<?, ?it/s]Loading weights:   0%|          | 1/340 [00:03<19:56,  3.53s/it]Loading weights:  62%|██████▏   | 211/340 [00:03<00:01, 79.63it/s]Loading weights:  83%|████████▎ | 282/340 [00:04<00:00, 80.30it/s]Loading weights:  96%|█████████▌| 325/340 [00:04<00:00, 85.30it/s]Loading weights: 100%|██████████| 340/340 [00:05<00:00, 67.53it/s]
+[19:14:24]   c003: 20 questions x 3 conditions in 4864s
+Loading weights:   0%|          | 0/340 [00:00<?, ?it/s]Loading weights:   0%|          | 1/340 [00:04<25:05,  4.44s/it]Loading weights:  48%|████▊     | 162/340 [00:04<00:03, 50.41it/s]Loading weights:  76%|███████▌  | 257/340 [00:04<00:01, 80.32it/s]Loading weights:  94%|█████████▍| 321/340 [00:06<00:00, 63.41it/s]Loading weights: 100%|██████████| 340/340 [00:07<00:00, 42.85it/s]
+[01:19:38]   c004: 20 questions x 3 conditions in 21914s
+Loading weights:   0%|          | 0/340 [00:00<?, ?it/s]Loading weights:   0%|          | 1/340 [00:02<14:52,  2.63s/it]Loading weights:  70%|██████▉   | 237/340 [00:02<00:00, 119.03it/s]Loading weights:  98%|█████████▊| 333/340 [00:03<00:00, 117.97it/s]Loading weights: 100%|██████████| 340/340 [00:03<00:00, 94.32it/s] 
+[02:19:50]   c005: 20 questions x 3 conditions in 3612s
+Loading weights:   0%|          | 0/340 [00:00<?, ?it/s]Loading weights:   0%|          | 1/340 [00:02<11:49,  2.09s/it]Loading weights:  62%|██████▏   | 211/340 [00:02<00:00, 132.03it/s]Loading weights:  90%|█████████ | 306/340 [00:03<00:00, 122.27it/s]Loading weights: 100%|██████████| 340/340 [00:03<00:00, 105.79it/s]
+[03:19:49]   c006: 20 questions x 3 conditions in 3599s
+Loading weights:   0%|          | 0/340 [00:00<?, ?it/s]Loading weights:   0%|          | 1/340 [00:01<08:04,  1.43s/it]Loading weights:  62%|██████▏   | 211/340 [00:01<00:00, 189.99it/s]Loading weights:  96%|█████████▌| 326/340 [00:02<00:00, 156.82it/s]Loading weights: 100%|██████████| 340/340 [00:02<00:00, 134.06it/s]
+[04:17:21]   c007: 20 questions x 3 conditions in 3453s
+[04:17:22] DONE self_reconsider: 8/8 chunks -> runs/night3-self_reconsider
+[04:17:22]     self_reconsider pre: parse-ok 0.244  hit-cap 0.731  median tokens 192
+[04:17:22]     self_reconsider post: parse-ok 0.475  hit-cap 0.358  median tokens 161
+[04:17:23] DONE debate: 8/8 chunks -> runs/night3-debate
+[04:17:23]     debate pre: parse-ok 0.244  hit-cap 0.731  median tokens 192
+[04:17:23]     debate post: parse-ok 0.685  hit-cap 0.227  median tokens 114
+[04:17:24] DONE misleading_one: 8/8 chunks -> runs/night3-misleading_one
+[04:17:24]     misleading_one pre: parse-ok 0.244  hit-cap 0.731  median tokens 192
+[04:17:24]     misleading_one post: parse-ok 0.798  hit-cap 0.100  median tokens 113
