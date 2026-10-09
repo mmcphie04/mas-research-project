@@ -1,0 +1,199 @@
+{
+ "identity": {
+  "name": "smoke-tiny",
+  "dataset": {
+   "key": "arc-easy",
+   "name": "allenai/ai2_arc:ARC-Easy",
+   "split": "test",
+   "revision": null
+  },
+  "pool": {
+   "name": "main",
+   "pilot_size": 120,
+   "order_seed": 7,
+   "master_order_sha256": "528576fe3a59f9722b51c46f64072e2ad903d5c05d36d5c225a526bb92958646"
+  },
+  "chunk_size": 2,
+  "conditions": {
+   "self_reconsider": {
+    "kind": "self_reconsider"
+   },
+   "debate": {
+    "kind": "debate",
+    "peer_confidence": false
+   },
+   "misleading_one": {
+    "kind": "misleading_one"
+   },
+   "debate_answer_only": {
+    "kind": "debate_answer_only"
+   }
+  },
+  "config": {
+   "seed": 20260909,
+   "model": {
+    "backend": "hf",
+    "repo_id": "google/gemma-3-270m-it",
+    "revision": null,
+    "dtype": "float32",
+    "device": "cpu",
+    "max_new_tokens": 64,
+    "temperature": 0.7,
+    "top_p": 0.95
+   },
+   "stub": {
+    "base_accuracy": 0.42,
+    "accuracy_spread": 0.3,
+    "revision_rate_correct": 0.14,
+    "revision_rate_incorrect": 0.28,
+    "switch_to_correct": 0.45,
+    "conformity": 0.6,
+    "control_revision_scale": 0.5,
+    "n_layers": 8,
+    "d_model": 64,
+    "noise_scale": 1.0,
+    "probe_signal": 1.2,
+    "difficulty_leak": 0.0,
+    "signal_peak_layer": 0.6,
+    "peer_exposure_commit": 0.6,
+    "freetext_noise": 0.03,
+    "confidence_signal": 0.55,
+    "confidence_noise": 1.1
+   },
+   "debate": {
+    "n_agents": 3,
+    "n_rounds": 1,
+    "condition": "debate",
+    "tie_break": "round0_then_agent0",
+    "canonical_answer": "stated",
+    "personas": [
+     "You are a careful, methodical reasoner."
+    ],
+    "peer_shows_confidence": false,
+    "ask_verbalized_confidence": true
+   },
+   "data": {
+    "dataset": "allenai/ai2_arc:ARC-Easy",
+    "dataset_revision": null,
+    "split": "test",
+    "subjects": null,
+    "stratify": true,
+    "permutation_seed": 12345,
+    "split_fracs": [
+     0.5,
+     0.2,
+     0.3
+    ],
+    "split_seed": 20260909,
+    "sample_seed": 7
+   },
+   "activations": {
+    "layers": "all",
+    "positions": [
+     "readout_last",
+     "generation_last",
+     "stated_answer"
+    ],
+    "dtype": "float16",
+    "shard_size": 64
+   }
+  },
+  "prompt_template_hashes": {
+   "adversarial_peer": "b428604be34b875d",
+   "brevity": "ab1d02c3aa05d3cd",
+   "ending_conf": "a48849121707c4d7",
+   "ending_no_conf": "558b14973471cf5e",
+   "mild_peer": "22963fb9b187cb53",
+   "peer_answer_only": "ba1f0cd92b83ea19",
+   "peer_block": "e8cff792d7c5f195",
+   "peer_entry": "90ec002c5b81d578",
+   "question": "1e3650fb59d929b6",
+   "readout_suffix": "b12a68884c9ecf8b",
+   "self_block": "9d30c3365474ae99",
+   "system": "5d659e0e90d9f7ef",
+   "system_no_conf": "3c240fc3055975c2"
+  },
+  "backend": {
+   "backend": "hf",
+   "n_layers": 18,
+   "d_model": 640,
+   "repo_id": "google/gemma-3-270m-it",
+   "requested_revision": null,
+   "model_commit": "ac82b4e820549b854eebf28ce6dedaf9fdfa17b3",
+   "tokenizer_class": "GemmaTokenizer",
+   "tokenizer_vocab_size": 262145,
+   "chat_template_sha256": "7de1c58e208eda46e9c7f86397df37ec49883aeece39fb961e0a6b24088dd3c4",
+   "supports_system_role": true,
+   "special_tokens": {
+    "bos": [
+     "<bos>",
+     2
+    ],
+    "eos": [
+     "<eos>",
+     1
+    ],
+    "pad": [
+     "<pad>",
+     0
+    ],
+    "generation_stop_ids": [
+     1,
+     106
+    ]
+   },
+   "letter_token_ids": {
+    "A": 236776,
+    "B": 236799,
+    "C": 236780,
+    "D": 236796,
+    "E": 236788,
+    "F": 236811,
+    "G": 236823,
+    "H": 236814,
+    "I": 236777,
+    "J": 236863
+   },
+   "readout_suffix": "\nFinal answer: (",
+   "dtype": "torch.float32",
+   "device": "cpu"
+  }
+ },
+ "identity_sha256": "793b9061f19e80a7da14bafd9e571a269f8c41dd3395bbc2f8ea3a8765ee3d2b",
+ "code": {
+  "git_sha": "0ac3e1eeddadae70f216e1e2941d7fd79e297897",
+  "git_dirty": true,
+  "git_dirty_files": [
+   "?? artifacts/"
+  ]
+ },
+ "questions": [
+  {
+   "id": "Mercury_7008418",
+   "sha256": "1489fde01957defa83a6ae197ac228a0022da4a8c265dfcc427d1ea873f0e68a"
+  },
+  {
+   "id": "Mercury_SC_LBS10949",
+   "sha256": "841189d843761cc511109cb03a0bc9f124f37c9d635f9db35929f4ade9b1f921"
+  }
+ ],
+ "chunks": [
+  [
+   "Mercury_7008418",
+   "Mercury_SC_LBS10949"
+  ]
+ ],
+ "history": [
+  {
+   "time": "2026-10-09T18:16:22-0400",
+   "git_sha": "0ac3e1eeddadae70f216e1e2941d7fd79e297897",
+   "git_dirty": true,
+   "n_questions": 2,
+   "execution": {
+    "batch_size": 4,
+    "readout_batch_size": 3
+   },
+   "event": "created"
+  }
+ ]
+}

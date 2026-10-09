@@ -1,0 +1,356 @@
+{
+ "identity": {
+  "name": "demo",
+  "dataset": {
+   "key": "synthetic",
+   "name": "synthetic",
+   "split": "none",
+   "revision": null
+  },
+  "pool": {
+   "name": "main",
+   "pilot_size": 120,
+   "order_seed": 7,
+   "master_order_sha256": "0f9e8960261a627ec13bea93864beac946b570534a20b3585393728a52bc018a"
+  },
+  "chunk_size": 10,
+  "conditions": {
+   "self_reconsider": {
+    "kind": "self_reconsider"
+   },
+   "debate": {
+    "kind": "debate",
+    "peer_confidence": false
+   },
+   "debate_answer_only": {
+    "kind": "debate_answer_only"
+   },
+   "misleading_one": {
+    "kind": "misleading_one"
+   },
+   "adversarial": {
+    "kind": "adversarial"
+   }
+  },
+  "config": {
+   "seed": 20260909,
+   "model": {
+    "backend": "stub",
+    "repo_id": "stub-tiny",
+    "revision": null,
+    "dtype": "float16",
+    "device": "cpu",
+    "max_new_tokens": 512,
+    "temperature": 0.7,
+    "top_p": 0.95
+   },
+   "stub": {
+    "base_accuracy": 0.42,
+    "accuracy_spread": 0.3,
+    "revision_rate_correct": 0.14,
+    "revision_rate_incorrect": 0.28,
+    "switch_to_correct": 0.45,
+    "conformity": 0.6,
+    "control_revision_scale": 0.5,
+    "n_layers": 8,
+    "d_model": 64,
+    "noise_scale": 1.0,
+    "probe_signal": 1.2,
+    "difficulty_leak": 0.0,
+    "signal_peak_layer": 0.6,
+    "peer_exposure_commit": 0.6,
+    "freetext_noise": 0.03,
+    "confidence_signal": 0.55,
+    "confidence_noise": 1.1
+   },
+   "debate": {
+    "n_agents": 3,
+    "n_rounds": 1,
+    "condition": "debate",
+    "tie_break": "round0_then_agent0",
+    "canonical_answer": "stated",
+    "personas": [
+     "You are a careful, methodical reasoner."
+    ],
+    "peer_shows_confidence": false,
+    "ask_verbalized_confidence": true
+   },
+   "data": {
+    "dataset": "synthetic",
+    "dataset_revision": null,
+    "split": "none",
+    "subjects": null,
+    "stratify": true,
+    "permutation_seed": 12345,
+    "split_fracs": [
+     0.5,
+     0.2,
+     0.3
+    ],
+    "split_seed": 20260909,
+    "sample_seed": 7
+   },
+   "activations": {
+    "layers": "all",
+    "positions": [
+     "readout_last"
+    ],
+    "dtype": "float16",
+    "shard_size": 500
+   }
+  },
+  "prompt_template_hashes": {
+   "adversarial_peer": "b428604be34b875d",
+   "brevity": "ab1d02c3aa05d3cd",
+   "ending_conf": "a48849121707c4d7",
+   "ending_no_conf": "558b14973471cf5e",
+   "mild_peer": "22963fb9b187cb53",
+   "peer_answer_only": "ba1f0cd92b83ea19",
+   "peer_block": "e8cff792d7c5f195",
+   "peer_entry": "90ec002c5b81d578",
+   "question": "1e3650fb59d929b6",
+   "readout_suffix": "b12a68884c9ecf8b",
+   "self_block": "9d30c3365474ae99",
+   "system": "5d659e0e90d9f7ef",
+   "system_no_conf": "3c240fc3055975c2"
+  },
+  "backend": {
+   "backend": "stub",
+   "n_layers": 8,
+   "d_model": 64
+  }
+ },
+ "identity_sha256": "1c1e6fd697df603a2f6bb1f088b30c1e22d4649bf0b66c6c9255f4556848f7a2",
+ "code": {
+  "git_sha": "0ac3e1eeddadae70f216e1e2941d7fd79e297897",
+  "git_dirty": true,
+  "git_dirty_files": [
+   "?? artifacts/"
+  ]
+ },
+ "questions": [
+  {
+   "id": "syn-000593",
+   "sha256": "e9ce025873c251f05e10f5bcff2ff623ce4d15cf4429d86977e978ee3ee93784"
+  },
+  {
+   "id": "syn-001059",
+   "sha256": "cd761da1f00d0cc794a497ba8cd12d0a64ad0118652ed7c74bcb758885cff49d"
+  },
+  {
+   "id": "syn-000262",
+   "sha256": "928e22b52ca424d3769725ce42ff5658097b8b2eb6eddce625d8a1a9b80f3b78"
+  },
+  {
+   "id": "syn-000745",
+   "sha256": "a84bf33d85ba9cec9b021dfcfd6f997fce38309d2c9f2f73f68ec24abc4eed5b"
+  },
+  {
+   "id": "syn-001386",
+   "sha256": "fb8369d2bb716c1f99705032b274b9218d1428821cb4e800899d82891c1bc480"
+  },
+  {
+   "id": "syn-000493",
+   "sha256": "89a3dd8a93752b3ce3d21f720e3e9fe2299d2e497191574e4be884e776e810c2"
+  },
+  {
+   "id": "syn-000534",
+   "sha256": "e6d5219bb5aa3b21a4e57f85d05833dc6f97d7b08c55af53d8e20b7ef3b9c815"
+  },
+  {
+   "id": "syn-000507",
+   "sha256": "7c14119cdd857b2ec82f81550caebfe55b49059344133636de75556b159a29cb"
+  },
+  {
+   "id": "syn-000025",
+   "sha256": "065e0ed3faef3b92d6ccf7664d26a45a473025acd974a7e99a6ffb90e933916b"
+  },
+  {
+   "id": "syn-000001",
+   "sha256": "1d81d303001977a62317c7fccad1a131b12089d24d9286337900086fe8e504d9"
+  },
+  {
+   "id": "syn-001608",
+   "sha256": "c60e13fcc4bd306c13006c3341822ed389507b3f71c88a7a74eb8701dde08330"
+  },
+  {
+   "id": "syn-000844",
+   "sha256": "639c7d3f92e5173ade450037466613e98bbd3d88a65c986986bc2b4bbea0aa43"
+  },
+  {
+   "id": "syn-000987",
+   "sha256": "12f56c7e42e78d8551f80bea56c55911c3f0fca4be3e5387536e8173303e40c6"
+  },
+  {
+   "id": "syn-001065",
+   "sha256": "5ac5322243729173a639c315a4314d825d4e02e8d224d5ea704d3e8f590ba3c1"
+  },
+  {
+   "id": "syn-001421",
+   "sha256": "b231e1ed4d7d9bd7a646aed7c3deda7936fa3a50111f6fedee41d79010e04f5b"
+  },
+  {
+   "id": "syn-001638",
+   "sha256": "3344dc00434fa4b7d479bff5392459199d78d5e291a0f1fb9b05552378b94848"
+  },
+  {
+   "id": "syn-001989",
+   "sha256": "9a5d4806c1a949831dbd9782d3fe9a013e71b0f465df9ad13309330d090bdf68"
+  },
+  {
+   "id": "syn-000182",
+   "sha256": "5562447a0cda15e71fd0c8920df72c1bb78b98051beab366850677b5514390e0"
+  },
+  {
+   "id": "syn-000190",
+   "sha256": "9d64ebc6d29dd2bcc5f166bd2976ddfdfc9502c1c18befac4dc8ebbe7c84df80"
+  },
+  {
+   "id": "syn-000211",
+   "sha256": "2bff6d6f733f274351212956e8566779e3cf9f39bca6e8ac4b580b6a1f085834"
+  },
+  {
+   "id": "syn-000733",
+   "sha256": "6774a657cb47a92d02c49a968f5311a2f5fb26ee93f9a215226c6d629681a50c"
+  },
+  {
+   "id": "syn-000319",
+   "sha256": "7db573055718ff1519a56912119981773bb0a482ee998621bcef0d5be5578b46"
+  },
+  {
+   "id": "syn-001067",
+   "sha256": "4e469166fd7d6f2116330115fb56d5210397750f70d6af09ad37e71d812cb041"
+  },
+  {
+   "id": "syn-001195",
+   "sha256": "41b3a2d660518bbbb9ee059d09b98ffb0d265ffcea4aba1a383479b46de69a01"
+  },
+  {
+   "id": "syn-000296",
+   "sha256": "4c26b2000168b654ad2741bb91aa6eb0d1f68bf407ed949ac96827bcf3d6954f"
+  },
+  {
+   "id": "syn-000483",
+   "sha256": "a9d15ac2cf75dbbe623b2209c783780ba598f171a810ffae44b0b55299d77ac3"
+  },
+  {
+   "id": "syn-000039",
+   "sha256": "cde2052bdae46d4182dd4f3d114e9dc5149d3db0a494bc8e5189bd57382eed6b"
+  },
+  {
+   "id": "syn-000367",
+   "sha256": "d86093565fd4df20f9f1bca6d9a3067a0b00c6e9c9dbeedf8919c25c84eee23f"
+  },
+  {
+   "id": "syn-001280",
+   "sha256": "22ef9738ac2241f2d37c99e17ad48e63b2d41bc67b58d8068338d928ca4dc560"
+  },
+  {
+   "id": "syn-001831",
+   "sha256": "88aa70aaa01a4f28c8a04c3ad44144e00cab8d64c7a3bf491a76b830953f0b9a"
+  },
+  {
+   "id": "syn-000213",
+   "sha256": "2a87411b143f65df04bbac31f3d1a9b566cd58485c9df5e637e4b0d8530083e7"
+  },
+  {
+   "id": "syn-000379",
+   "sha256": "bf6a5bb0f93917677c0b2f7eb14cc06e234a20cfdf345067c62d515efe499a4d"
+  },
+  {
+   "id": "syn-000807",
+   "sha256": "1579122eb0a3b2bbb584260b9f888bb65ae22f7135d892aa7b70366fd5c748a4"
+  },
+  {
+   "id": "syn-000725",
+   "sha256": "9a17a9f0d59988d8736981bd89c7a45c72bb16c8d7e9fa808772912b8288b486"
+  },
+  {
+   "id": "syn-001991",
+   "sha256": "0604a74a9feb4ddbf108e0ed7ab273da8caea3489b8b6e870b825108d8ac0af4"
+  },
+  {
+   "id": "syn-001418",
+   "sha256": "1f5044c03d24e87ac44b7069bede3141e5435da5e1f7fd48c9cddcb24003fa87"
+  },
+  {
+   "id": "syn-000454",
+   "sha256": "f3b6f26e9790710169cdc7f22ed5feef3b0e1d672e1e53117124ad688918030a"
+  },
+  {
+   "id": "syn-000302",
+   "sha256": "5eaef7dc0b0e95e21879bee569b84fbd4466e4bdbcea45d791b5a7f6d44d38d2"
+  },
+  {
+   "id": "syn-000810",
+   "sha256": "5980a2e8d707410f34a819ee8a95550494e9c3cc19470c789a67a5760f7b9596"
+  },
+  {
+   "id": "syn-000466",
+   "sha256": "3047de432fd4c5d89f249ede504ed99fe5469026eb5c75eb4a65ec546239c8a9"
+  }
+ ],
+ "chunks": [
+  [
+   "syn-000593",
+   "syn-001059",
+   "syn-000262",
+   "syn-000745",
+   "syn-001386",
+   "syn-000493",
+   "syn-000534",
+   "syn-000507",
+   "syn-000025",
+   "syn-000001"
+  ],
+  [
+   "syn-001608",
+   "syn-000844",
+   "syn-000987",
+   "syn-001065",
+   "syn-001421",
+   "syn-001638",
+   "syn-001989",
+   "syn-000182",
+   "syn-000190",
+   "syn-000211"
+  ],
+  [
+   "syn-000733",
+   "syn-000319",
+   "syn-001067",
+   "syn-001195",
+   "syn-000296",
+   "syn-000483",
+   "syn-000039",
+   "syn-000367",
+   "syn-001280",
+   "syn-001831"
+  ],
+  [
+   "syn-000213",
+   "syn-000379",
+   "syn-000807",
+   "syn-000725",
+   "syn-001991",
+   "syn-001418",
+   "syn-000454",
+   "syn-000302",
+   "syn-000810",
+   "syn-000466"
+  ]
+ ],
+ "history": [
+  {
+   "time": "2026-10-09T18:15:56-0400",
+   "git_sha": "0ac3e1eeddadae70f216e1e2941d7fd79e297897",
+   "git_dirty": true,
+   "n_questions": 40,
+   "execution": {
+    "batch_size": 8,
+    "readout_batch_size": null
+   },
+   "event": "created"
+  }
+ ]
+}

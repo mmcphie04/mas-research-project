@@ -1,0 +1,30 @@
+{
+  "chunks": [
+    [
+      0,
+      "demo-debate-c000",
+      "c234b5d66297b69267189160e942e32406825bd01239924dfb6af2d56bcb5567"
+    ],
+    [
+      1,
+      "demo-debate-c001",
+      "0493ffa2fe8e7d41cccc1a98f655ee9ea5cfc16c012d6827ed289c15a471d94b"
+    ],
+    [
+      2,
+      "demo-debate-c002",
+      "963e5dc3d84c7cb21dcf3b89bc7b8d6cf48f2ddb8cd48f9f285fa3606edc90db"
+    ],
+    [
+      3,
+      "demo-debate-c003",
+      "4b7611ec3438d83ce140041791b6e848be350fd418c0ef2f5b528ca3ce884635"
+    ]
+  ],
+  "chunks_complete": 4,
+  "chunks_total": 4,
+  "complete": true,
+  "questions": 40,
+  "questions_in_job": 40,
+  "hashes_verified": true
+}

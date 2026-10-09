@@ -1,0 +1,123 @@
+  seed 0 fold 0 done
+  seed 0 fold 1 done
+  seed 0 fold 2 done
+  seed 0 fold 3 done
+  seed 0 fold 4 done
+  seed 1 fold 0 done
+  seed 1 fold 1 done
+  seed 1 fold 2 done
+  seed 1 fold 3 done
+  seed 1 fold 4 done
+  seed 2 fold 0 done
+  seed 2 fold 1 done
+  seed 2 fold 2 done
+  seed 2 fold 3 done
+  seed 2 fold 4 done
+{
+  "reference": {
+    "accept_all": {
+      "agent_accuracy": 0.36095238095238097,
+      "panel_accuracy": 0.37714285714285717
+    },
+    "reject_all": {
+      "agent_accuracy": 0.38095238095238093,
+      "panel_accuracy": 0.37142857142857144
+    },
+    "agent_optimal": {
+      "agent_accuracy": 0.47714285714285715,
+      "panel_accuracy": 0.48
+    },
+    "panel_optimal": {
+      "agent_accuracy": 0.43142857142857144,
+      "panel_accuracy": 0.48
+    }
+  },
+  "paired": {
+    "combined - output_linear": {
+      "mean": 0.008571428571428572,
+      "ci95": [
+        -0.017142857142857144,
+        0.037142857142857144
+      ]
+    },
+    "combined - output_hgb": {
+      "mean": 0.008571428571428572,
+      "ci95": [
+        -0.017142857142857144,
+        0.03428571428571429
+      ]
+    },
+    "activation - output_linear": {
+      "mean": 0.022857142857142857,
+      "ci95": [
+        -0.002857142857142857,
+        0.04857142857142857
+      ]
+    },
+    "activation - output_hgb": {
+      "mean": 0.022857142857142857,
+      "ci95": [
+        0.0,
+        0.045714285714285714
+      ]
+    },
+    "activation - accept_all": {
+      "mean": 0.02857142857142857,
+      "ci95": [
+        -0.005714285714285714,
+        0.06285714285714286
+      ]
+    },
+    "combined - accept_all": {
+      "mean": 0.014285714285714285,
+      "ci95": [
+        -0.022857142857142857,
+        0.04857142857142857
+      ]
+    },
+    "output_linear - accept_all": {
+      "mean": 0.005714285714285714,
+      "ci95": [
+        -0.03428571428571429,
+        0.04
+      ]
+    },
+    "output_hgb - accept_all": {
+      "mean": 0.005714285714285714,
+      "ci95": [
+        -0.02857142857142857,
+        0.04
+      ]
+    }
+  },
+  "gates": {
+    "output_linear": {
+      "agent_accuracy": 0.37523809523809526,
+      "panel_accuracy": 0.38285714285714284,
+      "beneficial_kept": 40,
+      "harmful_blocked": 76,
+      "revisions_accepted": 161
+    },
+    "output_hgb": {
+      "agent_accuracy": 0.37333333333333335,
+      "panel_accuracy": 0.38285714285714284,
+      "beneficial_kept": 55,
+      "harmful_blocked": 59,
+      "revisions_accepted": 226
+    },
+    "activation": {
+      "agent_accuracy": 0.38761904761904764,
+      "panel_accuracy": 0.4057142857142857,
+      "beneficial_kept": 59,
+      "harmful_blocked": 70,
+      "revisions_accepted": 214
+    },
+    "combined": {
+      "agent_accuracy": 0.38952380952380955,
+      "panel_accuracy": 0.3914285714285714,
+      "beneficial_kept": 63,
+      "harmful_blocked": 68,
+      "revisions_accepted": 221
+    }
+  }
+}

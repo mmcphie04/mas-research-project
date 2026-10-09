@@ -1,0 +1,62 @@
+{
+  "name": "demo",
+  "state": "finished",
+  "chunks_done": 4,
+  "chunks_total": 4,
+  "questions_total": 40,
+  "conditions": [
+    "self_reconsider",
+    "debate",
+    "debate_answer_only",
+    "misleading_one",
+    "adversarial"
+  ],
+  "sessions": 1,
+  "elapsed_hours_total": 0.0,
+  "max_hours": null,
+  "timings": [
+    {
+      "chunk": "c000",
+      "questions": 10,
+      "seconds": 0.3,
+      "seconds_per_question": 0.0,
+      "round0_reloaded": false
+    },
+    {
+      "chunk": "c001",
+      "questions": 10,
+      "seconds": 0.3,
+      "seconds_per_question": 0.0,
+      "round0_reloaded": false
+    },
+    {
+      "chunk": "c002",
+      "questions": 10,
+      "seconds": 0.3,
+      "seconds_per_question": 0.0,
+      "round0_reloaded": false
+    },
+    {
+      "chunk": "c003",
+      "questions": 10,
+      "seconds": 0.3,
+      "seconds_per_question": 0.0,
+      "round0_reloaded": false
+    }
+  ],
+  "failures": [],
+  "diagnostics_last_chunk": {
+    "pre": {
+      "stated_answer_parsed": 1.0,
+      "hit_token_cap": 0.0,
+      "stated_agrees_readout": 0.9333,
+      "median_tokens": 36.0
+    },
+    "post": {
+      "stated_answer_parsed": 1.0,
+      "hit_token_cap": 0.0,
+      "stated_agrees_readout": 0.9333,
+      "median_tokens": 36.0
+    }
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "self_reconsider": {
+    "positions": {
+      "readout_last": 18,
+      "generation_last": 18
+    },
+    "answer_source": {
+      "readout_fallback": 12,
+      "readout": 6
+    },
+    "pre": {
+      "stated_answer_parsed": 0.0,
+      "hit_token_cap": 0.0,
+      "stated_agrees_readout": 0.0,
+      "median_tokens": 28.5
+    },
+    "post": {
+      "stated_answer_parsed": 0.0,
+      "hit_token_cap": 0.1667,
+      "stated_agrees_readout": 0.0,
+      "median_tokens": 36.0
+    }
+  },
+  "debate": {
+    "positions": {
+      "readout_last": 18,
+      "generation_last": 18
+    },
+    "answer_source": {
+      "readout_fallback": 12,
+      "readout": 6
+    },
+    "pre": {
+      "stated_answer_parsed": 0.0,
+      "hit_token_cap": 0.0,
+      "stated_agrees_readout": 0.0,
+      "median_tokens": 28.5
+    },
+    "post": {
+      "stated_answer_parsed": 0.0,
+      "hit_token_cap": 0.0,
+      "stated_agrees_readout": 0.0,
+      "median_tokens": 8.0
+    }
+  },
+  "misleading_one": {
+    "positions": {
+      "readout_last": 18,
+      "generation_last": 18
+    },
+    "answer_source": {
+      "readout_fallback": 12,
+      "readout": 6
+    },
+    "pre": {
+      "stated_answer_parsed": 0.0,
+      "hit_token_cap": 0.0,
+      "stated_agrees_readout": 0.0,
+      "median_tokens": 28.5
+    },
+    "post": {
+      "stated_answer_parsed": 0.0,
+      "hit_token_cap": 0.0,
+      "stated_agrees_readout": 0.0,
+      "median_tokens": 14.0
+    }
+  },
+  "debate_answer_only": {
+    "positions": {
+      "readout_last": 18,
+      "generation_last": 18,
+      "stated_answer": 1
+    },
+    "answer_source": {
+      "readout_fallback": 11,
+      "readout": 6,
+      "stated": 1
+    },
+    "pre": {
+      "stated_answer_parsed": 0.0,
+      "hit_token_cap": 0.0,
+      "stated_agrees_readout": 0.0,
+      "median_tokens": 28.5
+    },
+    "post": {
+      "stated_answer_parsed": 0.1667,
+      "hit_token_cap": 0.0,
+      "stated_agrees_readout": 0.1667,
+      "median_tokens": 9.5
+    }
+  },
+  "batched_vs_single": {
+    "max_abs_logprob_diff": 0.0,
+    "min_last_layer_cosine": 1.0,
+    "argmax_agree": "4/4"
+  }
+}

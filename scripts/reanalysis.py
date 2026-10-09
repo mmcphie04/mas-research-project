@@ -310,7 +310,10 @@ def run(run_dir: Path, out_dir: Path, seeds=(0, 1, 2), k_outer=5, families=None)
                 "revisions_accepted": int((acc & rev).sum()),
             }
             res["families"][fam] = fr
-        const = {t: np.full(len(ev), y.mean()) for t, y in (("old", y_old), ("new", y_new))}
+        # the training-fold base rate for each held-out row: informative about nothing, which is
+        # what makes it the right reference for calibration numbers
+        const = {t: np.array([y[fold != fold[i]].mean() for i in range(len(ev))])
+                 for t, y in (("old", y_old), ("new", y_new))}
         res["constant"] = {f"{t}_correct": {"auroc_all": 0.5, "brier": brier_score_loss(y, const[t]),
                                             "ece": expected_calibration_error(const[t], y)}
                            for t, y in (("old", y_old), ("new", y_new))}
