@@ -126,10 +126,10 @@ def run_debate(cfg, questions: list[Question], backend: Backend | None = None) -
     transcripts: list[dict] = []
     for meta, gen, read in zip(metas, gens_pre, reads_pre, strict=True):
         key = (meta["question_id"], meta["agent_id"])
-        pre_answer[key] = read.answer_index
         rows.append(
             _row(cfg, meta, gen, read, n_opts_by_qid[meta["question_id"]], gold_display, perms)
         )
+        pre_answer[key] = rows[-1]["answer"]  # canonical, so peers and labels agree
         transcripts.append({**meta, "text": gen.text})
         writer.add({**_akey(cfg, meta)}, read.hidden)
 
@@ -186,7 +186,7 @@ def run_debate(cfg, questions: list[Question], backend: Backend | None = None) -
 
     for meta, gen, read in zip(metas1, gens_post, reads_post, strict=True):
         row = _row(cfg, meta, gen, read, n_opts_by_qid[meta["question_id"]], gold_display, perms)
-        row["post_equals_peer_majority"] = int(read.answer_index == meta["peer_majority"])
+        row["post_equals_peer_majority"] = int(row["answer"] == meta["peer_majority"])
         rows.append(row)
         transcripts.append({**meta, "text": gen.text})
         writer.add({**_akey(cfg, meta)}, read.hidden)
@@ -222,11 +222,35 @@ def _akey(cfg, meta: dict) -> dict:
     }
 
 
+def canonical_answer(cfg, stated: int, stated_ok: bool, readout: int, phase: str) -> tuple[int, str]:
+    """The answer that counts, and where it came from (see DebateConfig.canonical_answer).
+
+    The peer_exposure state has no generated text, so its only answer is the readout's.
+    """
+    mode = getattr(cfg.debate, "canonical_answer", "readout")
+    if mode == "readout" or phase == "peer_exposure":
+        return readout, "readout"
+    if stated_ok:
+        return stated, "stated"
+    return readout, "readout_fallback"
+
+
+# Metadata copied verbatim from the request into its row when present. "shown" is what the
+# agent was shown; "panel" is what its real panel-mates answered in round 0. They differ in
+# self_reconsider (nothing shown), and in misleading_one and adversarial (fabricated peers).
+ROW_META_KEYS = (
+    "request_id", "chunk", "gen_seed", "shown_peer_answers", "shown_peer_sources",
+    "shown_peer_majority", "n_shown_agree_pre", "panel_peer_answers", "panel_peer_majority",
+    "n_panel_agree_pre", "misleading_target",
+)
+
+
 def _row(cfg, meta, gen, read, n_options, gold_display, perms) -> dict:
     qid = meta["question_id"]
     ft_idx, ft_ok = parse_answer(gen.text, n_options)
     gold = gold_display[qid]
-    return {
+    answer, source = canonical_answer(cfg, ft_idx, ft_ok, read.answer_index, meta["phase"])
+    row = {
         "run_id": cfg.run_id,
         "condition": meta["condition"],
         "question_id": qid,
@@ -235,7 +259,12 @@ def _row(cfg, meta, gen, read, n_options, gold_display, perms) -> dict:
         "n_options": n_options,
         "gold_display": gold,
         "permutation": ",".join(str(i) for i in perms[qid].as_list()),
+        # the canonical answer and its correctness: what every downstream label uses
+        "answer": answer,
+        "answer_source": source,
+        "correct": int(answer == gold),
         "readout_answer": read.answer_index,
+        "readout_correct": int(read.answer_index == gold),
         "readout_confidence": read.confidence,
         "readout_logprob_top": float(read.letter_logprobs.max()),
         # full distribution, so entropy / top-two margin / the whole vector are available to
@@ -249,13 +278,13 @@ def _row(cfg, meta, gen, read, n_options, gold_display, perms) -> dict:
         "readout_entropy": float(
             -(np.exp(read.letter_logprobs) * read.letter_logprobs).sum()
         ),
-        "correct": int(read.answer_index == gold),
         "freetext_answer": ft_idx,
         "freetext_parse_ok": int(ft_ok),
         "freetext_agrees_readout": int(ft_ok and ft_idx == read.answer_index),
         "verbalized_confidence": parse_confidence(gen.text),
         "n_prompt_tokens": gen.n_prompt_tokens,
         "n_completion_tokens": gen.n_completion_tokens,
+        "stop_reason": getattr(gen, "stop_reason", None),
         "n_readout_tokens": read.n_tokens,
         "rationale_chars": len(gen.text),
         "peer_majority": meta.get("peer_majority", -1),
@@ -263,3 +292,7 @@ def _row(cfg, meta, gen, read, n_options, gold_display, perms) -> dict:
         "peer_unanimous": meta.get("peer_unanimous", -1),
         "post_equals_peer_majority": -1,
     }
+    for k in ROW_META_KEYS:
+        if k in meta:
+            row[k] = meta[k]
+    return row

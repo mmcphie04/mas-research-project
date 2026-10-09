@@ -21,11 +21,16 @@ policy evaluation is offline and needs no GPU.
 
 ```bash
 uv sync --extra dev                    # laptop: analysis + tier-0
-uv run pytest -q                       # 65 tests, ~10s, no network or GPU needed
+uv run pytest -q                       # ~130 tests, about a minute, no GPU needed
 
 uv run mad run    --config configs/base.yaml configs/smoke_stub.yaml
 uv run mad report --run runs/smoke-stub
 uv run mad power  --n 300 600 900 1500 --auroc 0.65
+
+# the resumable multi-condition driver used on Colab (docs/COLAB.md), here on the stub
+uv run python scripts/run_experiment.py --config configs/base.yaml configs/smoke_stub.yaml \
+    --out-root runs --name demo --dataset synthetic --n-questions 20 --chunk 10
+uv run python scripts/summarize_run.py --out-root runs --name demo
 ```
 
 ## The three backend tiers

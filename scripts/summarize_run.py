@@ -1,12 +1,15 @@
-"""Is this model a good test bed? Instrument-quality summary for one run.
+"""Is this model a good test bed? Instrument-quality summary for one job.
 
     python scripts/summarize_run.py --out-root /content/drive/MyDrive/mas_runs --name pilot12b
 
 A pilot answers descriptive questions, not the research question: how accurate is the model,
-how often is it cut off, how much do the three agents disagree, how often do they change their
-answers, and how much room is there between accepting every change and a perfect choice.
-Every accuracy is reported with a 95% interval from resampling questions, so a 60-question pilot
+how often is it cut off, how often does its stated answer disagree with the forced readout, how
+much do the three agents disagree, how often do they change their answers, and how much room is
+there between accepting every change and the best possible choice. Every accuracy and every
+difference is reported with a 95% interval from resampling questions, so a 120-question pilot
 says plainly how much it can and cannot distinguish.
+
+Conditions are found through the job file (mad.job.view_dirs), never by directory-name patterns.
 """
 
 from __future__ import annotations
@@ -25,7 +28,7 @@ import pandas as pd  # noqa: E402
 from mad.analysis.labels import apply_policy, build_events  # noqa: E402
 from mad.analysis.oracles import panel_optimal_accept, policy_accept  # noqa: E402
 from mad.debate import ROWS_FILE  # noqa: E402
-from mad.provenance import is_complete  # noqa: E402
+from mad.job import VIEW_FILE, view_dirs  # noqa: E402
 
 
 def boot_ci(per_question: pd.Series, n_boot: int = 2000, seed: int = 0) -> tuple[float, float]:
@@ -39,42 +42,64 @@ def boot_ci(per_question: pd.Series, n_boot: int = 2000, seed: int = 0) -> tuple
     return float(lo), float(hi)
 
 
-def summarize(run_dir: Path, max_tok: int | None) -> dict:
-    rows = pd.read_parquet(run_dir / ROWS_FILE)
-    ev = build_events(rows)  # uses only the pre and post states
-    per_q_agent = ev.groupby("question_id").pre_correct.mean()
-    vote = apply_policy(ev, policy_accept(ev, "round0_plurality")).set_index("question_id").panel_correct
-    after = apply_policy(ev, policy_accept(ev, "mad_standard")).set_index("question_id").panel_correct
-    best = apply_policy(ev, panel_optimal_accept(ev)).set_index("question_id").panel_correct
-    change = (after - vote.reindex(after.index))
-    unanimous = ev.groupby("question_id").pre_answer.nunique().eq(1)
+def stat(series: pd.Series) -> dict:
+    lo, hi = boot_ci(series)
+    return {"mean": round(float(series.mean()), 4), "ci95": [round(lo, 4), round(hi, 4)],
+            "n_questions": int(len(series))}
 
-    def acc(series):
-        lo, hi = boot_ci(series)
-        return {"mean": round(float(series.mean()), 4), "ci95": [round(lo, 4), round(hi, 4)]}
+
+def panel_series(ev, accept, tie_break) -> pd.Series:
+    return apply_policy(ev, accept, tie_break).set_index("question_id").panel_correct.astype(float)
+
+
+def summarize(run_dir: Path, tie_break: str) -> tuple[dict, pd.Series]:
+    rows = pd.read_parquet(run_dir / ROWS_FILE)
+    ev = build_events(rows)  # pre and post states only; uses the canonical answer
+    vote = panel_series(ev, policy_accept(ev, "round0_plurality"), tie_break)
+    after = panel_series(ev, policy_accept(ev, "mad_standard"), tie_break).reindex(vote.index)
+    agent_opt = panel_series(ev, policy_accept(ev, "oracle_full"), tie_break).reindex(vote.index)
+    best = panel_series(ev, panel_optimal_accept(ev, tie_break), tie_break).reindex(vote.index)
+    unanimous = ev.groupby("question_id").pre_answer.nunique().eq(1)
+    view = json.loads((run_dir / VIEW_FILE).read_text()) if (run_dir / VIEW_FILE).exists() else {}
+
+    revs = {}
+    for k in ("beneficial", "harmful", "unhelpful"):
+        e = ev[ev.label == k]
+        revs[k] = {"events": int(len(e)), "distinct_questions": int(e.question_id.nunique())}
 
     out = {
         "questions": int(ev.question_id.nunique()),
         "agent_answers": int(len(ev)),
-        "one_agent_accuracy": acc(per_q_agent),
-        "vote_of_3": acc(vote),
-        "after_round_1": acc(after),
-        "change_from_round_1": acc(change),
-        "best_possible": acc(best),
-        "room_for_a_gate": round(float(best.mean() - after.mean()), 4),
+        "tie_break": tie_break,
+        "completeness": {k: view.get(k) for k in ("complete", "chunks_complete", "chunks_total",
+                                                   "questions", "questions_in_job", "hashes_verified")},
+        "one_agent_accuracy": stat(ev.groupby("question_id").pre_correct.mean()),
+        "one_agent_accuracy_after": stat(ev.groupby("question_id").post_correct.mean()),
+        "vote_of_3": stat(vote),
+        "after_round_1": stat(after),
+        "agent_optimal_not_a_panel_bound": stat(agent_opt),
+        "panel_optimal": stat(best),
+        "after_minus_vote": stat(after - vote),
+        "room_for_a_gate_panel_optimal_minus_after": stat(best - after),
         "first_answers_not_unanimous": round(float((~unanimous).mean()), 4),
         "revision_rate": round(float(ev.revised.mean()), 4),
-        "revisions": {k: int((ev.label == k).sum()) for k in ("beneficial", "harmful", "unhelpful")},
+        "revisions": revs,
         "chance_accuracy": round(float((1 / ev.n_options).mean()), 4),
+        "generation": {},
     }
     for phase in ("pre", "post"):
         s = rows[rows.phase == phase]
-        d = {"parse_ok": round(float(s.freetext_parse_ok.mean()), 4),
+        d = {"stated_answer_parsed": round(float(s.freetext_parse_ok.mean()), 4),
+             "stated_disagrees_readout": round(float(((s.freetext_parse_ok == 1)
+                                                      & (s.freetext_agrees_readout == 0)).mean()), 4),
              "median_tokens": float(s.n_completion_tokens.median())}
-        if max_tok:
-            d["hit_cap"] = round(float((s.n_completion_tokens >= max_tok - 2).mean()), 4)
-        out[f"generation_{phase}"] = d
-    return out
+        if "stop_reason" in s and s.stop_reason.notna().any():
+            d["hit_token_cap"] = round(float((s.stop_reason == "length").mean()), 4)
+        if "answer_source" in s:
+            d["answer_source"] = {k: round(float(v), 4)
+                                  for k, v in s.answer_source.value_counts(normalize=True).items()}
+        out["generation"][phase] = d
+    return out, after
 
 
 def main(argv=None) -> int:
@@ -83,38 +108,50 @@ def main(argv=None) -> int:
     ap.add_argument("--name", required=True)
     args = ap.parse_args(argv)
     root = Path(args.out_root)
-
-    runs = sorted(d for d in root.glob(f"{args.name}-*")
-                  if d.is_dir() and "-c0" not in d.name and is_complete(d))
-    if not runs:
-        print(f"no completed merged runs named {args.name}-* under {root}")
+    if not (root / f"{args.name}-job.json").exists():
+        print(f"no job file {args.name}-job.json under {root}")
+        return 1
+    job = json.loads((root / f"{args.name}-job.json").read_text())
+    tie_break = job["identity"]["config"]["debate"]["tie_break"]
+    views = view_dirs(root, args.name)
+    if not views:
+        print(f"no merged views for job {args.name} under {root}")
         return 1
 
-    summary = {}
-    for d in runs:
-        cond = d.name[len(args.name) + 1 :]
-        manifest = json.loads((d / "manifest.json").read_text())
-        max_tok = manifest.get("config", {}).get("model", {}).get("max_new_tokens")
-        summary[cond] = summarize(d, max_tok)
-        summary[cond]["model"] = manifest.get("config", {}).get("model", {}).get("repo_id")
+    conds, after = {}, {}
+    for cond, d in views.items():
+        conds[cond], after[cond] = summarize(d, tie_break)
+    if "self_reconsider" in after:
+        for cond in conds:
+            if cond != "self_reconsider":
+                a, b = after[cond], after["self_reconsider"]
+                common = a.index.intersection(b.index)
+                conds[cond]["after_minus_self_reconsider"] = stat(a[common] - b[common])
 
-    first = next(iter(summary.values()))
-    print(f"\n{args.name}: {first['questions']} questions, model {first['model']}, "
-          f"chance = {first['chance_accuracy']:.3f}\n")
-    hdr = (f"{'condition':<17}{'1 agent':>21}{'vote of 3':>21}{'after round 1':>21}"
-           f"{'room for gate':>15}{'revise':>8}")
-    print(hdr)
-    for cond, s in summary.items():
-        def f(k, s=s):
-            return f"{s[k]['mean']:.3f} [{s[k]['ci95'][0]:.2f},{s[k]['ci95'][1]:.2f}]"
-        print(f"{cond:<17}{f('one_agent_accuracy'):>21}{f('vote_of_3'):>21}{f('after_round_1'):>21}"
-              f"{s['room_for_a_gate']:>+15.3f}{s['revision_rate']:>8.3f}")
+    summary = {"job": args.name, "model": job["identity"]["config"]["model"]["repo_id"],
+               "pool": job["identity"]["pool"], "conditions": conds}
+    first = next(iter(conds.values()))
+    print(f"\n{args.name}: {first['questions']} questions, model {summary['model']}, "
+          f"tie-break {tie_break}, chance = {first['chance_accuracy']:.3f}\n")
+    print(f"{'condition':<20}{'1 agent':>21}{'vote of 3':>21}{'after round 1':>21}"
+          f"{'after - vote':>23}{'room for gate':>23}{'revise':>8}")
+    for cond, s in conds.items():
+        def f(k, s=s, sign=""):
+            m, (lo, hi) = s[k]["mean"], s[k]["ci95"]
+            return f"{m:{sign}.3f} [{lo:{sign}.2f},{hi:{sign}.2f}]"
+        print(f"{cond:<20}{f('one_agent_accuracy'):>21}{f('vote_of_3'):>21}{f('after_round_1'):>21}"
+              f"{f('after_minus_vote', sign='+'):>23}"
+              f"{f('room_for_a_gate_panel_optimal_minus_after', sign='+'):>23}"
+              f"{s['revision_rate']:>8.3f}")
     print(f"\nfirst answers not unanimous: {first['first_answers_not_unanimous']:.3f}")
-    for cond, s in summary.items():
-        g0, g1 = s["generation_pre"], s["generation_post"]
-        print(f"  {cond:<16} parse ok {g0['parse_ok']:.2f} -> {g1['parse_ok']:.2f}   "
-              f"hit cap {g0.get('hit_cap', float('nan')):.2f} -> {g1.get('hit_cap', float('nan')):.2f}   "
-              f"median tokens {g0['median_tokens']:.0f} -> {g1['median_tokens']:.0f}")
+    for cond, s in conds.items():
+        g0, g1 = s["generation"]["pre"], s["generation"]["post"]
+        print(f"  {cond:<18} stated answer parsed {g0['stated_answer_parsed']:.2f} -> "
+              f"{g1['stated_answer_parsed']:.2f}   hit cap {g0.get('hit_token_cap', float('nan')):.2f} -> "
+              f"{g1.get('hit_token_cap', float('nan')):.2f}   stated != readout "
+              f"{g0['stated_disagrees_readout']:.2f} -> {g1['stated_disagrees_readout']:.2f}   "
+              f"B/H/U {'/'.join(str(s['revisions'][k]['events']) for k in ('beneficial', 'harmful', 'unhelpful'))}"
+              f"   complete {s['completeness'].get('complete')}")
 
     out = root / f"{args.name}-summary.json"
     out.write_text(json.dumps(summary, indent=2))

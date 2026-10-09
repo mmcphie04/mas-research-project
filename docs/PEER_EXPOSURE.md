@@ -31,6 +31,9 @@ activations beat outputs on their own, but not whether they add anything on top 
 
 ## Results (ranking score, 0.5 = coin flip; mean ± sd over 8 splits)
 
+The eight splits reuse the same 350 questions in overlapping test sets, so they are not
+independent replications, and the ± figures are spreads across splits, not confidence intervals.
+
 | | all events | revisions only | initially correct |
 |---|---|---|---|
 | constant | 0.500 | 0.500 | 0.500 |
@@ -49,8 +52,8 @@ activations beat outputs on their own, but not whether they add anything on top 
 2. **The exposure state is not better than the pre state** (0.568 vs 0.571 on all events). The
    pre-revision moment does not carry extra signal that a linear probe can extract.
 3. **On revision events, nothing works.** Every predictor — activation at any moment, output-only,
-   constant — sits between 0.43 and 0.51. This replicates the earlier null in a separate run with
-   longer generations and a new state.
+   constant — sits between 0.43 and 0.51. This is consistent with the earlier null, in a separate
+   run with longer generations and a new state.
 4. **The strong result in the table is output-only on initially-correct agents, 0.887.** It is
    driven mostly by whether the forced instant answer has already moved at the exposure moment.
 

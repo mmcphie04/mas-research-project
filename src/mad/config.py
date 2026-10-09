@@ -28,7 +28,10 @@ class ModelConfig:
     max_new_tokens: int = 512
     temperature: float = 0.7
     top_p: float = 0.95
-    batch_size: int = 8
+    batch_size: int = 8  # generation batch
+    # Readout holds hidden states for every layer and position, so its safe batch differs from
+    # generation's. None means "same as batch_size".
+    readout_batch_size: int | None = None
 
 
 @dataclass
@@ -53,7 +56,7 @@ class StubConfig:
     difficulty_leak: float = 0.0  # question-level signal; drives the difficulty-detector shortcut
     signal_peak_layer: float = 0.6  # fractional depth at which the signal is strongest
     peer_exposure_commit: float = 0.6  # P(pre-revision state already holds the revised answer)
-    freetext_noise: float = 0.03  # P(prose states a different letter than the readout commits to)
+    freetext_noise: float = 0.03  # P(the forced readout commits to a different letter than the prose states)
     confidence_signal: float = 0.55  # readout-confidence separation; tuned for AUROC ~0.68
     confidence_noise: float = 1.1
 
@@ -63,7 +66,13 @@ class DebateConfig:
     n_agents: int = 3
     n_rounds: int = 1
     condition: Condition = "debate"
-    tie_break: str = "round0_then_agent0"  # round0_then_agent0 | round0_then_confidence | agent0
+    tie_break: str = "round0_then_agent0"  # one of mad.analysis.labels.TIE_BREAKS; validated on load
+    # Which answer counts. "stated": the letter the agent wrote in its final "Answer: (X)" line --
+    # the answer its peers read and the panel would count. The forced readout is kept alongside
+    # as an instrument. When no stated answer parses (e.g. truncation), the readout answer is
+    # used and the row is flagged answer_source="readout_fallback"; that rate is reported.
+    # "readout": the forced-choice readout answer for every row (the protocol of the 1B runs).
+    canonical_answer: str = "stated"
     # One persona for every agent. Distinct personas made the agents the same weights but
     # different policies, which contradicts the homogeneous-agent framing and interacted badly
     # with a tie-break that falls back to agent 0. Diversity now comes from sampling alone.
@@ -174,4 +183,31 @@ def load_config(*paths: str | Path, **overrides: Any) -> RunConfig:
             kwargs[key] = value
     cfg = RunConfig(**kwargs)
     cfg.data.split_fracs = tuple(cfg.data.split_fracs)  # yaml gives a list
+    validate(cfg)
     return cfg
+
+
+CANONICAL_ANSWERS = ("stated", "readout")
+
+
+def validate(cfg: RunConfig) -> None:
+    """Reject settings that nothing downstream implements, instead of silently ignoring them."""
+    from mad.analysis.labels import TIE_BREAKS
+
+    if cfg.debate.tie_break not in TIE_BREAKS:
+        raise ValueError(f"debate.tie_break={cfg.debate.tie_break!r}; expected one of {TIE_BREAKS}")
+    if cfg.debate.canonical_answer not in CANONICAL_ANSWERS:
+        raise ValueError(f"debate.canonical_answer={cfg.debate.canonical_answer!r}; "
+                         f"expected one of {CANONICAL_ANSWERS}")
+    if cfg.debate.n_rounds != 1:
+        raise ValueError("only one revision round is implemented (debate.n_rounds must be 1)")
+    unknown = set(cfg.activations.positions) - set(POSITIONS)
+    if unknown:
+        raise ValueError(f"unknown activation positions {sorted(unknown)}; expected from {POSITIONS}")
+
+
+# Token positions at which hidden states can be kept (see mad.backends.hf.HFBackend.readout):
+#   readout_last     the "(" of the appended "Final answer: (" -- the forced-choice position
+#   generation_last  the last generated token, before anything is appended
+#   stated_answer    the letter token inside the agent's own final "Answer: (X)" line
+POSITIONS = ("readout_last", "generation_last", "stated_answer")

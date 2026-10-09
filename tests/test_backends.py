@@ -116,3 +116,33 @@ def test_hf_backend_conformance():
     assert r.hidden.shape == (backend.n_layers + 1, backend.d_model)
     assert r.letter_logprobs.shape == (4,)
     assert 0 <= r.answer_index < 4
+
+
+@pytest.mark.skipif(
+    __import__("importlib.util", fromlist=["x"]).find_spec("transformers") is None,
+    reason="transformers not installed (uv sync --extra hf)",
+)
+def test_hf_records_stop_reason_and_extra_positions_land_on_the_right_tokens():
+    cfg = load_config("configs/base.yaml", "configs/smoke_tiny.yaml",
+                      **{"activations.positions": ["readout_last", "generation_last", "stated_answer"],
+                         "model.max_new_tokens": 8})
+    backend = build_backend(cfg)
+    prompt = backend.render(_messages())
+    g = backend.generate([prompt], seed=0)[0]
+    assert g.stop_reason in ("stop_token", "length") and g.token_ids is not None
+    assert len(g.token_ids) <= 8
+    # a response with an earlier answer line in the prompt and a final one in the response
+    text = prompt + "Peer said Answer: (A).\nMy reasoning.\nAnswer: (C)\nConfidence: 70"
+    gen_start = text.index("Peer said")
+    tok = backend.tokenizer
+    enc = tok([text + "\nFinal answer: ("], add_special_tokens=False, return_offsets_mapping=True,
+              return_tensors="pt")
+    found = backend._extra_positions([text], enc["offset_mapping"], enc["attention_mask"],
+                                     [{"gen_start_char": gen_start}], 0,
+                                     ["generation_last", "stated_answer"])[0]
+    ids = enc["input_ids"][0].tolist()
+    assert tok.decode([ids[found["stated_answer"]]]).strip() == "C"
+    assert tok.decode([ids[found["generation_last"]]]).strip() == "0"  # Gemma splits digits
+    r = backend.readout([text], [4], meta=[{"gen_start_char": gen_start}])[0]
+    assert set(r.extra) == {"generation_last", "stated_answer"}
+    assert r.extra["stated_answer"].shape == r.hidden.shape

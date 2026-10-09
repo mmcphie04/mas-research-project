@@ -35,8 +35,11 @@ def build_events(rows: pd.DataFrame) -> pd.DataFrame:
     ev["subject"] = pre["subject"]
     ev["n_options"] = pre["n_options"]
     ev["gold_display"] = pre["gold_display"]
-    ev["pre_answer"] = pre["readout_answer"]
-    ev["post_answer"] = post["readout_answer"]
+    # "answer" is the canonical answer (mad.debate.canonical_answer); runs collected before it
+    # existed used the readout answer, which is what they get here
+    col = "answer" if "answer" in pre.columns else "readout_answer"
+    ev["pre_answer"] = pre[col]
+    ev["post_answer"] = post[col]
     ev["pre_correct"] = pre["correct"]
     ev["post_correct"] = post["correct"]
     ev["pre_confidence"] = pre["readout_confidence"]

@@ -100,15 +100,24 @@ class ActivationStore:
         if not 0 <= layer <= self.n_layers:
             raise IndexError(f"layer {layer} out of range 0..{self.n_layers}")
         blocks = []
+        paths = self._shard_paths()
         for shard in sorted(self.index["shard"].unique()):
-            path = self.run_dir / SHARD_FMT.format(shard=int(shard))
-            arr = np.load(path, mmap_mode="r")
+            arr = np.load(paths[int(shard)], mmap_mode="r")
             blocks.append(np.asarray(arr[layer], dtype=np.float32))
         full = np.concatenate(blocks, axis=0)
         if rows is None:
             return full
         rows = np.asarray(rows)
         return full[rows]
+
+    def _shard_paths(self) -> dict[int, Path]:
+        """Shard number -> file. A merged VIEW (mad.job.build_view) records each shard's path,
+        relative to the view directory, instead of holding copies of the arrays."""
+        if "shard_path" in self.index.columns:
+            pairs = self.index[["shard", "shard_path"]].drop_duplicates()
+            return {int(s): (self.run_dir / p).resolve() for s, p in zip(pairs.shard, pairs.shard_path,
+                                                                          strict=True)}
+        return {int(s): self.run_dir / SHARD_FMT.format(shard=int(s)) for s in self.index["shard"].unique()}
 
     def layer_range(self) -> range:
         return range(self.n_layers + 1)

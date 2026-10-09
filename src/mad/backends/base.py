@@ -7,7 +7,7 @@ stub cannot quietly pass tests the real generation path would fail (docs/RISKS.m
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import numpy as np
 
@@ -19,16 +19,21 @@ class Generation:
     text: str
     n_prompt_tokens: int
     n_completion_tokens: int
+    token_ids: list[int] | None = None  # generated ids, padding removed; None where not applicable
+    stop_reason: str | None = None  # "stop_token" | "length"; None where not applicable
 
 
 @dataclass
 class Readout:
     """One canonical activation state plus the forced-choice answer distribution."""
 
-    hidden: np.ndarray  # (n_layers + 1, d_model), float16
+    hidden: np.ndarray  # (n_layers + 1, d_model), float16, at the readout position
     letter_logprobs: np.ndarray  # (n_options,), float32, log-softmax over option letters
     answer_index: int  # argmax over letter_logprobs -- never fails
     n_tokens: int
+    # Hidden states at further token positions (mad.config.POSITIONS), when requested. A position
+    # that does not exist for this text (no stated answer line) is absent from the dict.
+    extra: dict[str, np.ndarray] = field(default_factory=dict)
 
     @property
     def confidence(self) -> float:
@@ -67,6 +72,10 @@ class Backend(ABC):
     def plan_answer(self, **kwargs) -> int | None:
         """Tier-0 hook. Real backends return None and let sampling decide the answer."""
         return None
+
+    def describe(self) -> dict:
+        """Identity of the model and tokenizer, for the job manifest. Real backends extend this."""
+        return {"backend": self.name, "n_layers": self.n_layers, "d_model": self.d_model}
 
 
 def build_backend(cfg, oracle: dict[str, OracleEntry] | None = None) -> Backend:

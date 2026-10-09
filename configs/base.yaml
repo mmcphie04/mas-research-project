@@ -16,7 +16,7 @@ debate:
   n_agents: 3
   n_rounds: 1
   condition: debate
-  tie_break: round0_plurality
+  tie_break: round0_then_agent0
   ask_verbalized_confidence: true
 
 data:

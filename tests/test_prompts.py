@@ -65,3 +65,24 @@ def test_merge_system_folds_content_into_the_first_user_turn():
     assert _roles(merged) == ["user"]
     assert "You are careful." in merged[0]["content"]
     assert "acceleration" in merged[0]["content"]
+
+
+def test_every_module_level_template_is_hashed():
+    """An unhashed template is a protocol change the manifest cannot see."""
+    import mad.prompts as P
+
+    strings = {k: v for k, v in vars(P).items() if k.isupper() and isinstance(v, str)}
+    hashed = set(P.TEMPLATES.values())
+    missing = [k for k, v in strings.items() if v not in hashed and k != "LETTERS"]
+    assert not missing, f"templates missing from TEMPLATES: {missing}"
+
+
+def test_round1_asks_for_the_same_lines_as_round0():
+    for ask in (True, False):
+        r0 = round0_messages(persona="p", subject="s", question="q", options=["1", "2"],
+                             perm=identity_permutation(2), ask_confidence=ask)
+        for peers in (None, ["peer"]):
+            r1 = round1_messages(base=r0, own_response="x", peer_responses=peers, ask_confidence=ask)
+            assert ("Confidence" in r1[-1]["content"]) == ask
+            assert ("Confidence" in r0[0]["content"]) == ask
+            assert "150 words" in r0[0]["content"] and "150 words" in r1[-1]["content"]

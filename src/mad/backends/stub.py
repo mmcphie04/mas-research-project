@@ -123,26 +123,23 @@ class StubBackend(Backend):
             raise ValueError("the stub backend requires meta (question_id, agent_id, phase, ...)")
         out = []
         for prompt, m in zip(prompts, meta, strict=True):
+            # the prose states the planted answer: the stated answer is the agent's decision
             answer = m["planned_answer"]
             rng = _seed("text", m["question_id"], m["agent_id"], m["phase"], self.run_seed)
             correct = answer == self.oracle[m["question_id"]].gold_display_index
-            # occasionally state a different letter in prose than the readout will commit to,
-            # so the freetext/readout disagreement tracking has something to measure
-            stated = answer
-            n_opt = self.oracle[m["question_id"]].n_options
-            if rng.random() < self.s.freetext_noise and n_opt > 1:
-                stated = int(rng.choice([i for i in range(n_opt) if i != answer]))
             conf = int(np.clip(rng.normal(72 if correct else 62, 12), 0, 100))
             n_steps = int(rng.integers(2, 5))
             body = "\n".join(
                 f"Step {i + 1}: consider the {i + 1}th relevant fact." for i in range(n_steps)
             )
-            text = f"{body}\nAnswer: ({LETTERS[stated]})\nConfidence: {conf}"
+            text = f"{body}\nAnswer: ({LETTERS[answer]})\nConfidence: {conf}"
             out.append(
                 Generation(
                     text=text,
                     n_prompt_tokens=max(1, len(prompt) // 4),
                     n_completion_tokens=max(1, len(text) // 4),
+                    token_ids=None,
+                    stop_reason="stop_token",
                 )
             )
         return out
@@ -179,9 +176,17 @@ class StubBackend(Backend):
             # not a noisy sample -- so the chosen letter is forced to the top. Only the margin is
             # random, which is what gives readout confidence a realistic (imperfect) correlation
             # with correctness for the baseline to be a fair competitor.
+            # occasionally the forced readout commits to a different letter than the prose
+            # stated, so the stated/readout disagreement tracking has something to measure
+            committed = answer
+            if m.get("phase") != "peer_exposure" and n > 1:
+                nz = _seed("readout-noise", qid, m["agent_id"], m["phase"],
+                           m.get("condition", "debate"), self.run_seed)
+                if nz.random() < self.s.freetext_noise:
+                    committed = int(nz.choice([i for i in range(n) if i != answer]))
             logits = rng.normal(scale=self.s.confidence_noise, size=n)
             gap = 0.8 + (self.s.confidence_signal if correct else 0.0) + rng.normal(scale=0.6)
-            logits[answer] = logits.max() + max(gap, 0.05)
+            logits[committed] = logits.max() + max(gap, 0.05)
             logprobs = logits - np.log(np.exp(logits).sum())
             out.append(
                 Readout(
@@ -189,6 +194,8 @@ class StubBackend(Backend):
                     letter_logprobs=logprobs.astype(np.float32),
                     answer_index=int(np.argmax(logprobs)),
                     n_tokens=max(1, len(text) // 4),
+                    extra={p: (hidden + rng.normal(scale=0.1, size=hidden.shape)).astype(np.float16)
+                           for p in self.cfg.activations.positions if p != "readout_last"},
                 )
             )
         return out

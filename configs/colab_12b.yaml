@@ -4,23 +4,35 @@
 #   weights (bf16)                         26.4 GB
 #   KV cache, per 1k tokens in the batch    0.39 GB   (48 layers x 8 kv heads x 256 x 2 x bf16)
 #   hidden states, per 1k tokens readout    0.38 GB   (49 layers x 3840 x bf16)
-# A debate round-1 prompt holds the agent's own answer plus two peer answers, so with a
-# 768-token budget a round-1 sequence approaches ~3,400 tokens. At batch 4 that is ~5 GB of
-# KV cache and ~5 GB of hidden states on top of the weights -- comfortable. Batch 8 would be
-# ~37 GB peak, too close to 40. Raise batch_size only after the smoke test reports headroom.
+# The longest sequence the protocol produces is the round-1 READOUT: question (~600 tokens at
+# most) + the agent's own first answer + two peer answers + its new answer, each up to
+# max_new_tokens, plus ~250 tokens of instructions: ~600 + 4 x 768 + 250 = ~3,900 tokens.
+# At batch 4 that is ~6 GB of hidden states during readout and at most ~6 GB of KV cache during
+# generation (less in practice: most Gemma 3 layers use a 1,024-token sliding window), on top of
+# the weights -- a peak around 33 GB. The smoke test forces exactly this worst case (--smoke runs
+# a stress pass) and reports allocated and reserved peaks; raise a batch size only if it shows
+# room.
 run_id: colab
 model:
   backend: hf
   repo_id: google/gemma-3-12b-it
   device: cuda
   dtype: bfloat16
+  # A cap, not a target: the prompt asks for ~150 words. The pilot reports how often the cap is
+  # hit (stop_reason == "length"); if that is more than a few percent, fix the prompt, not the cap.
   max_new_tokens: 768
   temperature: 0.7
   top_p: 0.95
-  batch_size: 4
+  batch_size: 4           # generation
+  readout_batch_size: 4   # readout holds every layer's states for every position
 data:
   dataset: TIGER-Lab/MMLU-Pro
   split: test
-  n_questions: 60
+  n_questions: 120        # the driver's --n-questions overrides this and is what is recorded
 activations:
+  # Three positions for the pilot, so the choice of position is made on pilot data, not the
+  # test set: the forced-choice "(" (readout_last), the last generated token (generation_last),
+  # and the letter in the agent's own final "Answer: (X)" line (stated_answer). About 1.1 GB per
+  # condition per 120 questions; drop positions for the main run if the pilot shows no use.
+  positions: [readout_last, generation_last, stated_answer]
   shard_size: 256

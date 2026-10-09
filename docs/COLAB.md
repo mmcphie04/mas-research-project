@@ -39,41 +39,88 @@ go to Google Drive under `MyDrive/mas_runs/`. Instructions follow.
 
 ## Running
 
-Edit the settings cell, then *Runtime → Run all*. The cells:
+Set `COMMIT` in the settings cell to the full hash of the commit to run (the notebook refuses
+anything else and never follows a moving branch), edit the other settings, then *Runtime → Run
+all*. The cells:
 
 | cell | what it does |
 |---|---|
-| 2 | confirms a GPU is attached |
-| 3 | mounts Drive |
-| 4 | reads the two secrets; never prints them |
-| 5 | clones or pulls the repo; masks the token in any git error; removes it from the saved remote |
-| 6 | installs pinned dependencies, keeping Colab's CUDA build of torch |
-| 7 | **smoke test**: 2 questions through every condition |
-| 8 | full run, resumable |
-| 9 | summary with 95% intervals |
-| 10 | optional: push small results to the `colab-results` branch (off by default; never `master`) |
+| 2 | settings, including the pinned `COMMIT`, the pool (`pilot`/`main`) and `MAX_HOURS` |
+| 4 | confirms a GPU is attached |
+| 6 | mounts Drive |
+| 8 | reads the two secrets; never prints them |
+| 10 | checks out exactly `COMMIT`; masks the token in any git error; removes it from the saved remote |
+| 12 | installs pinned dependencies, keeping Colab's CUDA build of torch |
+| 15 | **smoke test** in a throwaway job: worst-case memory stress, then 2 questions through every condition |
+| 17 | the run, resumable |
+| 19 | summary with 95% intervals and paired differences |
+| 21 | optional: push small results to a new `colab-results/<name>-<time>` branch (off by default; never `master`, never force) |
 
-**Run the smoke test first and stop if it fails.** It asserts that every stored state has the shape
-the analysis expects — 49 layers × 3,840 numbers for Gemma-3-12B — and reports seconds per question
-and peak GPU memory, then projects the full run's duration.
+**Run the smoke test first and stop if it fails.** It forces the longest generation and readout the
+protocol can produce and reports allocated and reserved memory peaks. It then checks every stored
+state: 49 layers × 3,840 numbers for Gemma-3-12B, finite, not all identical, letter distributions
+that sum to one, answers inside each question's own option range. It also checks that a batched
+readout agrees with a one-at-a-time readout. Finally it reports seconds per question and projects
+the full run.
+
+### What makes a resume safe
+
+The first session writes `<name>-job.json`: the dataset and its fixed question order, chunk
+size, conditions, every setting except batch sizes, prompt hashes, the model's commit, tokenizer,
+chat template and letter token ids, and the code commit. Every later session must match it or
+the driver stops with a message saying what differs. Asking for more questions appends to the
+same order (`<name>-questions.jsonl` keeps a copy of every question's text). Round 0 for each
+chunk is saved before any condition runs and reloaded on retry. Each condition directory is
+written under a temporary name and renamed only when complete. After the chunks, each condition
+gets a merged *view* (`<name>-<condition>/`) that checks checksums, unique keys and exact question
+membership and points at the chunk files instead of copying them.
+
+The driver stops on an out-of-memory error, after two consecutive failed chunks, or once the
+job's total wall time across sessions reaches `--max-hours`. `<name>-status.json` records state,
+progress, per-chunk timings and memory peaks, and every failure.
+
+### Commands (what the notebook runs)
+
+```bash
+CFG="--config configs/base.yaml configs/colab_12b.yaml --out-root /content/drive/MyDrive/mas_runs"
+# 1. smoke + stress (throwaway job "smoke-pilot12b")
+python scripts/run_experiment.py $CFG --name pilot12b --dataset mmlu-pro --pool pilot \
+    --n-questions 120 --chunk 20 --conditions self_reconsider debate misleading_one --smoke
+# 2. pilot: the 120-question pilot pool
+python scripts/run_experiment.py $CFG --name pilot12b --dataset mmlu-pro --pool pilot \
+    --n-questions 120 --chunk 20 --conditions self_reconsider debate misleading_one --max-hours 6
+python scripts/summarize_run.py --out-root /content/drive/MyDrive/mas_runs --name pilot12b
+# 3. main run, only after docs/preregistration.md is dated: N from the pilot, main pool
+python scripts/run_experiment.py $CFG --name main12b --dataset mmlu-pro --pool main \
+    --n-questions N --chunk 25 --conditions self_reconsider debate misleading_one --max-hours H
+```
+
+Extending a job later: rerun with a larger `--n-questions`, keeping it a multiple of `--chunk`
+from a full last chunk (the driver refuses an extension that would change a chunk that already
+has output).
 
 ## What has and has not been verified
 
-Verified locally:
-- 101 tests pass, including the driver, resume after a lost chunk, the smoke checks, the summary,
-  and checks that the notebook parses, contains no secrets, masks the token and never pushes to
-  `master`.
-- The driver runs end to end on the stub exactly as the notebook calls it.
+Verified locally, on CPU:
+- The full test suite, including the job-file refusals (changed settings, chunk size, pool,
+  conditions, commit; a chunk from another job; a corrupted shard), extension by appending,
+  round-0 reuse after a crash between conditions, the time cap persisting across sessions, the
+  fail-fast stops, the merged view loading the same arrays as the chunks, and the notebook's
+  pinning and push rules.
+- The driver end to end on the stub, and on the real Hugging Face path with Gemma-3-270M on CPU
+  (`--smoke`): the stress pass, the extra activation positions, generated token ids and stop
+  reasons, and batched-vs-single readout agreement (identical in fp32 on CPU).
+- The letter-in-context check (the tokenizer encodes `Final answer: (` + letter as the scored
+  letter token) on the Gemma 3 tokenizer of the 270M model; it runs again at load time on the 12B.
 - The MMLU-Pro loader on the real dataset: 12,032 questions, 14 subjects, every gold answer valid.
 - Gemma-3-12B's configuration, on an empty "meta" device with no weights downloaded: 48 layers,
   d = 3,840, 26.4 GB of weights in bf16, answer letters A–J each a single distinct token.
 
-**Not verified until the first Colab run:**
-- That hidden states actually come back from the 12B model. Its forward function does not take
-  `output_hidden_states` as a named argument; it passes it through a catch-all keyword parameter.
-  The 1B model uses the identical mechanism and returned all 27 layers, so it should work — the
-  smoke test asserts it explicitly rather than assuming.
-- Real throughput and memory. Estimates below.
+**Not verified until the first Colab run (none of these has been run):**
+- That hidden states come back from the 12B model, and are finite and non-degenerate.
+- Real throughput and memory peaks under the stress pass, in bf16 on the A100.
+- Batched-vs-single readout agreement in bf16 (it is exact in fp32 on CPU; bf16 with left
+  padding can differ slightly, and the smoke test fails only on gross disagreement).
 - That the pinned `transformers==5.17.0` installs against Colab's torch.
 
 The `vllm` backend is still not implemented. The Hugging Face backend runs on the GPU; it is slower
@@ -81,12 +128,16 @@ at generation than vLLM but returns hidden states directly, which vLLM does not.
 
 ## Memory
 
-Weights take 26.4 GB of the 40. The remainder holds the KV cache during generation (~0.39 GB per
-1,000 tokens in the batch) and hidden states during readout (~0.38 GB per 1,000 tokens). A debate
-round-1 prompt contains the agent's own answer plus two peers' answers, so at 768 generation tokens
-a sequence approaches ~3,400 tokens. Batch 4 keeps peak near 32 GB; batch 8 would approach 37.
-`configs/colab_12b.yaml` defaults to 4. The driver logs the worst-case estimate at start-up, and the
-smoke test reports the measured peak; raise `model.batch_size` in `OVERRIDES` only if that shows room.
+Weights take 26.4 GB of the 40. The longest sequence the protocol produces is the round-1
+readout: the question (up to ~600 tokens), the agent's own first answer, two peer answers and its
+new answer (each up to the 768-token cap), plus ~250 tokens of instructions — about 3,900 tokens.
+At that length the KV cache during generation is ~0.39 GB per 1,000 tokens per sequence and the
+hidden states during readout ~0.38 GB per 1,000 tokens per sequence, so batch 4 needs ~6 GB for
+each (an upper bound for the cache: most Gemma 3 layers use a 1,024-token sliding window), for a
+peak around 33 GB of the 40. Generation and readout have separate batch sizes (`model.batch_size`,
+`model.readout_batch_size`); both default to 4. The smoke test's stress pass measures the real
+peaks; raise a batch size in `OVERRIDES` only if it shows room. Batch sizes may change between
+sessions of a job; nothing else may.
 
 ## Budget
 
@@ -99,7 +150,7 @@ conditions.
 | run | questions | estimated time | estimated units |
 |---|---|---|---|
 | smoke test | 2 | 5–10 min, mostly the model download | ~1 |
-| pilot | 60 | 30–50 min | 3–5 |
+| pilot | 120 | 1–1.5 h | 5–8 |
 | powered run | 1,500 | 8–17 h | 45–90 |
 
 ## Getting results back to the laptop
@@ -109,11 +160,13 @@ Run directories go to Drive. The laptop has no Drive sync, so one of:
 1. **Install Google Drive for Desktop** on Windows. Drive then appears as a drive letter that WSL can
    read directly, including the activation files. Simplest for analysis.
 2. **Run the summary on Colab** (cell 9) and read `<OUT_ROOT>/<RUN_NAME>-summary.json`.
-3. **Push small results** with the last cell, then `git fetch origin colab-results` on the laptop.
+3. **Push small results** with the last cell, then on the laptop
+   `git fetch origin 'refs/heads/colab-results/*:refs/remotes/origin/colab-results/*'`.
    Activation files are not pushed — they are too large for git.
 
 ## Token budget
 
-On the 1B model, 192 tokens still cut off 73% of first answers. 768 is a guess for the 12B model on
-MMLU-Pro; the smoke test and pilot report the cut-off rate. If it is high, raising the budget is the
-wrong fix — it multiplies cost — and a brevity instruction in the prompt is the right one.
+On the 1B model, 192 tokens still cut off 73% of first answers. The prompts now ask for about 150
+words of reasoning, and 768 tokens is a cap rather than a target. Every generated response
+records why it stopped (`stop_reason`: a stop token or the cap), and the summary reports the
+cap-hit rate. If it is high, tighten the brevity instruction — raising the cap multiplies cost.

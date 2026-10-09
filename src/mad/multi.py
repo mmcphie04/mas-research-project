@@ -1,4 +1,4 @@
-"""Multi-condition debate collection over a SHARED round 0.
+"""Multi-condition debate collection over a SHARED, PERSISTED round 0.
 
 Round 0 is generated once and reused by every condition. Two reasons:
 
@@ -9,26 +9,49 @@ Round 0 is generated once and reused by every condition. Two reasons:
 2. It removes the duplicated round-0 cost, which is roughly a third of the compute for three
    conditions.
 
+Round 0 is also SAVED before any condition runs (``save_round0``). A crash between conditions
+used to regenerate round 0 on retry, so finished conditions and redone ones started from
+different first answers while claiming to share them. Now a retry reloads the saved round 0 and
+checks it belongs to the same questions and job.
+
 Conditions differ only in what the agent is shown before it revises:
 
-  self_reconsider  nothing -- the ordinary-instability floor
-  debate           the two real peer responses, confidence line stripped
-  debate_conf      the two real peer responses with confidence left in (ablation)
-  adversarial      two fabricated peers confidently asserting the same wrong answer
+  self_reconsider     nothing -- the ordinary-instability floor
+  debate              the two real peer responses, confidence line stripped
+  debate_conf         the two real peer responses with confidence left in (ablation)
+  debate_answer_only  the two real peers' stated answers only, no reasoning
+  misleading_one      one fabricated, mildly worded peer for a random wrong answer + one real peer
+  adversarial         two fabricated peers confidently asserting the same random wrong answer
+
+Peer order is randomised per (condition, question, agent) from a stable seed and recorded, so
+"panel member 1" is not systematically the lower-numbered agent or the fabricated one.
 """
 
 from __future__ import annotations
 
+import hashlib
+import json
+import os
+import shutil
+from dataclasses import dataclass
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 from mad import prompts as P
-from mad.backends.base import Backend, OracleEntry, build_backend
+from mad.backends.base import Backend, Generation, OracleEntry, Readout, build_backend
 from mad.data import Question
 from mad.debate import ROWS_FILE, TRANSCRIPTS_FILE, RunResult, _akey, _row, peer_majority
 from mad.permute import LETTERS, make_permutation
-from mad.provenance import prompt_hashes, sha256_file, write_completion, write_manifest
+from mad.provenance import (
+    COMPLETION,
+    is_complete,
+    prompt_hashes,
+    sha256_file,
+    write_completion,
+    write_manifest,
+)
 from mad.store import ActivationWriter
 
 
@@ -38,37 +61,79 @@ class _NullGen:
     text = ""
     n_prompt_tokens = 0
     n_completion_tokens = 0
+    stop_reason = None
 
 
-KINDS = ("self_reconsider", "debate", "debate_conf", "adversarial", "misleading_one")
+KINDS = ("self_reconsider", "debate", "debate_conf", "debate_answer_only", "adversarial",
+         "misleading_one")
 
 
-def adversarial_answer(gold: int, pre: int, n_options: int) -> int:
-    """A wrong option for both fabricated peers to assert, differing from the focal answer."""
-    for i in range(n_options):
-        if i != gold and i != pre:
-            return i
-    return (gold + 1) % n_options
+def derive_seed(*parts) -> int:
+    """A stable 31-bit seed from any identifying parts. Distinct parts give independent streams."""
+    digest = hashlib.sha256("|".join(str(p) for p in parts).encode()).digest()
+    return int.from_bytes(digest[:4], "big") & 0x7FFFFFFF
 
 
-def run_conditions(
-    cfg,
-    questions: list[Question],
-    conditions: list[dict],
-    backend: Backend | None = None,
-) -> dict[str, RunResult]:
-    n_agents = cfg.debate.n_agents
+def stable_rng(*parts) -> np.random.Generator:
+    return np.random.default_rng(derive_seed(*parts))
+
+
+def wrong_target(seed: int, kind: str, qid: str, agent: int, gold: int, pre: int, n: int) -> int:
+    """A wrong option, uniformly at random among those that are neither gold nor the agent's own.
+
+    The previous rule took the lowest eligible letter. With the strong position bias measured on
+    the 1B model (accuracy 70% when the answer was A, 23% when it was D), that confounded "a peer
+    pushed a wrong answer" with "a peer pushed answer A".
+    """
+    eligible = [i for i in range(n) if i != gold and i != pre]
+    if not eligible:  # two options, agent already wrong: only the agent's own wrong answer is left
+        eligible = [i for i in range(n) if i != gold]
+    return int(stable_rng(seed, kind, "target", qid, agent).choice(eligible))
+
+
+def request_id(job: str, chunk: str, phase: str, condition: str, qid: str, agent: int) -> str:
+    return f"{job}/{chunk}/{condition}/{phase}/{qid}/a{agent}"
+
+
+def condition_seed(cfg, chunk: str, condition: str) -> int:
+    return derive_seed(cfg.seed, "round1", condition, chunk)
+
+
+def round0_seed(cfg, chunk: str) -> int:
+    return derive_seed(cfg.seed, "round0", chunk)
+
+
+# ----------------------------------------------------------------------------- round 0
+
+
+@dataclass
+class Round0:
+    metas: list[dict]  # one per (question, agent), in question-then-agent order
+    messages: list[list[dict]]
+    prompts: list[str]
+    gens: list[Generation]
+    reads: list[Readout]
+    seed: int
+    loaded: bool = False
+
+    def key(self, i: int) -> tuple[str, int]:
+        return self.metas[i]["question_id"], self.metas[i]["agent_id"]
+
+
+def _setup(cfg, questions, backend):
     perms = {q.question_id: make_permutation(q.n_options, q.question_id, cfg.data.permutation_seed)
              for q in questions}
     gold = {q.question_id: perms[q.question_id].original_to_display(q.gold_index) for q in questions}
-    n_opts = {q.question_id: q.n_options for q in questions}
     if backend is None:
         oracle = ({q.question_id: OracleEntry(gold[q.question_id], q.n_options) for q in questions}
                   if cfg.model.backend == "stub" else None)
         backend = build_backend(cfg, oracle=oracle)
+    return perms, gold, backend
 
-    # ---------------------------------------------------------------- round 0, generated once
-    base_msgs, prompts, metas = {}, [], []
+
+def generate_round0(cfg, questions, backend, perms, job="dev", chunk="c000") -> Round0:
+    n_agents = cfg.debate.n_agents
+    metas, messages, prompts = [], [], []
     for q in questions:
         for a in range(n_agents):
             msgs = P.round0_messages(
@@ -76,116 +141,301 @@ def run_conditions(
                 subject=q.subject, question=q.question, options=list(q.options),
                 perm=perms[q.question_id], ask_confidence=cfg.debate.ask_verbalized_confidence,
             )
-            base_msgs[(q.question_id, a)] = msgs
-            prompts.append(backend.render(msgs))
-            m0 = {"question_id": q.question_id, "agent_id": a, "phase": "pre", "condition": "shared"}
+            prompt = backend.render(msgs)
+            m0 = {"question_id": q.question_id, "agent_id": a, "phase": "pre", "condition": "shared",
+                  "request_id": request_id(job, chunk, "pre", "shared", q.question_id, a),
+                  "chunk": chunk, "gen_start_char": len(prompt)}
             planned = backend.plan_answer(phase="pre", question_id=q.question_id, agent_id=a)
             if planned is not None:
                 m0["planned_answer"] = planned
             metas.append(m0)
-    gens0 = backend.generate(prompts, seed=cfg.seed, meta=metas)
-    texts0 = [p + g.text for p, g in zip(prompts, gens0, strict=True)]
-    reads0 = backend.readout(texts0, [n_opts[m["question_id"]] for m in metas], meta=metas)
-    pre_answer = {(m["question_id"], m["agent_id"]): r.answer_index
-                  for m, r in zip(metas, reads0, strict=True)}
-    own_text = {(m["question_id"], m["agent_id"]): g.text
-                for m, g in zip(metas, gens0, strict=True)}
+            messages.append(msgs)
+            prompts.append(prompt)
+    seed = round0_seed(cfg, chunk)
+    for m in metas:
+        m["gen_seed"] = seed
+    gens = backend.generate(prompts, seed=seed, meta=metas)
+    texts = [p + g.text for p, g in zip(prompts, gens, strict=True)]
+    n_opts = {q.question_id: q.n_options for q in questions}
+    reads = backend.readout(texts, [n_opts[m["question_id"]] for m in metas], meta=metas)
+    return Round0(metas, messages, prompts, gens, reads, seed)
 
-    # ---------------------------------------------------------------- one round 1 per condition
+
+R0_RECORDS = "round0.jsonl"
+R0_HIDDEN = "round0_hidden_{pos}.npy"
+
+
+def save_round0(r0: Round0, out_dir: Path, identity: dict) -> Path:
+    """Persist round 0 atomically: write to a temporary directory, then rename into place."""
+    out_dir = Path(out_dir)
+    tmp = out_dir.with_name(out_dir.name + f".tmp-{os.getpid()}")
+    if tmp.exists():
+        shutil.rmtree(tmp)
+    tmp.mkdir(parents=True)
+    with open(tmp / R0_RECORDS, "w") as fh:
+        for m, msgs, prompt, g, r in zip(r0.metas, r0.messages, r0.prompts, r0.gens, r0.reads,
+                                         strict=True):
+            fh.write(json.dumps({
+                "meta": m, "messages": msgs, "prompt": prompt, "text": g.text,
+                "n_prompt_tokens": g.n_prompt_tokens, "n_completion_tokens": g.n_completion_tokens,
+                "token_ids": g.token_ids, "stop_reason": g.stop_reason,
+                "letter_logprobs": [float(x) for x in r.letter_logprobs],
+                "answer_index": r.answer_index, "n_tokens": r.n_tokens,
+                "extra_positions": sorted(r.extra),
+            }) + "\n")
+    hidden = {"readout_last": np.stack([r.hidden for r in r0.reads])}
+    for pos in sorted({p for r in r0.reads for p in r.extra}):
+        arr = np.full_like(hidden["readout_last"], np.nan)
+        for i, r in enumerate(r0.reads):
+            if pos in r.extra:
+                arr[i] = r.extra[pos]
+        hidden[pos] = arr
+    for pos, arr in hidden.items():
+        np.save(tmp / R0_HIDDEN.format(pos=pos), arr)
+    (tmp / "manifest.json").write_text(json.dumps({**identity, "seed": r0.seed,
+                                                   "n_records": len(r0.metas)}, indent=2))
+    write_completion(tmp, row_counts={"records": len(r0.metas)},
+                     shard_hashes={p.name: sha256_file(p) for p in sorted(tmp.iterdir())
+                                   if p.name != COMPLETION})
+    if out_dir.exists():
+        shutil.rmtree(out_dir)
+    os.replace(tmp, out_dir)
+    return out_dir
+
+
+def load_round0(out_dir: Path, identity: dict) -> Round0 | None:
+    """Reload a saved round 0, or None if absent. Refuses one that belongs to something else."""
+    out_dir = Path(out_dir)
+    if not is_complete(out_dir):
+        return None
+    man = json.loads((out_dir / "manifest.json").read_text())
+    for k, v in identity.items():
+        if man.get(k) != v:
+            raise RuntimeError(f"saved round 0 in {out_dir} does not match this chunk ({k} differs); "
+                               "refusing to reuse it")
+    done = json.loads((out_dir / COMPLETION).read_text())
+    for name, h in done["shard_sha256"].items():
+        if sha256_file(out_dir / name) != h:
+            raise RuntimeError(f"{out_dir / name} fails its checksum; refusing to reuse round 0")
+    recs = [json.loads(line) for line in (out_dir / R0_RECORDS).read_text().splitlines()]
+    hidden = {p.name[len("round0_hidden_"):-4]: np.load(p) for p in out_dir.glob("round0_hidden_*.npy")}
+    metas, messages, prompts, gens, reads = [], [], [], [], []
+    for i, rec in enumerate(recs):
+        metas.append(rec["meta"])
+        messages.append(rec["messages"])
+        prompts.append(rec["prompt"])
+        gens.append(Generation(rec["text"], rec["n_prompt_tokens"], rec["n_completion_tokens"],
+                               rec["token_ids"], rec["stop_reason"]))
+        lp = np.asarray(rec["letter_logprobs"], dtype=np.float32)
+        reads.append(Readout(hidden=hidden["readout_last"][i], letter_logprobs=lp,
+                             answer_index=rec["answer_index"], n_tokens=rec["n_tokens"],
+                             extra={p: hidden[p][i] for p in rec["extra_positions"]}))
+    return Round0(metas, messages, prompts, gens, reads, man["seed"], loaded=True)
+
+
+# ----------------------------------------------------------------------------- round 1
+
+
+def _peer_view(cfg, kind, cond, q, a, r0_ans, own_text, perms, gold):
+    """What agent ``a`` is shown, in display order, with a record of where each entry came from."""
+    qid, n_agents = q.question_id, cfg.debate.n_agents
+    others = [b for b in range(n_agents) if b != a]
+    pre = r0_ans[(qid, a)]
+    shown = perms[qid].display_options(list(q.options))
+    target = -1
+    if kind == "self_reconsider":
+        return None, [], [], target
+    if kind == "misleading_one":
+        # One dissenting peer, restrained wording, plus one genuine peer chosen at random. Two
+        # emphatic fabricated peers produced 99% adoption, which measures whether the model
+        # copies a confident assertion rather than anything about conformity.
+        target = wrong_target(cfg.seed, kind, qid, a, gold[qid], pre, q.n_options)
+        real = others[int(stable_rng(cfg.seed, kind, "peer", qid, a).integers(len(others)))]
+        entries = [(P.MILD_PEER.format(letter=LETTERS[target], option=shown[target]), target,
+                    "fabricated"),
+                   (P.strip_confidence(own_text[(qid, real)]), r0_ans[(qid, real)], f"agent{real}")]
+    elif kind == "adversarial":
+        target = wrong_target(cfg.seed, kind, qid, a, gold[qid], pre, q.n_options)
+        text = P.ADVERSARIAL_PEER.format(letter=LETTERS[target], option=shown[target])
+        entries = [(text, target, "fabricated")] * len(others)
+    elif kind == "debate_answer_only":
+        entries = []
+        for b in others:
+            ans = r0_ans[(qid, b)]
+            entries.append((P.PEER_ANSWER_ONLY.format(letter=LETTERS[ans], option=shown[ans]),
+                            ans, f"agent{b}"))
+    else:  # debate, debate_conf
+        keep_conf = bool(cond.get("peer_confidence"))
+        entries = [(own_text[(qid, b)] if keep_conf else P.strip_confidence(own_text[(qid, b)]),
+                    r0_ans[(qid, b)], f"agent{b}") for b in others]
+    order = stable_rng(cfg.seed, kind, "order", qid, a).permutation(len(entries))
+    entries = [entries[i] for i in order]
+    return [e[0] for e in entries], [e[1] for e in entries], [e[2] for e in entries], target
+
+
+def run_condition(cfg, questions, cond, r0: Round0, backend, perms, gold, final_dir: Path,
+                  job="dev", chunk="c000", extra_manifest: dict | None = None) -> RunResult:
+    """One condition's round 1 for one chunk, written atomically to ``final_dir``."""
+    name, kind = cond["name"], cond["kind"]
+    if kind not in KINDS:
+        raise ValueError(f"unknown condition kind {kind!r}; expected one of {KINDS}")
+    n_agents = cfg.debate.n_agents
+    n_opts = {q.question_id: q.n_options for q in questions}
+    cfg.run_id = cond["run_id"]
+    final_dir = Path(final_dir)
+    tmp = final_dir.with_name(final_dir.name + f".tmp-{os.getpid()}")
+    if tmp.exists():
+        shutil.rmtree(tmp)
+    seed1 = condition_seed(cfg, chunk, name)
+    write_manifest(cfg, run_dir=tmp, extra={
+        "prompt_template_hashes": prompt_hashes(P.TEMPLATES), "n_questions": len(questions),
+        "question_ids": [q.question_id for q in questions],
+        "condition": name, "kind": kind, "condition_spec": cond, "shared_round0": True,
+        "round0_seed": r0.seed, "round0_reloaded": r0.loaded, "round1_seed": seed1,
+        "peer_shows_confidence": bool(cond.get("peer_confidence", False)),
+        "backend_n_layers": backend.n_layers, "backend_d_model": backend.d_model,
+        "chunk": chunk, "job": job, **(extra_manifest or {}),
+    })
+    writer = ActivationWriter(tmp, backend.n_layers, backend.d_model, cfg.activations.shard_size)
+
+    def add_states(m, read):
+        writer.add(_akey(cfg, m), read.hidden)
+        for pos, h in read.extra.items():
+            writer.add({**_akey(cfg, m), "position": pos}, h)
+
+    rows, transcripts = [], []
+    r0_ans, own_text = {}, {}
+    for i, (meta, gen, read) in enumerate(zip(r0.metas, r0.gens, r0.reads, strict=True)):
+        m = {**meta, "condition": name}
+        row = _row(cfg, m, gen, read, n_opts[m["question_id"]], gold, perms)
+        rows.append(row)
+        r0_ans[r0.key(i)] = row["answer"]
+        own_text[r0.key(i)] = gen.text
+        transcripts.append({**m, "messages": r0.messages[i], "prompt": r0.prompts[i],
+                            "text": gen.text, "token_ids": gen.token_ids,
+                            "stop_reason": gen.stop_reason})
+        add_states(m, read)
+    base_msgs = {r0.key(i): r0.messages[i] for i in range(len(r0.metas))}
+
+    msgs1, prompts1, metas1 = [], [], []
+    for q in questions:
+        qid = q.question_id
+        for a in range(n_agents):
+            pre = r0_ans[(qid, a)]
+            panel = [r0_ans[(qid, b)] for b in range(n_agents) if b != a]
+            texts, shown_ans, sources, target = _peer_view(cfg, kind, cond, q, a, r0_ans,
+                                                           own_text, perms, gold)
+            maj = peer_majority(shown_ans) if shown_ans else None
+            msgs = P.round1_messages(base=base_msgs[(qid, a)], own_response=own_text[(qid, a)],
+                                     peer_responses=texts,
+                                     ask_confidence=cfg.debate.ask_verbalized_confidence)
+            prompt = backend.render(msgs)
+            planned = backend.plan_answer(phase="post", question_id=qid, agent_id=a, pre=pre,
+                                          peer_majority=maj, condition=kind)
+            pmaj = peer_majority(panel)
+            metas1.append({
+                "question_id": qid, "agent_id": a, "phase": "post", "condition": name,
+                "request_id": request_id(job, chunk, "post", name, qid, a), "chunk": chunk,
+                "gen_seed": seed1, "gen_start_char": len(prompt),
+                **({"planned_answer": planned} if planned is not None else {}),
+                # what the agent was SHOWN (the legacy column names keep this meaning)
+                "peer_majority": -1 if maj is None else maj,
+                "n_peers_agree_pre": sum(1 for p in shown_ans if p == pre) if shown_ans else -1,
+                "peers_agree_each_other": int(len(set(shown_ans)) == 1) if shown_ans else -1,
+                "peer_unanimous": int(len(set(shown_ans)) == 1) if shown_ans else -1,
+                "shown_peer_answers": ",".join(map(str, shown_ans)),
+                "shown_peer_sources": ",".join(sources),
+                "shown_peer_majority": -1 if maj is None else maj,
+                "n_shown_agree_pre": sum(1 for p in shown_ans if p == pre) if shown_ans else -1,
+                "misleading_target": target,
+                # what its real panel-mates answered, whatever it was shown
+                "panel_peer_answers": ",".join(map(str, panel)),
+                "panel_peer_majority": -1 if pmaj is None else pmaj,
+                "n_panel_agree_pre": sum(1 for p in panel if p == pre),
+            })
+            msgs1.append(msgs)
+            prompts1.append(prompt)
+
+    # Third state: after the agent has seen the intervention but BEFORE it commits to a
+    # revision. The post state exists only once the answer is decided, so it may be reading a
+    # decision rather than predicting one.
+    metas_pe = [{**m, "phase": "peer_exposure", "pre_answer": r0_ans[(m["question_id"], m["agent_id"])],
+                 "request_id": m["request_id"].replace("/post/", "/peer_exposure/"),
+                 "gen_start_char": None}
+                for m in metas1]
+    reads_pe = backend.readout(prompts1, [n_opts[m["question_id"]] for m in metas1], meta=metas_pe)
+    for m, read in zip(metas_pe, reads_pe, strict=True):
+        row = _row(cfg, m, _NullGen(), read, n_opts[m["question_id"]], gold, perms)
+        row["post_equals_peer_majority"] = int(row["answer"] == m["peer_majority"])
+        row["peers_agree_each_other"] = m["peers_agree_each_other"]
+        rows.append(row)
+        add_states(m, read)
+
+    gens1 = backend.generate(prompts1, seed=seed1, meta=metas1)
+    texts1 = [p + g.text for p, g in zip(prompts1, gens1, strict=True)]
+    reads1 = backend.readout(texts1, [n_opts[m["question_id"]] for m in metas1], meta=metas1)
+    for i, (m, gen, read) in enumerate(zip(metas1, gens1, reads1, strict=True)):
+        row = _row(cfg, m, gen, read, n_opts[m["question_id"]], gold, perms)
+        row["post_equals_peer_majority"] = int(row["answer"] == m["peer_majority"])
+        row["peers_agree_each_other"] = m["peers_agree_each_other"]
+        rows.append(row)
+        transcripts.append({**{k: v for k, v in m.items() if k != "planned_answer"},
+                            "messages": msgs1[i], "prompt": prompts1[i], "text": gen.text,
+                            "token_ids": gen.token_ids, "stop_reason": gen.stop_reason})
+        add_states(m, read)
+
+    index = writer.close()
+    frame = pd.DataFrame(rows)
+    frame["subject"] = frame["question_id"].map({q.question_id: q.subject for q in questions})
+    frame.to_parquet(tmp / ROWS_FILE, index=False)
+    pd.DataFrame(transcripts).drop(columns=["planned_answer"], errors="ignore").to_json(
+        tmp / TRANSCRIPTS_FILE, orient="records", lines=True)
+    hashes = {p.name: sha256_file(p) for p in writer.shard_paths}
+    for f in (ROWS_FILE, TRANSCRIPTS_FILE, "activation_index.parquet"):
+        hashes[f] = sha256_file(tmp / f)
+    write_completion(tmp, row_counts={"agent_states": len(frame), "activation_states": len(index),
+                                      "questions": len(questions)}, shard_hashes=hashes)
+    if final_dir.exists():
+        shutil.rmtree(final_dir)  # a stale, incomplete attempt
+    os.replace(tmp, final_dir)
+    return RunResult(run_dir=final_dir, rows=frame, n_states=len(index))
+
+
+def run_conditions(cfg, questions: list[Question], conditions: list[dict],
+                   backend: Backend | None = None, **kw) -> dict[str, RunResult]:
+    """Back-compatible entry point: ``run_chunk`` without the round-0 handle."""
+    return run_chunk(cfg, questions, conditions, backend, **kw)[0]
+
+
+def run_chunk(
+    cfg,
+    questions: list[Question],
+    conditions: list[dict],
+    backend: Backend | None = None,
+    *,
+    job: str = "dev",
+    chunk: str = "c000",
+    round0_dir: str | Path | None = None,
+    run_dirs: dict[str, Path] | None = None,
+    extra_manifest: dict | None = None,
+) -> tuple[dict[str, RunResult], Round0]:
+    """Round 0 once (reloaded from ``round0_dir`` if already saved), then every condition whose
+    output directory is not already complete. Returns results for ALL requested conditions."""
+    perms, gold, backend = _setup(cfg, questions, backend)
+    ident = {"job": job, "chunk": chunk, "question_ids": [q.question_id for q in questions],
+             "seed": round0_seed(cfg, chunk)}
+    r0 = load_round0(Path(round0_dir), ident) if round0_dir else None
+    if r0 is None:
+        r0 = generate_round0(cfg, questions, backend, perms, job=job, chunk=chunk)
+        if round0_dir:
+            save_round0(r0, Path(round0_dir), ident)
     results: dict[str, RunResult] = {}
     for cond in conditions:
-        name, kind = cond["name"], cond["kind"]
-        cfg.run_id = cond["run_id"]
-        manifest = write_manifest(cfg, extra={
-            "prompt_template_hashes": prompt_hashes(P.TEMPLATES), "n_questions": len(questions),
-            "condition": name, "kind": kind, "shared_round0": True,
-            "peer_shows_confidence": bool(cond.get("peer_confidence", False)),
-            "backend_n_layers": backend.n_layers, "backend_d_model": backend.d_model,
-        })
-        run_dir = manifest.run_dir
-        writer = ActivationWriter(run_dir, backend.n_layers, backend.d_model, cfg.activations.shard_size)
-
-        rows, transcripts = [], []
-        for meta, gen, read in zip(metas, gens0, reads0, strict=True):
-            m = {**meta, "condition": name}
-            rows.append(_row(cfg, m, gen, read, n_opts[m["question_id"]], gold, perms))
-            transcripts.append({**m, "text": gen.text})
-            writer.add(_akey(cfg, m), read.hidden)
-
-        prompts1, metas1 = [], []
-        for q in questions:
-            qid = q.question_id
-            for a in range(n_agents):
-                pre = pre_answer[(qid, a)]
-                peers = [pre_answer[(qid, b)] for b in range(n_agents) if b != a]
-                if kind == "self_reconsider":
-                    peer_texts, maj = None, None
-                elif kind == "misleading_one":
-                    # One dissenting peer, restrained wording, the other peer genuine. Two
-                    # emphatic fabricated peers produced 99% adoption, which measures whether
-                    # the model copies a confident assertion rather than anything about
-                    # conformity. One hedged dissenter should land in an informative range.
-                    adv = adversarial_answer(gold[qid], pre, q.n_options)
-                    shown = perms[qid].display_options(list(q.options))[adv]
-                    other = [b for b in range(n_agents) if b != a][0]
-                    peer_texts = [P.MILD_PEER.format(letter=LETTERS[adv], option=shown),
-                                  P.strip_confidence(own_text[(qid, other)])]
-                    peers = [adv, pre_answer[(qid, other)]]
-                    maj = peer_majority(peers)
-                elif kind == "adversarial":
-                    adv = adversarial_answer(gold[qid], pre, q.n_options)
-                    shown = perms[qid].display_options(list(q.options))[adv]
-                    peer_texts = [P.ADVERSARIAL_PEER.format(letter=LETTERS[adv], option=shown)] * (n_agents - 1)
-                    peers, maj = [adv] * (n_agents - 1), adv
-                else:
-                    raw = [own_text[(qid, b)] for b in range(n_agents) if b != a]
-                    peer_texts = raw if cond.get("peer_confidence") else [P.strip_confidence(t) for t in raw]
-                    maj = peer_majority(peers)
-                msgs = P.round1_messages(base=base_msgs[(qid, a)], own_response=own_text[(qid, a)],
-                                         peer_responses=peer_texts)
-                prompts1.append(backend.render(msgs))
-                planned = backend.plan_answer(phase="post", question_id=qid, agent_id=a, pre=pre,
-                                              peer_majority=maj, condition=kind)
-                metas1.append({"question_id": qid, "agent_id": a, "phase": "post", "condition": name,
-                               **({"planned_answer": planned} if planned is not None else {}),
-                               "peer_majority": -1 if maj is None else maj,
-                               "n_peers_agree_pre": sum(1 for p in peers if p == pre),
-                               "peers_agree_each_other": int(len(set(peers)) == 1),
-                               "peer_unanimous": int(len(set(peers)) == 1)})
-
-        # Third state: after the agent has seen the intervention but BEFORE it commits to a
-        # revision. Everything measured so far is the post-answer state, which exists only once
-        # the answer is decided, so it may be reading a decision rather than predicting one.
-        metas_pe = [{**m, "phase": "peer_exposure",
-                     "pre_answer": pre_answer[(m["question_id"], m["agent_id"])]}
-                    for m in metas1]
-        reads_pe = backend.readout(prompts1, [n_opts[m["question_id"]] for m in metas1], meta=metas_pe)
-        for m, read in zip(metas_pe, reads_pe, strict=True):
-            row = _row(cfg, m, _NullGen(), read, n_opts[m["question_id"]], gold, perms)
-            row["post_equals_peer_majority"] = int(read.answer_index == m["peer_majority"])
-            row["peers_agree_each_other"] = m["peers_agree_each_other"]
-            rows.append(row)
-            writer.add(_akey(cfg, m), read.hidden)
-
-        gens1 = backend.generate(prompts1, seed=cfg.seed + 1, meta=metas1)
-        texts1 = [p + g.text for p, g in zip(prompts1, gens1, strict=True)]
-        reads1 = backend.readout(texts1, [n_opts[m["question_id"]] for m in metas1], meta=metas1)
-        for m, gen, read in zip(metas1, gens1, reads1, strict=True):
-            row = _row(cfg, m, gen, read, n_opts[m["question_id"]], gold, perms)
-            row["post_equals_peer_majority"] = int(read.answer_index == m["peer_majority"])
-            row["peers_agree_each_other"] = m["peers_agree_each_other"]
-            rows.append(row)
-            transcripts.append({**m, "text": gen.text})
-            writer.add(_akey(cfg, m), read.hidden)
-
-        index = writer.close()
-        frame = pd.DataFrame(rows)
-        frame["subject"] = frame["question_id"].map({q.question_id: q.subject for q in questions})
-        frame.to_parquet(run_dir / ROWS_FILE, index=False)
-        pd.DataFrame(transcripts).to_json(run_dir / TRANSCRIPTS_FILE, orient="records", lines=True)
-        write_completion(run_dir,
-                         row_counts={"agent_states": len(frame), "activation_states": len(index),
-                                     "questions": len(questions)},
-                         shard_hashes={p.name: sha256_file(p) for p in writer.shard_paths})
-        results[name] = RunResult(run_dir=Path(run_dir), rows=frame, n_states=len(index))
-    return results
+        final = (run_dirs or {}).get(cond["name"]) or Path(cfg.out_dir) / cond["run_id"]
+        if is_complete(final):
+            results[cond["name"]] = RunResult(final, pd.read_parquet(final / ROWS_FILE),
+                                              len(pd.read_parquet(final / "activation_index.parquet")))
+            continue
+        results[cond["name"]] = run_condition(cfg, questions, cond, r0, backend, perms, gold, final,
+                                              job=job, chunk=chunk, extra_manifest=extra_manifest)
+    return results, r0

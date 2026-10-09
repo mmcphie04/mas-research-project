@@ -5,7 +5,7 @@ import pytest
 from conftest import make_cfg
 
 from mad.data import Question
-from mad.multi import adversarial_answer, run_conditions
+from mad.multi import run_chunk, run_conditions, wrong_target
 from mad.prompts import READOUT_SUFFIX, strip_confidence
 
 CONDS = [
@@ -14,6 +14,7 @@ CONDS = [
     {"name": "debate_conf", "kind": "debate_conf", "run_id": "m-debc", "peer_confidence": True},
     {"name": "adversarial", "kind": "adversarial", "run_id": "m-adv"},
     {"name": "misleading_one", "kind": "misleading_one", "run_id": "m-mild"},
+    {"name": "debate_answer_only", "kind": "debate_answer_only", "run_id": "m-ans"},
 ]
 
 
@@ -31,7 +32,7 @@ def multi(tmp_path_factory):
 
 def test_all_conditions_produced(multi):
     res, _ = multi
-    assert set(res) == {"self_reconsider", "debate", "debate_conf", "adversarial", "misleading_one"}
+    assert set(res) == {c["name"] for c in CONDS}
     for r in res.values():
         # three states per agent now: pre, peer_exposure, post
         assert len(r.rows) == 20 * 3 * 3
@@ -90,13 +91,20 @@ def test_misleading_one_uses_a_single_dissenter(multi):
     assert post.peers_agree_each_other.mean() < 0.9
 
 
-def test_adversarial_peers_assert_one_wrong_answer_the_focal_agent_did_not_give():
-    for gold in range(4):
-        for pre in range(4):
-            adv = adversarial_answer(gold, pre, 4)
-            assert adv != gold, "adversarial peers must assert a WRONG answer"
-            if gold != pre:
-                assert adv != pre, "and one the focal agent is not already giving"
+def test_wrong_target_is_wrong_new_and_not_position_biased():
+    from collections import Counter
+
+    picks = Counter()
+    for i in range(3000):
+        gold, pre = i % 4, (i // 4) % 4
+        t = wrong_target(0, "adversarial", f"q{i}", 0, gold, pre, 4)
+        assert t != gold, "fabricated peers must assert a WRONG answer"
+        if gold != pre:
+            assert t != pre, "and one the focal agent is not already giving"
+        picks[t] += 1
+    # the old rule always took the lowest eligible letter, so A dominated
+    assert max(picks.values()) / sum(picks.values()) < 0.3, picks
+    assert wrong_target(0, "x", "q", 1, 0, 1, 4) == wrong_target(0, "x", "q", 1, 0, 1, 4)
 
 
 def test_adversarial_peers_agree_with_each_other(multi):
@@ -139,3 +147,87 @@ def test_readout_suffix_is_appended_exactly_once(tmp_path):
         assert t.count(READOUT_SUFFIX.strip()) == 0, (
             "collect_states must not pre-append the readout suffix; the backend owns it"
         )
+
+
+def test_peer_order_is_randomised_and_recorded(multi):
+    res, _ = multi
+    post = res["misleading_one"].rows.query("phase == 'post'")
+    first = post.shown_peer_sources.str.split(",").str[0]
+    assert 0.2 < (first == "fabricated").mean() < 0.8, "the dissenter is always in the same slot"
+    targets = post.misleading_target
+    assert (targets >= 0).all() and (targets != post.gold_display).all()
+
+
+def test_shown_and_panel_metadata_are_distinguished(multi):
+    res, _ = multi
+    self_post = res["self_reconsider"].rows.query("phase == 'post'")
+    assert (self_post.shown_peer_answers == "").all() and (self_post.n_shown_agree_pre == -1).all()
+    assert (self_post.n_panel_agree_pre >= 0).all(), "panel agreement must still be recorded"
+    adv = res["adversarial"].rows.query("phase == 'post'")
+    assert (adv.shown_peer_sources == "fabricated,fabricated").all()
+    assert (adv.shown_peer_answers != adv.panel_peer_answers).any()
+
+
+def test_answer_only_peers_show_no_reasoning(multi):
+    res, d = multi
+    t = pd.read_json(d / "m-ans" / "transcripts.jsonl", lines=True)
+    user = t[t.phase == "post"].messages.map(lambda m: m[-1]["content"])
+    assert user.str.contains("Panel member 1").all()
+    assert not user.str.contains("Step 1:").any(), "peer reasoning leaked into answer-only"
+
+
+def test_transcripts_keep_structured_messages_and_request_ids(multi):
+    _, d = multi
+    t = pd.read_json(d / "m-deb" / "transcripts.jsonl", lines=True)
+    assert t.request_id.is_unique
+    assert {"messages", "prompt", "stop_reason", "token_ids"} <= set(t.columns)
+    assert "planned_answer" not in t.columns, "stub ground truth must not leak into transcripts"
+
+
+def test_round1_seeds_differ_by_condition(multi):
+    import json
+
+    res, _ = multi
+    seeds = {n: json.loads((r.run_dir / "manifest.json").read_text())["round1_seed"]
+             for n, r in res.items()}
+    assert len(set(seeds.values())) == len(seeds)
+
+
+def test_retry_reuses_saved_round0_and_skips_finished_conditions(tmp_path, monkeypatch):
+    """A crash after condition 1 must not regenerate round 0 for conditions 2 and 3."""
+    import json
+
+    import mad.multi as M
+
+    cfg = make_cfg(tmp_path, run_id="r", n_questions=4)
+    conds = [dict(c) for c in CONDS[:3]]
+    real = M.run_condition
+    calls = {"n": 0}
+
+    def crash_on_second(*a, **k):
+        calls["n"] += 1
+        if calls["n"] == 2:
+            raise RuntimeError("simulated disconnect")
+        return real(*a, **k)
+
+    monkeypatch.setattr(M, "run_condition", crash_on_second)
+    with pytest.raises(RuntimeError):
+        run_chunk(cfg, _qs(4), conds, round0_dir=tmp_path / "r0", job="j", chunk="c000")
+    assert (tmp_path / "m-self" / "completion.json").exists()
+    assert not (tmp_path / "m-deb").exists(), "a failed condition left a directory behind"
+    monkeypatch.setattr(M, "run_condition", real)
+    res, r0 = run_chunk(cfg, _qs(4), conds, round0_dir=tmp_path / "r0", job="j", chunk="c000")
+    assert r0.loaded, "round 0 was regenerated instead of reloaded"
+    pre = [r.rows.query("phase == 'pre'").sort_values(["question_id", "agent_id"]).answer.tolist()
+           for r in res.values()]
+    assert all(p == pre[0] for p in pre)
+    man = json.loads((tmp_path / "m-deb" / "manifest.json").read_text())
+    assert man["round0_reloaded"] is True
+
+
+def test_saved_round0_for_other_questions_is_refused(tmp_path):
+    cfg = make_cfg(tmp_path, run_id="r", n_questions=4)
+    conds = [dict(CONDS[0])]
+    run_chunk(cfg, _qs(4), conds, round0_dir=tmp_path / "r0", job="j", chunk="c000")
+    with pytest.raises(RuntimeError, match="does not match"):
+        run_chunk(cfg, _qs(5), [dict(CONDS[1])], round0_dir=tmp_path / "r0", job="j", chunk="c000")

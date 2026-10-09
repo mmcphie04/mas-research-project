@@ -80,9 +80,11 @@ class Manifest:
         return self.path.parent
 
 
-def write_manifest(cfg: RunConfig, extra: dict[str, Any] | None = None) -> Manifest:
-    """Write manifest.json BEFORE the run starts."""
-    run_dir = cfg.run_dir
+def write_manifest(
+    cfg: RunConfig, extra: dict[str, Any] | None = None, run_dir: Path | None = None
+) -> Manifest:
+    """Write manifest.json BEFORE the run starts (into ``run_dir``, default ``cfg.run_dir``)."""
+    run_dir = Path(run_dir) if run_dir is not None else cfg.run_dir
     run_dir.mkdir(parents=True, exist_ok=True)
     payload: dict[str, Any] = {
         "run_id": cfg.run_id,
