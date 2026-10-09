@@ -1,9 +1,9 @@
 # Running on Colab
 
-The laptop runs the 1B model at roughly 220 seconds per question, so any experiment large enough
-to detect the effects this project is looking for (hundreds to thousands of questions — see the
-the effect size and whether only changed answers count -- takes days there. Colab Pro for Education provides an
-A100 with 40 GB, which fits Gemma-3-12B, the model the plan was written for.
+The laptop runs the 1B model at roughly 220 seconds per question. Detecting the effects this
+project is looking for needs roughly 600 to 4,000 questions, depending on the effect size and on
+whether only changed answers count, so on the laptop it takes days. Colab Pro for Education
+provides an A100 with 40 GB, which fits Gemma-3-12B, the model the plan was written for.
 
 ## Division of labour
 
