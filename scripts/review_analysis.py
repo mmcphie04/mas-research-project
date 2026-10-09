@@ -9,6 +9,9 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from sklearn.linear_model import LogisticRegression
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
 
 from mad.analysis.calibrate import PlattScaler, expected_calibration_error
 from mad.analysis.labels import build_events
@@ -23,7 +26,8 @@ C_GRID = (0.001, 0.1)
 
 def split_by_question(qids, seed=11, fracs=(0.5, 0.2, 0.3)):
     uq = np.array(sorted(set(qids)))
-    rng = np.random.default_rng(seed); rng.shuffle(uq)
+    rng = np.random.default_rng(seed)
+    rng.shuffle(uq)
     a, b = int(fracs[0] * len(uq)), int((fracs[0] + fracs[1]) * len(uq))
     m = {q: ("train" if i < a else "val" if i < b else "test") for i, q in enumerate(uq)}
     return np.array([m[q] for q in qids])
@@ -51,8 +55,10 @@ store = ActivationStore("runs/night2-debate")
 bank = FeatureBank(store, ev)
 rev = (ev.revised == 1).to_numpy()
 sp = split_by_question(ev.question_id.to_numpy())
-y = ev.post_correct.to_numpy(); g = ev.question_id.to_numpy()
-tr = rev & np.isin(sp, ["train", "val"]); te = rev & (sp == "test")
+y = ev.post_correct.to_numpy()
+g = ev.question_id.to_numpy()
+tr = rev & np.isin(sp, ["train", "val"])
+te = rev & (sp == "test")
 print(f"  revision events: {tr.sum()} train+val, {te.sum()} test")
 
 best = (-1, None)
@@ -73,7 +79,8 @@ for rep in ("pre", "post", "diff", "pre_post", "pre_diff", "paired"):
     else:
         Xf = bank.features(L, rep)
     m = fit_probe(Xf[tr], y[tr], g[tr], layer=L, C_grid=C_GRID)
-    s = m.score(Xf[te]); res[rep] = s
+    s = m.score(Xf[te])
+    res[rep] = s
     c, npair, _ = conditional_auroc(y[te], s, g[te])
     print(f"    {rep:<10} test AUROC {auroc(y[te], s):.4f}   conditional {c:.4f} ({npair} pairs)")
 
@@ -84,10 +91,6 @@ cols = [c for c in ("post_confidence", "pre_confidence", "post_rationale_chars",
 Xo = ev[cols].apply(pd.to_numeric, errors="coerce").fillna(0).to_numpy()
 oof_o = grouped_oof(Xo[tr], y[tr], g[tr], C=1.0)
 mo = ~np.isnan(oof_o)
-from sklearn.linear_model import LogisticRegression
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
-
 pipe = Pipeline([("s", StandardScaler()), ("c", LogisticRegression(C=1.0, max_iter=2000))]).fit(Xo[tr], y[tr])
 s_out = pipe.predict_proba(Xo[te])[:, 1]
 raw = ev.post_confidence.to_numpy()

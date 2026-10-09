@@ -1,0 +1,18 @@
+# Dependencies for running on Google Colab.
+#
+# Pinned to the versions the code was tested against locally where they affect behaviour on the
+# model path (Gemma 3 loading, logits_to_keep, hidden-state output, dataset loading).
+#
+# torch is deliberately NOT listed: Colab ships a CUDA build of torch, and letting pip replace it
+# with a different build is the most common way to end up with a CPU-only or broken install.
+# The package itself is not pip-installed either (pyproject pins Python 3.12, which Colab may not
+# match); the notebook puts src/ on PYTHONPATH instead.
+transformers==5.17.0
+accelerate==1.15.0
+datasets==5.0.1
+pyyaml>=6.0
+scikit-learn>=1.5
+scipy>=1.13
+pyarrow>=16
+pandas>=2.2
+tqdm>=4.66

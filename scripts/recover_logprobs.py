@@ -51,7 +51,8 @@ def main(run: str, n_questions: int = 350) -> None:
             msgs = P.round1_messages(base=base, own_response=text_of[(qid, aid, "pre")],
                                      peer_responses=[P.strip_confidence(t) for t in peers])
         texts.append(backend.render(msgs) + gen)
-        keys.append((qid, aid, phase)); nopt.append(q.n_options)
+        keys.append((qid, aid, phase))
+        nopt.append(q.n_options)
 
     print(f"replaying readout for {len(texts)} states", flush=True)
     reads = backend.readout(texts, nopt)

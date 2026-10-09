@@ -52,6 +52,9 @@ class HFBackend(Backend):
         text_cfg = getattr(cfg_obj, "text_config", cfg_obj)
         self.n_layers = text_cfg.num_hidden_layers
         self.d_model = text_cfg.hidden_size
+        self.vocab_size = text_cfg.vocab_size
+        self.n_kv_heads = getattr(text_cfg, "num_key_value_heads", None)
+        self.head_dim = getattr(text_cfg, "head_dim", None)
         self._letter_ids = self._resolve_letter_ids()
         self._supports_system = self._probe_system_role()
 
@@ -154,10 +157,23 @@ class HFBackend(Backend):
         return out
 
     def estimated_readout_gb(self, batch: int, seq: int) -> float:
-        """Peak activation memory for one readout batch, with logits_to_keep=1."""
-        hidden = (self.n_layers + 1) * batch * seq * self.d_model * 4
-        logits = batch * 1 * self.model.config.get_text_config().vocab_size * 4
+        """Activation memory for one readout batch with logits_to_keep=1, excluding weights.
+
+        Hidden states are returned for every layer and every position, so this grows with
+        batch x sequence length -- on a 40 GB card holding 26.4 GB of Gemma-3-12B weights it is
+        the term that decides the safe batch size.
+        """
+        elt = 2 if self.device != "cpu" else 4
+        hidden = (self.n_layers + 1) * batch * seq * self.d_model * elt
+        logits = batch * self.vocab_size * 4
         return (hidden + logits) / 1e9
+
+    def estimated_kv_cache_gb(self, batch: int, seq: int) -> float:
+        """Key/value cache for generation, excluding weights."""
+        if not (self.n_kv_heads and self.head_dim):
+            return float("nan")
+        elt = 2 if self.device != "cpu" else 4
+        return 2 * self.n_layers * self.n_kv_heads * self.head_dim * batch * seq * elt / 1e9
 
     def readout(
         self, texts: list[str], n_options: list[int], meta: list[dict] | None = None

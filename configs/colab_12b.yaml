@@ -1,0 +1,26 @@
+# Gemma-3-12B on a Colab A100 (40 GB). Layer over configs/base.yaml.
+#
+# Memory budget, from the model config on the meta device:
+#   weights (bf16)                         26.4 GB
+#   KV cache, per 1k tokens in the batch    0.39 GB   (48 layers x 8 kv heads x 256 x 2 x bf16)
+#   hidden states, per 1k tokens readout    0.38 GB   (49 layers x 3840 x bf16)
+# A debate round-1 prompt holds the agent's own answer plus two peer answers, so with a
+# 768-token budget a round-1 sequence approaches ~3,400 tokens. At batch 4 that is ~5 GB of
+# KV cache and ~5 GB of hidden states on top of the weights -- comfortable. Batch 8 would be
+# ~37 GB peak, too close to 40. Raise batch_size only after the smoke test reports headroom.
+run_id: colab
+model:
+  backend: hf
+  repo_id: google/gemma-3-12b-it
+  device: cuda
+  dtype: bfloat16
+  max_new_tokens: 768
+  temperature: 0.7
+  top_p: 0.95
+  batch_size: 4
+data:
+  dataset: TIGER-Lab/MMLU-Pro
+  split: test
+  n_questions: 60
+activations:
+  shard_size: 256
