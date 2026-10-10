@@ -187,6 +187,15 @@ def load_config(*paths: str | Path, **overrides: Any) -> RunConfig:
     return cfg
 
 
+def config_from_dict(data: dict[str, Any]) -> RunConfig:
+    """Rebuild a RunConfig from its ``to_dict()`` form (e.g. a parent job's recorded identity)."""
+    kwargs = {k: (_from_dict(_SECTIONS[k], v or {}) if k in _SECTIONS else v) for k, v in data.items()}
+    cfg = RunConfig(**kwargs)
+    cfg.data.split_fracs = tuple(cfg.data.split_fracs)
+    validate(cfg)
+    return cfg
+
+
 CANONICAL_ANSWERS = ("stated", "readout")
 
 

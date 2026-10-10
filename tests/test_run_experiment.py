@@ -267,12 +267,14 @@ def test_child_job_refuses_without_the_parents_round0(driver, tmp_path):
     assert any("never generates its own round 0" in f["message"] for f in status["failures"])
 
 
-def test_child_job_refuses_a_different_config(driver, tmp_path):
-    driver.main(_args(tmp_path, n=4, chunk=2))
+def test_child_job_takes_its_config_from_the_parent(driver, tmp_path):
+    driver.main(_args(tmp_path, "--set", "model.max_new_tokens=99", n=4, chunk=2))
     child = ["--config", *STUB, "--out-root", str(tmp_path), "--name", "kid", "--parent", "t",
-             "--conditions", "debate_answer_only", "--set", "model.max_new_tokens=99"]
-    with pytest.raises(SystemExit, match="parent's config"):
-        driver.main(child)
+             "--conditions", "debate_answer_only", "--set", "model.batch_size=2"]
+    assert driver.main(child) == 0  # no need to repeat the parent's settings
+    kid = json.loads((tmp_path / "kid-job.json").read_text())
+    assert kid["identity"]["config"]["model"]["max_new_tokens"] == 99
+    assert kid["history"][0]["execution"]["batch_size"] == 2
 
 
 def test_pilot_and_main_pools_are_disjoint(driver, tmp_path):

@@ -337,6 +337,16 @@ def main(argv=None) -> int:
         if args.smoke:
             raise SystemExit("--smoke and --parent cannot be combined")
         parent = json.loads((out_root / f"{args.parent}-job.json").read_text())
+        # A child's configuration IS its parent's: rebuilt from the parent's recorded identity,
+        # with only execution settings (batch sizes) taken from this command line.
+        from mad.config import config_from_dict
+
+        pcfg = json.loads(json.dumps(parent["identity"]["config"]))
+        pcfg["model"]["batch_size"] = cfg.model.batch_size
+        pcfg["model"]["readout_batch_size"] = cfg.model.readout_batch_size
+        pcfg["run_id"], pcfg["out_dir"] = cfg.run_id, cfg.out_dir
+        pcfg["data"]["n_questions"] = cfg.data.n_questions
+        cfg = config_from_dict(pcfg)
         # the dataset and pool are the parent's, whatever the command line says
         args.dataset = parent["identity"]["dataset"]["key"]
         args.pool = parent["identity"]["pool"]["name"]
