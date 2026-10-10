@@ -67,6 +67,16 @@ confirmed it loads identical activations (`pilot-indep-verify.json`, `verify_std
 
 ## `stub_candidates/` — `scripts/analyze_candidates.py` on a 40-question stub candidate run
 
+## `child_restore_with_split/` — a child restored alone, carrying the registered split
+
+Stub: a split made BEFORE generation (`make_split.py` selection mode, saved under an unrelated
+name), a main job bound to it with `--split-manifest --require-split`, and a child job
+(`debate_answer_only`, first 20 questions) that inherits it. `verify_archive.py --name
+main-answeronly --copy-to <clean location>` copied the child, the parent's job file, question
+snapshot and round-0 caches, and `main-answeronly-split.json` (`restored_listing.txt`); the copy's
+split matched the hash in the job identity (`main-answeronly-verify.json`: `copy.split.verified`)
+and loads identical activations.
+
 ## `tiny_cpu_smoke/` — the real Hugging Face path, gemma-3-270m on CPU (commit `3e5fc7a`)
 
 `run_experiment.py --smoke` over a 120-question ARC-Easy pilot pool's measured token lengths, four

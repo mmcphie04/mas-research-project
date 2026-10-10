@@ -47,28 +47,31 @@ Limits that rule it out for collection:
 ## Running
 
 Set `COMMIT` in the settings cell to the full hash of the commit to run (the notebook refuses
-anything else and never follows a moving branch), edit the other settings, then *Runtime → Run
-all*. The cells:
+anything else and never follows a moving branch), choose `STAGE`, edit the other settings, then
+*Runtime → Run all*. **"Run all" runs only the chosen stage**, and `STAGE = "smoke"` is the
+default: a passing smoke test does not roll on into collection. The cells:
 
 | cell | what it does |
 |---|---|
-| 2 | settings, including the pinned `COMMIT`, the pool (`pilot`/`main`) and `MAX_HOURS` |
+| 2 | settings: `STAGE` (`smoke` / `pilot` / `main`), the pinned `COMMIT`, pilot and main settings, split seed and fractions, `MAX_HOURS` |
 | 4 | confirms a GPU is attached |
-| 6 | mounts Drive |
+| 6 | mounts Drive (the required persistent destination) |
 | 8 | reads the two secrets; never prints them |
-| 10 | checks out exactly `COMMIT`; masks the token in any git error; removes it from the saved remote |
+| 10 | checks out exactly `COMMIT` and verifies a clean tree; masks the token in any git error |
 | 12 | installs pinned dependencies, keeping Colab's CUDA build of torch |
-| 15 | **smoke test** in a throwaway job: worst-case memory stress, then 2 questions through every condition |
-| 17 | the run, resumable |
-| 19 | summary with 95% intervals and paired differences |
-| 21 | optional: push small results to a new `colab-results/<name>-<time>` branch (off by default; never `master`, never force) |
+| 13 | builds the command; shows the stage and commit; for `main`, adds `--split-manifest ... --require-split` |
+| 15 | `main` only: creates the frozen split (CPU, no model) or checks an existing one matches the settings |
+| 17 | `smoke` only: the smoke test in a throwaway job |
+| 19 | `pilot` / `main` only: collection, resumable |
+| 21 | `pilot` / `main` only: summary, archive verification, and (pilot) the pilot report |
+| 23 | optional: push small results to a new `colab-results/<name>-<time>` branch (off by default; never `master`, never force) |
 
-**Run the smoke test first and stop if it fails.** It forces the longest generation and readout the
-protocol can produce and reports allocated and reserved memory peaks. It then checks every stored
-state: 49 layers × 3,840 numbers for Gemma-3-12B, finite, not all identical, letter distributions
-that sum to one, answers inside each question's own option range. It also checks that a batched
-readout agrees with a one-at-a-time readout. Finally it reports seconds per question and projects
-the full run.
+**Read the smoke reports before changing `STAGE`.** The smoke test stresses the real generation
+and readout/extraction workload at the configured batch size over the pool's measured worst-case
+lengths, checks all 49 stored layers × 3,840 (finite, not all identical), checks a fixed
+own-response transcript against the model's own logits at every position, checks letter
+distributions, option ranges, batched-vs-single agreement and exact replay, and reports seconds
+per question.
 
 ### What makes a resume safe
 
@@ -122,13 +125,14 @@ python scripts/run_experiment.py $CFG --name pilot12b-indep --parent pilot12b --
 #    docs/preregistration.md, then freeze the main questions' split from the same deterministic
 #    selection the driver will make
 python scripts/make_split.py --dataset mmlu-pro --pool main --n-questions 900 \
-       --fracs 0.375 0.125 0.5 --seed SEED --out $R/main12b-split.json
+       --fracs 0.375 0.125 0.5 --seed 20261010 --out $R/main12b-split.json
 
-# 4. main run, bound to that split (the driver refuses a split that does not cover exactly
-#    these questions and records its hash in the job identity)
+# 4. main run, bound to that split (before loading the model, the driver refuses a split that
+#    does not cover exactly these questions; it records the hash and keeps the assignment as
+#    main12b-split.json in the archive)
 python scripts/run_experiment.py $CFG --name main12b --dataset mmlu-pro --pool main \
        --n-questions 900 --chunk 25 --conditions self_reconsider debate --max-hours 12 \
-       --split-manifest $R/main12b-split.json
+       --split-manifest $R/main12b-split.json --require-split
 python scripts/verify_archive.py --out-root $R --name main12b
 
 # 5. optional children, reusing main12b's saved round 0 and its split (never regenerated)
@@ -136,12 +140,12 @@ python scripts/run_experiment.py $CFG --name main12b-answeronly --parent main12b
        --conditions debate_answer_only --max-hours 3
 python scripts/run_experiment.py $CFG --name main12b-indep --parent main12b --subset-n 300 \
        --conditions independent --max-hours 2
-#    candidate evaluation: inspect 10 questions first, then the full set (refuses to overwrite)
+#    candidate evaluation: a prompt check on 10 questions (kept in <job>-candidates-check), then an
+#    explicit per-split sample checked against main12b's registered split (refuses to overwrite)
 python scripts/run_candidates.py --config configs/base.yaml configs/colab_12b.yaml \
-       --out-root $R --parent main12b --n 10 --split-manifest $R/main12b-split.json --splits train
-python scripts/run_candidates.py --config configs/base.yaml configs/colab_12b.yaml --force \
-       --out-root $R --parent main12b --n 300 --split-manifest $R/main12b-split.json \
-       --splits train validation test
+       --out-root $R --parent main12b --n 10 --check
+python scripts/run_candidates.py --config configs/base.yaml configs/colab_12b.yaml \
+       --out-root $R --parent main12b --n-per-split 120 30 150
 
 # 6. before deleting anything: verify an independent second copy (a child's copy includes the
 #    parent round-0 files it points into)

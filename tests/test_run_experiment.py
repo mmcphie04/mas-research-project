@@ -527,3 +527,59 @@ def test_a_child_cannot_be_a_parent(driver, tmp_path):
     with pytest.raises(SystemExit, match="itself a child"):
         driver.main(["--config", *STUB, "--out-root", str(tmp_path), "--name", "grandkid", "--parent", "kid",
                      "--conditions", "debate_answer_only"])
+
+
+def _split_for(tmp_path, n, out_name="elsewhere-split.json"):
+    ms = _load("make_split")
+    path = tmp_path / out_name
+    assert ms.main(["--dataset", "synthetic", "--n-questions", str(n), "--fracs", "0.4", "0.3", "0.3",
+                    "--seed", "5", "--out", str(path)]) == 0
+    return path
+
+
+def test_split_assignment_travels_with_the_job_and_its_children(driver, tmp_path):
+    from mad.job import JobMismatch, verify_archive
+
+    src_split = _split_for(tmp_path, 20)  # 4 per synthetic subject: every partition non-empty
+    root = tmp_path / "r"
+    assert driver.main(_args(root, "--split-manifest", str(src_split), n=20, chunk=4)) == 0
+    assert (root / "t-split.json").read_bytes() == src_split.read_bytes(), "split not archived with the job"
+    assert driver.main(["--config", *STUB, "--out-root", str(root), "--name", "kid", "--parent", "t",
+                        "--subset-n", "8", "--conditions", "independent"]) == 0
+    assert (root / "kid-split.json").read_bytes() == src_split.read_bytes(), "child lacks the split"
+    va = _load("verify_archive")
+    dst = tmp_path / "restore"
+    assert va.main(["--out-root", str(root), "--name", "kid", "--copy-to", str(dst)]) == 0
+    assert json.loads((root / "kid-verify.json").read_text())["copy"]["split"]["verified"]
+    data = json.loads((dst / "kid-split.json").read_text())
+    q = next(iter(data["assignment"]))
+    data["assignment"][q] = "train" if data["assignment"][q] != "train" else "test"
+    (dst / "kid-split.json").write_text(json.dumps(data))
+    with pytest.raises(JobMismatch, match="split hash"):
+        verify_archive(dst, "kid")
+
+
+def test_require_split_refuses_before_anything_is_loaded(driver, tmp_path):
+    with pytest.raises(SystemExit, match="require-split"):
+        driver.main(_args(tmp_path, "--require-split", n=4))
+    assert not (tmp_path / "t-job.json").exists(), "a job was created without its split"
+
+
+def test_notebook_defaults_to_smoke_and_guards_collection_by_stage():
+    _, cells = _code_cells()
+    settings = next(c for c in cells if c.startswith("STAGE"))
+    assert 'STAGE       = "smoke"' in settings, "Run all must default to the smoke test only"
+    collect = next(c for c in cells if "run(BASE_CMD)" in c)
+    assert 'if STAGE in ("pilot", "main")' in collect
+    smoke = next(c for c in cells if '"--smoke"' in c)
+    assert 'if STAGE == "smoke"' in smoke
+
+
+def test_notebook_main_stage_requires_and_creates_the_split():
+    _, cells = _code_cells()
+    src = "\n".join(cells)
+    assert '"--split-manifest", SPLIT_PATH, "--require-split"' in src
+    split_cell = next(c for c in cells if "scripts/make_split.py" in c)
+    assert 'if STAGE == "main"' in split_cell and '"--seed", str(SPLIT_SEED)' in split_cell
+    assert "assert got == want" in split_cell, "an existing split must match the current settings"
+    assert "MAIN_N and SPLIT_SEED is not None" in src

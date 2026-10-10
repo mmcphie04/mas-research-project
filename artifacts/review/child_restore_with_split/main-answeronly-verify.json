@@ -1,0 +1,68 @@
+{
+  "job": "main-answeronly",
+  "identity_sha256": "36e1f50267fbaeabe60c267ec782121659e1426b4e5b6ae973d0541b700e5797",
+  "chunks": {
+    "main-answeronly-debate_answer_only-c000": "ok",
+    "main-answeronly-debate_answer_only-c001": "ok"
+  },
+  "views": {
+    "debate_answer_only": {
+      "questions": 20,
+      "states": 180,
+      "layers": 9,
+      "d_model": 64,
+      "by_phase_and_position": {
+        "peer_exposure/readout_last": 60,
+        "post/readout_last": 60,
+        "pre/readout_last": 60
+      }
+    }
+  },
+  "split": {
+    "assignment_sha256": "e7bf10824922bbc4402a34c0acbf50bd05d62769aba1e7ec6c0bcf1582e8cb69",
+    "verified": true
+  },
+  "copied": [
+    "main-answeronly-debate_answer_only",
+    "main-answeronly-debate_answer_only-c000",
+    "main-answeronly-debate_answer_only-c001",
+    "main-answeronly-job.json",
+    "main-answeronly-ledger.jsonl",
+    "main-answeronly-questions.jsonl",
+    "main-answeronly-split.json",
+    "main-answeronly-status.json",
+    "main-job.json",
+    "main-questions.jsonl",
+    "main-round0-c000",
+    "main-round0-c001",
+    "main-round0-c002",
+    "main-round0-c003"
+  ],
+  "copy": {
+    "job": "main-answeronly",
+    "identity_sha256": "36e1f50267fbaeabe60c267ec782121659e1426b4e5b6ae973d0541b700e5797",
+    "chunks": {
+      "main-answeronly-debate_answer_only-c000": "ok",
+      "main-answeronly-debate_answer_only-c001": "ok"
+    },
+    "views": {
+      "debate_answer_only": {
+        "questions": 20,
+        "states": 180,
+        "layers": 9,
+        "d_model": 64,
+        "by_phase_and_position": {
+          "peer_exposure/readout_last": 60,
+          "post/readout_last": 60,
+          "pre/readout_last": 60
+        }
+      }
+    },
+    "split": {
+      "assignment_sha256": "e7bf10824922bbc4402a34c0acbf50bd05d62769aba1e7ec6c0bcf1582e8cb69",
+      "verified": true
+    }
+  },
+  "copy_loads_identically": true,
+  "ok": true
+}

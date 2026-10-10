@@ -56,14 +56,32 @@ ALL = ("output_linear", "output_hgb", "output_readout_only", "activation", "comb
 # ----------------------------------------------------------------------------- data
 
 
-def prepare(run_dir, time, position, exposure_position, families, output_positions=()):
+# The STRONG output-only baseline: besides the forced readout, the option probabilities just
+# before the agent's own answer letter (its confidence before committing, not a repetition of an
+# answer already written) and at its last generated token -- whenever the run saved them.
+STRONG_OUTPUT_POSITIONS = ("before_stated_answer", "generation_last")
+
+
+def resolve_output_positions(available, position, requested=None) -> list[str]:
+    """Explicit ``requested`` wins (possibly empty). Otherwise the strong set plus the activation
+    position, restricted to what this run saved; identical for every activation comparison."""
+    if requested is not None:
+        return list(requested)
+    want = [*STRONG_OUTPUT_POSITIONS, *([position] if position != "readout_last" else [])]
+    return [p for p in dict.fromkeys(want) if p in available]
+
+
+def prepare(run_dir, time, position, exposure_position, families, output_positions=None):
     """Events and per-family feature sources at one information time. Questions with any
     missing required state are dropped whole (so panel votes stay complete) and counted.
 
     ``output_positions``: extra token positions whose saved option distributions join the output
-    features -- the position-matched control for activations at that position. The readout-only
-    output baseline is then kept as the ``output_readout_only`` ablation."""
+    features (default: ``resolve_output_positions``). Phase availability follows ``time``. When
+    any are used, the readout-only output baseline is kept as the ``output_readout_only``
+    ablation."""
     ev, _ = load_events(run_dir)
+    output_positions = resolve_output_positions(ev.attrs.get("positions_with_probabilities", []),
+                                                position, output_positions)
     Xout, names = output_features(ev, time, output_positions)
     Xbase, base_names = output_features(ev, time)
     report = {"events_total": int(len(ev)), "lp_source": ev.attrs["lp_source"], "time": time,
@@ -99,7 +117,7 @@ def prepare(run_dir, time, position, exposure_position, families, output_positio
     layers = sorted({int(bank.n_layers * f) for f in LAYER_FRACS}) if need_act else []
     feats = {fam: G.Features(fam, output=Xout, act=act, layers=layers)
              for fam in families if fam not in ("stacked", "output_readout_only")}
-    if "output_readout_only" in families:
+    if "output_readout_only" in families and output_positions:  # else identical to output_linear
         feats["output_readout_only"] = G.Features("output_linear", output=Xbase)
     report.update({"events_used": int(len(ev)), "questions_used": int(ev.question_id.nunique()),
                    "revised_used": int(ev.revised.sum()), "position": position,
@@ -443,8 +461,8 @@ def main(argv=None) -> int:
     ap.add_argument("--position", default="readout_last")
     ap.add_argument("--output-positions", nargs="*", default=None,
                     help="extra positions whose option distributions join the output features "
-                         "(default: the activation --position when it is not readout_last; "
-                         "pass with no values for none)")
+                         "(default: before_stated_answer and generation_last, plus the activation "
+                         "--position, whichever this run saved; pass with no values for none)")
     ap.add_argument("--exposure-position", default="readout_last")
     ap.add_argument("--families", nargs="+", default=list(ALL), choices=list(ALL))
     ap.add_argument("--tie-break", help="default: the run manifest's debate.tie_break")
@@ -455,14 +473,10 @@ def main(argv=None) -> int:
                          "applied to them, frozen, on held-out questions")
     args = ap.parse_args(argv)
     run = Path(args.run)
-    out_pos = args.output_positions
-    if out_pos is None:
-        out_pos = [] if args.position == "readout_last" else [args.position]
+    out_pos = args.output_positions  # None: the strong default (resolve_output_positions)
     fams = set(args.families)
     if "stacked" in fams:
         fams |= set(Stacked.BASES)
-    if not out_pos:
-        fams.discard("output_readout_only")  # identical to output_linear without extra positions
     fams = [f for f in ALL if f in fams]
     man = json.loads((run / "manifest.json").read_text())
     tie = args.tie_break or man.get("config", {}).get("debate", {}).get("tie_break", "round0_then_agent0")
@@ -471,6 +485,8 @@ def main(argv=None) -> int:
               "round0_then_agent0, so that is used")
         tie = "round0_then_agent0"
     ev, feats, report = prepare(run, args.time, args.position, args.exposure_position, fams, out_pos)
+    fams = [f for f in fams if f in feats or f == "stacked"]
+    out_pos = report["output_positions"]  # transfer runs use exactly the same output controls
     print(f"{run}: {report['events_used']} events, {report['questions_used']} questions, "
           f"{report['revised_used']} revised; time={args.time}; families={fams}; tie-break={tie}")
     transfer = {}

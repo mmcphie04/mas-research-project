@@ -58,7 +58,8 @@ def messages_for(cfg, q, perm, item) -> list[dict]:
     return [{"role": "system", "content": system}, {"role": "user", "content": user}]
 
 
-def run_candidates(cfg, questions, out_dir: Path, backend=None, extra_manifest=None) -> pd.DataFrame:
+def run_candidates(cfg, questions, out_dir: Path, backend=None, extra_manifest=None,
+                   question_split: dict | None = None) -> pd.DataFrame:
     """All six readouts for every question, written atomically to ``out_dir``."""
     out_dir = Path(out_dir)
     perms = {q.question_id: make_permutation(q.n_options, q.question_id, cfg.data.permutation_seed)
@@ -86,6 +87,7 @@ def run_candidates(cfg, questions, out_dir: Path, backend=None, extra_manifest=N
             if planned is not None:
                 m["planned_answer"] = planned
             recs.append({"question_id": q.question_id, "subject": q.subject, "item": k,
+                         "split": (question_split or {}).get(q.question_id, "unassigned"),
                          "n_options": q.n_options, **item})
             texts.append(backend.render(msgs))
             metas.append(m)

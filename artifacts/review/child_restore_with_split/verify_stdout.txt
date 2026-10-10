@@ -1,0 +1,2 @@
+debate_answer_only: 20 questions, 180 states, 9 layers x 64
+VERIFIED 2 chunk directories and a restored copy

@@ -1,9 +1,10 @@
 # Preregistration — DRAFT, not yet committed
 
-**Status:** draft, revised 2026-10-09 against the code at the reviewed commit. Not in force until
-the author and advisor edit it, date it, and commit it **after the pilot and before any
-main-pool question is generated.** Bracketed items `[...]` are open decisions; each bracket gives
-the current code default. Once dated, changes go in the deviation log, not the text.
+**Status:** draft, revised 2026-10-10 against the code at the reviewed commit. Not in force until
+the author and advisor confirm the checklist (§8), date it, and commit it **after the pilot and
+before any main-pool question is generated.** Values in this draft are proposals to confirm;
+the only items left open are N (from the pilot, by the §9 rule) and the remaining budget.
+Once dated, changes go in the deviation log, not the text.
 
 Every rule here names the code that implements it. If they disagree, the code is wrong.
 
@@ -24,21 +25,21 @@ probabilities and the observable debate already tell us, well enough to change p
   is the first N of the main pool, so it holds roughly equal numbers per subject. **Every
   accuracy is therefore a subject-balanced estimate, not an estimate for MMLU-Pro's natural
   subject mix.**
-- **Main sample size:** `N = [900]`, set from the pilot's measured cost (docs/BUDGET.md).
+- **Main sample size:** N set from the pilot's measured cost by the rule in §9 (planning
+  figure: 900, docs/BUDGET.md).
 
 ## 3. Protocol (fixed by the job file and prompt hashes)
 
 - Three agents, one persona, sampled independently (temperature 0.7, top-p 0.95), token cap
-  `[768]`. Prompts ask for about 150 words of reasoning ending in `Answer: (X)` and
+  768 (the pilot may lower it; §7). Prompts ask for about 150 words of reasoning ending in `Answer: (X)` and
   `Confidence: NN`; round 1 asks for the same lines (`mad/prompts.py`).
 - Round 0 once per question, saved, and shared by every condition and every child job.
 - **Conditions (main):** `debate` (both real peers' responses, confidence lines removed, random
-  recorded order), `self_reconsider` (no peer content), `[debate_answer_only]` (each peer's stated
+  recorded order), `self_reconsider` (no peer content); and, as a child job on the first 450 main questions
+  (or in full if the pilot shows it affordable), `debate_answer_only` (each peer's stated
   letter **and option text**, no reasoning; a peer with no valid stated answer shows "No final
   answer was given."). `misleading_one` (one fabricated mildly worded peer for a uniformly random
   wrong option + one random real peer) is run in the pilot and is secondary.
-  `[If throughput requires: debate_answer_only on a matched subset — the first [450] main
-  questions — as a child job reusing the parent's saved round 0.]`
 - **Stated answer** (`mad/parsing.py`): the last answer field of the agent's own response under a
   line-anchored grammar (`Answer: (X)` strict; `Answer: X` alone on the line, or `Answer: (X)`
   / `X)` followed by text, permissive). A letter outside the options makes the response invalid;
@@ -67,7 +68,7 @@ probabilities and the observable debate already tell us, well enough to change p
   depth 3 (`output_hgb`); activations at one layer, L2 logistic (`activation`); activations +
   output features (`combined`); a cross-fitted logistic combination of the `output_linear` and
   `activation` scores (`stacked`).
-- **Activation position:** `[readout_last]` primary. `generation_last`, `stated_answer`,
+- **Activation position:** `readout_last` primary. `generation_last`, `stated_answer`,
   `before_stated_answer` are secondary. Activation phases follow the information time (post:
   pre + post states). Candidate layers: 25/50/65/80/92/100% depth.
 
@@ -75,51 +76,79 @@ probabilities and the observable debate already tell us, well enough to change p
 
 - **Split** (`scripts/make_split.py`, selection mode): made **before any main-pool question is
   generated**, from the same deterministic selection the driver makes; train / validation / test
-  `[37.5 / 12.5 / 50%]`, stratified by subject, seed `[...]`, by question (all agents,
+  **37.5 / 12.5 / 50%**, stratified by subject, **seed 20261010**, by question (all agents,
   conditions and child jobs of a question on the same side). The main job is started with
-  `--split-manifest`: the driver refuses a split that does not cover exactly its questions and
-  records the assignment hash in the job identity; children inherit it. The analysis refuses a
+  `--split-manifest ... --require-split`: the driver refuses, before loading the model, a split
+  that does not cover exactly its questions; records the assignment hash in the job identity and
+  keeps the assignment itself as `<job>-split.json`; children inherit it. The analysis refuses a
   manifest whose hash, split names, partitions or membership are wrong, or which the run did not
   record (`load_split`).
-- **Fitting:** layer, regularisation and tree settings by grouped cross-validated AUROC within
-  train. Models refit on all of train.
-- **Calibration and threshold:** Platt calibrators fitted on validation; the primary gate accepts
-  a revision iff calibrated P(new) − calibrated P(old) > τ ("difference" rule); τ chosen on
+- **Fitting:** probe layer, regularisation and tree settings by grouped cross-validated AUROC
+  within train; models refit on all of train. No choice uses test questions.
+- **Calibration and threshold:** Platt calibrators fitted on validation; the gate accepts a
+  revision iff calibrated P(new) − calibrated P(old) > τ ("difference" rule); τ chosen on
   validation over a grid that includes −∞ (accept every revision) and +∞ (reject every
-  revision), maximising **panel accuracy** under the declared tie-break. Reported as secondary:
-  the agent-accuracy τ, and the "protect" rule (keep the first answer iff calibrated P(old) > τ).
-  The test set is scored once, with everything frozen.
-- **Output controls at the activation position:** for a probe at a position other than
-  `readout_last`, the output-only baseline also gets the option distribution saved at that same
-  position (with explicit missingness) -- the position-matched control; the readout-only output
-  baseline is kept as an ablation (`output_readout_only`).
-- **Primary outcome — `[choose before the main run]`:**
-  - *Option 1 (current draft):* paired difference in test panel accuracy, `combined` gate minus
-    `output_linear` gate, in `debate`; 95% interval from resampling test questions. At N = 900
-    (450 test) only a ~4–5 point difference is detectable at 80% power unless the gates rarely
-    disagree (docs/BUDGET.md).
-  - *Option 2 (better powered):* paired difference in held-out AUROC for P(new correct),
-    `combined` minus `output_linear`, on all agent answers and on revisions, in `debate`;
-    intervals resample questions. Panel accuracy co-primary, reported with its interval.
-- **Secondary:** a pre-only protection gate (`--time pre`, rule `protect`): keep the first answer
-  when its predicted correctness from pre-debate information alone exceeds a validation-chosen
-  threshold -- distinct from predicting that a replacement is right; post time with all three
-  stages' states (`--time post_all`) against pre + post; every family against `output_linear`
-  and `output_hgb`; every gate against
-  accept-all and reject-all; beneficial revisions lost vs harmful revisions blocked; AUROC
-  overall, on revisions and within question (difficulty guard), for old- and new-answer
-  correctness separately; calibration (Brier, log-loss, ECE) against a constant predictor that
-  always outputs the training base rate (exported as `constant_training_rate`); the `exposure` and `pre` information times; the other
-  positions; the panel-optimal ceiling (best of ≤ 8 accept patterns per question) and the
-  agent-optimal policy (accept only wrong→right), labelled as such; transfer of gates fixed on
-  `debate` to `self_reconsider` and `debate_answer_only` on the same held-out questions
-  (observational, not causal).
-- **Decision rule for the primary outcome:** lower bound of the 95% interval > 0 → activations add
-  measurable value here; interval within ±`[2 panel points | 0.02 AUROC]` → no practically
-  meaningful added value; otherwise inconclusive at this sample size.
+  revision), maximising **panel accuracy** under the **`round0_then_agent0`** tie-break. The test
+  set is scored once, with everything frozen.
+- **Output controls, identical for every activation comparison:** the output-only features
+  (§4) plus the option distributions saved just **before the agent's own answer letter** and at
+  its **last generated token** (`--output-positions before_stated_answer generation_last`), with
+  explicit missingness and information-time restrictions (at `pre`, only round-0 values; at
+  `exposure`, nothing from the revised response). The confidence read at `Final answer: (` partly
+  reflects repeating an answer already written; the before-letter distribution is the model's
+  confidence before committing. The readout-only output baseline is kept as an ablation
+  (`output_readout_only`).
+- **Primary outcome (one):** in `debate`, the paired difference in **held-out panel accuracy**
+  between the `combined` gate (activations + the output controls above) and the `output_linear`
+  gate (the output controls alone, L2 logistic), at activation position `readout_last`,
+  information time `post`. 95% interval from 10,000 bootstrap resamples of test questions.
+  **Power, stated in advance:** with ~450 test questions only a ~4–5 point difference is
+  detectable at 80% power unless the two gates rarely disagree (docs/BUDGET.md); the interval is
+  reported whatever its width.
+- **Decision rule for the primary outcome** (δ = **2 panel points**):
+  lower bound > 0 → activations add measurable panel accuracy here;
+  upper bound < +δ → no practically meaningful advantage (the interval excludes one);
+  otherwise → inconclusive at this sample size. A non-significant difference is never reported
+  as equivalence unless the upper bound is below +δ.
+- **Predictive gains are not panel gains.** Better ranking or calibration of correctness (AUROC,
+  Brier) and better panel accuracy under a selected threshold are reported separately and can
+  disagree (they did on the 1B data: docs/REANALYSIS.md §6).
+- **Secondary outcomes (all in `debate` unless stated; reported, never substituted for the
+  primary):**
+  1. predictive: AUROC of `combined`, `activation` and `stacked` minus `output_linear`, for P(old
+     correct) and P(new correct) separately, on all answers, on revisions only, and within
+     question (difficulty guard); calibration (Brier, log-loss, ECE) against a constant predictor
+     that always outputs the training base rate;
+  2. the **pre-only protection gate** (`--time pre`, rule `protect`): keep the first answer when its
+     predicted correctness from round-0 information exceeds a validation-chosen threshold;
+     compared with accept-all, reject-all and the primary gates -- distinct from predicting that
+     a replacement is right;
+  3. information stages: `pre`, `exposure`, `post`, and `post_all` (all three stages' states)
+     against `post` (pre + post);
+  4. the readout-only output ablation; the trees output family; other activation positions;
+  5. beneficial revisions lost vs harmful revisions blocked, per gate; the panel-optimal ceiling
+     (best of ≤ 8 accept patterns per question) and the agent-optimal policy, labelled as such;
+  6. transfer of gates fixed on `debate` to `self_reconsider` and `debate_answer_only` on the same
+     held-out questions (observational, not causal); `misleading_one` (pilot only).
 - **Intervals:** every agent-level interval resamples questions (agents of one question are
   correlated); no row-wise DeLong. Repeated CV seeds (exploratory route,
   `scripts/reanalysis.py --mode cv`) are sensitivity checks, not replications.
+- **Frozen analysis commands** (`$R` the archive root):
+
+```bash
+A="--mode split --split-manifest $R/main12b-split.json --output-positions before_stated_answer generation_last"
+F="--families output_linear output_hgb output_readout_only activation combined stacked"
+# primary (and secondary 1, 4, 5, 6)
+python scripts/reanalysis.py --run $R/main12b-debate $A $F --time post --position readout_last \
+    --transfer-runs $R/main12b-self_reconsider --out $R/analysis/primary
+# secondary 2 and 3
+python scripts/reanalysis.py --run $R/main12b-debate $A $F --time pre      --out $R/analysis/pre
+python scripts/reanalysis.py --run $R/main12b-debate $A $F --time exposure --out $R/analysis/exposure
+python scripts/reanalysis.py --run $R/main12b-debate $A $F --time post_all --out $R/analysis/post_all
+# secondary 4: other activation positions, same output controls
+python scripts/reanalysis.py --run $R/main12b-debate $A $F --time post --position before_stated_answer \
+    --out $R/analysis/pos_before_letter
+```
 
 ## 6. Data handling
 
@@ -142,8 +171,7 @@ stated-answer parse status; cap-hit rate; stated-vs-readout disagreement; measur
 question by stage; disk per question; worst-case memory; power sensitivity; a fixed random
 transcript sample and every malformed answer, read by hand.
 
-Aims, investigated rather than applied mechanically: parsed answers ≥ `[98%]`; cap hits ≤
-`[2–5%]`; first answers not unanimous in a useful share of questions; a non-trivial number of
+Aims, investigated rather than applied mechanically: parsed answers ≥ 98%; cap hits ≤ 2–5%; first answers not unanimous in a useful share of questions; a non-trivial number of
 both beneficial and harmful revisions. High initial accuracy alone is not disqualifying.
 
 **The pilot may change:** token cap, brevity wording (a prompt change means a new job and a new
@@ -151,27 +179,31 @@ pilot), batch sizes, N, which optional conditions run in full or on a subset. **
 change:** the primary outcome, decision rule, predictor families, threshold objective, or the
 retained activation positions.
 
-## 8. Freeze checklist (all decided and dated before the main run)
+## 8. Freeze checklist (confirmed and dated before the main run)
 
-| item | current default | decided |
+| item | value in this draft | confirmed |
 |---|---|---|
-| primary outcome and comparator (§5 option 1 or 2) | `combined` vs `output_linear`, `debate` | `[ ]` |
-| activation position for the primary analysis | `readout_last` | `[ ]` |
-| N (main questions) and conditions | 900; `debate`, `self_reconsider` | `[ ]` |
-| split fractions and seed | 37.5 / 12.5 / 50; seed `[...]` | `[ ]` |
-| equivalence tolerance in the decision rule | 2 panel points / 0.02 AUROC | `[ ]` |
+| primary outcome and comparator | `combined` vs `output_linear` (strong output controls), held-out panel accuracy, `debate`, `readout_last`, `post` | `[ ]` |
+| threshold rule, objective, tie-break | difference rule; panel accuracy; `round0_then_agent0` | `[ ]` |
+| output controls for every comparison | readout features + `before_stated_answer` + `generation_last` distributions | `[ ]` |
+| split fractions and seed | 37.5 / 12.5 / 50; seed 20261010 | `[ ]` |
+| decision rule tolerance δ | 2 panel points | `[ ]` |
+| N and conditions | set by the rule in §9 from the pilot report; conditions `debate`, `self_reconsider` | `[ ]` |
 | stopping rule | below | `[ ]` |
 
-**Stopping rule (draft):** collect exactly the N questions in the split manifest; no outcome on
-any main-pool question is examined until collection ends. Collection stops early only for a
+**Stopping rule:** collect exactly the N questions in the split manifest; no outcome on any
+main-pool question is examined until collection ends. Collection stops early only for a
 technical failure that cannot be fixed without changing the protocol, or when the compute budget
-`[... A100-hours]` is exhausted; in either case the completed chunks are analysed as they stand
-and the shortfall is reported. Collection is never stopped or extended because of results.
+is exhausted; in either case the completed chunks are analysed as they stand and the shortfall
+is reported. Collection is never stopped or extended because of results.
 
 ## 9. Sample size
 
-`N` and the split are set from the pilot's measured seconds per question and the power table
-(docs/BUDGET.md), within a total of `[10–20]` A100-hours, before any main-pool outcome is seen.
+N is the largest multiple of the chunk size such that the pilot report's projected A100-hours for
+the main conditions (measured seconds per question, per condition), plus the planned child jobs,
+plus 15% contingency, fit within the remaining budget of `[... A100-hours]`, capped at 1,200. It
+is computed from the pilot report, written into §8, and frozen -- together with the split made
+for exactly those N questions -- before any main-pool question is generated.
 
 ## Deviation log
 

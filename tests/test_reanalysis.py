@@ -290,9 +290,19 @@ def test_readout_only_ablation_and_constant_baseline_are_exported(stub_view, tmp
                    "--position", "stated_answer", "--families", "output_linear", "output_readout_only",
                    "activation", "--transfer-runs", str(stub_view / "s-self_reconsider")]) == 0
     res = json.loads((tmp_path / "results.json").read_text())
-    assert res["output_positions"] == ["stated_answer"]
+    assert res["output_positions"] == ["generation_last", "stated_answer"]  # strong set + activation position
     assert len(res["output_features"]) > len(res["output_features_readout_only"])
     r0 = res["results"][0]
     assert "output_readout_only" in r0["families"] and "constant_training_rate" in r0
     assert "gate_protect_panel" in r0["families"]["activation"]
     assert (tmp_path / "transfer_predictions.csv").exists() and (tmp_path / "transfer_panel.csv").exists()
+
+
+def test_strong_output_baseline_is_the_default_where_saved():
+    R = _load("reanalysis")
+    all4 = ["readout_last", "generation_last", "stated_answer", "before_stated_answer"]
+    assert R.resolve_output_positions(all4, "readout_last") == ["before_stated_answer", "generation_last"]
+    assert R.resolve_output_positions(all4, "stated_answer") == ["before_stated_answer", "generation_last",
+                                                                 "stated_answer"]
+    assert R.resolve_output_positions([], "readout_last") == [], "old runs fall back to the readout"
+    assert R.resolve_output_positions(all4, "readout_last", []) == [], "explicit empty means none"

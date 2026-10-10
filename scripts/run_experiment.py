@@ -448,6 +448,9 @@ def main(argv=None) -> int:
     ap.add_argument("--split-manifest", help="frozen split from scripts/make_split.py: must cover exactly this "
                                              "job's questions (a child's must be its parent's); its hash "
                                              "becomes part of the job identity")
+    ap.add_argument("--require-split", action="store_true",
+                    help="refuse to start (before loading the model) without a split manifest; the "
+                         "notebook passes this for main-pool collection")
     ap.add_argument("--parent", help="child job: take round 0 from this job's saved caches")
     ap.add_argument("--subset-n", type=int, help="child job: the first N questions of the parent")
     args = ap.parse_args(argv)
@@ -495,6 +498,26 @@ def main(argv=None) -> int:
         pool = load_pool(args.dataset, cfg)
         master = master_order(pool, cfg.data.sample_seed)
         intended = select(master, args.pool, n_total, args.pilot_size)
+    # The split is checked BEFORE any model is loaded, so a main run with a missing or wrong split
+    # costs nothing.
+    split_info, split_src = None, None
+    if args.split_manifest and not args.smoke:
+        from make_split import load_split
+
+        _, smeta = load_split(args.split_manifest, [q.question_id for q in intended], allow_subset=bool(parent))
+        split_info = {"assignment_sha256": smeta["assignment_sha256"], "counts": smeta["counts"]}
+        if parent and parent["identity"].get("split") and parent["identity"]["split"] != split_info:
+            raise SystemExit("a child job must use its parent's split manifest")
+        split_src = Path(args.split_manifest)
+    elif parent and parent["identity"].get("split") and not args.smoke:
+        split_src = out_root / f"{args.parent}-split.json"  # inherited: the parent's archived copy
+        if not split_src.exists():
+            raise SystemExit(f"{args.parent} records a split but {split_src.name} is missing")
+    if args.require_split and not args.smoke and split_info is None and not (parent and parent["identity"].get("split")):
+        raise SystemExit("--require-split: this run has no split manifest. Make one with "
+                         "scripts/make_split.py before any main-pool question is generated.")
+    if split_src is not None:  # the assignment itself travels with the job, not only its hash
+        _archive_split(split_src, out_root / f"{name}-split.json")
     questions = intended[:2] if args.smoke else intended
     if args.smoke:
         n_total, chunk = 2, 2
@@ -504,7 +527,12 @@ def main(argv=None) -> int:
         f"dataset={args.dataset}, model={cfg.model.repo_id}, tokens={cfg.model.max_new_tokens}, "
         f"batch gen/readout={cfg.model.batch_size}/{cfg.model.readout_batch_size or cfg.model.batch_size}"
         + (f", child of {args.parent}" if parent else ""))
-    ledger("session_start", argv=argv if argv is not None else sys.argv[1:])
+    from mad.provenance import git_state
+
+    code = git_state()
+    log(f"  code at {code['git_sha']}{' (UNCOMMITTED CHANGES)' if code['git_dirty'] else ''}")
+    ledger("session_start", argv=argv if argv is not None else sys.argv[1:], git_sha=code["git_sha"],
+           git_dirty=code["git_dirty"])
 
     backend = None
     if cfg.model.backend != "stub":
@@ -538,13 +566,7 @@ def main(argv=None) -> int:
             chunk_size=chunk, conditions={c["name"]: CONDITION_SPECS[c["name"]] for c in conds_all},
             templates_hash=prompt_hashes(P.TEMPLATES), backend_desc=desc, master_ids_sha=master_sha)
         chunks = None
-    if args.split_manifest and not args.smoke:
-        from make_split import load_split
-
-        _, smeta = load_split(args.split_manifest, [q.question_id for q in intended], allow_subset=bool(parent))
-        split_info = {"assignment_sha256": smeta["assignment_sha256"], "counts": smeta["counts"]}
-        if parent and parent["identity"].get("split") and parent["identity"]["split"] != split_info:
-            raise SystemExit("a child job must use its parent's split manifest")
+    if split_info is not None:
         identity["split"] = split_info
     execution = {"batch_size": cfg.model.batch_size, "readout_batch_size": cfg.model.readout_batch_size,
                  "packages": package_versions(), **gpu_identity()}
@@ -686,6 +708,18 @@ def main(argv=None) -> int:
     ledger("session_end", state=state)
     log(f"{state}; failures this job: {len(failures)}")
     return 0 if state in ("finished", "stopped_time_cap") else 1
+
+
+def _archive_split(src: Path, dst: Path) -> None:
+    """Keep the exact split assignment as ``<job>-split.json`` beside the job, so the archive set
+    carries it. Refuses to replace a different assignment already there."""
+    data = src.read_bytes()
+    if dst.exists() and dst.resolve() != src.resolve():
+        if dst.read_bytes() != data:
+            raise SystemExit(f"{dst.name} already holds a different split assignment")
+        return
+    if dst.resolve() != src.resolve():
+        dst.write_bytes(data)
 
 
 def _child_questions(out_root: Path, parent: dict, subset_n: int | None) -> list:

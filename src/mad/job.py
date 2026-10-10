@@ -345,6 +345,19 @@ def verify_archive(out_root: Path, name: str) -> dict:
     out_root = Path(out_root)
     job = json.loads((out_root / f"{name}-job.json").read_text())
     report = {"job": name, "identity_sha256": job["identity_sha256"], "chunks": {}, "views": {}}
+    split = job["identity"].get("split")
+    if split:  # the assignment itself must travel with the job and match the recorded hash
+        sf = out_root / f"{name}-split.json"
+        if not sf.exists():
+            raise JobMismatch(f"{name} records a split but {sf.name} is not in the archive")
+        data = json.loads(sf.read_text())
+        blob = json.dumps(data["assignment"], sort_keys=True).encode()
+        if hashlib.sha256(blob).hexdigest() != split["assignment_sha256"]:
+            raise JobMismatch(f"{sf.name} does not match the split hash recorded in the job identity")
+        missing = [q["id"] for q in job["questions"] if q["id"] not in data["assignment"]]
+        if missing:
+            raise JobMismatch(f"{sf.name} does not assign {len(missing)} of the job's questions")
+        report["split"] = {"assignment_sha256": split["assignment_sha256"], "verified": True}
     for i in range(len(job["chunks"])):
         tag = chunk_tag(i)
         r0 = out_root / f"{name}-round0-{tag}"
