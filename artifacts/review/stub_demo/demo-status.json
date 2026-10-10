@@ -8,40 +8,115 @@
     "self_reconsider",
     "debate",
     "debate_answer_only",
-    "misleading_one",
-    "adversarial"
+    "misleading_one"
   ],
   "sessions": 1,
-  "elapsed_hours_total": 0.0,
+  "elapsed_hours_total": 0.001,
   "max_hours": null,
   "timings": [
     {
       "chunk": "c000",
       "questions": 10,
-      "seconds": 0.3,
+      "seconds": 0.4,
       "seconds_per_question": 0.0,
-      "round0_reloaded": false
+      "round0_reloaded": false,
+      "stages": {
+        "round0_s": 0.01,
+        "self_reconsider/exposure_readout_s": 0.0,
+        "self_reconsider/generation_s": 0.0,
+        "self_reconsider/readout_s": 0.0,
+        "self_reconsider/write_s": 0.06,
+        "debate/exposure_readout_s": 0.01,
+        "debate/generation_s": 0.0,
+        "debate/readout_s": 0.01,
+        "debate/write_s": 0.04,
+        "debate_answer_only/exposure_readout_s": 0.01,
+        "debate_answer_only/generation_s": 0.0,
+        "debate_answer_only/readout_s": 0.0,
+        "debate_answer_only/write_s": 0.04,
+        "misleading_one/exposure_readout_s": 0.0,
+        "misleading_one/generation_s": 0.0,
+        "misleading_one/readout_s": 0.0,
+        "misleading_one/write_s": 0.04
+      }
     },
     {
       "chunk": "c001",
       "questions": 10,
       "seconds": 0.3,
       "seconds_per_question": 0.0,
-      "round0_reloaded": false
+      "round0_reloaded": false,
+      "stages": {
+        "round0_s": 0.01,
+        "self_reconsider/exposure_readout_s": 0.01,
+        "self_reconsider/generation_s": 0.0,
+        "self_reconsider/readout_s": 0.0,
+        "self_reconsider/write_s": 0.03,
+        "debate/exposure_readout_s": 0.0,
+        "debate/generation_s": 0.0,
+        "debate/readout_s": 0.01,
+        "debate/write_s": 0.04,
+        "debate_answer_only/exposure_readout_s": 0.01,
+        "debate_answer_only/generation_s": 0.0,
+        "debate_answer_only/readout_s": 0.0,
+        "debate_answer_only/write_s": 0.03,
+        "misleading_one/exposure_readout_s": 0.0,
+        "misleading_one/generation_s": 0.0,
+        "misleading_one/readout_s": 0.0,
+        "misleading_one/write_s": 0.03
+      }
     },
     {
       "chunk": "c002",
       "questions": 10,
       "seconds": 0.3,
       "seconds_per_question": 0.0,
-      "round0_reloaded": false
+      "round0_reloaded": false,
+      "stages": {
+        "round0_s": 0.01,
+        "self_reconsider/exposure_readout_s": 0.01,
+        "self_reconsider/generation_s": 0.0,
+        "self_reconsider/readout_s": 0.0,
+        "self_reconsider/write_s": 0.03,
+        "debate/exposure_readout_s": 0.0,
+        "debate/generation_s": 0.0,
+        "debate/readout_s": 0.0,
+        "debate/write_s": 0.03,
+        "debate_answer_only/exposure_readout_s": 0.0,
+        "debate_answer_only/generation_s": 0.0,
+        "debate_answer_only/readout_s": 0.01,
+        "debate_answer_only/write_s": 0.03,
+        "misleading_one/exposure_readout_s": 0.0,
+        "misleading_one/generation_s": 0.0,
+        "misleading_one/readout_s": 0.0,
+        "misleading_one/write_s": 0.03
+      }
     },
     {
       "chunk": "c003",
       "questions": 10,
       "seconds": 0.3,
       "seconds_per_question": 0.0,
-      "round0_reloaded": false
+      "round0_reloaded": false,
+      "stages": {
+        "round0_s": 0.01,
+        "self_reconsider/exposure_readout_s": 0.0,
+        "self_reconsider/generation_s": 0.0,
+        "self_reconsider/readout_s": 0.01,
+        "self_reconsider/write_s": 0.04,
+        "debate/exposure_readout_s": 0.0,
+        "debate/generation_s": 0.0,
+        "debate/readout_s": 0.0,
+        "debate/write_s": 0.03,
+        "debate_answer_only/exposure_readout_s": 0.0,
+        "debate_answer_only/generation_s": 0.0,
+        "debate_answer_only/readout_s": 0.01,
+        "debate_answer_only/write_s": 0.04,
+        "misleading_one/exposure_readout_s": 0.0,
+        "misleading_one/generation_s": 0.0,
+        "misleading_one/readout_s": 0.0,
+        "misleading_one/write_s": 0.03
+      }
     }
   ],
   "failures": [],

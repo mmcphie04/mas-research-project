@@ -1,0 +1,265 @@
+{
+ "identity": {
+  "name": "demo-indep",
+  "dataset": {
+   "key": "synthetic",
+   "name": "synthetic",
+   "split": "none",
+   "revision": null
+  },
+  "pool": {
+   "name": "main",
+   "pilot_size": 120,
+   "order_seed": 7,
+   "master_order_sha256": "0f9e8960261a627ec13bea93864beac946b570534a20b3585393728a52bc018a"
+  },
+  "chunk_size": 10,
+  "conditions": {
+   "independent": {
+    "kind": "independent"
+   }
+  },
+  "config": {
+   "seed": 20260909,
+   "model": {
+    "backend": "stub",
+    "repo_id": "stub-tiny",
+    "revision": null,
+    "dtype": "float16",
+    "device": "cpu",
+    "max_new_tokens": 512,
+    "temperature": 0.7,
+    "top_p": 0.95
+   },
+   "stub": {
+    "base_accuracy": 0.42,
+    "accuracy_spread": 0.3,
+    "revision_rate_correct": 0.14,
+    "revision_rate_incorrect": 0.28,
+    "switch_to_correct": 0.45,
+    "conformity": 0.6,
+    "control_revision_scale": 0.5,
+    "n_layers": 8,
+    "d_model": 64,
+    "noise_scale": 1.0,
+    "probe_signal": 1.2,
+    "difficulty_leak": 0.0,
+    "signal_peak_layer": 0.6,
+    "peer_exposure_commit": 0.6,
+    "freetext_noise": 0.03,
+    "confidence_signal": 0.55,
+    "confidence_noise": 1.1
+   },
+   "debate": {
+    "n_agents": 3,
+    "n_rounds": 1,
+    "condition": "debate",
+    "tie_break": "round0_then_agent0",
+    "canonical_answer": "stated",
+    "personas": [
+     "You are a careful, methodical reasoner."
+    ],
+    "peer_shows_confidence": false,
+    "ask_verbalized_confidence": true
+   },
+   "data": {
+    "dataset": "synthetic",
+    "dataset_revision": null,
+    "split": "none",
+    "subjects": null,
+    "stratify": true,
+    "permutation_seed": 12345,
+    "split_fracs": [
+     0.5,
+     0.2,
+     0.3
+    ],
+    "split_seed": 20260909,
+    "sample_seed": 7
+   },
+   "activations": {
+    "layers": "all",
+    "positions": [
+     "readout_last",
+     "generation_last",
+     "stated_answer",
+     "before_stated_answer"
+    ],
+    "dtype": "float16",
+    "shard_size": 500
+   }
+  },
+  "prompt_template_hashes": {
+   "adversarial_peer": "b428604be34b875d",
+   "brevity": "ab1d02c3aa05d3cd",
+   "candidate_block": "5d9819941923f9a3",
+   "candidate_system": "caa3691bca130cc9",
+   "ending_conf": "a48849121707c4d7",
+   "ending_no_conf": "558b14973471cf5e",
+   "endorsement": "366342ebd3b084e9",
+   "mild_peer": "22963fb9b187cb53",
+   "peer_answer_only": "ba1f0cd92b83ea19",
+   "peer_block": "e8cff792d7c5f195",
+   "peer_entry": "90ec002c5b81d578",
+   "peer_no_answer": "1e009318543bd6e4",
+   "question": "1e3650fb59d929b6",
+   "readout_suffix": "b12a68884c9ecf8b",
+   "self_block": "9d30c3365474ae99",
+   "system": "5d659e0e90d9f7ef",
+   "system_no_conf": "3c240fc3055975c2"
+  },
+  "backend": {
+   "backend": "stub",
+   "n_layers": 8,
+   "d_model": 64
+  },
+  "parent": {
+   "name": "demo",
+   "identity_sha256": "bfa3c2b74d6466e7195c606c75e574341f402c068c72b56948dde060c93c150c",
+   "subset_n": 20
+  }
+ },
+ "identity_sha256": "6102d94d942b7454a48fa026043bce5f60e56f1a25990cd9f08bd0b6fd7cd121",
+ "code": {
+  "git_sha": "925f51338373cade23ee469440d0383dfb7b4a32",
+  "git_dirty": true,
+  "git_dirty_files": [
+   "?? artifacts/review/reanalysis_v2/"
+  ]
+ },
+ "questions": [
+  {
+   "id": "syn-000593",
+   "sha256": "e9ce025873c251f05e10f5bcff2ff623ce4d15cf4429d86977e978ee3ee93784"
+  },
+  {
+   "id": "syn-001059",
+   "sha256": "cd761da1f00d0cc794a497ba8cd12d0a64ad0118652ed7c74bcb758885cff49d"
+  },
+  {
+   "id": "syn-000262",
+   "sha256": "928e22b52ca424d3769725ce42ff5658097b8b2eb6eddce625d8a1a9b80f3b78"
+  },
+  {
+   "id": "syn-000745",
+   "sha256": "a84bf33d85ba9cec9b021dfcfd6f997fce38309d2c9f2f73f68ec24abc4eed5b"
+  },
+  {
+   "id": "syn-001386",
+   "sha256": "fb8369d2bb716c1f99705032b274b9218d1428821cb4e800899d82891c1bc480"
+  },
+  {
+   "id": "syn-000493",
+   "sha256": "89a3dd8a93752b3ce3d21f720e3e9fe2299d2e497191574e4be884e776e810c2"
+  },
+  {
+   "id": "syn-000534",
+   "sha256": "e6d5219bb5aa3b21a4e57f85d05833dc6f97d7b08c55af53d8e20b7ef3b9c815"
+  },
+  {
+   "id": "syn-000507",
+   "sha256": "7c14119cdd857b2ec82f81550caebfe55b49059344133636de75556b159a29cb"
+  },
+  {
+   "id": "syn-000025",
+   "sha256": "065e0ed3faef3b92d6ccf7664d26a45a473025acd974a7e99a6ffb90e933916b"
+  },
+  {
+   "id": "syn-000001",
+   "sha256": "1d81d303001977a62317c7fccad1a131b12089d24d9286337900086fe8e504d9"
+  },
+  {
+   "id": "syn-001608",
+   "sha256": "c60e13fcc4bd306c13006c3341822ed389507b3f71c88a7a74eb8701dde08330"
+  },
+  {
+   "id": "syn-000844",
+   "sha256": "639c7d3f92e5173ade450037466613e98bbd3d88a65c986986bc2b4bbea0aa43"
+  },
+  {
+   "id": "syn-000987",
+   "sha256": "12f56c7e42e78d8551f80bea56c55911c3f0fca4be3e5387536e8173303e40c6"
+  },
+  {
+   "id": "syn-001065",
+   "sha256": "5ac5322243729173a639c315a4314d825d4e02e8d224d5ea704d3e8f590ba3c1"
+  },
+  {
+   "id": "syn-001421",
+   "sha256": "b231e1ed4d7d9bd7a646aed7c3deda7936fa3a50111f6fedee41d79010e04f5b"
+  },
+  {
+   "id": "syn-001638",
+   "sha256": "3344dc00434fa4b7d479bff5392459199d78d5e291a0f1fb9b05552378b94848"
+  },
+  {
+   "id": "syn-001989",
+   "sha256": "9a5d4806c1a949831dbd9782d3fe9a013e71b0f465df9ad13309330d090bdf68"
+  },
+  {
+   "id": "syn-000182",
+   "sha256": "5562447a0cda15e71fd0c8920df72c1bb78b98051beab366850677b5514390e0"
+  },
+  {
+   "id": "syn-000190",
+   "sha256": "9d64ebc6d29dd2bcc5f166bd2976ddfdfc9502c1c18befac4dc8ebbe7c84df80"
+  },
+  {
+   "id": "syn-000211",
+   "sha256": "2bff6d6f733f274351212956e8566779e3cf9f39bca6e8ac4b580b6a1f085834"
+  }
+ ],
+ "chunks": [
+  [
+   "syn-000593",
+   "syn-001059",
+   "syn-000262",
+   "syn-000745",
+   "syn-001386",
+   "syn-000493",
+   "syn-000534",
+   "syn-000507",
+   "syn-000025",
+   "syn-000001"
+  ],
+  [
+   "syn-001608",
+   "syn-000844",
+   "syn-000987",
+   "syn-001065",
+   "syn-001421",
+   "syn-001638",
+   "syn-001989",
+   "syn-000182",
+   "syn-000190",
+   "syn-000211"
+  ],
+  [],
+  []
+ ],
+ "history": [
+  {
+   "time": "2026-10-09T21:08:06-0400",
+   "git_sha": "925f51338373cade23ee469440d0383dfb7b4a32",
+   "git_dirty": true,
+   "n_questions": 20,
+   "execution": {
+    "batch_size": 8,
+    "readout_batch_size": null,
+    "packages": {
+     "python": "3.12.14",
+     "numpy": "2.3.5",
+     "pandas": "3.0.5",
+     "scikit-learn": "1.9.0",
+     "scipy": "1.18.1",
+     "torch": "2.13.0+cpu",
+     "transformers": "5.17.0",
+     "datasets": "5.0.1",
+     "vllm": null
+    },
+    "torch_cuda": null
+   },
+   "event": "created"
+  }
+ ]
+}

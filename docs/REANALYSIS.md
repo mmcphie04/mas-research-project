@@ -10,6 +10,13 @@
 > below is replaced with a reanalysis in which every choice is made inside training questions, and
 > the conclusion is reworded. Sections 1–3 used legitimate within-training selection for layer and
 > regularisation; their numbers stand, with the "±" caveat.
+>
+> **Second correction (2026-10-09, review of b56c836).** Section 4's procedure still chose τ on
+> raw out-of-fold probabilities and then applied it to calibrated held-out probabilities, and it
+> maximised agent accuracy although the endpoint is panel accuracy. Section 5 reruns the analysis
+> with both fixed; section 4 is kept unchanged as the superseded version (export:
+> `artifacts/review/reanalysis_v1_b56c836/`). The corrections were specified by the review before
+> this rerun; none was chosen by looking at its results.
 
 All 1,050 events (350 questions x 3 agents) from `runs/night2-debate`, 401 of them revisions.
 8 repeated question-grouped outer splits (70/30). Layer (from 6 depths) and C (from 1e-4..1e-1)
@@ -64,7 +71,7 @@ The `initially correct` number (0.684) is inflated by an easier task: two thirds
 correct agents never revise, so predicting their final correctness largely means predicting
 whether they revise at all.
 
-## 4. Gating, redone with every choice made on training questions
+## 4. Gating, redone with every choice made on training questions (superseded by §5)
 
 `scripts/reanalysis.py` (corrected), outputs in `artifacts/review/reanalysis/`. Outer loop:
 grouped 5-fold over questions, so every question is held out exactly once per seed. Inside each
@@ -142,17 +149,100 @@ What these measurements show, literally:
    questions, so this consistency is stability, not replication, and no gate advantage followed
    from it here.
 
+## 5. Gating with the threshold on the evaluated scale and the panel objective (current)
+
+`scripts/reanalysis.py` at commit `6b6fa42`; outputs in `artifacts/review/reanalysis_v2/`
+(per-answer raw and calibrated probabilities, per-question panel answers under every gate, every
+chosen parameter and calibrator coefficient). Same data and outer folds as §4: grouped 5-fold
+over the 350 questions, three fold assignments of the same questions.
+
+What changed from §4:
+1. τ is chosen on **calibrated** out-of-fold scores (each inner fold calibrated by a Platt fit on
+   the others), the same construction used on held-out questions.
+2. τ maximises **panel accuracy** under the tie-break actually applied (`round0_then_agent0`;
+   the run's config named an unimplemented rule). The agent-accuracy τ is reported too.
+3. Accept-all (τ = −∞) and reject-all (τ = +∞) are always candidates.
+4. A fifth family: a cross-fitted logistic combination of the output-logistic and activation
+   scores (`stacked`).
+5. Output features come from the shared adapter. For this old run they are §4's plus verbalized
+   confidence (with a missingness indicator) and stated-versus-readout disagreement indicators,
+   before and after; columns for fields the run never recorded (fallback, cap hits, shown-peer
+   answers) are constant zero. Feature names are in `results.json`.
+
+**Panel accuracy on held-out questions, panel-objective τ** (seed 0 / 1 / 2):
+
+| gate | panel accuracy | agent accuracy |
+|---|---|---|
+| accept every revision | 0.377 | 0.361 |
+| reject every revision | 0.371 | 0.381 |
+| output-only, logistic | 0.414 / 0.406 / 0.391 | 0.398 / 0.391 / 0.380 |
+| output-only, trees | 0.394 / 0.389 / 0.386 | 0.386 / 0.382 / 0.383 |
+| activation | 0.406 / 0.423 / 0.414 | 0.392 / 0.404 / 0.396 |
+| combined | 0.400 / 0.391 / 0.414 | 0.391 / 0.390 / 0.395 |
+| stacked | 0.403 / 0.420 / 0.411 | 0.391 / 0.403 / 0.387 |
+| agent-optimal (not a panel bound) | 0.480 | 0.477 |
+| panel-optimal (best of ≤8 patterns) | 0.480 | 0.431 |
+
+**Paired differences in panel accuracy**, 95% intervals resampling questions:
+
+| comparison | seed 0 | seed 1 | seed 2 |
+|---|---|---|---|
+| output logistic − accept all | +0.037 [+0.011, +0.066] | +0.029 [−0.006, +0.063] | +0.014 [−0.017, +0.046] |
+| activation − accept all | +0.029 [−0.003, +0.060] | +0.046 [+0.011, +0.080] | +0.037 [+0.009, +0.066] |
+| stacked − accept all | +0.026 [−0.009, +0.060] | +0.043 [+0.014, +0.071] | +0.034 [+0.003, +0.066] |
+| combined − accept all | +0.023 [−0.006, +0.051] | +0.014 [−0.014, +0.043] | +0.037 [+0.009, +0.066] |
+| activation − output logistic | −0.009 [−0.031, +0.014] | +0.017 [−0.011, +0.046] | +0.023 [+0.000, +0.046] |
+| combined − output logistic | −0.014 [−0.037, +0.009] | −0.014 [−0.040, +0.011] | +0.023 [+0.003, +0.046] |
+| stacked − output logistic | −0.011 [−0.037, +0.011] | +0.014 [−0.009, +0.037] | +0.020 [+0.000, +0.040] |
+
+**Ranking differences (AUROC), minus output logistic**, 95% intervals resampling questions:
+
+| comparison | seed 0 | seed 1 | seed 2 |
+|---|---|---|---|
+| activation, P(old correct), all answers | +0.043 [+0.004, +0.083] | +0.037 [−0.006, +0.078] | +0.041 [+0.002, +0.079] |
+| stacked, P(old correct), all answers | +0.044 [+0.013, +0.077] | +0.045 [+0.012, +0.077] | +0.046 [+0.014, +0.077] |
+| stacked, P(new correct), all answers | +0.042 [+0.006, +0.079] | +0.043 [+0.012, +0.076] | +0.017 [−0.010, +0.044] |
+| activation, P(new correct), revisions only | +0.008 [−0.082, +0.098] | +0.069 [−0.023, +0.159] | +0.068 [−0.004, +0.141] |
+| stacked, P(new correct), revisions only | +0.011 [−0.061, +0.082] | +0.048 [−0.008, +0.106] | +0.046 [−0.005, +0.098] |
+
+On revisions alone, every family's AUROC for P(new correct) is 0.44–0.57 in every seed.
+Within-question AUROC for P(old correct): activation 0.649 / 0.676 / 0.669, stacked
+0.635 / 0.669 / 0.689, output logistic 0.622 / 0.635 / 0.615.
+
+What these measurements show, literally:
+
+1. **Gates now show gains over accepting every revision**: point estimates of +1.4 to +4.6 panel
+   points for the logistic, activation, combined and stacked gates, with intervals excluding zero
+   in one to two of the three fold assignments for each. The trees gate does not. Compared with
+   §4, the change comes from the corrected procedure (calibrated-scale τ, panel objective). The
+   three fold assignments reuse the same 350 questions, so their agreement in direction is
+   stability, not three confirmations.
+2. **Activations are not shown to raise panel accuracy over the output-logistic gate.** The
+   activation, combined and stacked gates are within about ±2 points of it, and each interval
+   includes or touches zero.
+3. **Activations rank whether the agent's FIRST answer was correct better than output features
+   do**, by about 0.04 AUROC: for the stacked combination the interval excludes zero in all three
+   fold assignments; for activations alone, in two of three. The within-question AUROCs show the
+   same ordering (no interval was computed for that difference), so question difficulty alone
+   does not appear to explain it.
+4. **Whether a revision is correct remains near chance for every predictor** on revisions alone;
+   activation-minus-output differences there are positive in all seeds but every interval
+   includes zero.
+
 ## Answer to the core research question, at this scale
 
 > After an agent sees peer responses and proposes a new answer, do its internal activations
 > provide information beyond its answer probabilities and observable debate features about
 > whether to accept the new answer?
 
-**No demonstrated incremental activation benefit under the tested 1B protocol.** With every
-choice made on training questions, neither activations nor a combined model are shown to improve
-on a fairly fitted output-only gate, and no gate is shown to improve on accepting every revision.
-This is an absence of evidence at this scale, not evidence of absence: the intervals are about
-±3 panel points, so effects of a few points in either direction are not ruled out.
+**No demonstrated incremental activation benefit to panel accuracy under the tested 1B
+protocol.** With the corrected procedure (§5), gates built from output features alone already
+improve on accepting every revision by a few panel points in some fold assignments, and adding
+activations does not measurably improve on that gate. Activations do add a modest, consistent
+improvement in ranking whether the agent's first answer was correct (~0.04 AUROC), which did not
+translate into a measurable panel gain at this sample size. Whether a proposed revision is
+correct is not predicted above chance by anything tested. All of this is at 350 questions with
+intervals of about ±3 panel points: effects of a few points are not ruled out in either direction.
 
 Scope of that claim: gemma-3-1b-it, ARC-Challenge, 350 questions, generations truncated at 64
 tokens so agents exchanged incomplete reasoning. Untested: a competent model producing complete

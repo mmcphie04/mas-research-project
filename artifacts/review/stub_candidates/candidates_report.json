@@ -1,0 +1,103 @@
+{
+  "questions": 40,
+  "readouts": 240,
+  "output_ranking_correct_over_incorrect": {
+    "neutral": 0.85,
+    "endorse_correct": 0.75,
+    "endorse_incorrect": 0.675
+  },
+  "endorsement_shifts": {
+    "correct candidate, agreeing endorsement": {
+      "mean_logodds_shift": -0.3519569382635833,
+      "ci95": [
+        -1.0307446461821064,
+        0.3325667212476806
+      ]
+    },
+    "correct candidate, disagreeing endorsement": {
+      "mean_logodds_shift": -1.4382244692136248,
+      "ci95": [
+        -2.2662232758432586,
+        -0.5398587751679111
+      ]
+    },
+    "incorrect candidate, agreeing endorsement": {
+      "mean_logodds_shift": 0.6961574660332477,
+      "ci95": [
+        -0.07974661339850864,
+        1.46267432715018
+      ]
+    },
+    "incorrect candidate, disagreeing endorsement": {
+      "mean_logodds_shift": 0.6609021026471051,
+      "ci95": [
+        -0.2150908389924599,
+        1.482761140664264
+      ]
+    }
+  },
+  "candidate_correctness": {
+    "output_only": {
+      "auroc": 0.7092361111111111,
+      "ci95": [
+        0.6518645833333332,
+        0.7681267361111112
+      ],
+      "auroc_within_question": 0.7361111111111112,
+      "by_context": {
+        "neutral": 0.818125,
+        "endorse_correct": 0.7350000000000001,
+        "endorse_incorrect": 0.560625
+      }
+    },
+    "probe": {
+      "auroc": 0.5618750000000001,
+      "ci95": [
+        0.4738038194444444,
+        0.6476458333333334
+      ],
+      "auroc_within_question": 0.575,
+      "by_context": {
+        "neutral": 0.5662499999999999,
+        "endorse_correct": 0.5506249999999999,
+        "endorse_incorrect": 0.5631250000000001
+      }
+    },
+    "combined": {
+      "auroc": 0.6102083333333332,
+      "ci95": [
+        0.5323506944444445,
+        0.6863975694444442
+      ],
+      "auroc_within_question": 0.6416666666666667,
+      "by_context": {
+        "neutral": 0.6843750000000001,
+        "endorse_correct": 0.5856250000000001,
+        "endorse_incorrect": 0.5425
+      }
+    }
+  },
+  "probe_choices": [
+    {
+      "layer": 5,
+      "C": 0.0001
+    },
+    {
+      "layer": 4,
+      "C": 0.1
+    },
+    {
+      "layer": 4,
+      "C": 0.1
+    },
+    {
+      "layer": 4,
+      "C": 0.1
+    },
+    {
+      "layer": 4,
+      "C": 0.0001
+    }
+  ],
+  "route": "grouped 5-fold CV (exploratory)"
+}

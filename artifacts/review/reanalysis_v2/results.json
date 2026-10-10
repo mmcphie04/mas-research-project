@@ -1,0 +1,1707 @@
+{
+  "events_total": 1050,
+  "lp_source": "readout_full.parquet",
+  "time": "post",
+  "output_features": [
+    "p_old@pre",
+    "p_new@pre",
+    "margin@pre",
+    "entropy@pre",
+    "lp0@pre",
+    "lp1@pre",
+    "lp2@pre",
+    "lp3@pre",
+    "lp4@pre",
+    "verbal_conf_pre",
+    "verbal_conf_pre_missing",
+    "len_pre",
+    "fallback_pre",
+    "hit_cap_pre",
+    "stated_vs_readout_disagree_pre",
+    "panel_agree_old",
+    "old_is_0",
+    "old_is_1",
+    "old_is_2",
+    "old_is_3",
+    "old_is_4",
+    "n_shown",
+    "shown_agree_old",
+    "p_old@post",
+    "p_new@post",
+    "margin@post",
+    "entropy@post",
+    "lp0@post",
+    "lp1@post",
+    "lp2@post",
+    "lp3@post",
+    "lp4@post",
+    "verbal_conf_post",
+    "verbal_conf_post_missing",
+    "len_post",
+    "fallback_post",
+    "hit_cap_post",
+    "stated_vs_readout_disagree_post",
+    "revised",
+    "panel_agree_new",
+    "shown_agree_new",
+    "new_is_0",
+    "new_is_1",
+    "new_is_2",
+    "new_is_3",
+    "new_is_4"
+  ],
+  "questions_dropped_missing_states": [],
+  "events_used": 1050,
+  "questions_used": 350,
+  "revised_used": 401,
+  "position": "readout_last",
+  "exposure_position": null,
+  "activation_phases": [
+    "pre",
+    "post"
+  ],
+  "candidate_layers": [
+    6,
+    13,
+    16,
+    20,
+    23,
+    26
+  ],
+  "run": "runs/night2-debate",
+  "mode": "cv",
+  "tie_break": "round0_then_agent0",
+  "families": [
+    "output_linear",
+    "output_hgb",
+    "activation",
+    "combined",
+    "stacked"
+  ],
+  "threshold_objectives": {
+    "primary": "panel",
+    "secondary": "agent"
+  },
+  "results": [
+    {
+      "families": {
+        "output_linear": {
+          "old_correct": {
+            "auroc_all": 0.6655576923076924,
+            "auroc_all_ci95": [
+              0.6176216192551361,
+              0.7131346233423115
+            ],
+            "auroc_revised": 0.6235677771901991,
+            "auroc_revised_ci95": [
+              0.5459250515114641,
+              0.7009793318703498
+            ],
+            "auroc_within_question": 0.6216216216216216,
+            "within_question_pairs": 148,
+            "brier": 0.21313140068890432,
+            "logloss": 0.6164270029556478,
+            "ece": 0.03193042747709949,
+            "sd": 0.1494383587281999
+          },
+          "new_correct": {
+            "auroc_all": 0.6356990904765463,
+            "auroc_all_ci95": [
+              0.5847324481493689,
+              0.6819903119105798
+            ],
+            "auroc_revised": 0.5303630363036305,
+            "auroc_revised_ci95": [
+              0.45544548674665286,
+              0.6036560723670098
+            ],
+            "auroc_within_question": 0.6326530612244898,
+            "within_question_pairs": 196,
+            "brier": 0.21778017382938544,
+            "logloss": 0.6260464264174632,
+            "ece": 0.021667771259746883,
+            "sd": 0.1052109586088696
+          },
+          "gate_panel": {
+            "agent_accuracy": 0.3980952380952381,
+            "panel_accuracy": 0.4142857142857143,
+            "beneficial_kept": 81,
+            "beneficial_lost": 20,
+            "harmful_blocked": 59,
+            "harmful_accepted": 63,
+            "unhelpful_accepted": 134,
+            "revisions_accepted": 278,
+            "revisions": 401
+          },
+          "gate_agent": {
+            "agent_accuracy": 0.3942857142857143,
+            "panel_accuracy": 0.4085714285714286,
+            "beneficial_kept": 74,
+            "beneficial_lost": 27,
+            "harmful_blocked": 62,
+            "harmful_accepted": 60,
+            "unhelpful_accepted": 124,
+            "revisions_accepted": 258,
+            "revisions": 401
+          }
+        },
+        "output_hgb": {
+          "old_correct": {
+            "auroc_all": 0.6396326923076923,
+            "auroc_all_ci95": [
+              0.5932927134539124,
+              0.6874617386550812
+            ],
+            "auroc_revised": 0.5824960338445268,
+            "auroc_revised_ci95": [
+              0.5088422684955902,
+              0.659780662381523
+            ],
+            "auroc_within_question": 0.5743243243243243,
+            "within_question_pairs": 148,
+            "brier": 0.21738903844937443,
+            "logloss": 0.6260435897477178,
+            "ece": 0.04122532865138515,
+            "sd": 0.12102622004284928
+          },
+          "new_correct": {
+            "auroc_all": 0.641369357749824,
+            "auroc_all_ci95": [
+              0.5921561566367904,
+              0.6893086477767181
+            ],
+            "auroc_revised": 0.5191419141914191,
+            "auroc_revised_ci95": [
+              0.43354487291962623,
+              0.6049551873232892
+            ],
+            "auroc_within_question": 0.6377551020408163,
+            "within_question_pairs": 196,
+            "brier": 0.21204655395826752,
+            "logloss": 0.6153849539881389,
+            "ece": 0.031523440913245625,
+            "sd": 0.12189618864976205
+          },
+          "gate_panel": {
+            "agent_accuracy": 0.38571428571428573,
+            "panel_accuracy": 0.3942857142857143,
+            "beneficial_kept": 63,
+            "beneficial_lost": 38,
+            "harmful_blocked": 64,
+            "harmful_accepted": 58,
+            "unhelpful_accepted": 113,
+            "revisions_accepted": 234,
+            "revisions": 401
+          },
+          "gate_agent": {
+            "agent_accuracy": 0.38095238095238093,
+            "panel_accuracy": 0.38,
+            "beneficial_kept": 26,
+            "beneficial_lost": 75,
+            "harmful_blocked": 96,
+            "harmful_accepted": 26,
+            "unhelpful_accepted": 48,
+            "revisions_accepted": 100,
+            "revisions": 401
+          }
+        },
+        "activation": {
+          "old_correct": {
+            "auroc_all": 0.7081576923076923,
+            "auroc_all_ci95": [
+              0.6621747274828826,
+              0.7540056075038596
+            ],
+            "auroc_revised": 0.6447793642399671,
+            "auroc_revised_ci95": [
+              0.5734934154308005,
+              0.7155775279666768
+            ],
+            "auroc_within_question": 0.6486486486486487,
+            "within_question_pairs": 148,
+            "brier": 0.2050822669050794,
+            "logloss": 0.5977372069898409,
+            "ece": 0.02877378340317858,
+            "sd": 0.19020816659848164
+          },
+          "new_correct": {
+            "auroc_all": 0.6683876701178488,
+            "auroc_all_ci95": [
+              0.6205273371907702,
+              0.7152028315324446
+            ],
+            "auroc_revised": 0.5382508250825083,
+            "auroc_revised_ci95": [
+              0.4593559055591535,
+              0.6133659968203133
+            ],
+            "auroc_within_question": 0.5561224489795918,
+            "within_question_pairs": 196,
+            "brier": 0.20996516379427366,
+            "logloss": 0.6093642390953501,
+            "ece": 0.02175409934301611,
+            "sd": 0.1390087455052701
+          },
+          "gate_panel": {
+            "agent_accuracy": 0.3923809523809524,
+            "panel_accuracy": 0.4057142857142857,
+            "beneficial_kept": 70,
+            "beneficial_lost": 31,
+            "harmful_blocked": 64,
+            "harmful_accepted": 58,
+            "unhelpful_accepted": 117,
+            "revisions_accepted": 245,
+            "revisions": 401
+          },
+          "gate_agent": {
+            "agent_accuracy": 0.38285714285714284,
+            "panel_accuracy": 0.39714285714285713,
+            "beneficial_kept": 60,
+            "beneficial_lost": 41,
+            "harmful_blocked": 64,
+            "harmful_accepted": 58,
+            "unhelpful_accepted": 114,
+            "revisions_accepted": 232,
+            "revisions": 401
+          }
+        },
+        "combined": {
+          "old_correct": {
+            "auroc_all": 0.7090461538461539,
+            "auroc_all_ci95": [
+              0.6636952656165862,
+              0.7554371560309988
+            ],
+            "auroc_revised": 0.6411069980609906,
+            "auroc_revised_ci95": [
+              0.5674647731423628,
+              0.7143216584518453
+            ],
+            "auroc_within_question": 0.6216216216216216,
+            "within_question_pairs": 148,
+            "brier": 0.20465077776102994,
+            "logloss": 0.5968719515642643,
+            "ece": 0.03939749228796836,
+            "sd": 0.19240551790182298
+          },
+          "new_correct": {
+            "auroc_all": 0.6778132114868132,
+            "auroc_all_ci95": [
+              0.6316558094359043,
+              0.7241657004982295
+            ],
+            "auroc_revised": 0.5413201320132013,
+            "auroc_revised_ci95": [
+              0.46454995336361526,
+              0.6151299409823976
+            ],
+            "auroc_within_question": 0.6020408163265306,
+            "within_question_pairs": 196,
+            "brier": 0.20762729014232192,
+            "logloss": 0.6042489857182266,
+            "ece": 0.02993163311399414,
+            "sd": 0.14650022267336
+          },
+          "gate_panel": {
+            "agent_accuracy": 0.3914285714285714,
+            "panel_accuracy": 0.4,
+            "beneficial_kept": 74,
+            "beneficial_lost": 27,
+            "harmful_blocked": 59,
+            "harmful_accepted": 63,
+            "unhelpful_accepted": 126,
+            "revisions_accepted": 263,
+            "revisions": 401
+          },
+          "gate_agent": {
+            "agent_accuracy": 0.3914285714285714,
+            "panel_accuracy": 0.39714285714285713,
+            "beneficial_kept": 73,
+            "beneficial_lost": 28,
+            "harmful_blocked": 60,
+            "harmful_accepted": 62,
+            "unhelpful_accepted": 122,
+            "revisions_accepted": 257,
+            "revisions": 401
+          }
+        },
+        "stacked": {
+          "old_correct": {
+            "auroc_all": 0.7095615384615384,
+            "auroc_all_ci95": [
+              0.661697939693931,
+              0.7559680461291293
+            ],
+            "auroc_revised": 0.6449262588871262,
+            "auroc_revised_ci95": [
+              0.5681840428379791,
+              0.7175953602848765
+            ],
+            "auroc_within_question": 0.6351351351351351,
+            "within_question_pairs": 148,
+            "brier": 0.20214766832825679,
+            "logloss": 0.5919021273605409,
+            "ece": 0.028827796304250544,
+            "sd": 0.1834383051216376
+          },
+          "new_correct": {
+            "auroc_all": 0.6776048036050633,
+            "auroc_all_ci95": [
+              0.6287368087490106,
+              0.7233542930917336
+            ],
+            "auroc_revised": 0.5414191419141914,
+            "auroc_revised_ci95": [
+              0.46341122339304913,
+              0.6149914779782827
+            ],
+            "auroc_within_question": 0.6020408163265306,
+            "within_question_pairs": 196,
+            "brier": 0.20785598967344485,
+            "logloss": 0.6054926207594123,
+            "ece": 0.037952167151623556,
+            "sd": 0.12576722826293257
+          },
+          "gate_panel": {
+            "agent_accuracy": 0.3914285714285714,
+            "panel_accuracy": 0.40285714285714286,
+            "beneficial_kept": 63,
+            "beneficial_lost": 38,
+            "harmful_blocked": 70,
+            "harmful_accepted": 52,
+            "unhelpful_accepted": 101,
+            "revisions_accepted": 216,
+            "revisions": 401
+          },
+          "gate_agent": {
+            "agent_accuracy": 0.38952380952380955,
+            "panel_accuracy": 0.4057142857142857,
+            "beneficial_kept": 58,
+            "beneficial_lost": 43,
+            "harmful_blocked": 73,
+            "harmful_accepted": 49,
+            "unhelpful_accepted": 107,
+            "revisions_accepted": 214,
+            "revisions": 401
+          }
+        }
+      },
+      "reference": {
+        "accept_all": {
+          "agent_accuracy": 0.36095238095238097,
+          "panel_accuracy": 0.37714285714285717
+        },
+        "reject_all": {
+          "agent_accuracy": 0.38095238095238093,
+          "panel_accuracy": 0.37142857142857144
+        },
+        "agent_optimal_not_a_panel_bound": {
+          "agent_accuracy": 0.47714285714285715,
+          "panel_accuracy": 0.48
+        },
+        "panel_optimal": {
+          "agent_accuracy": 0.43142857142857144,
+          "panel_accuracy": 0.48
+        }
+      },
+      "paired_panel": {
+        "activation - output_linear": {
+          "mean": -0.008571428571428572,
+          "ci95": [
+            -0.03142857142857143,
+            0.014285714285714285
+          ],
+          "n_questions": 350
+        },
+        "activation - output_hgb": {
+          "mean": 0.011428571428571429,
+          "ci95": [
+            -0.011428571428571429,
+            0.03428571428571429
+          ],
+          "n_questions": 350
+        },
+        "combined - output_linear": {
+          "mean": -0.014285714285714285,
+          "ci95": [
+            -0.037142857142857144,
+            0.008571428571428572
+          ],
+          "n_questions": 350
+        },
+        "combined - output_hgb": {
+          "mean": 0.005714285714285714,
+          "ci95": [
+            -0.017142857142857144,
+            0.025714285714285714
+          ],
+          "n_questions": 350
+        },
+        "stacked - output_linear": {
+          "mean": -0.011428571428571429,
+          "ci95": [
+            -0.037142857142857144,
+            0.011428571428571429
+          ],
+          "n_questions": 350
+        },
+        "stacked - output_hgb": {
+          "mean": 0.008571428571428572,
+          "ci95": [
+            -0.017142857142857144,
+            0.03149999999999961
+          ],
+          "n_questions": 350
+        },
+        "output_linear - accept_all": {
+          "mean": 0.037142857142857144,
+          "ci95": [
+            0.011428571428571429,
+            0.06571428571428571
+          ],
+          "n_questions": 350
+        },
+        "output_linear - reject_all": {
+          "mean": 0.04285714285714286,
+          "ci95": [
+            0.008571428571428572,
+            0.08
+          ],
+          "n_questions": 350
+        },
+        "output_hgb - accept_all": {
+          "mean": 0.017142857142857144,
+          "ci95": [
+            -0.014285714285714285,
+            0.04857142857142857
+          ],
+          "n_questions": 350
+        },
+        "output_hgb - reject_all": {
+          "mean": 0.022857142857142857,
+          "ci95": [
+            -0.008571428571428572,
+            0.05714285714285714
+          ],
+          "n_questions": 350
+        },
+        "activation - accept_all": {
+          "mean": 0.02857142857142857,
+          "ci95": [
+            -0.002857142857142857,
+            0.06
+          ],
+          "n_questions": 350
+        },
+        "activation - reject_all": {
+          "mean": 0.03428571428571429,
+          "ci95": [
+            0.002857142857142857,
+            0.06857142857142857
+          ],
+          "n_questions": 350
+        },
+        "combined - accept_all": {
+          "mean": 0.022857142857142857,
+          "ci95": [
+            -0.005714285714285714,
+            0.05142857142857143
+          ],
+          "n_questions": 350
+        },
+        "combined - reject_all": {
+          "mean": 0.02857142857142857,
+          "ci95": [
+            -0.005714285714285714,
+            0.06285714285714286
+          ],
+          "n_questions": 350
+        },
+        "stacked - accept_all": {
+          "mean": 0.025714285714285714,
+          "ci95": [
+            -0.008571428571428572,
+            0.06
+          ],
+          "n_questions": 350
+        },
+        "stacked - reject_all": {
+          "mean": 0.03142857142857143,
+          "ci95": [
+            0.0,
+            0.06571428571428571
+          ],
+          "n_questions": 350
+        }
+      },
+      "auroc_differences": {
+        "activation - output_linear | new_correct | all": {
+          "point": 0.03268857964130256,
+          "ci95": [
+            -0.013456630477074853,
+            0.08025216349790046
+          ]
+        },
+        "activation - output_linear | old_correct | all": {
+          "point": 0.04259999999999997,
+          "ci95": [
+            0.0037818220677159095,
+            0.08253859213398773
+          ]
+        },
+        "activation - output_linear | new_correct | revised": {
+          "point": 0.007887788778877858,
+          "ci95": [
+            -0.08160346045197736,
+            0.09751554353315135
+          ]
+        },
+        "activation - output_linear | old_correct | revised": {
+          "point": 0.021211587049768,
+          "ci95": [
+            -0.046311790389367516,
+            0.0897270010646535
+          ]
+        },
+        "combined - output_linear | new_correct | all": {
+          "point": 0.0421141210102669,
+          "ci95": [
+            -0.001087793399376191,
+            0.08573497291590713
+          ]
+        },
+        "combined - output_linear | old_correct | all": {
+          "point": 0.04348846153846153,
+          "ci95": [
+            0.005596662649234005,
+            0.08191955841688105
+          ]
+        },
+        "combined - output_linear | new_correct | revised": {
+          "point": 0.010957095709570819,
+          "ci95": [
+            -0.0762340869007536,
+            0.09897344351920753
+          ]
+        },
+        "combined - output_linear | old_correct | revised": {
+          "point": 0.017539220870791516,
+          "ci95": [
+            -0.04647757104587978,
+            0.08517685694723721
+          ]
+        },
+        "stacked - output_linear | new_correct | all": {
+          "point": 0.041905713128516986,
+          "ci95": [
+            0.006164142308254761,
+            0.07857849926530534
+          ]
+        },
+        "stacked - output_linear | old_correct | all": {
+          "point": 0.044003846153846005,
+          "ci95": [
+            0.012935043424459815,
+            0.07681228830995834
+          ]
+        },
+        "stacked - output_linear | new_correct | revised": {
+          "point": 0.011056105610560918,
+          "ci95": [
+            -0.06054318577245655,
+            0.08247344714522392
+          ]
+        },
+        "stacked - output_linear | old_correct | revised": {
+          "point": 0.021358481696927112,
+          "ci95": [
+            -0.029637079544997395,
+            0.07476446350821933
+          ]
+        }
+      },
+      "seed": 0,
+      "transfer": {}
+    },
+    {
+      "families": {
+        "output_linear": {
+          "old_correct": {
+            "auroc_all": 0.6641115384615386,
+            "auroc_all_ci95": [
+              0.6157301355355373,
+              0.711520200070225
+            ],
+            "auroc_revised": 0.6044420941300899,
+            "auroc_revised_ci95": [
+              0.5206596428791933,
+              0.6839729175009586
+            ],
+            "auroc_within_question": 0.6351351351351351,
+            "within_question_pairs": 148,
+            "brier": 0.21403555162350893,
+            "logloss": 0.6192346619558794,
+            "ece": 0.03644267975357495,
+            "sd": 0.15001737569256282
+          },
+          "new_correct": {
+            "auroc_all": 0.6408621008300925,
+            "auroc_all_ci95": [
+              0.5898382130683771,
+              0.6912811157686269
+            ],
+            "auroc_revised": 0.4983168316831682,
+            "auroc_revised_ci95": [
+              0.41465251025905725,
+              0.5818139123843223
+            ],
+            "auroc_within_question": 0.5663265306122449,
+            "within_question_pairs": 196,
+            "brier": 0.21531509155306786,
+            "logloss": 0.6220987207443767,
+            "ece": 0.03685073244334227,
+            "sd": 0.12638431659631014
+          },
+          "gate_panel": {
+            "agent_accuracy": 0.3914285714285714,
+            "panel_accuracy": 0.4057142857142857,
+            "beneficial_kept": 66,
+            "beneficial_lost": 35,
+            "harmful_blocked": 67,
+            "harmful_accepted": 55,
+            "unhelpful_accepted": 108,
+            "revisions_accepted": 229,
+            "revisions": 401
+          },
+          "gate_agent": {
+            "agent_accuracy": 0.38761904761904764,
+            "panel_accuracy": 0.4,
+            "beneficial_kept": 57,
+            "beneficial_lost": 44,
+            "harmful_blocked": 72,
+            "harmful_accepted": 50,
+            "unhelpful_accepted": 91,
+            "revisions_accepted": 198,
+            "revisions": 401
+          }
+        },
+        "output_hgb": {
+          "old_correct": {
+            "auroc_all": 0.6198076923076923,
+            "auroc_all_ci95": [
+              0.5707381014613213,
+              0.6679319667221606
+            ],
+            "auroc_revised": 0.5727422292731652,
+            "auroc_revised_ci95": [
+              0.49185304545738967,
+              0.6513271321529303
+            ],
+            "auroc_within_question": 0.6621621621621622,
+            "within_question_pairs": 148,
+            "brier": 0.221715540815949,
+            "logloss": 0.6355032206861573,
+            "ece": 0.03542855758296063,
+            "sd": 0.1265864904583176
+          },
+          "new_correct": {
+            "auroc_all": 0.6407795241222294,
+            "auroc_all_ci95": [
+              0.5924285776116214,
+              0.6867291013383827
+            ],
+            "auroc_revised": 0.5437623762376238,
+            "auroc_revised_ci95": [
+              0.46777771867274875,
+              0.622807140428104
+            ],
+            "auroc_within_question": 0.6020408163265306,
+            "within_question_pairs": 196,
+            "brier": 0.21119893696216568,
+            "logloss": 0.6129854985697901,
+            "ece": 0.02743931756114359,
+            "sd": 0.12464184439305838
+          },
+          "gate_panel": {
+            "agent_accuracy": 0.3819047619047619,
+            "panel_accuracy": 0.38857142857142857,
+            "beneficial_kept": 48,
+            "beneficial_lost": 53,
+            "harmful_blocked": 75,
+            "harmful_accepted": 47,
+            "unhelpful_accepted": 96,
+            "revisions_accepted": 191,
+            "revisions": 401
+          },
+          "gate_agent": {
+            "agent_accuracy": 0.37523809523809526,
+            "panel_accuracy": 0.38,
+            "beneficial_kept": 41,
+            "beneficial_lost": 60,
+            "harmful_blocked": 75,
+            "harmful_accepted": 47,
+            "unhelpful_accepted": 64,
+            "revisions_accepted": 152,
+            "revisions": 401
+          }
+        },
+        "activation": {
+          "old_correct": {
+            "auroc_all": 0.7012653846153846,
+            "auroc_all_ci95": [
+              0.64970162106607,
+              0.7451831423512629
+            ],
+            "auroc_revised": 0.6579411246254185,
+            "auroc_revised_ci95": [
+              0.5839420088125924,
+              0.7292458016183917
+            ],
+            "auroc_within_question": 0.6756756756756757,
+            "within_question_pairs": 148,
+            "brier": 0.20487589667510234,
+            "logloss": 0.5993714576006632,
+            "ece": 0.030119757855252588,
+            "sd": 0.18346362936437685
+          },
+          "new_correct": {
+            "auroc_all": 0.6787215552733092,
+            "auroc_all_ci95": [
+              0.6286616791791018,
+              0.7268267830553825
+            ],
+            "auroc_revised": 0.5671287128712871,
+            "auroc_revised_ci95": [
+              0.4983626536028816,
+              0.6369558158347692
+            ],
+            "auroc_within_question": 0.5867346938775511,
+            "within_question_pairs": 196,
+            "brier": 0.20823019505549986,
+            "logloss": 0.6055424182938903,
+            "ece": 0.01961142086830672,
+            "sd": 0.15542702560186233
+          },
+          "gate_panel": {
+            "agent_accuracy": 0.4038095238095238,
+            "panel_accuracy": 0.4228571428571429,
+            "beneficial_kept": 76,
+            "beneficial_lost": 25,
+            "harmful_blocked": 70,
+            "harmful_accepted": 52,
+            "unhelpful_accepted": 119,
+            "revisions_accepted": 247,
+            "revisions": 401
+          },
+          "gate_agent": {
+            "agent_accuracy": 0.38952380952380955,
+            "panel_accuracy": 0.39714285714285713,
+            "beneficial_kept": 60,
+            "beneficial_lost": 41,
+            "harmful_blocked": 71,
+            "harmful_accepted": 51,
+            "unhelpful_accepted": 92,
+            "revisions_accepted": 203,
+            "revisions": 401
+          }
+        },
+        "combined": {
+          "old_correct": {
+            "auroc_all": 0.7000461538461538,
+            "auroc_all_ci95": [
+              0.6486792339510289,
+              0.7451649737601043
+            ],
+            "auroc_revised": 0.6480991832657617,
+            "auroc_revised_ci95": [
+              0.5726490832908874,
+              0.7187140967412456
+            ],
+            "auroc_within_question": 0.6418918918918919,
+            "within_question_pairs": 148,
+            "brier": 0.20536206823559255,
+            "logloss": 0.6004126349139246,
+            "ece": 0.027707121745063176,
+            "sd": 0.1839946020522117
+          },
+          "new_correct": {
+            "auroc_all": 0.6758864216366703,
+            "auroc_all_ci95": [
+              0.626551423916678,
+              0.724552271893379
+            ],
+            "auroc_revised": 0.5512211221122112,
+            "auroc_revised_ci95": [
+              0.4787369038301498,
+              0.6216297457665093
+            ],
+            "auroc_within_question": 0.5663265306122449,
+            "within_question_pairs": 196,
+            "brier": 0.20894487038356055,
+            "logloss": 0.6072127166679511,
+            "ece": 0.016333228541136658,
+            "sd": 0.16197711112377755
+          },
+          "gate_panel": {
+            "agent_accuracy": 0.38952380952380955,
+            "panel_accuracy": 0.3914285714285714,
+            "beneficial_kept": 71,
+            "beneficial_lost": 30,
+            "harmful_blocked": 60,
+            "harmful_accepted": 62,
+            "unhelpful_accepted": 113,
+            "revisions_accepted": 246,
+            "revisions": 401
+          },
+          "gate_agent": {
+            "agent_accuracy": 0.3952380952380952,
+            "panel_accuracy": 0.4057142857142857,
+            "beneficial_kept": 69,
+            "beneficial_lost": 32,
+            "harmful_blocked": 68,
+            "harmful_accepted": 54,
+            "unhelpful_accepted": 100,
+            "revisions_accepted": 223,
+            "revisions": 401
+          }
+        },
+        "stacked": {
+          "old_correct": {
+            "auroc_all": 0.7087923076923077,
+            "auroc_all_ci95": [
+              0.6580363491981978,
+              0.7543051354443373
+            ],
+            "auroc_revised": 0.6487455197132614,
+            "auroc_revised_ci95": [
+              0.5685170580814676,
+              0.7234821729045141
+            ],
+            "auroc_within_question": 0.668918918918919,
+            "within_question_pairs": 148,
+            "brier": 0.20309746278370433,
+            "logloss": 0.5957966247733225,
+            "ece": 0.04642130000672341,
+            "sd": 0.17707553857440117
+          },
+          "new_correct": {
+            "auroc_all": 0.6841480246471812,
+            "auroc_all_ci95": [
+              0.6334435261568861,
+              0.7317548646473215
+            ],
+            "auroc_revised": 0.5466996699669967,
+            "auroc_revised_ci95": [
+              0.47025632316167465,
+              0.6258583635938757
+            ],
+            "auroc_within_question": 0.5867346938775511,
+            "within_question_pairs": 196,
+            "brier": 0.20439452795587357,
+            "logloss": 0.5976421788525018,
+            "ece": 0.03231613834700137,
+            "sd": 0.1573683008712677
+          },
+          "gate_panel": {
+            "agent_accuracy": 0.40285714285714286,
+            "panel_accuracy": 0.42,
+            "beneficial_kept": 82,
+            "beneficial_lost": 19,
+            "harmful_blocked": 63,
+            "harmful_accepted": 59,
+            "unhelpful_accepted": 134,
+            "revisions_accepted": 275,
+            "revisions": 401
+          },
+          "gate_agent": {
+            "agent_accuracy": 0.38952380952380955,
+            "panel_accuracy": 0.40285714285714286,
+            "beneficial_kept": 66,
+            "beneficial_lost": 35,
+            "harmful_blocked": 65,
+            "harmful_accepted": 57,
+            "unhelpful_accepted": 109,
+            "revisions_accepted": 232,
+            "revisions": 401
+          }
+        }
+      },
+      "reference": {
+        "accept_all": {
+          "agent_accuracy": 0.36095238095238097,
+          "panel_accuracy": 0.37714285714285717
+        },
+        "reject_all": {
+          "agent_accuracy": 0.38095238095238093,
+          "panel_accuracy": 0.37142857142857144
+        },
+        "agent_optimal_not_a_panel_bound": {
+          "agent_accuracy": 0.47714285714285715,
+          "panel_accuracy": 0.48
+        },
+        "panel_optimal": {
+          "agent_accuracy": 0.43142857142857144,
+          "panel_accuracy": 0.48
+        }
+      },
+      "paired_panel": {
+        "activation - output_linear": {
+          "mean": 0.017142857142857144,
+          "ci95": [
+            -0.011428571428571429,
+            0.045714285714285714
+          ],
+          "n_questions": 350
+        },
+        "activation - output_hgb": {
+          "mean": 0.03428571428571429,
+          "ci95": [
+            0.005714285714285714,
+            0.06285714285714286
+          ],
+          "n_questions": 350
+        },
+        "combined - output_linear": {
+          "mean": -0.014285714285714285,
+          "ci95": [
+            -0.04,
+            0.011428571428571429
+          ],
+          "n_questions": 350
+        },
+        "combined - output_hgb": {
+          "mean": 0.002857142857142857,
+          "ci95": [
+            -0.025714285714285714,
+            0.03142857142857143
+          ],
+          "n_questions": 350
+        },
+        "stacked - output_linear": {
+          "mean": 0.014285714285714285,
+          "ci95": [
+            -0.008571428571428572,
+            0.037142857142857144
+          ],
+          "n_questions": 350
+        },
+        "stacked - output_hgb": {
+          "mean": 0.03142857142857143,
+          "ci95": [
+            0.008571428571428572,
+            0.054285714285714284
+          ],
+          "n_questions": 350
+        },
+        "output_linear - accept_all": {
+          "mean": 0.02857142857142857,
+          "ci95": [
+            -0.005714285714285714,
+            0.06285714285714286
+          ],
+          "n_questions": 350
+        },
+        "output_linear - reject_all": {
+          "mean": 0.03428571428571429,
+          "ci95": [
+            0.0,
+            0.06857142857142857
+          ],
+          "n_questions": 350
+        },
+        "output_hgb - accept_all": {
+          "mean": 0.011428571428571429,
+          "ci95": [
+            -0.025714285714285714,
+            0.045714285714285714
+          ],
+          "n_questions": 350
+        },
+        "output_hgb - reject_all": {
+          "mean": 0.017142857142857144,
+          "ci95": [
+            -0.011428571428571429,
+            0.045714285714285714
+          ],
+          "n_questions": 350
+        },
+        "activation - accept_all": {
+          "mean": 0.045714285714285714,
+          "ci95": [
+            0.011428571428571429,
+            0.08
+          ],
+          "n_questions": 350
+        },
+        "activation - reject_all": {
+          "mean": 0.05142857142857143,
+          "ci95": [
+            0.02,
+            0.08285714285714285
+          ],
+          "n_questions": 350
+        },
+        "combined - accept_all": {
+          "mean": 0.014285714285714285,
+          "ci95": [
+            -0.014357142857142853,
+            0.04285714285714286
+          ],
+          "n_questions": 350
+        },
+        "combined - reject_all": {
+          "mean": 0.02,
+          "ci95": [
+            -0.011428571428571429,
+            0.05142857142857143
+          ],
+          "n_questions": 350
+        },
+        "stacked - accept_all": {
+          "mean": 0.04285714285714286,
+          "ci95": [
+            0.014285714285714285,
+            0.07142857142857142
+          ],
+          "n_questions": 350
+        },
+        "stacked - reject_all": {
+          "mean": 0.04857142857142857,
+          "ci95": [
+            0.014285714285714285,
+            0.08285714285714285
+          ],
+          "n_questions": 350
+        }
+      },
+      "auroc_differences": {
+        "activation - output_linear | new_correct | all": {
+          "point": 0.0378594544432167,
+          "ci95": [
+            -0.011101958372299969,
+            0.0866121564427852
+          ]
+        },
+        "activation - output_linear | old_correct | all": {
+          "point": 0.03715384615384598,
+          "ci95": [
+            -0.005806720648986523,
+            0.07772834016318754
+          ]
+        },
+        "activation - output_linear | new_correct | revised": {
+          "point": 0.06881188118811887,
+          "ci95": [
+            -0.023029750875976383,
+            0.15890447543217043
+          ]
+        },
+        "activation - output_linear | old_correct | revised": {
+          "point": 0.05349903049532867,
+          "ci95": [
+            -0.019777894546005335,
+            0.130367169725249
+          ]
+        },
+        "combined - output_linear | new_correct | all": {
+          "point": 0.0350243208065778,
+          "ci95": [
+            -0.009806441742077942,
+            0.07980275083777692
+          ]
+        },
+        "combined - output_linear | old_correct | all": {
+          "point": 0.035934615384615176,
+          "ci95": [
+            -0.006156125055707276,
+            0.07570844592343122
+          ]
+        },
+        "combined - output_linear | new_correct | revised": {
+          "point": 0.05290429042904299,
+          "ci95": [
+            -0.03483358298658491,
+            0.13938945398473634
+          ]
+        },
+        "combined - output_linear | old_correct | revised": {
+          "point": 0.04365708913567179,
+          "ci95": [
+            -0.027966300319185834,
+            0.11973070663672172
+          ]
+        },
+        "stacked - output_linear | new_correct | all": {
+          "point": 0.04328592381708862,
+          "ci95": [
+            0.012212655114074378,
+            0.0758409402054824
+          ]
+        },
+        "stacked - output_linear | old_correct | all": {
+          "point": 0.044680769230769135,
+          "ci95": [
+            0.012223140518971127,
+            0.07670143189200031
+          ]
+        },
+        "stacked - output_linear | new_correct | revised": {
+          "point": 0.0483828382838285,
+          "ci95": [
+            -0.008414899488046667,
+            0.1058829566701445
+          ]
+        },
+        "stacked - output_linear | old_correct | revised": {
+          "point": 0.044303425583171574,
+          "ci95": [
+            -0.012770532778773075,
+            0.10071789284249365
+          ]
+        }
+      },
+      "seed": 1,
+      "transfer": {}
+    },
+    {
+      "families": {
+        "output_linear": {
+          "old_correct": {
+            "auroc_all": 0.6629884615384614,
+            "auroc_all_ci95": [
+              0.6140482994332476,
+              0.7123465753001502
+            ],
+            "auroc_revised": 0.6092014806980434,
+            "auroc_revised_ci95": [
+              0.5333613289689741,
+              0.6801235501532676
+            ],
+            "auroc_within_question": 0.6148648648648649,
+            "within_question_pairs": 148,
+            "brier": 0.21522436147248314,
+            "logloss": 0.6215811333111996,
+            "ece": 0.021817323022422792,
+            "sd": 0.15065731247099612
+          },
+          "new_correct": {
+            "auroc_all": 0.6336739950218042,
+            "auroc_all_ci95": [
+              0.5802538386987492,
+              0.6852986090076191
+            ],
+            "auroc_revised": 0.4371617161716172,
+            "auroc_revised_ci95": [
+              0.3612540466639029,
+              0.5173195581462123
+            ],
+            "auroc_within_question": 0.5918367346938775,
+            "within_question_pairs": 196,
+            "brier": 0.21721604553189566,
+            "logloss": 0.628190807172231,
+            "ece": 0.05265325763226042,
+            "sd": 0.13767716067158378
+          },
+          "gate_panel": {
+            "agent_accuracy": 0.38,
+            "panel_accuracy": 0.3914285714285714,
+            "beneficial_kept": 65,
+            "beneficial_lost": 36,
+            "harmful_blocked": 56,
+            "harmful_accepted": 66,
+            "unhelpful_accepted": 121,
+            "revisions_accepted": 252,
+            "revisions": 401
+          },
+          "gate_agent": {
+            "agent_accuracy": 0.3742857142857143,
+            "panel_accuracy": 0.38571428571428573,
+            "beneficial_kept": 42,
+            "beneficial_lost": 59,
+            "harmful_blocked": 73,
+            "harmful_accepted": 49,
+            "unhelpful_accepted": 83,
+            "revisions_accepted": 174,
+            "revisions": 401
+          }
+        },
+        "output_hgb": {
+          "old_correct": {
+            "auroc_all": 0.6289903846153846,
+            "auroc_all_ci95": [
+              0.5779382223674593,
+              0.6780133534399662
+            ],
+            "auroc_revised": 0.6055878723779305,
+            "auroc_revised_ci95": [
+              0.5270203320301746,
+              0.6783463652730638
+            ],
+            "auroc_within_question": 0.6148648648648649,
+            "within_question_pairs": 148,
+            "brier": 0.22169751021730824,
+            "logloss": 0.6357058788590344,
+            "ece": 0.03988239131003436,
+            "sd": 0.12197766545820715
+          },
+          "new_correct": {
+            "auroc_all": 0.6114294028131131,
+            "auroc_all_ci95": [
+              0.5587981054022637,
+              0.659420821503613
+            ],
+            "auroc_revised": 0.4810891089108911,
+            "auroc_revised_ci95": [
+              0.4011856521644189,
+              0.5610939156405936
+            ],
+            "auroc_within_question": 0.6173469387755102,
+            "within_question_pairs": 196,
+            "brier": 0.21756646281432707,
+            "logloss": 0.6277819598297154,
+            "ece": 0.04916377345334227,
+            "sd": 0.13038835028841003
+          },
+          "gate_panel": {
+            "agent_accuracy": 0.38285714285714284,
+            "panel_accuracy": 0.38571428571428573,
+            "beneficial_kept": 44,
+            "beneficial_lost": 57,
+            "harmful_blocked": 80,
+            "harmful_accepted": 42,
+            "unhelpful_accepted": 72,
+            "revisions_accepted": 158,
+            "revisions": 401
+          },
+          "gate_agent": {
+            "agent_accuracy": 0.38285714285714284,
+            "panel_accuracy": 0.37714285714285717,
+            "beneficial_kept": 38,
+            "beneficial_lost": 63,
+            "harmful_blocked": 86,
+            "harmful_accepted": 36,
+            "unhelpful_accepted": 60,
+            "revisions_accepted": 134,
+            "revisions": 401
+          }
+        },
+        "activation": {
+          "old_correct": {
+            "auroc_all": 0.7041999999999999,
+            "auroc_all_ci95": [
+              0.6546091388476722,
+              0.7519328891466884
+            ],
+            "auroc_revised": 0.6416358187907634,
+            "auroc_revised_ci95": [
+              0.5614232139136411,
+              0.7160813598873648
+            ],
+            "auroc_within_question": 0.668918918918919,
+            "within_question_pairs": 148,
+            "brier": 0.2050918416298635,
+            "logloss": 0.6014361524351569,
+            "ece": 0.04653950480588537,
+            "sd": 0.18665287421713853
+          },
+          "new_correct": {
+            "auroc_all": 0.6472283717839322,
+            "auroc_all_ci95": [
+              0.5952446690971751,
+              0.6973078943254524
+            ],
+            "auroc_revised": 0.5046864686468646,
+            "auroc_revised_ci95": [
+              0.42973255321710857,
+              0.5814537629052327
+            ],
+            "auroc_within_question": 0.5867346938775511,
+            "within_question_pairs": 196,
+            "brier": 0.21492501551135437,
+            "logloss": 0.6214419743838727,
+            "ece": 0.028674558507746317,
+            "sd": 0.15362075547368123
+          },
+          "gate_panel": {
+            "agent_accuracy": 0.3961904761904762,
+            "panel_accuracy": 0.4142857142857143,
+            "beneficial_kept": 80,
+            "beneficial_lost": 21,
+            "harmful_blocked": 58,
+            "harmful_accepted": 64,
+            "unhelpful_accepted": 124,
+            "revisions_accepted": 268,
+            "revisions": 401
+          },
+          "gate_agent": {
+            "agent_accuracy": 0.38857142857142857,
+            "panel_accuracy": 0.4085714285714286,
+            "beneficial_kept": 62,
+            "beneficial_lost": 39,
+            "harmful_blocked": 68,
+            "harmful_accepted": 54,
+            "unhelpful_accepted": 110,
+            "revisions_accepted": 226,
+            "revisions": 401
+          }
+        },
+        "combined": {
+          "old_correct": {
+            "auroc_all": 0.704926923076923,
+            "auroc_all_ci95": [
+              0.6556383660136834,
+              0.7519439553272341
+            ],
+            "auroc_revised": 0.6349961807391737,
+            "auroc_revised_ci95": [
+              0.553075597432991,
+              0.708787443333373
+            ],
+            "auroc_within_question": 0.668918918918919,
+            "within_question_pairs": 148,
+            "brier": 0.2049583978690716,
+            "logloss": 0.6009273183029064,
+            "ece": 0.04022334143290091,
+            "sd": 0.18769190577318515
+          },
+          "new_correct": {
+            "auroc_all": 0.6618444490757307,
+            "auroc_all_ci95": [
+              0.610886537655614,
+              0.7102592867752305
+            ],
+            "auroc_revised": 0.519042904290429,
+            "auroc_revised_ci95": [
+              0.44555149592004206,
+              0.5942783544872451
+            ],
+            "auroc_within_question": 0.6122448979591837,
+            "within_question_pairs": 196,
+            "brier": 0.21111853645530168,
+            "logloss": 0.6133226937087735,
+            "ece": 0.02395269815932321,
+            "sd": 0.153107338453759
+          },
+          "gate_panel": {
+            "agent_accuracy": 0.3952380952380952,
+            "panel_accuracy": 0.4142857142857143,
+            "beneficial_kept": 77,
+            "beneficial_lost": 24,
+            "harmful_blocked": 60,
+            "harmful_accepted": 62,
+            "unhelpful_accepted": 122,
+            "revisions_accepted": 261,
+            "revisions": 401
+          },
+          "gate_agent": {
+            "agent_accuracy": 0.38857142857142857,
+            "panel_accuracy": 0.4085714285714286,
+            "beneficial_kept": 59,
+            "beneficial_lost": 42,
+            "harmful_blocked": 71,
+            "harmful_accepted": 51,
+            "unhelpful_accepted": 104,
+            "revisions_accepted": 214,
+            "revisions": 401
+          }
+        },
+        "stacked": {
+          "old_correct": {
+            "auroc_all": 0.7087153846153845,
+            "auroc_all_ci95": [
+              0.6593135073699956,
+              0.7547988491586244
+            ],
+            "auroc_revised": 0.6445443328045127,
+            "auroc_revised_ci95": [
+              0.5618904020597723,
+              0.719694029729736
+            ],
+            "auroc_within_question": 0.6891891891891891,
+            "within_question_pairs": 148,
+            "brier": 0.2046556503029967,
+            "logloss": 0.5997802254725376,
+            "ece": 0.035940820298074036,
+            "sd": 0.17386132337976476
+          },
+          "new_correct": {
+            "auroc_all": 0.6510426292423784,
+            "auroc_all_ci95": [
+              0.596426307739506,
+              0.7020332422258815
+            ],
+            "auroc_revised": 0.48277227722772276,
+            "auroc_revised_ci95": [
+              0.41018933476636216,
+              0.5587231458153068
+            ],
+            "auroc_within_question": 0.5816326530612245,
+            "within_question_pairs": 196,
+            "brier": 0.2122554793628919,
+            "logloss": 0.615827360846538,
+            "ece": 0.033817607602785814,
+            "sd": 0.1437845644526342
+          },
+          "gate_panel": {
+            "agent_accuracy": 0.38666666666666666,
+            "panel_accuracy": 0.4114285714285714,
+            "beneficial_kept": 64,
+            "beneficial_lost": 37,
+            "harmful_blocked": 64,
+            "harmful_accepted": 58,
+            "unhelpful_accepted": 118,
+            "revisions_accepted": 240,
+            "revisions": 401
+          },
+          "gate_agent": {
+            "agent_accuracy": 0.38476190476190475,
+            "panel_accuracy": 0.4114285714285714,
+            "beneficial_kept": 53,
+            "beneficial_lost": 48,
+            "harmful_blocked": 73,
+            "harmful_accepted": 49,
+            "unhelpful_accepted": 110,
+            "revisions_accepted": 212,
+            "revisions": 401
+          }
+        }
+      },
+      "reference": {
+        "accept_all": {
+          "agent_accuracy": 0.36095238095238097,
+          "panel_accuracy": 0.37714285714285717
+        },
+        "reject_all": {
+          "agent_accuracy": 0.38095238095238093,
+          "panel_accuracy": 0.37142857142857144
+        },
+        "agent_optimal_not_a_panel_bound": {
+          "agent_accuracy": 0.47714285714285715,
+          "panel_accuracy": 0.48
+        },
+        "panel_optimal": {
+          "agent_accuracy": 0.43142857142857144,
+          "panel_accuracy": 0.48
+        }
+      },
+      "paired_panel": {
+        "activation - output_linear": {
+          "mean": 0.022857142857142857,
+          "ci95": [
+            0.0,
+            0.045714285714285714
+          ],
+          "n_questions": 350
+        },
+        "activation - output_hgb": {
+          "mean": 0.02857142857142857,
+          "ci95": [
+            0.0,
+            0.05714285714285714
+          ],
+          "n_questions": 350
+        },
+        "combined - output_linear": {
+          "mean": 0.022857142857142857,
+          "ci95": [
+            0.00278571428571429,
+            0.045714285714285714
+          ],
+          "n_questions": 350
+        },
+        "combined - output_hgb": {
+          "mean": 0.02857142857142857,
+          "ci95": [
+            0.002857142857142857,
+            0.05714285714285714
+          ],
+          "n_questions": 350
+        },
+        "stacked - output_linear": {
+          "mean": 0.02,
+          "ci95": [
+            0.0,
+            0.04
+          ],
+          "n_questions": 350
+        },
+        "stacked - output_hgb": {
+          "mean": 0.025714285714285714,
+          "ci95": [
+            -0.002857142857142857,
+            0.05142857142857143
+          ],
+          "n_questions": 350
+        },
+        "output_linear - accept_all": {
+          "mean": 0.014285714285714285,
+          "ci95": [
+            -0.017142857142857144,
+            0.045714285714285714
+          ],
+          "n_questions": 350
+        },
+        "output_linear - reject_all": {
+          "mean": 0.02,
+          "ci95": [
+            -0.014285714285714285,
+            0.054285714285714284
+          ],
+          "n_questions": 350
+        },
+        "output_hgb - accept_all": {
+          "mean": 0.008571428571428572,
+          "ci95": [
+            -0.02857142857142857,
+            0.045714285714285714
+          ],
+          "n_questions": 350
+        },
+        "output_hgb - reject_all": {
+          "mean": 0.014285714285714285,
+          "ci95": [
+            -0.014285714285714285,
+            0.04285714285714286
+          ],
+          "n_questions": 350
+        },
+        "activation - accept_all": {
+          "mean": 0.037142857142857144,
+          "ci95": [
+            0.008571428571428572,
+            0.06571428571428571
+          ],
+          "n_questions": 350
+        },
+        "activation - reject_all": {
+          "mean": 0.04285714285714286,
+          "ci95": [
+            0.008571428571428572,
+            0.07714285714285714
+          ],
+          "n_questions": 350
+        },
+        "combined - accept_all": {
+          "mean": 0.037142857142857144,
+          "ci95": [
+            0.008571428571428572,
+            0.06571428571428571
+          ],
+          "n_questions": 350
+        },
+        "combined - reject_all": {
+          "mean": 0.04285714285714286,
+          "ci95": [
+            0.008571428571428572,
+            0.07714285714285714
+          ],
+          "n_questions": 350
+        },
+        "stacked - accept_all": {
+          "mean": 0.03428571428571429,
+          "ci95": [
+            0.002857142857142857,
+            0.06571428571428571
+          ],
+          "n_questions": 350
+        },
+        "stacked - reject_all": {
+          "mean": 0.04,
+          "ci95": [
+            0.008571428571428572,
+            0.07142857142857142
+          ],
+          "n_questions": 350
+        }
+      },
+      "auroc_differences": {
+        "activation - output_linear | new_correct | all": {
+          "point": 0.013554376762128006,
+          "ci95": [
+            -0.027870025778954408,
+            0.05495426227894264
+          ]
+        },
+        "activation - output_linear | old_correct | all": {
+          "point": 0.04121153846153858,
+          "ci95": [
+            0.0021526132212695698,
+            0.07885514885629519
+          ]
+        },
+        "activation - output_linear | new_correct | revised": {
+          "point": 0.06752475247524742,
+          "ci95": [
+            -0.003587218586568053,
+            0.14140473276427382
+          ]
+        },
+        "activation - output_linear | old_correct | revised": {
+          "point": 0.032434338092720005,
+          "ci95": [
+            -0.03821868291018644,
+            0.1030919370698132
+          ]
+        },
+        "combined - output_linear | new_correct | all": {
+          "point": 0.028170454053926486,
+          "ci95": [
+            -0.013637929408647187,
+            0.0678879484712334
+          ]
+        },
+        "combined - output_linear | old_correct | all": {
+          "point": 0.04193846153846159,
+          "ci95": [
+            0.0025797021795025024,
+            0.07892617161228076
+          ]
+        },
+        "combined - output_linear | new_correct | revised": {
+          "point": 0.08188118811881179,
+          "ci95": [
+            0.012233804975090388,
+            0.15866099072048903
+          ]
+        },
+        "combined - output_linear | old_correct | revised": {
+          "point": 0.02579470004113038,
+          "ci95": [
+            -0.04523244234990064,
+            0.0941779398625811
+          ]
+        },
+        "stacked - output_linear | new_correct | all": {
+          "point": 0.01736863422057422,
+          "ci95": [
+            -0.01010947437525749,
+            0.04426266318774954
+          ]
+        },
+        "stacked - output_linear | old_correct | all": {
+          "point": 0.045726923076923165,
+          "ci95": [
+            0.014246009345047883,
+            0.07679331404527079
+          ]
+        },
+        "stacked - output_linear | new_correct | revised": {
+          "point": 0.04561056105610556,
+          "ci95": [
+            -0.004552233417518515,
+            0.09841571188318267
+          ]
+        },
+        "stacked - output_linear | old_correct | revised": {
+          "point": 0.03534285210646937,
+          "ci95": [
+            -0.02245504054326582,
+            0.09158877079930985
+          ]
+        }
+      },
+      "seed": 2,
+      "transfer": {}
+    }
+  ]
+}

@@ -128,10 +128,21 @@ within-question ranking and endorsement log-odds shifts (output-only), and a can
 probe trained on training questions vs output-only and combined, per context. Stub: tested end to
 end. 270M: runs (the 270M model simply adopts the proposed answer, probability ≈ 1).
 
-## 6. 1B reanalysis rerun
+## 6. 1B reanalysis rerun — what changed from the previous results
 
-See docs/REANALYSIS.md §5 and `artifacts/review/reanalysis_v2/`. The earlier export is kept as
-`artifacts/review/reanalysis_v1_b56c836/`.
+Rerun at commit `6b6fa42` (docs/REANALYSIS.md §5, `artifacts/review/reanalysis_v2/`); the
+previous export is kept as `artifacts/review/reanalysis_v1_b56c836/`. The corrections were fixed
+by the review before the rerun, not chosen from its results.
+
+- **Changed:** gates versus accepting every revision. Previously every interval included zero.
+  With τ on the calibrated scale and the panel objective, the output-logistic, activation,
+  combined and stacked gates gain +1.4 to +4.6 panel points, with intervals excluding zero in one
+  or two of three fold assignments each (same 350 questions; stability, not replication).
+- **Unchanged:** activations are not shown to raise panel accuracy over the output-logistic gate
+  (−1.4 to +2.3 points, every interval includes or touches zero); revisions' correctness is near
+  chance for every predictor.
+- **Newly quantified:** activations rank whether the first answer was correct about 0.04 AUROC
+  better than output features (stacked: interval excludes zero in all three fold assignments).
 
 ## 7. Deliverables
 

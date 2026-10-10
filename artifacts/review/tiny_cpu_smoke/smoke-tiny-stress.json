@@ -1,0 +1,56 @@
+{
+  "identity_sha256": "3f2ffcd46c612cd4cb6f8226a4a4db354dad9288bcd65891803b569f8dbfa614",
+  "torch_cuda": null,
+  "coverage": {
+    "exact_tokens": true,
+    "n_questions": 120,
+    "token_cap": 64,
+    "round0_prompt_tokens": {
+      "p50": 165,
+      "p95": 216,
+      "max": 249
+    },
+    "round1_template_overhead": 94,
+    "worst_round1_prompt_tokens": 535,
+    "worst_readout_tokens": 604
+  },
+  "configured": {
+    "batch_size": 4,
+    "readout_batch_size": 3
+  },
+  "passed": true,
+  "seconds": 70.7,
+  "prompt_tokens": 535,
+  "gen_tokens": 64,
+  "readout_tokens": 604,
+  "generation": [
+    {
+      "batch": 2,
+      "ok": true,
+      "seconds": 29.7,
+      "new_tokens": 64
+    },
+    {
+      "batch": 4,
+      "ok": true,
+      "seconds": 33.5,
+      "new_tokens": 64
+    }
+  ],
+  "readout": [
+    {
+      "batch": 2,
+      "ok": true,
+      "seconds": 2.8,
+      "finite_all_layers": true
+    },
+    {
+      "batch": 4,
+      "ok": true,
+      "seconds": 4.7,
+      "finite_all_layers": true
+    }
+  ],
+  "max_ok_generation_batch": 4,
+  "max_ok_readout_batch": 4
+}

@@ -14,7 +14,10 @@
       "dtype": "float16",
       "layers": "all",
       "positions": [
-        "readout_last"
+        "readout_last",
+        "generation_last",
+        "stated_answer",
+        "before_stated_answer"
       ],
       "shard_size": 500
     },
@@ -58,7 +61,7 @@
       "temperature": 0.7,
       "top_p": 0.95
     },
-    "out_dir": "<scratch>/stubdemo",
+    "out_dir": "<scratch>/ex",
     "run_id": "demo-debate-c000",
     "seed": 20260909,
     "stub": {
@@ -81,14 +84,14 @@
       "switch_to_correct": 0.45
     }
   },
-  "config_hash": "201219f191ae01aa993165c0ebc4c5f9d79bf6e6c7fcd8f7a891fcf6f2e1b6ea",
+  "config_hash": "825bad32c06f6217ff5d8d5667ab899d3ee6c53db6206976aea0aac1e1f8c813",
   "git_dirty": true,
   "git_dirty_files": [
-    "?? artifacts/"
+    "?? artifacts/review/reanalysis_v2/"
   ],
-  "git_sha": "0ac3e1eeddadae70f216e1e2941d7fd79e297897",
+  "git_sha": "925f51338373cade23ee469440d0383dfb7b4a32",
   "job": "demo",
-  "job_identity_sha256": "1c1e6fd697df603a2f6bb1f088b30c1e22d4649bf0b66c6c9255f4556848f7a2",
+  "job_identity_sha256": "bfa3c2b74d6466e7195c606c75e574341f402c068c72b56948dde060c93c150c",
   "kind": "debate",
   "n_questions": 10,
   "packages": {
@@ -111,12 +114,16 @@
   "prompt_template_hashes": {
     "adversarial_peer": "b428604be34b875d",
     "brevity": "ab1d02c3aa05d3cd",
+    "candidate_block": "5d9819941923f9a3",
+    "candidate_system": "caa3691bca130cc9",
     "ending_conf": "a48849121707c4d7",
     "ending_no_conf": "558b14973471cf5e",
+    "endorsement": "366342ebd3b084e9",
     "mild_peer": "22963fb9b187cb53",
     "peer_answer_only": "ba1f0cd92b83ea19",
     "peer_block": "e8cff792d7c5f195",
     "peer_entry": "90ec002c5b81d578",
+    "peer_no_answer": "1e009318543bd6e4",
     "question": "1e3650fb59d929b6",
     "readout_suffix": "b12a68884c9ecf8b",
     "self_block": "9d30c3365474ae99",
@@ -140,5 +147,5 @@
   "round1_seed": 1573941430,
   "run_id": "demo-debate-c000",
   "shared_round0": true,
-  "timestamp_start": "2026-10-09T18:15:56-0400"
+  "timestamp_start": "2026-10-09T21:08:02-0400"
 }

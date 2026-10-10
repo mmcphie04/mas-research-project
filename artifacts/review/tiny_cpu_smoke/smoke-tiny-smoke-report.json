@@ -1,92 +1,162 @@
 {
   "self_reconsider": {
     "positions": {
-      "readout_last": 18,
-      "generation_last": 18
+      "generation_last": 18,
+      "readout_last": 18
+    },
+    "missing_positions": {
+      "generation_last": {},
+      "stated_answer": {
+        "answer_missing": 12,
+        "no_generated_response": 6
+      },
+      "before_stated_answer": {
+        "answer_missing": 12,
+        "no_generated_response": 6
+      }
+    },
+    "replay_exact": {
+      "True": 12
     },
     "answer_source": {
       "readout_fallback": 12,
       "readout": 6
     },
+    "stated_status": {
+      "missing": 12,
+      "no_text": 6
+    },
     "pre": {
       "stated_answer_parsed": 0.0,
       "hit_token_cap": 0.0,
       "stated_agrees_readout": 0.0,
-      "median_tokens": 28.5
+      "median_tokens": 33.0
+    },
+    "post": {
+      "stated_answer_parsed": 0.0,
+      "hit_token_cap": 0.0,
+      "stated_agrees_readout": 0.0,
+      "median_tokens": 20.5
+    }
+  },
+  "debate": {
+    "positions": {
+      "generation_last": 18,
+      "readout_last": 18
+    },
+    "missing_positions": {
+      "generation_last": {},
+      "stated_answer": {
+        "answer_missing": 12,
+        "no_generated_response": 6
+      },
+      "before_stated_answer": {
+        "answer_missing": 12,
+        "no_generated_response": 6
+      }
+    },
+    "replay_exact": {
+      "True": 12
+    },
+    "answer_source": {
+      "readout_fallback": 12,
+      "readout": 6
+    },
+    "stated_status": {
+      "missing": 12,
+      "no_text": 6
+    },
+    "pre": {
+      "stated_answer_parsed": 0.0,
+      "hit_token_cap": 0.0,
+      "stated_agrees_readout": 0.0,
+      "median_tokens": 33.0
     },
     "post": {
       "stated_answer_parsed": 0.0,
       "hit_token_cap": 0.1667,
       "stated_agrees_readout": 0.0,
-      "median_tokens": 36.0
-    }
-  },
-  "debate": {
-    "positions": {
-      "readout_last": 18,
-      "generation_last": 18
-    },
-    "answer_source": {
-      "readout_fallback": 12,
-      "readout": 6
-    },
-    "pre": {
-      "stated_answer_parsed": 0.0,
-      "hit_token_cap": 0.0,
-      "stated_agrees_readout": 0.0,
-      "median_tokens": 28.5
-    },
-    "post": {
-      "stated_answer_parsed": 0.0,
-      "hit_token_cap": 0.0,
-      "stated_agrees_readout": 0.0,
-      "median_tokens": 8.0
-    }
-  },
-  "misleading_one": {
-    "positions": {
-      "readout_last": 18,
-      "generation_last": 18
-    },
-    "answer_source": {
-      "readout_fallback": 12,
-      "readout": 6
-    },
-    "pre": {
-      "stated_answer_parsed": 0.0,
-      "hit_token_cap": 0.0,
-      "stated_agrees_readout": 0.0,
-      "median_tokens": 28.5
-    },
-    "post": {
-      "stated_answer_parsed": 0.0,
-      "hit_token_cap": 0.0,
-      "stated_agrees_readout": 0.0,
-      "median_tokens": 14.0
+      "median_tokens": 16.0
     }
   },
   "debate_answer_only": {
     "positions": {
-      "readout_last": 18,
       "generation_last": 18,
-      "stated_answer": 1
+      "readout_last": 18
+    },
+    "missing_positions": {
+      "generation_last": {},
+      "stated_answer": {
+        "answer_missing": 12,
+        "no_generated_response": 6
+      },
+      "before_stated_answer": {
+        "answer_missing": 12,
+        "no_generated_response": 6
+      }
+    },
+    "replay_exact": {
+      "True": 12
     },
     "answer_source": {
-      "readout_fallback": 11,
-      "readout": 6,
-      "stated": 1
+      "readout_fallback": 12,
+      "readout": 6
+    },
+    "stated_status": {
+      "missing": 12,
+      "no_text": 6
     },
     "pre": {
       "stated_answer_parsed": 0.0,
       "hit_token_cap": 0.0,
       "stated_agrees_readout": 0.0,
-      "median_tokens": 28.5
+      "median_tokens": 33.0
     },
     "post": {
-      "stated_answer_parsed": 0.1667,
+      "stated_answer_parsed": 0.0,
       "hit_token_cap": 0.0,
-      "stated_agrees_readout": 0.1667,
-      "median_tokens": 9.5
+      "stated_agrees_readout": 0.0,
+      "median_tokens": 17.0
+    }
+  },
+  "misleading_one": {
+    "positions": {
+      "generation_last": 18,
+      "readout_last": 18
+    },
+    "missing_positions": {
+      "generation_last": {},
+      "stated_answer": {
+        "answer_missing": 12,
+        "no_generated_response": 6
+      },
+      "before_stated_answer": {
+        "answer_missing": 12,
+        "no_generated_response": 6
+      }
+    },
+    "replay_exact": {
+      "True": 12
+    },
+    "answer_source": {
+      "readout_fallback": 12,
+      "readout": 6
+    },
+    "stated_status": {
+      "missing": 12,
+      "no_text": 6
+    },
+    "pre": {
+      "stated_answer_parsed": 0.0,
+      "hit_token_cap": 0.0,
+      "stated_agrees_readout": 0.0,
+      "median_tokens": 33.0
+    },
+    "post": {
+      "stated_answer_parsed": 0.0,
+      "hit_token_cap": 0.0,
+      "stated_agrees_readout": 0.0,
+      "median_tokens": 19.0
     }
   },
   "batched_vs_single": {

@@ -27,9 +27,6 @@
    },
    "misleading_one": {
     "kind": "misleading_one"
-   },
-   "adversarial": {
-    "kind": "adversarial"
    }
   },
   "config": {
@@ -93,7 +90,10 @@
    "activations": {
     "layers": "all",
     "positions": [
-     "readout_last"
+     "readout_last",
+     "generation_last",
+     "stated_answer",
+     "before_stated_answer"
     ],
     "dtype": "float16",
     "shard_size": 500
@@ -102,12 +102,16 @@
   "prompt_template_hashes": {
    "adversarial_peer": "b428604be34b875d",
    "brevity": "ab1d02c3aa05d3cd",
+   "candidate_block": "5d9819941923f9a3",
+   "candidate_system": "caa3691bca130cc9",
    "ending_conf": "a48849121707c4d7",
    "ending_no_conf": "558b14973471cf5e",
+   "endorsement": "366342ebd3b084e9",
    "mild_peer": "22963fb9b187cb53",
    "peer_answer_only": "ba1f0cd92b83ea19",
    "peer_block": "e8cff792d7c5f195",
    "peer_entry": "90ec002c5b81d578",
+   "peer_no_answer": "1e009318543bd6e4",
    "question": "1e3650fb59d929b6",
    "readout_suffix": "b12a68884c9ecf8b",
    "self_block": "9d30c3365474ae99",
@@ -120,12 +124,12 @@
    "d_model": 64
   }
  },
- "identity_sha256": "1c1e6fd697df603a2f6bb1f088b30c1e22d4649bf0b66c6c9255f4556848f7a2",
+ "identity_sha256": "bfa3c2b74d6466e7195c606c75e574341f402c068c72b56948dde060c93c150c",
  "code": {
-  "git_sha": "0ac3e1eeddadae70f216e1e2941d7fd79e297897",
+  "git_sha": "925f51338373cade23ee469440d0383dfb7b4a32",
   "git_dirty": true,
   "git_dirty_files": [
-   "?? artifacts/"
+   "?? artifacts/review/reanalysis_v2/"
   ]
  },
  "questions": [
@@ -342,13 +346,25 @@
  ],
  "history": [
   {
-   "time": "2026-10-09T18:15:56-0400",
-   "git_sha": "0ac3e1eeddadae70f216e1e2941d7fd79e297897",
+   "time": "2026-10-09T21:08:02-0400",
+   "git_sha": "925f51338373cade23ee469440d0383dfb7b4a32",
    "git_dirty": true,
    "n_questions": 40,
    "execution": {
     "batch_size": 8,
-    "readout_batch_size": null
+    "readout_batch_size": null,
+    "packages": {
+     "python": "3.12.14",
+     "numpy": "2.3.5",
+     "pandas": "3.0.5",
+     "scikit-learn": "1.9.0",
+     "scipy": "1.18.1",
+     "torch": "2.13.0+cpu",
+     "transformers": "5.17.0",
+     "datasets": "5.0.1",
+     "vllm": null
+    },
+    "torch_cuda": null
    },
    "event": "created"
   }
