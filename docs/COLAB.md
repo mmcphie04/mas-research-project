@@ -81,47 +81,63 @@ progress, per-chunk timings and memory peaks, and every failure.
 
 ### Commands (what the notebook runs)
 
+Run from a checkout of the pinned commit. Nothing below has been run on a GPU yet.
+
 ```bash
-CFG="--config configs/base.yaml configs/colab_12b.yaml --out-root /content/drive/MyDrive/mas_runs"
-# 1. smoke + stress (throwaway job "smoke-pilot12b")
-python scripts/run_experiment.py $CFG --name pilot12b --dataset mmlu-pro --pool pilot \
-    --n-questions 120 --chunk 20 --conditions self_reconsider debate misleading_one --smoke
-# 2. pilot: the 120-question pilot pool
-python scripts/run_experiment.py $CFG --name pilot12b --dataset mmlu-pro --pool pilot \
-    --n-questions 120 --chunk 20 --conditions self_reconsider debate misleading_one --max-hours 6
-python scripts/summarize_run.py --out-root /content/drive/MyDrive/mas_runs --name pilot12b
-# 3. main run, only after docs/preregistration.md is dated: N from the pilot, main pool
+R=/content/drive/MyDrive/mas_runs
+CFG="--config configs/base.yaml configs/colab_12b.yaml --out-root $R"
+PILOT="--name pilot12b --dataset mmlu-pro --pool pilot --n-questions 120 --chunk 20 \
+       --conditions self_reconsider debate debate_answer_only misleading_one"
+
+# 1. smoke: worst-case memory stress at batches 4/6/8 over the pilot pool's real token lengths,
+#    then 2 questions through all four conditions with value checks (throwaway job smoke-pilot12b)
+python scripts/run_experiment.py $CFG $PILOT --smoke
+#    read $R/smoke-pilot12b-stress.json and -smoke-report.json; raise model.batch_size with
+#    --set model.batch_size=8 only if the stress report shows it fits
+
+# 2. pilot: the 120-question pilot pool, all four conditions, capped at 4 hours
+python scripts/run_experiment.py $CFG $PILOT --max-hours 4
+python scripts/verify_archive.py --out-root $R --name pilot12b
+python scripts/summarize_run.py  --out-root $R --name pilot12b
+python scripts/pilot_report.py   --out-root $R --name pilot12b --main-n 600 900 1200 \
+       --main-conditions 2 --out $R/pilot12b-report
+
+# 3. main run -- only after docs/preregistration.md is dated. N and conditions from the pilot.
 python scripts/run_experiment.py $CFG --name main12b --dataset mmlu-pro --pool main \
-    --n-questions N --chunk 25 --conditions self_reconsider debate misleading_one --max-hours H
+       --n-questions 900 --chunk 25 --conditions self_reconsider debate --max-hours 12
+python scripts/make_split.py --out-root $R --name main12b --seed SEED --out $R/main12b-split.json
+
+# 4. optional, reusing main12b's saved round 0 (never regenerated): answer-only peers and fresh
+#    independent answers on the first 450 / 300 main questions; candidate evaluation on 300
+python scripts/run_experiment.py $CFG --name main12b-answeronly --parent main12b --subset-n 450 \
+       --conditions debate_answer_only --max-hours 3
+python scripts/run_experiment.py $CFG --name main12b-indep --parent main12b --subset-n 300 \
+       --conditions independent --max-hours 2
+python scripts/run_candidates.py --config configs/base.yaml configs/colab_12b.yaml \
+       --out-root $R --parent main12b --n 300 --split-manifest $R/main12b-split.json --splits train validation test
+
+# 5. archive check before deleting anything from the runtime or moving it
+python scripts/verify_archive.py --out-root $R --name main12b --copy-to /path/to/second/copy
 ```
 
-Extending a job later: rerun with a larger `--n-questions`, keeping it a multiple of `--chunk`
-from a full last chunk (the driver refuses an extension that would change a chunk that already
-has output).
+A child job (`--parent`) uses the parent's dataset, pool, config, prompts and model, refuses any
+difference, and reads round 0 from the parent's verified caches. Extending a job: rerun with a
+larger `--n-questions`, a multiple of `--chunk` from a full last chunk.
 
 ## What has and has not been verified
 
-Verified locally, on CPU:
-- The full test suite, including the job-file refusals (changed settings, chunk size, pool,
-  conditions, commit; a chunk from another job; a corrupted shard), extension by appending,
-  round-0 reuse after a crash between conditions, the time cap persisting across sessions, the
-  fail-fast stops, the merged view loading the same arrays as the chunks, and the notebook's
-  pinning and push rules.
-- The driver end to end on the stub, and on the real Hugging Face path with Gemma-3-270M on CPU
-  (`--smoke`): the stress pass, the extra activation positions, generated token ids and stop
-  reasons, and batched-vs-single readout agreement (identical in fp32 on CPU).
-- The letter-in-context check (the tokenizer encodes `Final answer: (` + letter as the scored
-  letter token) on the Gemma 3 tokenizer of the 270M model; it runs again at load time on the 12B.
-- The MMLU-Pro loader on the real dataset: 12,032 questions, 14 subjects, every gold answer valid.
-- Gemma-3-12B's configuration, on an empty "meta" device with no weights downloaded: 48 layers,
-  d = 3,840, 26.4 GB of weights in bf16, answer letters A–J each a single distinct token.
+Verified locally on CPU (stub and Gemma-3-270M; see docs/REVIEW_b56c836_CHANGES.md for the list):
+the whole test suite; the driver end to end on the stub, including child jobs, the archive
+verifier and its restored copy; and on the real Hugging Face path with the 270M model, the
+stress pass over a 120-question pool, exact replay of every generated row, all four activation
+positions with their option probabilities, response log-likelihoods equal to full-sequence
+logits, and batched-vs-single agreement (exact in fp32).
 
-**Not verified until the first Colab run (none of these has been run):**
-- That hidden states come back from the 12B model, and are finite and non-degenerate.
-- Real throughput and memory peaks under the stress pass, in bf16 on the A100.
-- Batched-vs-single readout agreement in bf16 (it is exact in fp32 on CPU; bf16 with left
-  padding can differ slightly, and the smoke test fails only on gross disagreement).
-- That the pinned `transformers==5.17.0` installs against Colab's torch.
+**Not verified until the first 12B run** (each is checked by the smoke test; see
+docs/GPU_MEASUREMENTS.md): hidden states for all 49 layers at every position, finite; the
+letter-in-context check on the 12B tokenizer; bf16 batched-vs-single agreement; exact replay;
+memory at the pool's worst-case lengths at batches 4/6/8; real seconds per question; that
+`transformers==5.17.0` installs against Colab's torch.
 
 The `vllm` backend is still not implemented. The Hugging Face backend runs on the GPU; it is slower
 at generation than vLLM but returns hidden states directly, which vLLM does not.
@@ -136,22 +152,18 @@ hidden states during readout ~0.38 GB per 1,000 tokens per sequence, so batch 4 
 each (an upper bound for the cache: most Gemma 3 layers use a 1,024-token sliding window), for a
 peak around 33 GB of the 40. Generation and readout have separate batch sizes (`model.batch_size`,
 `model.readout_batch_size`); both default to 4. The smoke test's stress pass measures the real
-peaks; raise a batch size in `OVERRIDES` only if it shows room. Batch sizes may change between
+peaks at batches 4, 6 and 8, using the longest prompt in the intended question pool (measured with
+the real tokenizer) plus three full responses, and saves them to `<name>-stress.json`; raise a
+batch size in `OVERRIDES` only if it shows room. A job's own stress pass runs once per GPU type
+and is not repeated on resume. Batch sizes may change between
 sessions of a job; nothing else may.
 
 ## Budget
 
-300 compute units at about 5.3 per hour ≈ 56 A100-hours.
-
-Rough estimates, to be replaced by the smoke test's measurement: generation on a single A100 is
-limited by reading 26 GB of weights per step, so roughly 20–40 seconds per question across three
-conditions.
-
-| run | questions | estimated time | estimated units |
-|---|---|---|---|
-| smoke test | 2 | 5–10 min, mostly the model download | ~1 |
-| pilot | 120 | 1–1.5 h | 5–8 |
-| powered run | 1,500 | 8–17 h | 45–90 |
+300 compute units at about 5.3 per hour ≈ 56 A100-hours; the target is 10–20. See
+**docs/BUDGET.md** for the per-question cost model, three plans (8–24 A100-hours including smoke,
+pilot, extras and 15% contingency), power, and disk (~30 GB for the fullest plan: confirm the
+Drive quota first). Every estimate is replaced by the pilot report's measurements.
 
 ## Getting results back to the laptop
 

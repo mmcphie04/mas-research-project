@@ -210,4 +210,5 @@ def validate(cfg: RunConfig) -> None:
 #   readout_last     the "(" of the appended "Final answer: (" -- the forced-choice position
 #   generation_last  the last generated token, before anything is appended
 #   stated_answer    the letter token inside the agent's own final "Answer: (X)" line
-POSITIONS = ("readout_last", "generation_last", "stated_answer")
+#   before_stated_answer  the token immediately before that letter, whose output predicts it
+POSITIONS = ("readout_last", "generation_last", "stated_answer", "before_stated_answer")

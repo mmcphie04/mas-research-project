@@ -111,6 +111,7 @@ def write_completion(
     row_counts: dict[str, int],
     shard_hashes: dict[str, str] | None = None,
     errors: list[str] | None = None,
+    extra: dict[str, Any] | None = None,
 ) -> Path:
     """Write completion.json AFTER the run finishes."""
     payload = {
@@ -118,6 +119,7 @@ def write_completion(
         "row_counts": row_counts,
         "shard_sha256": shard_hashes or {},
         "errors": errors or [],
+        **(extra or {}),
     }
     path = Path(run_dir) / COMPLETION
     path.write_text(json.dumps(payload, indent=2, sort_keys=True))

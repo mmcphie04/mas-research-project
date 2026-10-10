@@ -35,25 +35,20 @@ DEFAULT_C_GRID = (0.0001, 0.001, 0.01, 0.1, 1.0)
 
 
 class FeatureBank:
-    """Aligns activation rows to event rows so ``layer(l)`` returns matched (pre, post) matrices."""
+    """Aligns activation rows to event rows so ``layer(l)`` returns matched (pre, post) matrices.
 
-    def __init__(self, store, events: pd.DataFrame):
+    Position-aware: built on mad.analysis.states.StateBank, at ONE named position (default
+    ``readout_last``). A state missing at that position is an error, never a substitution.
+    """
+
+    def __init__(self, store, events: pd.DataFrame, position: str = "readout_last"):
+        from mad.analysis.states import StateBank
+
         self.store = store
         self.events = events.reset_index(drop=True)
-        idx = store.index.reset_index(drop=True)
-        pos = {
-            (r.condition, r.question_id, r.agent_id, r.phase): i
-            for i, r in enumerate(idx.itertuples())
-        }
-        self._pre = np.array(
-            [pos[(e.condition, e.question_id, e.agent_id, "pre")] for e in self.events.itertuples()]
-        )
-        self._post = np.array(
-            [
-                pos[(e.condition, e.question_id, e.agent_id, "post")]
-                for e in self.events.itertuples()
-            ]
-        )
+        bank = StateBank(store.run_dir)
+        self._pre, _ = bank.rows(self.events, "pre", position)
+        self._post, _ = bank.rows(self.events, "post", position)
 
     def layer(self, layer: int) -> tuple[np.ndarray, np.ndarray]:
         full = self.store.load_layer(layer)

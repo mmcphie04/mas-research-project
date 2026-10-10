@@ -62,6 +62,9 @@ def main():
     rows = pd.read_parquet(f"{RUN}/{ROWS_FILE}")
     store = ActivationStore(RUN)
     idx = store.index.reset_index(drop=True)
+    if set(idx.get("position", pd.Series(["readout_last"]))) != {"readout_last"}:
+        raise SystemExit("LEGACY-ONLY: this script predates multi-position runs and would mix "
+                         "positions. Use scripts/reanalysis.py --time exposure instead.")
     pos = {(r.question_id, r.agent_id, r.phase): i for i, r in idx.iterrows()}
 
     w = rows.pivot_table(index=["question_id", "agent_id"], columns="phase",

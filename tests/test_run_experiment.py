@@ -166,6 +166,115 @@ def test_a_corrupted_shard_fails_the_view(driver, tmp_path):
         driver.main(_args(tmp_path, n=4))
 
 
+def test_round0_states_are_referenced_not_copied(driver, tmp_path):
+    import pandas as pd
+
+    driver.main(_args(tmp_path, n=2))
+    ix = pd.read_parquet(tmp_path / "t-debate-c000" / "activation_index.parquet")
+    pre = ix[ix.phase == "pre"]
+    assert (pre.layout == "row_major").all() and pre.shard_path.str.startswith("../t-round0-c000/").all()
+    assert not (ix[ix.phase != "pre"].shard_path.str.startswith("..")).any()
+
+
+def test_full_verification_catches_a_flipped_byte_that_the_view_cache_misses(driver, tmp_path):
+    from mad.job import JobMismatch, build_view, verify_archive
+
+    driver.main(_args(tmp_path, n=4))
+    assert verify_archive(tmp_path, "t")["views"]["debate"]["questions"] == 4
+    shard = tmp_path / "t-debate-c001" / "acts_0001.npy"
+    if not shard.exists():
+        shard = next((tmp_path / "t-debate-c001").glob("acts_*.npy"))
+    b = bytearray(shard.read_bytes())
+    b[-3] ^= 0xFF  # one byte; no metadata touched
+    shard.write_bytes(bytes(b))
+    job = json.loads((tmp_path / "t-job.json").read_text())
+    assert build_view(tmp_path, job, "debate") is not None  # the cached view does not notice
+    with pytest.raises(JobMismatch, match="checksum"):
+        verify_archive(tmp_path, "t")
+
+
+def test_a_corrupted_shared_round0_file_is_caught(driver, tmp_path):
+    from mad.job import JobMismatch, verify_archive
+
+    driver.main(_args(tmp_path, n=2))
+    f = tmp_path / "t-round0-c000" / "round0_hidden_readout_last.npy"
+    b = bytearray(f.read_bytes())
+    b[-5] ^= 0x01
+    f.write_bytes(bytes(b))
+    with pytest.raises(JobMismatch, match="checksum"):
+        verify_archive(tmp_path, "t")
+
+
+def test_an_archive_copied_elsewhere_verifies_and_loads_identically(driver, tmp_path):
+    out, copy = tmp_path / "a", tmp_path / "elsewhere" / "b"
+    driver.main(_args(out, n=4))
+    va = _load("verify_archive")
+    assert va.main(["--out-root", str(out), "--name", "t", "--copy-to", str(copy)]) == 0
+    rep = json.loads((out / "t-verify.json").read_text())
+    assert rep["ok"] and rep["copy_loads_identically"]
+    assert "pre/readout_last" in rep["views"]["debate"]["by_phase_and_position"]
+
+
+def test_smoke_measures_lengths_over_the_intended_pool_not_two_questions(driver, tmp_path, capsys):
+    driver.main(_args(tmp_path, "--smoke", n=40))
+    out = capsys.readouterr().out
+    assert "token coverage over all 40 intended questions" in out
+
+
+def test_ledger_records_every_session_and_chunk(driver, tmp_path):
+    driver.main(_args(tmp_path, n=4))
+    driver.main(_args(tmp_path, n=4))
+    events = [json.loads(x)["event"] for x in (tmp_path / "t-ledger.jsonl").read_text().splitlines()]
+    assert events.count("session_start") == 2 and events.count("session_end") == 2
+    assert events.count("chunk_done") == 2
+    status = json.loads((tmp_path / "t-status.json").read_text())
+    assert "debate/generation_s" in status["timings"][0]["stages"]
+
+
+def test_child_job_reuses_the_parents_round0_exactly(driver, tmp_path):
+    import pandas as pd
+
+    from mad.job import verify_archive
+
+    driver.main(_args(tmp_path, n=6, chunk=2))
+    child = ["--config", *STUB, "--out-root", str(tmp_path), "--name", "kid", "--parent", "t",
+             "--subset-n", "3", "--conditions", "debate_answer_only", "independent"]
+    assert driver.main(child) == 0
+    assert not list(tmp_path.glob("kid-round0-*")), "a child job generated its own round 0"
+    job = json.loads((tmp_path / "kid-job.json").read_text())
+    assert job["identity"]["parent"]["identity_sha256"] == json.loads(
+        (tmp_path / "t-job.json").read_text())["identity_sha256"]
+    assert [len(c) for c in job["chunks"]] == [2, 1, 0]
+    k = ["question_id", "agent_id"]
+    parent = pd.read_parquet(tmp_path / "t-debate" / "agent_states.parquet").query("phase == 'pre'")
+    kid = pd.read_parquet(tmp_path / "kid-debate_answer_only" / "agent_states.parquet").query("phase == 'pre'")
+    merged = kid.merge(parent, on=k, suffixes=("_kid", "_parent"))
+    assert len(merged) == 9 and (merged.answer_kid == merged.answer_parent).all()
+    assert (merged.readout_logprobs_kid == merged.readout_logprobs_parent).all()
+    rep = verify_archive(tmp_path, "kid")
+    assert rep["views"]["independent"]["questions"] == 3
+
+
+def test_child_job_refuses_without_the_parents_round0(driver, tmp_path):
+    import shutil
+
+    driver.main(_args(tmp_path, n=4, chunk=2))
+    shutil.rmtree(tmp_path / "t-round0-c001")
+    child = ["--config", *STUB, "--out-root", str(tmp_path), "--name", "kid", "--parent", "t",
+             "--conditions", "debate_answer_only"]
+    assert driver.main(child) == 1
+    status = json.loads((tmp_path / "kid-status.json").read_text())
+    assert any("never generates its own round 0" in f["message"] for f in status["failures"])
+
+
+def test_child_job_refuses_a_different_config(driver, tmp_path):
+    driver.main(_args(tmp_path, n=4, chunk=2))
+    child = ["--config", *STUB, "--out-root", str(tmp_path), "--name", "kid", "--parent", "t",
+             "--conditions", "debate_answer_only", "--set", "model.max_new_tokens=99"]
+    with pytest.raises(SystemExit, match="parent's config"):
+        driver.main(child)
+
+
 def test_pilot_and_main_pools_are_disjoint(driver, tmp_path):
     driver.main(_args(tmp_path, "--pool", "pilot", "--pilot-size", "8", n=8, name="p"))
     driver.main(_args(tmp_path, "--pilot-size", "8", n=8, name="m"))
@@ -313,3 +422,17 @@ def test_notebook_flags_match_the_driver():
     defined = set(re.findall(r'add_argument\("(--[a-z-]+)"', driver_src))
     assert used, "found no flags in the notebook -- the regex is wrong"
     assert used <= defined, f"notebook uses flags the driver does not define: {used - defined}"
+
+
+def test_pilot_report_runs_on_a_four_condition_pilot(driver, tmp_path):
+    assert driver.main(_args(tmp_path, "--pool", "pilot", "--pilot-size", "40", "--conditions",
+                             "self_reconsider", "debate", "debate_answer_only", "misleading_one",
+                             n=40, chunk=20)) == 0
+    pr = _load("pilot_report")
+    out = tmp_path / "report"
+    assert pr.main(["--out-root", str(tmp_path), "--name", "t", "--out", str(out)]) == 0
+    rep = json.loads((out / "report.json").read_text())
+    assert set(rep["conditions"]) == {"self_reconsider", "debate", "debate_answer_only", "misleading_one"}
+    assert rep["power"]["table"] and rep["disk"]["projected_gb"] and "runtime" in rep
+    assert (out / "transcripts.md").read_text().count("###") >= 12
+    assert pr.required_test_questions(0.03, 0.10) > pr.required_test_questions(0.04, 0.10)

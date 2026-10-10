@@ -29,6 +29,7 @@ from collections import defaultdict
 from dataclasses import asdict
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 from mad.data import Question
@@ -125,7 +126,8 @@ class JobMismatch(RuntimeError):
 
 
 def open_job(out_root: Path, identity: dict, questions: list[Question], *,
-             allow_code_change: bool = False, execution: dict | None = None) -> dict:
+             allow_code_change: bool = False, execution: dict | None = None,
+             chunks: list[list[str]] | None = None) -> dict:
     """Create the job file, or validate a resume/extension against it. Returns the job dict.
 
     Refuses: any identity difference; a question list that is not an extension of the recorded
@@ -143,7 +145,8 @@ def open_job(out_root: Path, identity: dict, questions: list[Question], *,
 
     if not path.exists():
         job = {"identity": identity, "identity_sha256": _sha(identity), "code": code,
-               "questions": qrec, "chunks": chunks_of([q["id"] for q in qrec], chunk_size),
+               "questions": qrec,
+               "chunks": chunks if chunks is not None else chunks_of([q["id"] for q in qrec], chunk_size),
                "history": [{**event, "event": "created"}]}
         _atomic_write(path, json.dumps(job, indent=1))
         _write_snapshot(out_root, identity["name"], questions)
@@ -163,7 +166,7 @@ def open_job(out_root: Path, identity: dict, questions: list[Question], *,
         bad = next(i for i, (a, b) in enumerate(zip(qrec, old, strict=False)) if a != b)
         raise JobMismatch(f"question {bad} differs from the job's ({old[bad]['id']}); the question "
                           "order or content changed. Refusing to mix samples.")
-    new_chunks = chunks_of([q["id"] for q in qrec], chunk_size)
+    new_chunks = chunks if chunks is not None else chunks_of([q["id"] for q in qrec], chunk_size)
     for i, members in enumerate(job["chunks"]):
         if new_chunks[i] != members and _chunk_started(out_root, identity, i):
             raise JobMismatch(f"extending to {len(qrec)} questions would change the membership of "
@@ -192,6 +195,7 @@ def _chunk_started(out_root: Path, identity: dict, i: int) -> bool:
     tag = chunk_tag(i)
     dirs = [f"{identity['name']}-round0-{tag}"] + [f"{identity['name']}-{c}-{tag}"
                                                    for c in identity["conditions"]]
+    # a child job's chunks are subsets of its parent's; its round 0 lives with the parent
     return any((out_root / d).exists() for d in dirs)
 
 
@@ -236,27 +240,21 @@ def build_view(out_root: Path, job: dict, cond: str, *, verify_hashes: bool = Tr
         return out
 
     rows, idx, transcripts, metas = [], [], [], []
-    shard_base = 0
     for i, d, _ in parts:
-        done = json.loads((d / COMPLETION).read_text())
         if verify_hashes:
-            for f, h in done["shard_sha256"].items():
-                if sha256_file(d / f) != h:
-                    raise JobMismatch(f"{d / f} does not match its recorded checksum")
+            _check_hashes(d)
         r = pd.read_parquet(d / ROWS_FILE)
         if set(r.question_id) != set(job["chunks"][i]):
             raise JobMismatch(f"{d} rows cover different questions than chunk {chunk_tag(i)}")
         rows.append(r)
-        ix = pd.read_parquet(d / "activation_index.parquet")
-        ix["shard_path"] = [f"../{d.name}/acts_{int(s):04d}.npy" for s in ix["shard"]]
-        ix["shard"] = ix["shard"] + shard_base
-        shard_base = int(ix["shard"].max()) + 1
-        idx.append(ix)
+        idx.append(_view_index(d))
         metas.append(pd.read_parquet(d / "activation_meta.parquet"))
         transcripts.append((d / TRANSCRIPTS_FILE).read_text())
 
     rows = pd.concat(rows, ignore_index=True)
     idx = pd.concat(idx, ignore_index=True)
+    files = list(dict.fromkeys(idx["shard_path"]))  # first-appearance order
+    idx["shard"] = idx["shard_path"].map({f: k for k, f in enumerate(files)})
     if rows.duplicated(["question_id", "agent_id", "phase"]).any():
         raise JobMismatch(f"{cond}: duplicate (question, agent, phase) rows across chunks")
     if idx.duplicated(["question_id", "agent_id", "phase", "position"]).any():
@@ -277,7 +275,7 @@ def build_view(out_root: Path, job: dict, cond: str, *, verify_hashes: bool = Tr
     idx.to_parquet(tmp / "activation_index.parquet", index=False)
     metas[0].to_parquet(tmp / "activation_meta.parquet", index=False)
     (tmp / TRANSCRIPTS_FILE).write_text("".join(transcripts))
-    n_done, n_all = len(parts), len(job["chunks"])
+    n_done, n_all = len(parts), sum(1 for c in job["chunks"] if c)
     first = json.loads((parts[0][1] / MANIFEST).read_text())
     (tmp / MANIFEST).write_text(json.dumps({
         "run_id": out.name, "view_of": [d.name for _, d, _ in parts], "condition": cond,
@@ -298,6 +296,86 @@ def build_view(out_root: Path, job: dict, cond: str, *, verify_hashes: bool = Tr
         shutil.rmtree(out)
     os.replace(tmp, out)
     return out
+
+
+def _view_index(d: Path) -> pd.DataFrame:
+    """A chunk's activation index with every shard path rewritten relative to a sibling view."""
+    ix = pd.read_parquet(d / "activation_index.parquet")
+    if "shard_path" not in ix.columns:
+        ix["shard_path"] = [f"acts_{int(x):04d}.npy" for x in ix["shard"]]
+    if "layout" not in ix.columns:
+        ix["layout"] = "layer_major"
+    ix["shard_path"] = [os.path.normpath(os.path.join("..", d.name, p)) for p in ix["shard_path"]]
+    return ix
+
+
+def _check_hashes(d: Path) -> None:
+    """Every file a directory's completion record lists -- its own and any it references --
+    must match the checksum recorded when it was written."""
+    done = json.loads((d / COMPLETION).read_text())
+    for f, h in done["shard_sha256"].items():
+        path = (d / f).resolve()
+        if not path.exists():
+            raise JobMismatch(f"{d.name}: {f} is missing")
+        if sha256_file(path) != h:
+            raise JobMismatch(f"{path} does not match its recorded checksum")
+
+
+def verify_archive(out_root: Path, name: str) -> dict:
+    """Full, independent verification of a job's archive. Checks bytes even when a view's
+    metadata looks unchanged (``build_view`` skips work then; this never does).
+
+    For every complete round-0 cache and condition chunk: every recorded checksum (activation
+    files, rows, transcripts, index, activation metadata, referenced round-0 files); the chunk
+    belongs to the job and holds its questions. For every condition view: unique keys, exactly
+    n_agents x 3 rows per question, every index row loadable at the recorded dimensions, every
+    stored value finite, and how many states exist per phase and position.
+    Raises JobMismatch on the first failure; returns a report otherwise.
+    """
+    from mad.store import ActivationStore
+
+    out_root = Path(out_root)
+    job = json.loads((out_root / f"{name}-job.json").read_text())
+    report = {"job": name, "identity_sha256": job["identity_sha256"], "chunks": {}, "views": {}}
+    for i in range(len(job["chunks"])):
+        tag = chunk_tag(i)
+        r0 = out_root / f"{name}-round0-{tag}"
+        if is_complete(r0):
+            _check_hashes(r0)
+            if json.loads((r0 / MANIFEST).read_text()).get("question_ids") != job["chunks"][i]:
+                raise JobMismatch(f"{r0.name} holds different questions than chunk {tag}")
+        for cond in job["identity"]["conditions"]:
+            d = out_root / f"{name}-{cond}-{tag}"
+            if is_complete(d):
+                check_chunk_dir(d, job, i)
+                _check_hashes(d)
+                report["chunks"][d.name] = "ok"
+    n_agents = job["identity"]["config"]["debate"]["n_agents"]
+    for cond, d in view_dirs(out_root, name).items():
+        rows = pd.read_parquet(d / ROWS_FILE)
+        store = ActivationStore(d)
+        ix = store.index
+        if ix.duplicated(["question_id", "agent_id", "phase", "position"]).any():
+            raise JobMismatch(f"{cond}: duplicate activation keys")
+        if (rows.groupby("question_id").size() != n_agents * 3).any():
+            raise JobMismatch(f"{cond}: a question has the wrong number of states")
+        missing_rows = set(map(tuple, rows[["question_id", "agent_id", "phase"]].values)) - set(
+            map(tuple, ix[ix.position == "readout_last"][["question_id", "agent_id", "phase"]].values))
+        if missing_rows:
+            raise JobMismatch(f"{cond}: {len(missing_rows)} states have no readout activation")
+        for layer in store.layer_range():
+            x = store.load_layer(layer)
+            if x.shape != (len(ix), store.d_model):
+                raise JobMismatch(f"{cond}: layer {layer} has shape {x.shape}")
+            if not np.isfinite(x).all():
+                raise JobMismatch(f"{cond}: non-finite values at layer {layer}")
+        report["views"][cond] = {
+            "questions": int(rows.question_id.nunique()), "states": int(len(ix)),
+            "layers": store.n_layers + 1, "d_model": store.d_model,
+            "by_phase_and_position": {f"{p}/{q}": int(n) for (p, q), n in
+                                      ix.groupby(["phase", "position"]).size().items()},
+        }
+    return report
 
 
 def view_dirs(out_root: Path, name: str) -> dict[str, Path]:

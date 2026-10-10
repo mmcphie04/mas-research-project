@@ -32,8 +32,14 @@ class Readout:
     answer_index: int  # argmax over letter_logprobs -- never fails
     n_tokens: int
     # Hidden states at further token positions (mad.config.POSITIONS), when requested. A position
-    # that does not exist for this text (no stated answer line) is absent from the dict.
+    # that does not exist for this text (no stated answer line) is absent from the dict, and its
+    # reason is in alignment["missing"].
     extra: dict[str, np.ndarray] = field(default_factory=dict)
+    # Option-letter log-probabilities computed at each extra position (same model transform).
+    extra_logprobs: dict[str, np.ndarray] = field(default_factory=dict)
+    # {"positions": {name: [token_index, token_id]}, "missing": {name: reason},
+    #  "replay_exact": bool | None}
+    alignment: dict = field(default_factory=dict)
 
     @property
     def confidence(self) -> float:

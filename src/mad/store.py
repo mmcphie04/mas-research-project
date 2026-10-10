@@ -95,15 +95,25 @@ class ActivationStore:
     def load_layer(self, layer: int, rows: np.ndarray | pd.Series | None = None) -> np.ndarray:
         """Return (n, d_model) float32 for one layer, in index order.
 
+        Only the offsets the index lists are read from each shard, so a shard may hold rows this
+        index does not use (a saved round-0 file with a missing position, for instance). Two
+        on-disk layouts: ``layer_major`` (L+1, n, d) -- this writer's shards -- and ``row_major``
+        (n, L+1, d) -- the round-0 cache, referenced by condition directories instead of copied.
         ``rows`` is an optional boolean mask or positional index over ``self.index``.
         """
         if not 0 <= layer <= self.n_layers:
             raise IndexError(f"layer {layer} out of range 0..{self.n_layers}")
         blocks = []
         paths = self._shard_paths()
-        for shard in sorted(self.index["shard"].unique()):
+        layouts = (dict(zip(self.index["shard"], self.index["layout"], strict=True))
+                   if "layout" in self.index.columns else {})
+        for shard, grp in self.index.groupby("shard", sort=True):
             arr = np.load(paths[int(shard)], mmap_mode="r")
-            blocks.append(np.asarray(arr[layer], dtype=np.float32))
+            off = grp["offset"].to_numpy()
+            if layouts.get(shard, "layer_major") == "row_major":
+                blocks.append(np.asarray(arr[off, layer], dtype=np.float32))
+            else:
+                blocks.append(np.asarray(arr[layer][off], dtype=np.float32))
         full = np.concatenate(blocks, axis=0)
         if rows is None:
             return full
@@ -111,8 +121,9 @@ class ActivationStore:
         return full[rows]
 
     def _shard_paths(self) -> dict[int, Path]:
-        """Shard number -> file. A merged VIEW (mad.job.build_view) records each shard's path,
-        relative to the view directory, instead of holding copies of the arrays."""
+        """Shard number -> file. An index may record each shard's path relative to its own
+        directory (a merged view, or a condition referencing the shared round-0 cache) instead
+        of the default file name in the same directory."""
         if "shard_path" in self.index.columns:
             pairs = self.index[["shard", "shard_path"]].drop_duplicates()
             return {int(s): (self.run_dir / p).resolve() for s, p in zip(pairs.shard, pairs.shard_path,

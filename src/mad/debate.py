@@ -23,7 +23,7 @@ import pandas as pd
 from mad import prompts as P
 from mad.backends.base import Backend, OracleEntry, build_backend
 from mad.data import Question
-from mad.parsing import parse_answer, parse_confidence
+from mad.parsing import parse_answer_field, parse_confidence
 from mad.permute import Permutation, make_permutation
 from mad.provenance import prompt_hashes, sha256_file, write_completion, write_manifest
 from mad.store import ActivationWriter
@@ -47,6 +47,7 @@ class RunResult:
     run_dir: Path
     rows: pd.DataFrame
     n_states: int
+    timings: dict | None = None
 
 
 def run_debate(cfg, questions: list[Question], backend: Backend | None = None) -> RunResult:
@@ -240,14 +241,16 @@ def canonical_answer(cfg, stated: int, stated_ok: bool, readout: int, phase: str
 # self_reconsider (nothing shown), and in misleading_one and adversarial (fabricated peers).
 ROW_META_KEYS = (
     "request_id", "chunk", "gen_seed", "shown_peer_answers", "shown_peer_sources",
-    "shown_peer_majority", "n_shown_agree_pre", "panel_peer_answers", "panel_peer_majority",
+    "shown_peer_majority", "n_shown_agree_pre", "n_shown_missing", "panel_peer_answers",
+    "panel_peer_majority",
     "n_panel_agree_pre", "misleading_target",
 )
 
 
 def _row(cfg, meta, gen, read, n_options, gold_display, perms) -> dict:
     qid = meta["question_id"]
-    ft_idx, ft_ok = parse_answer(gen.text, n_options)
+    parsed = parse_answer_field(gen.text, n_options)  # the agent's own response only
+    ft_idx, ft_ok = parsed.index, parsed.ok
     gold = gold_display[qid]
     answer, source = canonical_answer(cfg, ft_idx, ft_ok, read.answer_index, meta["phase"])
     row = {
@@ -278,8 +281,10 @@ def _row(cfg, meta, gen, read, n_options, gold_display, perms) -> dict:
         "readout_entropy": float(
             -(np.exp(read.letter_logprobs) * read.letter_logprobs).sum()
         ),
-        "freetext_answer": ft_idx,
+        "freetext_answer": ft_idx,  # the stated answer, -1 when there is no valid one
         "freetext_parse_ok": int(ft_ok),
+        "stated_status": parsed.status if meta["phase"] != "peer_exposure" else "no_text",
+        "stated_n_fields": parsed.n_fields,
         "freetext_agrees_readout": int(ft_ok and ft_idx == read.answer_index),
         "verbalized_confidence": parse_confidence(gen.text),
         "n_prompt_tokens": gen.n_prompt_tokens,
@@ -295,4 +300,18 @@ def _row(cfg, meta, gen, read, n_options, gold_display, perms) -> dict:
     for k in ROW_META_KEYS:
         if k in meta:
             row[k] = meta[k]
+    # where each extra position is, why it is missing, and the option probabilities there
+    al = getattr(read, "alignment", None) or {}
+    row["replay_exact"] = al.get("replay_exact")
+    for k in ("response_logprob_mean", "response_logprob_min", "response_logprob_sum"):
+        row[k] = al.get(k, np.nan)
+    for p in cfg.activations.positions:
+        if p == "readout_last":
+            continue
+        ti = al.get("positions", {}).get(p)
+        lp = (getattr(read, "extra_logprobs", None) or {}).get(p)
+        row[f"pos_{p}_token_index"] = ti[0] if ti else -1
+        row[f"pos_{p}_token_id"] = ti[1] if ti else -1
+        row[f"pos_{p}_missing"] = al.get("missing", {}).get(p, "" if ti else "not_returned")
+        row[f"pos_{p}_logprobs"] = ",".join(f"{v:.5f}" for v in lp) if lp is not None else ""
     return row

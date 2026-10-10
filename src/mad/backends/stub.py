@@ -72,6 +72,11 @@ class StubBackend(Backend):
         """Planted round-1 answer, in display index space."""
         entry = self.oracle[question_id]
         gold, n = entry.gold_display_index, entry.n_options
+        if condition == "independent":  # a fresh first answer, not a revision
+            r = _seed("independent", question_id, agent_id, self.run_seed)
+            if r.random() < self.p_correct(question_id):
+                return gold
+            return int(r.choice([i for i in range(n) if i != gold]))
         rng = _seed("post", question_id, agent_id, condition, self.run_seed)
         pre_correct = pre == gold
         rate = self.s.revision_rate_correct if pre_correct else self.s.revision_rate_incorrect
@@ -98,6 +103,14 @@ class StubBackend(Backend):
         return int(rng.choice(others))
 
     def plan_answer(self, **kw) -> int | None:
+        if kw["phase"] == "candidate":  # candidate evaluation: endorsement pulls, gold attracts
+            entry = self.oracle[kw["question_id"]]
+            r = _seed("candidate", kw["question_id"], kw["item"], self.run_seed).random()
+            if kw.get("endorsed", -1) >= 0 and r < 0.35:
+                return kw["endorsed"]
+            if r < 0.35 + self.p_correct(kw["question_id"]) * 0.65:
+                return entry.gold_display_index
+            return kw["candidate"]
         if kw["phase"] == "pre":
             return self.plan_pre(kw["question_id"], kw["agent_id"])
         return self.plan_post(
@@ -194,8 +207,33 @@ class StubBackend(Backend):
                     letter_logprobs=logprobs.astype(np.float32),
                     answer_index=int(np.argmax(logprobs)),
                     n_tokens=max(1, len(text) // 4),
-                    extra={p: (hidden + rng.normal(scale=0.1, size=hidden.shape)).astype(np.float16)
-                           for p in self.cfg.activations.positions if p != "readout_last"},
+                    **self._extra(text, m, n, hidden, logprobs, rng),
                 )
             )
         return out
+
+    def _extra(self, text, m, n, hidden, logprobs, rng) -> dict:
+        """Extra positions with the same existence rules as the real backend."""
+        from mad.parsing import parse_answer_field
+
+        extra, extra_lp, positions, missing = {}, {}, {}, {}
+        for p in self.cfg.activations.positions:
+            if p == "readout_last":
+                continue
+            if p in ("stated_answer", "before_stated_answer"):
+                gs = m.get("gen_start_char")
+                if gs is None:
+                    missing[p] = "no_generated_response"
+                    continue
+                parsed = parse_answer_field(text[gs:], n)
+                if not parsed.ok:
+                    missing[p] = f"answer_{parsed.status}"
+                    continue
+            extra[p] = (hidden + rng.normal(scale=0.1, size=hidden.shape)).astype(np.float16)
+            extra_lp[p] = logprobs.astype(np.float32)
+            positions[p] = [-1, -1]  # the stub has no tokens
+        al = {"positions": positions, "missing": missing, "replay_exact": None}
+        if m.get("gen_start_char") is not None:  # a response exists: a stand-in likelihood
+            al["response_logprob_mean"] = float(-0.3 - 0.4 * rng.random())
+            al["response_logprob_min"] = float(-3.0 * rng.random())
+        return {"extra": extra, "extra_logprobs": extra_lp, "alignment": al}

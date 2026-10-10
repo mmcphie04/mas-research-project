@@ -57,7 +57,7 @@ from mad.job import (  # noqa: E402
 )
 from mad.multi import run_chunk  # noqa: E402
 from mad.permute import make_permutation  # noqa: E402
-from mad.provenance import is_complete, prompt_hashes  # noqa: E402
+from mad.provenance import is_complete, package_versions, prompt_hashes  # noqa: E402
 from mad.store import ActivationStore  # noqa: E402
 
 CONDITION_SPECS = {
@@ -67,6 +67,7 @@ CONDITION_SPECS = {
     "debate_answer_only": {"kind": "debate_answer_only"},
     "misleading_one": {"kind": "misleading_one"},
     "adversarial": {"kind": "adversarial"},
+    "independent": {"kind": "independent"},
 }
 DATASETS = {
     "mmlu-pro": ("TIGER-Lab/MMLU-Pro", "test"),
@@ -169,8 +170,24 @@ def smoke_checks(res: dict, r0, backend, cfg, n_q: int) -> dict:
             assert len(lp) == row.n_options, f"{cond}: {len(lp)} letter scores for {row.n_options} options"
             assert abs(np.exp(lp).sum() - 1) < 1e-3, f"{cond}: answer distribution not normalised"
             assert 0 <= row.readout_answer < row.n_options and 0 <= row.answer < row.n_options
-        report[cond] = {"positions": positions,
+        missing = {}
+        for p in cfg.activations.positions:
+            if p == "readout_last":
+                continue
+            col = rows[f"pos_{p}_logprobs"]
+            for v in col[col != ""]:
+                lp = np.array([float(x) for x in v.split(",")])
+                assert abs(np.exp(lp).sum() - 1) < 1e-3, f"{cond}: {p} distribution not normalised"
+            reasons = rows[f"pos_{p}_missing"]
+            missing[p] = reasons[reasons != ""].value_counts().to_dict()
+        gen_rows = rows[rows.phase != "peer_exposure"]
+        replay = gen_rows.replay_exact.value_counts(dropna=False).to_dict()
+        if hasattr(backend, "count_tokens"):  # a real tokenizer: every generated row must replay exactly
+            assert (gen_rows.replay_exact == True).all(), f"{cond}: inexact replay {replay}"  # noqa: E712
+        report[cond] = {"positions": positions, "missing_positions": missing,
+                        "replay_exact": {str(k): int(v) for k, v in replay.items()},
                         "answer_source": rows.answer_source.value_counts().to_dict(),
+                        "stated_status": rows.stated_status.value_counts().to_dict(),
                         **diagnostics(r.run_dir)}
     if hasattr(backend, "count_tokens"):  # a real model: batched and one-at-a-time must agree
         k = min(4, len(r0.prompts))
@@ -195,20 +212,79 @@ def smoke_checks(res: dict, r0, backend, cfg, n_q: int) -> dict:
     return report
 
 
-def worst_case_lengths(cfg, backend, questions) -> tuple[int, int]:
-    """(round-1 prompt tokens, round-1 readout tokens) at the token budget, for the longest
-    question: the prompt holds the question, the agent's own answer and two peer answers; the
-    readout additionally holds the new answer."""
+def coverage(cfg, backend, questions) -> dict:
+    """Token lengths over the WHOLE intended question set, from actually rendered prompts.
+
+    Round-0 prompt lengths are measured for every question. The round-1 template's fixed
+    overhead (instructions, panel headers, chat turns) is measured by rendering a real round-1
+    prompt with empty responses. The worst round-1 prompt is then the longest question plus that
+    overhead plus three full responses (the agent's own and two peers', each up to the cap); the
+    worst readout adds the new response and the readout suffix. With a tokenizer-less backend
+    (the stub) lengths are characters / 4 and marked approximate.
+    """
     m = cfg.model.max_new_tokens
-    longest = max(questions, key=lambda q: len(q.question) + sum(len(o) for o in q.options))
-    msgs = P.round0_messages(persona=cfg.debate.personas[0], subject=longest.subject,
-                             question=longest.question, options=list(longest.options),
-                             perm=make_permutation(longest.n_options, longest.question_id, 0),
-                             ask_confidence=cfg.debate.ask_verbalized_confidence)
-    text = backend.render(msgs)
-    q_tok = backend.count_tokens(text) if hasattr(backend, "count_tokens") else len(text) // 4
-    overhead = 250  # round-1 instructions, panel headers, chat-template turns, readout suffix
-    return q_tok + 3 * m + overhead, q_tok + 4 * m + overhead
+    count = getattr(backend, "count_tokens", None)
+    exact = count is not None
+    count = count or (lambda t: max(1, len(t) // 4))
+
+    def r0(q):
+        return P.round0_messages(persona=cfg.debate.personas[0], subject=q.subject, question=q.question,
+                                 options=list(q.options), perm=make_permutation(q.n_options, q.question_id, 0),
+                                 ask_confidence=cfg.debate.ask_verbalized_confidence)
+
+    lens = [count(backend.render(r0(q))) for q in questions]
+    base = r0(questions[int(np.argmax(lens))])
+    r1 = P.round1_messages(base=base, own_response="", peer_responses=["", ""],
+                           ask_confidence=cfg.debate.ask_verbalized_confidence)
+    overhead = count(backend.render(r1)) - count(backend.render(base))
+    worst_prompt = max(lens) + overhead + 3 * m
+    return {
+        "exact_tokens": exact, "n_questions": len(questions), "token_cap": m,
+        "round0_prompt_tokens": {"p50": int(np.percentile(lens, 50)), "p95": int(np.percentile(lens, 95)),
+                                 "max": int(max(lens))},
+        "round1_template_overhead": int(overhead),
+        "worst_round1_prompt_tokens": int(worst_prompt),
+        "worst_readout_tokens": int(worst_prompt + m + count(P.READOUT_SUFFIX)),
+    }
+
+
+def gpu_identity() -> dict:
+    out = {}
+    try:
+        import torch
+
+        out["torch_cuda"] = torch.version.cuda
+        if torch.cuda.is_available():
+            out["gpu"] = torch.cuda.get_device_name(0)
+            out["gpu_total_gb"] = round(torch.cuda.get_device_properties(0).total_memory / 1e9, 2)
+    except Exception:
+        pass
+    try:
+        import subprocess
+
+        r = subprocess.run(["nvidia-smi", "--query-gpu=driver_version", "--format=csv,noheader"],
+                           capture_output=True, text=True, timeout=10)
+        if r.returncode == 0:
+            out["nvidia_driver"] = r.stdout.strip()
+    except Exception:
+        pass
+    return out
+
+
+class Ledger:
+    """Append-only budget ledger, one JSON line per event, kept beside the job on the output
+    drive -- so model loading, stress passes, failed work and every session's wall time are
+    accounted for even if the runtime disappears. Colab idle time outside this process is not
+    visible here; compare with the compute-unit balance."""
+
+    def __init__(self, path: Path, t0: float):
+        self.path, self.t0 = path, t0
+
+    def __call__(self, event: str, **kw) -> None:
+        rec = {"time": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "event": event,
+               "session_seconds": round(time.time() - self.t0, 1), **kw}
+        with open(self.path, "a") as fh:
+            fh.write(json.dumps(rec, default=str) + "\n")
 
 
 # ----------------------------------------------------------------------------- main
@@ -234,7 +310,13 @@ def main(argv=None) -> int:
                     help="resume a job created at a different commit (recorded in the job history)")
     ap.add_argument("--skip-hash-check", action="store_true", help="skip shard checksums when merging")
     ap.add_argument("--smoke", action="store_true", help="2 questions, check everything, report, stop")
+    ap.add_argument("--stress-batches", type=int, nargs="+", default=[4, 6, 8],
+                    help="generation and readout batch sizes to try in the worst-case memory pass")
+    ap.add_argument("--skip-stress", action="store_true", help="never run the memory stress pass")
+    ap.add_argument("--parent", help="child job: take round 0 from this job's saved caches")
+    ap.add_argument("--subset-n", type=int, help="child job: the first N questions of the parent")
     args = ap.parse_args(argv)
+    t_process = time.time()
 
     out_root = Path(args.out_root)
     out_root.mkdir(parents=True, exist_ok=True)
@@ -246,69 +328,123 @@ def main(argv=None) -> int:
 
     if args.smoke:
         name = f"smoke-{args.name}"
-        n_total, chunk = 2, 2
         for d in out_root.glob(f"{name}-*"):  # a smoke run always starts clean
             shutil.rmtree(d) if d.is_dir() else d.unlink()
+    ledger = Ledger(out_root / f"{name}-ledger.jsonl", t_process)
+
+    parent = None
+    if args.parent:
+        if args.smoke:
+            raise SystemExit("--smoke and --parent cannot be combined")
+        parent = json.loads((out_root / f"{args.parent}-job.json").read_text())
+        # the dataset and pool are the parent's, whatever the command line says
+        args.dataset = parent["identity"]["dataset"]["key"]
+        args.pool = parent["identity"]["pool"]["name"]
+        args.pilot_size = parent["identity"]["pool"]["pilot_size"]
+        cfg.data.dataset, cfg.data.split = DATASETS[args.dataset]
+        intended, chunk = _child_questions(out_root, parent, args.subset_n), parent["identity"]["chunk_size"]
+        n_total = len(intended)
+    else:
+        pool = load_pool(args.dataset, cfg)
+        master = master_order(pool, cfg.data.sample_seed)
+        intended = select(master, args.pool, n_total, args.pilot_size)
+    questions = intended[:2] if args.smoke else intended
+    if args.smoke:
+        n_total, chunk = 2, 2
     cfg.data.n_questions = n_total  # the resolved config records what actually runs
 
-    log(f"=== {name}: {n_total} {args.pool}-pool questions x {len(args.conditions)} conditions, "
+    log(f"=== {name}: {len(questions)} {args.pool}-pool questions x {len(args.conditions)} conditions, "
         f"dataset={args.dataset}, model={cfg.model.repo_id}, tokens={cfg.model.max_new_tokens}, "
-        f"batch gen/readout={cfg.model.batch_size}/{cfg.model.readout_batch_size or cfg.model.batch_size}")
-    pool = load_pool(args.dataset, cfg)
-    master = master_order(pool, cfg.data.sample_seed)
-    questions = select(master, args.pool, n_total, args.pilot_size)
-    log(f"  {len(questions)} questions across {len({q.subject for q in questions})} subjects "
-        f"(pool of {len(pool)}; first {args.pilot_size} of the fixed order are the pilot pool)")
+        f"batch gen/readout={cfg.model.batch_size}/{cfg.model.readout_batch_size or cfg.model.batch_size}"
+        + (f", child of {args.parent}" if parent else ""))
+    ledger("session_start", argv=argv if argv is not None else sys.argv[1:])
 
     backend = None
     if cfg.model.backend != "stub":
         t = time.time()
         backend = build_backend(cfg)  # loaded once, reused by every chunk
         log(f"  model loaded in {time.time() - t:.0f}s: {backend.n_layers} layers, d={backend.d_model}")
+        ledger("model_loaded", seconds=round(time.time() - t, 1))
         desc = backend.describe()
     else:
         desc = {"backend": "stub", "n_layers": cfg.stub.n_layers, "d_model": cfg.stub.d_model}
 
-    master_sha = hashlib.sha256(",".join(q.question_id for q in master).encode()).hexdigest()
     conds_all = [{"name": c, **CONDITION_SPECS[c]} for c in args.conditions]
-    identity = build_identity(
-        name=name, cfg=cfg, dataset_key=args.dataset, pool=args.pool, pilot_size=args.pilot_size,
-        chunk_size=chunk, conditions={c["name"]: CONDITION_SPECS[c["name"]] for c in conds_all},
-        templates_hash=prompt_hashes(P.TEMPLATES), backend_desc=desc, master_ids_sha=master_sha)
+    if parent:
+        identity = {**parent["identity"], "name": name,
+                    "conditions": {c["name"]: CONDITION_SPECS[c["name"]] for c in conds_all},
+                    "parent": {"name": args.parent, "identity_sha256": parent["identity_sha256"],
+                               "subset_n": n_total}}
+        mine = build_identity(name=name, cfg=cfg, dataset_key=args.dataset, pool=args.pool,
+                              pilot_size=args.pilot_size, chunk_size=chunk, conditions={},
+                              templates_hash=prompt_hashes(P.TEMPLATES), backend_desc=desc,
+                              master_ids_sha="")
+        for k in ("config", "prompt_template_hashes", "backend"):
+            if mine[k] != parent["identity"][k]:
+                raise SystemExit(f"a child job must use its parent's {k}; it differs")
+        keep = {x.question_id for x in intended}
+        chunks = [[q for q in members if q in keep] for members in parent["chunks"]]
+    else:
+        master_sha = hashlib.sha256(",".join(q.question_id for q in master).encode()).hexdigest()
+        identity = build_identity(
+            name=name, cfg=cfg, dataset_key=args.dataset, pool=args.pool, pilot_size=args.pilot_size,
+            chunk_size=chunk, conditions={c["name"]: CONDITION_SPECS[c["name"]] for c in conds_all},
+            templates_hash=prompt_hashes(P.TEMPLATES), backend_desc=desc, master_ids_sha=master_sha)
+        chunks = None
     execution = {"batch_size": cfg.model.batch_size, "readout_batch_size": cfg.model.readout_batch_size,
-                 **{k: v for k, v in gpu_stats().items() if k in ("device", "total_gb")}}
+                 "packages": package_versions(), **gpu_identity()}
     job = open_job(out_root, identity, questions, allow_code_change=args.allow_code_change,
-                   execution=execution)
-    log(f"  job {name}: {len(job['chunks'])} chunks of {chunk}; history: "
+                   execution=execution, chunks=chunks)
+    log(f"  job {name}: {sum(1 for c in job['chunks'] if c)} chunks; history: "
         f"{[h['event'] for h in job['history']]}")
 
-    if backend is not None and hasattr(backend, "estimated_readout_gb"):
-        gen_len, read_len = worst_case_lengths(cfg, backend, questions)
-        rb = cfg.model.readout_batch_size or cfg.model.batch_size
-        log(f"  worst-case lengths: round-1 prompt ~{gen_len} tokens + {cfg.model.max_new_tokens} "
-            f"generated; readout ~{read_len} tokens. Estimated KV cache "
-            f"{backend.estimated_kv_cache_gb(cfg.model.batch_size, read_len):.1f} GB at batch "
-            f"{cfg.model.batch_size}; readout states {backend.estimated_readout_gb(rb, read_len):.1f} GB "
-            f"at batch {rb}. {gpu_stats()}")
-        if args.smoke:
-            log("  stress: forcing full-length generation and the longest readout ...")
-            stress = backend.stress(gen_len, cfg.model.max_new_tokens, cfg.model.batch_size, rb)
-            log(f"  stress passed: {stress}")
-            assert stress["readout"]["finite"], "non-finite hidden states at the worst-case length"
+    cov = coverage(cfg, backend or _StubRender(cfg), intended)
+    log(f"  token coverage over all {len(intended)} intended questions: {cov}")
+    stress_path = out_root / f"{name}-stress.json"
+    if backend is not None and hasattr(backend, "stress") and not args.skip_stress:
+        prior = json.loads(stress_path.read_text()) if stress_path.exists() else {}
+        same = (prior.get("identity_sha256") == job["identity_sha256"]
+                and prior.get("gpu") == gpu_identity().get("gpu") and prior.get("passed"))
+        if same:
+            log(f"  stress already passed for this job on this GPU ({stress_path.name}); not repeating")
+        else:
+            log(f"  stress: worst-case generation and readout at batches {args.stress_batches} ...")
+            t = time.time()
+            rep = backend.stress(cov["worst_round1_prompt_tokens"], cfg.model.max_new_tokens,
+                                 cov["worst_readout_tokens"], args.stress_batches, args.stress_batches)
+            rb = cfg.model.readout_batch_size or cfg.model.batch_size
+            passed = (any(r["ok"] and r["batch"] >= cfg.model.batch_size for r in rep["generation"])
+                      and any(r["ok"] and r.get("finite_all_layers") and r["batch"] >= rb
+                              for r in rep["readout"]))
+            rec = {"identity_sha256": job["identity_sha256"], **gpu_identity(), "coverage": cov,
+                   "configured": {"batch_size": cfg.model.batch_size, "readout_batch_size": rb},
+                   "passed": passed, "seconds": round(time.time() - t, 1), **rep}
+            stress_path.write_text(json.dumps(rec, indent=2))
+            ledger("stress", seconds=rec["seconds"], passed=passed,
+                   max_ok_generation_batch=rep["max_ok_generation_batch"],
+                   max_ok_readout_batch=rep["max_ok_readout_batch"])
+            log(f"  stress {'passed' if passed else 'FAILED'} in {rec['seconds']}s: largest safe batch "
+                f"generation {rep['max_ok_generation_batch']}, readout {rep['max_ok_readout_batch']} "
+                f"(report: {stress_path.name})")
+            if not passed:
+                log("stopping: the configured batch sizes do not fit the worst case. Lower them.")
+                ledger("session_end", state="stress_failed")
+                return 1
 
     status_path = out_root / f"{name}-status.json"
     prev = json.loads(status_path.read_text()) if status_path.exists() else {}
     hours_before = float(prev.get("elapsed_hours_total", 0.0))
     timings, failures = prev.get("timings", []), prev.get("failures", [])
     sessions = prev.get("sessions", 0) + 1
-    t_run = time.time()
+    t_run = t_process  # the cap counts model loading and the stress pass too
     state, consecutive, smoke_report, last = "running", 0, None, None
 
     def write_status():
+        live = [j for j, members in enumerate(job["chunks"]) if members]
         done = sum(all(is_complete(out_root / f"{name}-{c}-{chunk_tag(j)}") for c in args.conditions)
-                   for j in range(len(job["chunks"])))
+                   for j in live)
         status_path.write_text(json.dumps({
-            "name": name, "state": state, "chunks_done": done, "chunks_total": len(job["chunks"]),
+            "name": name, "state": state, "chunks_done": done, "chunks_total": len(live),
             "questions_total": len(job["questions"]), "conditions": args.conditions,
             "sessions": sessions, "elapsed_hours_total": round(hours_before + (time.time() - t_run) / 3600, 3),
             "max_hours": args.max_hours, "timings": timings, "failures": failures,
@@ -317,6 +453,8 @@ def main(argv=None) -> int:
 
     by_id = {q.question_id: q for q in questions}
     for i, members in enumerate(job["chunks"]):
+        if not members:  # a child job's chunk with none of its questions
+            continue
         tag = chunk_tag(i)
         dirs = {c: out_root / f"{name}-{c}-{tag}" for c in args.conditions}
         if all(is_complete(d) for d in dirs.values()):
@@ -333,13 +471,18 @@ def main(argv=None) -> int:
         t = time.time()
         gpu_stats(reset=True)
         try:
+            parent_r0 = ({"dir": out_root / f"{args.parent}-round0-{tag}", "job": args.parent,
+                          "question_ids": parent["chunks"][i]} if parent else None)
             res, r0 = run_chunk(cfg, part, conds, backend=backend, job=name, chunk=tag,
                                 round0_dir=out_root / f"{name}-round0-{tag}", run_dirs=dirs,
-                                extra_manifest={"job_identity_sha256": job["identity_sha256"]})
+                                extra_manifest={"job_identity_sha256": job["identity_sha256"]},
+                                parent_round0=parent_r0)
         except Exception as exc:
             consecutive += 1
             failures.append({"chunk": tag, "time": time.strftime("%Y-%m-%dT%H:%M:%S"),
                              "error": type(exc).__name__, "message": str(exc)[:500]})
+            ledger("chunk_failed", chunk=tag, seconds=round(time.time() - t, 1),
+                   error=type(exc).__name__)
             log(f"FAILED {tag}\n{traceback.format_exc()}")
             if args.smoke or is_oom(exc) or consecutive >= MAX_CONSECUTIVE_FAILURES:
                 state = "failed"
@@ -352,16 +495,19 @@ def main(argv=None) -> int:
         consecutive = 0
         last = dirs[args.conditions[-1]]
         dt = time.time() - t
+        stages = {"round0_s": (r0.timings or {}).get("round0_s", 0.0),
+                  **{f"{c}/{k}": v for c, r in res.items() for k, v in (r.timings or {}).items()}}
         timings.append({"chunk": tag, "questions": len(part), "seconds": round(dt, 1),
                         "seconds_per_question": round(dt / len(part), 1),
-                        "round0_reloaded": r0.loaded, **gpu_stats()})
+                        "round0_reloaded": r0.loaded, "stages": stages, **gpu_stats()})
+        ledger("chunk_done", chunk=tag, seconds=round(dt, 1), questions=len(part), stages=stages)
         log(f"  {tag}: {len(part)} questions in {dt:.0f}s ({dt / len(part):.0f} s/question)  {gpu_stats()}")
         if args.smoke:
             smoke_report = smoke_checks(res, r0, backend or _StubShape(cfg), cfg, len(part))
         write_status()
     if state == "running":
         complete = all(is_complete(out_root / f"{name}-{c}-{chunk_tag(j)}")
-                       for c in args.conditions for j in range(len(job["chunks"])))
+                       for c in args.conditions for j, members in enumerate(job["chunks"]) if members)
         state = "finished" if complete else "incomplete"
     write_status()
 
@@ -377,8 +523,39 @@ def main(argv=None) -> int:
         log(f"SMOKE PASSED. {spq:.0f} s/question with {len(args.conditions)} conditions -> "
             f"~{hours:.1f} h for {args.n_questions} questions (an overestimate: 2 questions batch poorly). "
             f"{gpu_stats()}")
+    ledger("session_end", state=state)
     log(f"{state}; failures this job: {len(failures)}")
     return 0 if state in ("finished", "stopped_time_cap") else 1
+
+
+def _child_questions(out_root: Path, parent: dict, subset_n: int | None) -> list:
+    """The first ``subset_n`` questions of a parent job, from its verified local snapshot."""
+    from mad.data import Question
+    from mad.job import question_sha256
+
+    name = parent["identity"]["name"]
+    snap = [json.loads(line) for line in
+            (out_root / f"{name}-questions.jsonl").read_text().splitlines()]
+    qs = [Question(**{**d, "options": tuple(d["options"])}) for d in snap]
+    recorded = {q["id"]: q["sha256"] for q in parent["questions"]}
+    for q in qs:
+        if recorded.get(q.question_id) != question_sha256(q):
+            raise SystemExit(f"{name}-questions.jsonl does not match the parent job's hashes")
+    order = [q["id"] for q in parent["questions"]]
+    by_id = {q.question_id: q for q in qs}
+    return [by_id[i] for i in order[: subset_n or len(order)]]
+
+
+class _StubRender:
+    """Rendering for coverage when the stub backend is built inside each chunk."""
+
+    def __init__(self, cfg):
+        from mad.backends.stub import StubBackend
+
+        self._b = StubBackend(cfg, {})
+
+    def render(self, msgs):
+        return self._b.render(msgs)
 
 
 class _StubShape:

@@ -52,6 +52,19 @@ def panel_series(ev, accept, tie_break) -> pd.Series:
     return apply_policy(ev, accept, tie_break).set_index("question_id").panel_correct.astype(float)
 
 
+def pool_vote(ev: pd.DataFrame, tie_break: str) -> pd.Series:
+    """Panel correctness when all six answers (three first, three after round 1) vote, with the
+    declared tie-break. In an ``independent`` condition that is six independent samples."""
+    from mad.analysis.labels import panel_vote
+
+    out = {}
+    for q, grp in ev.sort_values("agent_id").groupby("question_id"):
+        answers = grp.pre_answer.tolist() + grp.post_answer.tolist()
+        conf = grp.pre_confidence.tolist() + grp.post_confidence.tolist()
+        out[q] = float(panel_vote(answers, conf, grp.pre_answer.tolist(), tie_break) == grp.gold_display.iloc[0])
+    return pd.Series(out)
+
+
 def summarize(run_dir: Path, tie_break: str) -> tuple[dict, pd.Series]:
     rows = pd.read_parquet(run_dir / ROWS_FILE)
     ev = build_events(rows)  # pre and post states only; uses the canonical answer
@@ -61,6 +74,12 @@ def summarize(run_dir: Path, tie_break: str) -> tuple[dict, pd.Series]:
     best = panel_series(ev, panel_optimal_accept(ev, tie_break), tie_break).reindex(vote.index)
     unanimous = ev.groupby("question_id").pre_answer.nunique().eq(1)
     view = json.loads((run_dir / VIEW_FILE).read_text()) if (run_dir / VIEW_FILE).exists() else {}
+
+    # answer coverage: is a correct answer anywhere in the panel, before and after?
+    any_pre = ev.groupby("question_id").pre_correct.max().reindex(vote.index).astype(float)
+    any_post = ev.groupby("question_id").post_correct.max().reindex(vote.index).astype(float)
+    pooled = pool_vote(ev, tie_break).reindex(vote.index)
+    better = np.maximum(vote, after)
 
     revs = {}
     for k in ("beneficial", "harmful", "unhelpful"):
@@ -81,6 +100,11 @@ def summarize(run_dir: Path, tie_break: str) -> tuple[dict, pd.Series]:
         "panel_optimal": stat(best),
         "after_minus_vote": stat(after - vote),
         "room_for_a_gate_panel_optimal_minus_after": stat(best - after),
+        "room_above_better_baseline_per_question": stat(best - better),
+        "vote_of_all_6_answers": stat(pooled),
+        "correct_answer_present_initially": stat(any_pre),
+        "correct_answer_present_after": stat(any_post),
+        "correct_answer_introduced_by_round_1": stat(((any_pre == 0) & (any_post == 1)).astype(float)),
         "first_answers_not_unanimous": round(float((~unanimous).mean()), 4),
         "revision_rate": round(float(ev.revised.mean()), 4),
         "revisions": revs,
@@ -95,6 +119,9 @@ def summarize(run_dir: Path, tie_break: str) -> tuple[dict, pd.Series]:
              "median_tokens": float(s.n_completion_tokens.median())}
         if "stop_reason" in s and s.stop_reason.notna().any():
             d["hit_token_cap"] = round(float((s.stop_reason == "length").mean()), 4)
+        if "stated_status" in s:
+            d["stated_status"] = {k: round(float(v), 4)
+                                  for k, v in s.stated_status.value_counts(normalize=True).items()}
         if "answer_source" in s:
             d["answer_source"] = {k: round(float(v), 4)
                                   for k, v in s.answer_source.value_counts(normalize=True).items()}

@@ -30,9 +30,12 @@ data:
   split: test
   n_questions: 120        # the driver's --n-questions overrides this and is what is recorded
 activations:
-  # Three positions for the pilot, so the choice of position is made on pilot data, not the
-  # test set: the forced-choice "(" (readout_last), the last generated token (generation_last),
-  # and the letter in the agent's own final "Answer: (X)" line (stated_answer). About 1.1 GB per
-  # condition per 120 questions; drop positions for the main run if the pilot shows no use.
-  positions: [readout_last, generation_last, stated_answer]
+  # Kept through the main run, all 49 layers each (positions are never dropped on noisy pilot
+  # numbers): the forced-choice "(" (readout_last); the last generated token (generation_last; for
+  # the exposure state, the last prompt token); the letter in the agent's own final answer line
+  # (stated_answer) and the token just before it, whose output predicts that letter
+  # (before_stated_answer). Option probabilities are saved at every position. Round-0 states are
+  # stored once per chunk and referenced by each condition. ~0.38 MB per state per position; see
+  # docs/BUDGET.md for the disk projection.
+  positions: [readout_last, generation_last, stated_answer, before_stated_answer]
   shard_size: 256
