@@ -1,0 +1,712 @@
+{
+  "job": "pilot",
+  "model": "stub-tiny",
+  "pool": {
+    "name": "pilot",
+    "pilot_size": 120,
+    "order_seed": 7,
+    "master_order_sha256": "0f9e8960261a627ec13bea93864beac946b570534a20b3585393728a52bc018a"
+  },
+  "conditions": {
+    "self_reconsider": {
+      "questions": 120,
+      "agent_answers": 360,
+      "tie_break": "round0_then_agent0",
+      "completeness": {
+        "complete": true,
+        "chunks_complete": 6,
+        "chunks_total": 6,
+        "questions": 120,
+        "questions_in_job": 120,
+        "hashes_verified": true
+      },
+      "one_agent_accuracy": {
+        "mean": 0.4222,
+        "ci95": [
+          0.3694,
+          0.4778
+        ],
+        "n_questions": 120
+      },
+      "one_agent_accuracy_after": {
+        "mean": 0.425,
+        "ci95": [
+          0.375,
+          0.4778
+        ],
+        "n_questions": 120
+      },
+      "vote_of_3": {
+        "mean": 0.45,
+        "ci95": [
+          0.3667,
+          0.5333
+        ],
+        "n_questions": 120
+      },
+      "after_round_1": {
+        "mean": 0.4667,
+        "ci95": [
+          0.3833,
+          0.55
+        ],
+        "n_questions": 120
+      },
+      "agent_optimal_not_a_panel_bound": {
+        "mean": 0.5,
+        "ci95": [
+          0.4167,
+          0.5917
+        ],
+        "n_questions": 120
+      },
+      "panel_optimal": {
+        "mean": 0.5,
+        "ci95": [
+          0.4167,
+          0.5917
+        ],
+        "n_questions": 120
+      },
+      "after_minus_vote": {
+        "mean": 0.0167,
+        "ci95": [
+          -0.0333,
+          0.0667
+        ],
+        "n_questions": 120
+      },
+      "room_for_a_gate_panel_optimal_minus_after": {
+        "mean": 0.0333,
+        "ci95": [
+          0.0083,
+          0.0667
+        ],
+        "n_questions": 120
+      },
+      "room_above_better_baseline": {
+        "mean": 0.0333,
+        "ci95": [
+          0.0083,
+          0.0583
+        ],
+        "n_questions": 120,
+        "better_baseline": "after_round_1"
+      },
+      "per_question_oracle_room_above_baselines": {
+        "mean": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "n_questions": 120
+      },
+      "vote_of_all_6_answers": {
+        "mean": 0.4667,
+        "ci95": [
+          0.3833,
+          0.5583
+        ],
+        "n_questions": 120
+      },
+      "correct_answer_present_initially": {
+        "mean": 0.8083,
+        "ci95": [
+          0.7333,
+          0.875
+        ],
+        "n_questions": 120
+      },
+      "correct_answer_present_after": {
+        "mean": 0.8,
+        "ci95": [
+          0.725,
+          0.8667
+        ],
+        "n_questions": 120
+      },
+      "correct_answer_introduced_by_round_1": {
+        "mean": 0.0417,
+        "ci95": [
+          0.0083,
+          0.0833
+        ],
+        "n_questions": 120
+      },
+      "first_answers_not_unanimous": 0.8833,
+      "revision_rate": 0.1111,
+      "revisions": {
+        "beneficial": {
+          "events": 13,
+          "distinct_questions": 13
+        },
+        "harmful": {
+          "events": 12,
+          "distinct_questions": 11
+        },
+        "unhelpful": {
+          "events": 15,
+          "distinct_questions": 15
+        }
+      },
+      "chance_accuracy": 0.25,
+      "generation": {
+        "pre": {
+          "stated_answer_parsed": 1.0,
+          "stated_disagrees_readout": 0.0222,
+          "median_tokens": 36.0,
+          "hit_token_cap": 0.0,
+          "stated_status": {
+            "strict": 1.0
+          },
+          "answer_source": {
+            "stated": 1.0
+          }
+        },
+        "post": {
+          "stated_answer_parsed": 1.0,
+          "stated_disagrees_readout": 0.0389,
+          "median_tokens": 36.0,
+          "hit_token_cap": 0.0,
+          "stated_status": {
+            "strict": 1.0
+          },
+          "answer_source": {
+            "stated": 1.0
+          }
+        }
+      }
+    },
+    "debate": {
+      "questions": 120,
+      "agent_answers": 360,
+      "tie_break": "round0_then_agent0",
+      "completeness": {
+        "complete": true,
+        "chunks_complete": 6,
+        "chunks_total": 6,
+        "questions": 120,
+        "questions_in_job": 120,
+        "hashes_verified": true
+      },
+      "one_agent_accuracy": {
+        "mean": 0.4222,
+        "ci95": [
+          0.3694,
+          0.4778
+        ],
+        "n_questions": 120
+      },
+      "one_agent_accuracy_after": {
+        "mean": 0.4194,
+        "ci95": [
+          0.3667,
+          0.475
+        ],
+        "n_questions": 120
+      },
+      "vote_of_3": {
+        "mean": 0.45,
+        "ci95": [
+          0.3667,
+          0.5333
+        ],
+        "n_questions": 120
+      },
+      "after_round_1": {
+        "mean": 0.4667,
+        "ci95": [
+          0.375,
+          0.55
+        ],
+        "n_questions": 120
+      },
+      "agent_optimal_not_a_panel_bound": {
+        "mean": 0.525,
+        "ci95": [
+          0.4333,
+          0.6083
+        ],
+        "n_questions": 120
+      },
+      "panel_optimal": {
+        "mean": 0.525,
+        "ci95": [
+          0.4333,
+          0.6083
+        ],
+        "n_questions": 120
+      },
+      "after_minus_vote": {
+        "mean": 0.0167,
+        "ci95": [
+          -0.0417,
+          0.075
+        ],
+        "n_questions": 120
+      },
+      "room_for_a_gate_panel_optimal_minus_after": {
+        "mean": 0.0583,
+        "ci95": [
+          0.0167,
+          0.1083
+        ],
+        "n_questions": 120
+      },
+      "room_above_better_baseline": {
+        "mean": 0.0583,
+        "ci95": [
+          0.0167,
+          0.0917
+        ],
+        "n_questions": 120,
+        "better_baseline": "after_round_1"
+      },
+      "per_question_oracle_room_above_baselines": {
+        "mean": 0.0167,
+        "ci95": [
+          0.0,
+          0.0417
+        ],
+        "n_questions": 120
+      },
+      "vote_of_all_6_answers": {
+        "mean": 0.4667,
+        "ci95": [
+          0.3833,
+          0.5583
+        ],
+        "n_questions": 120
+      },
+      "correct_answer_present_initially": {
+        "mean": 0.8083,
+        "ci95": [
+          0.7333,
+          0.875
+        ],
+        "n_questions": 120
+      },
+      "correct_answer_present_after": {
+        "mean": 0.7833,
+        "ci95": [
+          0.7083,
+          0.85
+        ],
+        "n_questions": 120
+      },
+      "correct_answer_introduced_by_round_1": {
+        "mean": 0.05,
+        "ci95": [
+          0.0167,
+          0.0917
+        ],
+        "n_questions": 120
+      },
+      "first_answers_not_unanimous": 0.8833,
+      "revision_rate": 0.2,
+      "revisions": {
+        "beneficial": {
+          "events": 24,
+          "distinct_questions": 19
+        },
+        "harmful": {
+          "events": 25,
+          "distinct_questions": 23
+        },
+        "unhelpful": {
+          "events": 23,
+          "distinct_questions": 20
+        }
+      },
+      "chance_accuracy": 0.25,
+      "generation": {
+        "pre": {
+          "stated_answer_parsed": 1.0,
+          "stated_disagrees_readout": 0.0222,
+          "median_tokens": 36.0,
+          "hit_token_cap": 0.0,
+          "stated_status": {
+            "strict": 1.0
+          },
+          "answer_source": {
+            "stated": 1.0
+          }
+        },
+        "post": {
+          "stated_answer_parsed": 1.0,
+          "stated_disagrees_readout": 0.0278,
+          "median_tokens": 36.0,
+          "hit_token_cap": 0.0,
+          "stated_status": {
+            "strict": 1.0
+          },
+          "answer_source": {
+            "stated": 1.0
+          }
+        }
+      },
+      "after_minus_self_reconsider": {
+        "mean": 0.0,
+        "ci95": [
+          -0.075,
+          0.075
+        ],
+        "n_questions": 120
+      }
+    },
+    "debate_answer_only": {
+      "questions": 120,
+      "agent_answers": 360,
+      "tie_break": "round0_then_agent0",
+      "completeness": {
+        "complete": true,
+        "chunks_complete": 6,
+        "chunks_total": 6,
+        "questions": 120,
+        "questions_in_job": 120,
+        "hashes_verified": true
+      },
+      "one_agent_accuracy": {
+        "mean": 0.4222,
+        "ci95": [
+          0.3694,
+          0.4778
+        ],
+        "n_questions": 120
+      },
+      "one_agent_accuracy_after": {
+        "mean": 0.4444,
+        "ci95": [
+          0.3944,
+          0.4973
+        ],
+        "n_questions": 120
+      },
+      "vote_of_3": {
+        "mean": 0.45,
+        "ci95": [
+          0.3667,
+          0.5333
+        ],
+        "n_questions": 120
+      },
+      "after_round_1": {
+        "mean": 0.5167,
+        "ci95": [
+          0.4333,
+          0.6083
+        ],
+        "n_questions": 120
+      },
+      "agent_optimal_not_a_panel_bound": {
+        "mean": 0.5833,
+        "ci95": [
+          0.5,
+          0.6669
+        ],
+        "n_questions": 120
+      },
+      "panel_optimal": {
+        "mean": 0.5833,
+        "ci95": [
+          0.5,
+          0.6669
+        ],
+        "n_questions": 120
+      },
+      "after_minus_vote": {
+        "mean": 0.0667,
+        "ci95": [
+          -0.0083,
+          0.1417
+        ],
+        "n_questions": 120
+      },
+      "room_for_a_gate_panel_optimal_minus_after": {
+        "mean": 0.0667,
+        "ci95": [
+          0.025,
+          0.1083
+        ],
+        "n_questions": 120
+      },
+      "room_above_better_baseline": {
+        "mean": 0.0667,
+        "ci95": [
+          0.025,
+          0.1083
+        ],
+        "n_questions": 120,
+        "better_baseline": "after_round_1"
+      },
+      "per_question_oracle_room_above_baselines": {
+        "mean": 0.0083,
+        "ci95": [
+          0.0,
+          0.025
+        ],
+        "n_questions": 120
+      },
+      "vote_of_all_6_answers": {
+        "mean": 0.5083,
+        "ci95": [
+          0.425,
+          0.5917
+        ],
+        "n_questions": 120
+      },
+      "correct_answer_present_initially": {
+        "mean": 0.8083,
+        "ci95": [
+          0.7333,
+          0.875
+        ],
+        "n_questions": 120
+      },
+      "correct_answer_present_after": {
+        "mean": 0.8167,
+        "ci95": [
+          0.7417,
+          0.8833
+        ],
+        "n_questions": 120
+      },
+      "correct_answer_introduced_by_round_1": {
+        "mean": 0.0417,
+        "ci95": [
+          0.0083,
+          0.0833
+        ],
+        "n_questions": 120
+      },
+      "first_answers_not_unanimous": 0.8833,
+      "revision_rate": 0.2333,
+      "revisions": {
+        "beneficial": {
+          "events": 31,
+          "distinct_questions": 29
+        },
+        "harmful": {
+          "events": 23,
+          "distinct_questions": 18
+        },
+        "unhelpful": {
+          "events": 30,
+          "distinct_questions": 27
+        }
+      },
+      "chance_accuracy": 0.25,
+      "generation": {
+        "pre": {
+          "stated_answer_parsed": 1.0,
+          "stated_disagrees_readout": 0.0222,
+          "median_tokens": 36.0,
+          "hit_token_cap": 0.0,
+          "stated_status": {
+            "strict": 1.0
+          },
+          "answer_source": {
+            "stated": 1.0
+          }
+        },
+        "post": {
+          "stated_answer_parsed": 1.0,
+          "stated_disagrees_readout": 0.0361,
+          "median_tokens": 36.0,
+          "hit_token_cap": 0.0,
+          "stated_status": {
+            "strict": 1.0
+          },
+          "answer_source": {
+            "stated": 1.0
+          }
+        }
+      },
+      "after_minus_self_reconsider": {
+        "mean": 0.05,
+        "ci95": [
+          -0.0333,
+          0.1417
+        ],
+        "n_questions": 120
+      }
+    },
+    "misleading_one": {
+      "questions": 120,
+      "agent_answers": 360,
+      "tie_break": "round0_then_agent0",
+      "completeness": {
+        "complete": true,
+        "chunks_complete": 6,
+        "chunks_total": 6,
+        "questions": 120,
+        "questions_in_job": 120,
+        "hashes_verified": true
+      },
+      "one_agent_accuracy": {
+        "mean": 0.4222,
+        "ci95": [
+          0.3694,
+          0.4778
+        ],
+        "n_questions": 120
+      },
+      "one_agent_accuracy_after": {
+        "mean": 0.4306,
+        "ci95": [
+          0.3778,
+          0.4806
+        ],
+        "n_questions": 120
+      },
+      "vote_of_3": {
+        "mean": 0.45,
+        "ci95": [
+          0.3667,
+          0.5333
+        ],
+        "n_questions": 120
+      },
+      "after_round_1": {
+        "mean": 0.4417,
+        "ci95": [
+          0.3583,
+          0.5333
+        ],
+        "n_questions": 120
+      },
+      "agent_optimal_not_a_panel_bound": {
+        "mean": 0.4917,
+        "ci95": [
+          0.4081,
+          0.575
+        ],
+        "n_questions": 120
+      },
+      "panel_optimal": {
+        "mean": 0.5,
+        "ci95": [
+          0.4083,
+          0.5833
+        ],
+        "n_questions": 120
+      },
+      "after_minus_vote": {
+        "mean": -0.0083,
+        "ci95": [
+          -0.0667,
+          0.0417
+        ],
+        "n_questions": 120
+      },
+      "room_for_a_gate_panel_optimal_minus_after": {
+        "mean": 0.0583,
+        "ci95": [
+          0.0167,
+          0.1
+        ],
+        "n_questions": 120
+      },
+      "room_above_better_baseline": {
+        "mean": 0.05,
+        "ci95": [
+          0.0167,
+          0.075
+        ],
+        "n_questions": 120,
+        "better_baseline": "vote_of_3"
+      },
+      "per_question_oracle_room_above_baselines": {
+        "mean": 0.0083,
+        "ci95": [
+          0.0,
+          0.025
+        ],
+        "n_questions": 120
+      },
+      "vote_of_all_6_answers": {
+        "mean": 0.4333,
+        "ci95": [
+          0.3417,
+          0.525
+        ],
+        "n_questions": 120
+      },
+      "correct_answer_present_initially": {
+        "mean": 0.8083,
+        "ci95": [
+          0.7333,
+          0.875
+        ],
+        "n_questions": 120
+      },
+      "correct_answer_present_after": {
+        "mean": 0.8333,
+        "ci95": [
+          0.7667,
+          0.9
+        ],
+        "n_questions": 120
+      },
+      "correct_answer_introduced_by_round_1": {
+        "mean": 0.05,
+        "ci95": [
+          0.0167,
+          0.0917
+        ],
+        "n_questions": 120
+      },
+      "first_answers_not_unanimous": 0.8833,
+      "revision_rate": 0.1806,
+      "revisions": {
+        "beneficial": {
+          "events": 14,
+          "distinct_questions": 14
+        },
+        "harmful": {
+          "events": 11,
+          "distinct_questions": 10
+        },
+        "unhelpful": {
+          "events": 40,
+          "distinct_questions": 36
+        }
+      },
+      "chance_accuracy": 0.25,
+      "generation": {
+        "pre": {
+          "stated_answer_parsed": 1.0,
+          "stated_disagrees_readout": 0.0222,
+          "median_tokens": 36.0,
+          "hit_token_cap": 0.0,
+          "stated_status": {
+            "strict": 1.0
+          },
+          "answer_source": {
+            "stated": 1.0
+          }
+        },
+        "post": {
+          "stated_answer_parsed": 1.0,
+          "stated_disagrees_readout": 0.0194,
+          "median_tokens": 36.0,
+          "hit_token_cap": 0.0,
+          "stated_status": {
+            "strict": 1.0
+          },
+          "answer_source": {
+            "stated": 1.0
+          }
+        }
+      },
+      "after_minus_self_reconsider": {
+        "mean": -0.025,
+        "ci95": [
+          -0.1,
+          0.05
+        ],
+        "n_questions": 120
+      }
+    }
+  }
+}

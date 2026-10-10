@@ -159,7 +159,7 @@ rerunning with a larger `--n-questions`, a multiple of `--chunk` from a full las
 See docs/REVIEW_8bd3b82_CHANGES.md for the current list and which tests cover each change. In
 short: earlier rounds verified on CPU (stub and Gemma-3-270M) the driver, child jobs, archive
 restore, exact replay, the four positions and their option probabilities, and response
-likelihoods. **The changes in the latest round have tests written but not yet run.**
+likelihoods; the latest round's changes are covered by the 200 passing tests.
 
 **Not verified until the first 12B run** (each is checked by the smoke test; see
 docs/GPU_MEASUREMENTS.md): all 49 layers × 3,840 finite at every position; the letter-in-context

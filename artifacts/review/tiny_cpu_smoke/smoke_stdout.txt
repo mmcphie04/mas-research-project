@@ -1,15 +1,16 @@
-[21:09:09] === smoke-tiny: 2 pilot-pool questions x 4 conditions, dataset=arc-easy, model=google/gemma-3-270m-it, tokens=64, batch gen/readout=4/3
-[21:09:16]   model loaded in 7s: 18 layers, d=640
-[21:09:16]   job smoke-tiny: 1 chunks; history: ['created']
-[21:09:16]   token coverage over all 120 intended questions: {'exact_tokens': True, 'n_questions': 120, 'token_cap': 64, 'round0_prompt_tokens': {'p50': 165, 'p95': 216, 'max': 249}, 'round1_template_overhead': 94, 'worst_round1_prompt_tokens': 535, 'worst_readout_tokens': 604}
-[21:09:16]   stress: worst-case generation and readout at batches [2, 4] ...
-[21:10:27]   stress passed in 70.7s: largest safe batch generation 4, readout 4 (report: smoke-tiny-stress.json)
-[21:13:35]   c000: 2 questions in 188s (94 s/question)  {}
-[21:13:44]   batched vs single readout: {'max_abs_logprob_diff': 0.0, 'min_last_layer_cosine': 1.0, 'argmax_agree': '4/4'}
-[21:13:44]   smoke checks passed: 19 layers x 640, finite, non-degenerate, normalised, answers in each row's range
-[21:13:44] VIEW self_reconsider: <scratch>/tiny3/smoke-tiny-self_reconsider  {'pre': {'stated_answer_parsed': 0.0, 'hit_token_cap': 0.0, 'stated_agrees_readout': 0.0, 'median_tokens': 33.0}, 'post': {'stated_answer_parsed': 0.0, 'hit_token_cap': 0.0, 'stated_agrees_readout': 0.0, 'median_tokens': 20.5}}
-[21:13:44] VIEW debate: <scratch>/tiny3/smoke-tiny-debate  {'pre': {'stated_answer_parsed': 0.0, 'hit_token_cap': 0.0, 'stated_agrees_readout': 0.0, 'median_tokens': 33.0}, 'post': {'stated_answer_parsed': 0.0, 'hit_token_cap': 0.1667, 'stated_agrees_readout': 0.0, 'median_tokens': 16.0}}
-[21:13:44] VIEW debate_answer_only: <scratch>/tiny3/smoke-tiny-debate_answer_only  {'pre': {'stated_answer_parsed': 0.0, 'hit_token_cap': 0.0, 'stated_agrees_readout': 0.0, 'median_tokens': 33.0}, 'post': {'stated_answer_parsed': 0.0, 'hit_token_cap': 0.0, 'stated_agrees_readout': 0.0, 'median_tokens': 17.0}}
-[21:13:44] VIEW misleading_one: <scratch>/tiny3/smoke-tiny-misleading_one  {'pre': {'stated_answer_parsed': 0.0, 'hit_token_cap': 0.0, 'stated_agrees_readout': 0.0, 'median_tokens': 33.0}, 'post': {'stated_answer_parsed': 0.0, 'hit_token_cap': 0.0, 'stated_agrees_readout': 0.0, 'median_tokens': 19.0}}
-[21:13:44] SMOKE PASSED. 94 s/question with 4 conditions -> ~3.1 h for 120 questions (an overestimate: 2 questions batch poorly). {}
-[21:13:44] finished; failures this job: 0
+[23:27:25] === smoke-tiny: 2 pilot-pool questions x 4 conditions, dataset=arc-easy, model=google/gemma-3-270m-it, tokens=64, batch gen/readout=4/3
+[23:27:37]   model loaded in 11s: 18 layers, d=640
+[23:27:37]   job smoke-tiny: 1 chunks; history: ['created']
+[23:27:37]   token coverage over all 120 intended questions: {'exact_tokens': True, 'n_questions': 120, 'token_cap': 64, 'round0_prompt_tokens': {'p50': 165, 'p95': 216, 'max': 249}, 'round1_template_overhead': 94, 'worst_round1_prompt_tokens': 535, 'worst_readout_tokens': 604}
+[23:27:37]   stress (no passing stress report): the real generation and readout/extraction workload at the worst-case lengths, generation batches [2, 4], readout batches [2, 3] ...
+[23:28:22]   stress passed in 44.8s: largest safe batch generation 4, readout 3 (report: smoke-tiny-stress.json)
+[23:30:28]   c000: 2 questions in 127s (63 s/question)  {}
+[23:30:32]   position fixture passed: {'max_prob_diff_vs_model_logits': {'readout_last': 0.0, 'generation_last': 0.0, 'stated_answer': 0.0, 'before_stated_answer': 0.0}, 'permissive_answer': 'flagged letter_token_mismatch', 'positions_checked': ['before_stated_answer', 'generation_last', 'stated_answer']}
+[23:30:37]   batched vs single readout: {'max_abs_logprob_diff': 0.0, 'min_last_layer_cosine': 1.0, 'argmax_agree': '4/4'}
+[23:30:37]   smoke checks passed: all 19 layers x 640, finite, non-degenerate, normalised, answers in each row's range, exposure semantics
+[23:30:37] VIEW self_reconsider: <scratch>/tiny4/smoke-tiny-self_reconsider  {'pre': {'stated_answer_parsed': 0.0, 'hit_token_cap': 0.0, 'stated_agrees_readout': 0.0, 'median_tokens': 33.0}, 'post': {'stated_answer_parsed': 0.0, 'hit_token_cap': 0.0, 'stated_agrees_readout': 0.0, 'median_tokens': 20.5}}
+[23:30:37] VIEW debate: <scratch>/tiny4/smoke-tiny-debate  {'pre': {'stated_answer_parsed': 0.0, 'hit_token_cap': 0.0, 'stated_agrees_readout': 0.0, 'median_tokens': 33.0}, 'post': {'stated_answer_parsed': 0.0, 'hit_token_cap': 0.1667, 'stated_agrees_readout': 0.0, 'median_tokens': 16.0}}
+[23:30:37] VIEW debate_answer_only: <scratch>/tiny4/smoke-tiny-debate_answer_only  {'pre': {'stated_answer_parsed': 0.0, 'hit_token_cap': 0.0, 'stated_agrees_readout': 0.0, 'median_tokens': 33.0}, 'post': {'stated_answer_parsed': 0.0, 'hit_token_cap': 0.0, 'stated_agrees_readout': 0.0, 'median_tokens': 17.0}}
+[23:30:37] VIEW misleading_one: <scratch>/tiny4/smoke-tiny-misleading_one  {'pre': {'stated_answer_parsed': 0.0, 'hit_token_cap': 0.0, 'stated_agrees_readout': 0.0, 'median_tokens': 33.0}, 'post': {'stated_answer_parsed': 0.0, 'hit_token_cap': 0.0, 'stated_agrees_readout': 0.0, 'median_tokens': 19.0}}
+[23:30:37] SMOKE PASSED. 63 s/question with 4 conditions -> ~2.1 h for 120 questions (an overestimate: 2 questions batch poorly). {}
+[23:30:37] finished; failures this job: 0

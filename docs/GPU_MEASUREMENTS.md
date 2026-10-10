@@ -14,8 +14,8 @@ tokenizer family), not on the 12B. **No 12B measurement has been made yet.**
 | hidden states at `stated_answer` (the letter in the agent's own final answer line) | shards | pre, post when the answer parses | yes |
 | hidden states at `before_stated_answer` (the token whose output predicts that letter) | shards | pre, post when the answer parses | yes |
 | option-letter distribution at each extra position (letter rows of the output layer, with the model's soft-capping) | `pos_<name>_logprobs` | as above | yes — equals the model's own logits at the readout position |
-| token index and token id of each extra position; reason for each missing position (incl. `letter_token_mismatch`: the stated letter is not the standalone token the readout scores, so neither stated-answer state is stored) | `pos_<name>_token_index/_id/_missing` | as above | yes; the mismatch flag has a test written (not yet run) |
-| readout input token counts (prompt part, own-response part) | `readout_prompt_tokens`, `readout_response_tokens` | all | test written (not yet run) |
+| token index and token id of each extra position; reason for each missing position (incl. `letter_token_mismatch`: the stated letter is not the standalone token the readout scores, so neither stated-answer state is stored) | `pos_<name>_token_index/_id/_missing` | as above | yes; a permissive `Answer: C` is flagged on the Gemma 3 tokenizer |
+| readout input token counts (prompt part, own-response part) | `readout_prompt_tokens`, `readout_response_tokens` | all | tested |
 | exact-replay flag: the readout input is the generation-time token sequence | `replay_exact` | pre, post | yes (the readout is built from generated ids, not re-tokenised text) |
 | response log-likelihood at temperature 1 (mean, min, sum of token log-probabilities) | `response_logprob_*` | pre, post | yes — equals full-sequence logits |
 | generated token ids, stop reason (stop token or cap), prompt and response token counts | transcripts, rows | pre, post | yes |
@@ -31,7 +31,7 @@ tokenizer family), not on the 12B. **No 12B measurement has been made yet.**
 | model commit, tokenizer, chat template hash, special tokens, letter token ids, dtype | job identity | yes |
 | GPU name, memory, CUDA, NVIDIA driver, package versions | job history (each session) | partly (no GPU on CPU) |
 | token-length coverage of the whole intended question pool | `<name>-stress.json`, log | yes |
-| worst-case memory of the REAL workload at the configured batch sizes (plus optional extras): `generate` at full length, and `readout()` with all layers, all positions, option probabilities and the response likelihood; GPU allocated/reserved and host resident peaks; finite values; with the code, package, GPU and length context that decides whether it may be reused | `<name>-stress.json` | 270M on CPU, test written (not yet run) |
+| worst-case memory of the REAL workload at the configured batch sizes (plus optional extras): `generate` at full length, and `readout()` with all layers, all positions, option probabilities and the response likelihood; GPU allocated/reserved and host resident peaks; finite values; with the code, package, GPU and length context that decides whether it may be reused | `<name>-stress.json` | 270M on CPU, tested |
 | batched vs one-at-a-time readout agreement | smoke report | yes (exact in fp32); **bf16 not verified** |
 | stage timings (round 0, generation, readouts, writes) per chunk; session wall time | status file, ledger | yes |
 

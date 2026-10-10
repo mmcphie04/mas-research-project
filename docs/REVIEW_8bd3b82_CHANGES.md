@@ -1,11 +1,18 @@
 # Changes in response to the review of 8bd3b82
 
-Each finding was checked against the code before changing anything. **Tests for this round are
-written but have not been run yet** (at the author's request); the commands are at the end.
-Nothing has been run on a GPU. Verification levels: **stub** (tier-0), **270M** (real Hugging
-Face path, gemma-3-270m on CPU), **12B** (not yet).
+Each finding was checked against the code before changing anything. **All 200 tests pass**
+(`uv run pytest -q`, 7 min 44 s on the laptop CPU, commit `3e5fc7a`), including every test named
+below. Nothing has been run on a GPU. Verification levels: **stub** (tier-0), **270M** (real
+Hugging Face path, gemma-3-270m on CPU), **12B** (not yet).
 
-| # | finding | verdict | change | tests (not yet run) |
+**Found by the new checks.** On the Gemma 3 tokenizer (270M), the letter in a strict
+`Answer: (C)` IS the standalone token the readout scores (the fixture asserts it), so earlier
+stated-answer positions were placed correctly. A permissive `Answer: C` is NOT: the letter after a
+space is a different token, so such rows are flagged `letter_token_mismatch` and store no
+stated-answer states (the answer itself still counts). How often the 12B uses the permissive form
+is in the pilot report's parse-status shares.
+
+| # | finding | verdict | change | tests (all pass) |
 |---|---|---|---|---|
 | 1 | stress bypasses likelihood and extra-position extraction | **confirmed**: the readout stress called the model directly | the stress readout now runs `HFBackend.readout()` itself on synthetic worst-length transcripts ending in a valid answer line, so every layer, every configured position, option probabilities and the response likelihood run; records GPU allocated/reserved and host RSS; likelihood chunk size is a setting (`activations.likelihood_chunk`, an execution field); only the configured batch sizes are required to pass (extras are informational; no automatic promotion) | `test_hf_stress_exercises_the_full_extraction_path` (270M) |
 | 2 | stress result reused across batch sizes / lengths / environments | **confirmed**: reuse compared identity, GPU name and pass flag only | `stress_reusable`: reuse only if the configured generation and readout batches were tested and passed, current worst-case lengths and cap do not exceed the tested ones, and identity, GPU identity, packages, code commit, likelihood chunk and positions are unchanged; the report records all of these | `test_stress_report_is_reused_only_when_it_covers_the_current_settings` |
@@ -24,9 +31,12 @@ the model identity, rendered prompts and token counts, and the instructions insp
 before the full set; it stays a single short job (no chunked resume). The candidate prompt format
 is unchanged.
 
-**Not done in this round:** the requested exports (stub pilot report, child-dependency
-restoration evidence, a stress report from the full extraction path) — they need code runs, held
-until the tests are run.
+**Exports** (`artifacts/review/`, all CPU): the corrected stub pilot report
+(`stub_pilot_report/`); a child job restored alone into a clean location with its parent round-0
+dependency, verified and loading identically (`child_restore/`); the memory report from the full
+extraction path on the 270M model with the position fixture (`tiny_cpu_smoke/`); and an
+exploratory run of the pre-only protection gate on the 1B data (`reanalysis_v3_pre/`,
+docs/REANALYSIS.md §6).
 
 ## Commands to run the tests
 

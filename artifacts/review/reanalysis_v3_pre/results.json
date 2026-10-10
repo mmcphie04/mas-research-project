@@ -1,0 +1,1834 @@
+{
+  "events_total": 1050,
+  "lp_source": "readout_full.parquet",
+  "time": "pre",
+  "output_positions": [],
+  "output_features": [
+    "p_old@pre",
+    "margin@pre",
+    "entropy@pre",
+    "lp0@pre",
+    "lp1@pre",
+    "lp2@pre",
+    "lp3@pre",
+    "lp4@pre",
+    "verbal_conf_pre",
+    "verbal_conf_pre_missing",
+    "len_pre",
+    "fallback_pre",
+    "hit_cap_pre",
+    "stated_vs_readout_disagree_pre",
+    "panel_agree_old",
+    "old_is_0",
+    "old_is_1",
+    "old_is_2",
+    "old_is_3",
+    "old_is_4"
+  ],
+  "output_features_readout_only": [
+    "p_old@pre",
+    "margin@pre",
+    "entropy@pre",
+    "lp0@pre",
+    "lp1@pre",
+    "lp2@pre",
+    "lp3@pre",
+    "lp4@pre",
+    "verbal_conf_pre",
+    "verbal_conf_pre_missing",
+    "len_pre",
+    "fallback_pre",
+    "hit_cap_pre",
+    "stated_vs_readout_disagree_pre",
+    "panel_agree_old",
+    "old_is_0",
+    "old_is_1",
+    "old_is_2",
+    "old_is_3",
+    "old_is_4"
+  ],
+  "questions_dropped_missing_states": [],
+  "events_used": 1050,
+  "questions_used": 350,
+  "revised_used": 401,
+  "position": "readout_last",
+  "exposure_position": null,
+  "activation_phases": [
+    "pre"
+  ],
+  "candidate_layers": [
+    6,
+    13,
+    16,
+    20,
+    23,
+    26
+  ],
+  "run": "runs/night2-debate",
+  "mode": "cv",
+  "tie_break": "round0_then_agent0",
+  "families": [
+    "output_linear",
+    "output_hgb",
+    "activation"
+  ],
+  "gates": {
+    "keys": [
+      "difference_panel",
+      "difference_agent",
+      "protect_panel",
+      "protect_agent"
+    ],
+    "primary": "difference_panel",
+    "rules": {
+      "difference": "accept iff P(new) - P(old) > tau",
+      "protect": "accept iff P(old) <= tau (keep confident first answers)"
+    },
+    "objectives": {
+      "panel": "primary",
+      "agent": "secondary"
+    }
+  },
+  "results": [
+    {
+      "families": {
+        "output_linear": {
+          "old_correct": {
+            "auroc_all": 0.6755807692307693,
+            "auroc_all_ci95": [
+              0.6291519326734603,
+              0.72171657409479
+            ],
+            "auroc_revised": 0.6424290498854223,
+            "auroc_revised_ci95": [
+              0.5620621392496392,
+              0.7184225858272694
+            ],
+            "auroc_within_question": 0.6148648648648649,
+            "within_question_pairs": 148,
+            "brier": 0.2101597932057863,
+            "logloss": 0.6099697028103418,
+            "ece": 0.04401628475659473,
+            "sd": 0.15014368525065092
+          },
+          "new_correct": {
+            "auroc_all": 0.5770853567903613,
+            "auroc_all_ci95": [
+              0.527202078686613,
+              0.6268554168682772
+            ],
+            "auroc_revised": 0.4702970297029703,
+            "auroc_revised_ci95": [
+              0.3994766631644527,
+              0.5468101694824768
+            ],
+            "auroc_within_question": 0.4336734693877551,
+            "within_question_pairs": 196,
+            "brier": 0.2263069863073343,
+            "logloss": 0.645260293178218,
+            "ece": 0.03738867049709971,
+            "sd": 0.06156638227621386
+          },
+          "gate_difference_panel": {
+            "agent_accuracy": 0.4,
+            "panel_accuracy": 0.42,
+            "beneficial_kept": 85,
+            "beneficial_lost": 16,
+            "harmful_blocked": 57,
+            "harmful_accepted": 65,
+            "unhelpful_accepted": 129,
+            "revisions_accepted": 279,
+            "revisions": 401
+          },
+          "gate_difference_agent": {
+            "agent_accuracy": 0.40095238095238095,
+            "panel_accuracy": 0.42,
+            "beneficial_kept": 79,
+            "beneficial_lost": 22,
+            "harmful_blocked": 64,
+            "harmful_accepted": 58,
+            "unhelpful_accepted": 125,
+            "revisions_accepted": 262,
+            "revisions": 401
+          },
+          "gate_protect_panel": {
+            "agent_accuracy": 0.39904761904761904,
+            "panel_accuracy": 0.4257142857142857,
+            "beneficial_kept": 87,
+            "beneficial_lost": 14,
+            "harmful_blocked": 54,
+            "harmful_accepted": 68,
+            "unhelpful_accepted": 134,
+            "revisions_accepted": 289,
+            "revisions": 401
+          },
+          "gate_protect_agent": {
+            "agent_accuracy": 0.3933333333333333,
+            "panel_accuracy": 0.4142857142857143,
+            "beneficial_kept": 64,
+            "beneficial_lost": 37,
+            "harmful_blocked": 71,
+            "harmful_accepted": 51,
+            "unhelpful_accepted": 95,
+            "revisions_accepted": 210,
+            "revisions": 401
+          }
+        },
+        "output_hgb": {
+          "old_correct": {
+            "auroc_all": 0.6453634615384616,
+            "auroc_all_ci95": [
+              0.5983547328803287,
+              0.6916558533638119
+            ],
+            "auroc_revised": 0.6165021446618484,
+            "auroc_revised_ci95": [
+              0.542134749805838,
+              0.6917044158909059
+            ],
+            "auroc_within_question": 0.6283783783783784,
+            "within_question_pairs": 148,
+            "brier": 0.2162327970423933,
+            "logloss": 0.6239030178589596,
+            "ece": 0.036058437656636425,
+            "sd": 0.12181691760646245
+          },
+          "new_correct": {
+            "auroc_all": 0.5941846336543339,
+            "auroc_all_ci95": [
+              0.5489542931697026,
+              0.6382303459825983
+            ],
+            "auroc_revised": 0.47483498349834974,
+            "auroc_revised_ci95": [
+              0.4059415498626519,
+              0.5410193178228402
+            ],
+            "auroc_within_question": 0.49489795918367346,
+            "within_question_pairs": 196,
+            "brier": 0.22351400292379858,
+            "logloss": 0.6395086046998194,
+            "ece": 0.05277444903320991,
+            "sd": 0.0731732612336802
+          },
+          "gate_difference_panel": {
+            "agent_accuracy": 0.38571428571428573,
+            "panel_accuracy": 0.4085714285714286,
+            "beneficial_kept": 71,
+            "beneficial_lost": 30,
+            "harmful_blocked": 56,
+            "harmful_accepted": 66,
+            "unhelpful_accepted": 129,
+            "revisions_accepted": 266,
+            "revisions": 401
+          },
+          "gate_difference_agent": {
+            "agent_accuracy": 0.38666666666666666,
+            "panel_accuracy": 0.4057142857142857,
+            "beneficial_kept": 68,
+            "beneficial_lost": 33,
+            "harmful_blocked": 60,
+            "harmful_accepted": 62,
+            "unhelpful_accepted": 119,
+            "revisions_accepted": 249,
+            "revisions": 401
+          },
+          "gate_protect_panel": {
+            "agent_accuracy": 0.3914285714285714,
+            "panel_accuracy": 0.40285714285714286,
+            "beneficial_kept": 81,
+            "beneficial_lost": 20,
+            "harmful_blocked": 52,
+            "harmful_accepted": 70,
+            "unhelpful_accepted": 131,
+            "revisions_accepted": 282,
+            "revisions": 401
+          },
+          "gate_protect_agent": {
+            "agent_accuracy": 0.38761904761904764,
+            "panel_accuracy": 0.39714285714285713,
+            "beneficial_kept": 51,
+            "beneficial_lost": 50,
+            "harmful_blocked": 78,
+            "harmful_accepted": 44,
+            "unhelpful_accepted": 80,
+            "revisions_accepted": 175,
+            "revisions": 401
+          }
+        },
+        "activation": {
+          "old_correct": {
+            "auroc_all": 0.7346807692307692,
+            "auroc_all_ci95": [
+              0.6900744353575914,
+              0.7787922992005015
+            ],
+            "auroc_revised": 0.6776250073447324,
+            "auroc_revised_ci95": [
+              0.6037577666067938,
+              0.7497431833111206
+            ],
+            "auroc_within_question": 0.7162162162162162,
+            "within_question_pairs": 148,
+            "brier": 0.1965772171173374,
+            "logloss": 0.578690623344817,
+            "ece": 0.016951073664308515,
+            "sd": 0.19373560152876604
+          },
+          "new_correct": {
+            "auroc_all": 0.6720171130396486,
+            "auroc_all_ci95": [
+              0.6260666785735811,
+              0.7177265976593162
+            ],
+            "auroc_revised": 0.5121452145214521,
+            "auroc_revised_ci95": [
+              0.4367658517875747,
+              0.585837047406543
+            ],
+            "auroc_within_question": 0.5459183673469388,
+            "within_question_pairs": 196,
+            "brier": 0.20726834906135616,
+            "logloss": 0.6041305587438652,
+            "ece": 0.03795192275323146,
+            "sd": 0.1350843975509531
+          },
+          "gate_difference_panel": {
+            "agent_accuracy": 0.4,
+            "panel_accuracy": 0.42,
+            "beneficial_kept": 71,
+            "beneficial_lost": 30,
+            "harmful_blocked": 71,
+            "harmful_accepted": 51,
+            "unhelpful_accepted": 111,
+            "revisions_accepted": 233,
+            "revisions": 401
+          },
+          "gate_difference_agent": {
+            "agent_accuracy": 0.3942857142857143,
+            "panel_accuracy": 0.39714285714285713,
+            "beneficial_kept": 60,
+            "beneficial_lost": 41,
+            "harmful_blocked": 76,
+            "harmful_accepted": 46,
+            "unhelpful_accepted": 94,
+            "revisions_accepted": 200,
+            "revisions": 401
+          },
+          "gate_protect_panel": {
+            "agent_accuracy": 0.3980952380952381,
+            "panel_accuracy": 0.4114285714285714,
+            "beneficial_kept": 79,
+            "beneficial_lost": 22,
+            "harmful_blocked": 61,
+            "harmful_accepted": 61,
+            "unhelpful_accepted": 132,
+            "revisions_accepted": 272,
+            "revisions": 401
+          },
+          "gate_protect_agent": {
+            "agent_accuracy": 0.40190476190476193,
+            "panel_accuracy": 0.4057142857142857,
+            "beneficial_kept": 58,
+            "beneficial_lost": 43,
+            "harmful_blocked": 86,
+            "harmful_accepted": 36,
+            "unhelpful_accepted": 101,
+            "revisions_accepted": 195,
+            "revisions": 401
+          }
+        }
+      },
+      "reference": {
+        "accept_all": {
+          "agent_accuracy": 0.36095238095238097,
+          "panel_accuracy": 0.37714285714285717
+        },
+        "reject_all": {
+          "agent_accuracy": 0.38095238095238093,
+          "panel_accuracy": 0.37142857142857144
+        },
+        "agent_optimal_not_a_panel_bound": {
+          "agent_accuracy": 0.47714285714285715,
+          "panel_accuracy": 0.48
+        },
+        "panel_optimal": {
+          "agent_accuracy": 0.43142857142857144,
+          "panel_accuracy": 0.48
+        }
+      },
+      "constant_training_rate": {
+        "old_correct": {
+          "brier": 0.23654705215419503,
+          "logloss": 0.6660616508086392,
+          "ece": 0.0,
+          "auroc_all": 0.5
+        },
+        "new_correct": {
+          "brier": 0.2326422902494331,
+          "logloss": 0.6582844991778036,
+          "ece": 0.0,
+          "auroc_all": 0.5
+        }
+      },
+      "paired_panel": {
+        "difference_panel": {
+          "activation - output_linear": {
+            "mean": 0.0,
+            "ci95": [
+              -0.022857142857142857,
+              0.022857142857142857
+            ],
+            "n_questions": 350
+          },
+          "activation - output_hgb": {
+            "mean": 0.011428571428571429,
+            "ci95": [
+              -0.014285714285714285,
+              0.037142857142857144
+            ],
+            "n_questions": 350
+          },
+          "output_linear - accept_all": {
+            "mean": 0.04285714285714286,
+            "ci95": [
+              0.017142857142857144,
+              0.06857142857142857
+            ],
+            "n_questions": 350
+          },
+          "output_linear - reject_all": {
+            "mean": 0.04857142857142857,
+            "ci95": [
+              0.014285714285714285,
+              0.08571428571428572
+            ],
+            "n_questions": 350
+          },
+          "output_hgb - accept_all": {
+            "mean": 0.03142857142857143,
+            "ci95": [
+              0.0,
+              0.06285714285714286
+            ],
+            "n_questions": 350
+          },
+          "output_hgb - reject_all": {
+            "mean": 0.037142857142857144,
+            "ci95": [
+              0.002857142857142857,
+              0.07142857142857142
+            ],
+            "n_questions": 350
+          },
+          "activation - accept_all": {
+            "mean": 0.04285714285714286,
+            "ci95": [
+              0.011428571428571429,
+              0.07428571428571429
+            ],
+            "n_questions": 350
+          },
+          "activation - reject_all": {
+            "mean": 0.04857142857142857,
+            "ci95": [
+              0.017142857142857144,
+              0.08
+            ],
+            "n_questions": 350
+          }
+        },
+        "difference_agent": {
+          "activation - output_linear": {
+            "mean": -0.022857142857142857,
+            "ci95": [
+              -0.04857142857142857,
+              0.002857142857142857
+            ],
+            "n_questions": 350
+          },
+          "activation - output_hgb": {
+            "mean": -0.008571428571428572,
+            "ci95": [
+              -0.037142857142857144,
+              0.017142857142857144
+            ],
+            "n_questions": 350
+          },
+          "output_linear - accept_all": {
+            "mean": 0.04285714285714286,
+            "ci95": [
+              0.017142857142857144,
+              0.07142857142857142
+            ],
+            "n_questions": 350
+          },
+          "output_linear - reject_all": {
+            "mean": 0.04857142857142857,
+            "ci95": [
+              0.014285714285714285,
+              0.08571428571428572
+            ],
+            "n_questions": 350
+          },
+          "output_hgb - accept_all": {
+            "mean": 0.02857142857142857,
+            "ci95": [
+              -0.002857142857142857,
+              0.06
+            ],
+            "n_questions": 350
+          },
+          "output_hgb - reject_all": {
+            "mean": 0.03428571428571429,
+            "ci95": [
+              0.002857142857142857,
+              0.06857142857142857
+            ],
+            "n_questions": 350
+          },
+          "activation - accept_all": {
+            "mean": 0.02,
+            "ci95": [
+              -0.014285714285714285,
+              0.054285714285714284
+            ],
+            "n_questions": 350
+          },
+          "activation - reject_all": {
+            "mean": 0.025714285714285714,
+            "ci95": [
+              -0.002857142857142857,
+              0.054285714285714284
+            ],
+            "n_questions": 350
+          }
+        },
+        "protect_panel": {
+          "activation - output_linear": {
+            "mean": -0.014285714285714285,
+            "ci95": [
+              -0.03428571428571429,
+              0.005714285714285714
+            ],
+            "n_questions": 350
+          },
+          "activation - output_hgb": {
+            "mean": 0.008571428571428572,
+            "ci95": [
+              -0.011428571428571429,
+              0.02857142857142857
+            ],
+            "n_questions": 350
+          },
+          "output_linear - accept_all": {
+            "mean": 0.04857142857142857,
+            "ci95": [
+              0.022857142857142857,
+              0.07428571428571429
+            ],
+            "n_questions": 350
+          },
+          "output_linear - reject_all": {
+            "mean": 0.054285714285714284,
+            "ci95": [
+              0.02,
+              0.09142857142857143
+            ],
+            "n_questions": 350
+          },
+          "output_hgb - accept_all": {
+            "mean": 0.025714285714285714,
+            "ci95": [
+              0.0,
+              0.05142857142857143
+            ],
+            "n_questions": 350
+          },
+          "output_hgb - reject_all": {
+            "mean": 0.03142857142857143,
+            "ci95": [
+              -0.002857142857142857,
+              0.06857142857142857
+            ],
+            "n_questions": 350
+          },
+          "activation - accept_all": {
+            "mean": 0.03428571428571429,
+            "ci95": [
+              0.005714285714285714,
+              0.06
+            ],
+            "n_questions": 350
+          },
+          "activation - reject_all": {
+            "mean": 0.04,
+            "ci95": [
+              0.005714285714285714,
+              0.07428571428571429
+            ],
+            "n_questions": 350
+          }
+        },
+        "protect_agent": {
+          "activation - output_linear": {
+            "mean": -0.008571428571428572,
+            "ci95": [
+              -0.03428571428571429,
+              0.017214285714285325
+            ],
+            "n_questions": 350
+          },
+          "activation - output_hgb": {
+            "mean": 0.008571428571428572,
+            "ci95": [
+              -0.017142857142857144,
+              0.03428571428571429
+            ],
+            "n_questions": 350
+          },
+          "output_linear - accept_all": {
+            "mean": 0.037142857142857144,
+            "ci95": [
+              0.002857142857142857,
+              0.07142857142857142
+            ],
+            "n_questions": 350
+          },
+          "output_linear - reject_all": {
+            "mean": 0.04285714285714286,
+            "ci95": [
+              0.017142857142857144,
+              0.07142857142857142
+            ],
+            "n_questions": 350
+          },
+          "output_hgb - accept_all": {
+            "mean": 0.02,
+            "ci95": [
+              -0.014285714285714285,
+              0.054285714285714284
+            ],
+            "n_questions": 350
+          },
+          "output_hgb - reject_all": {
+            "mean": 0.025714285714285714,
+            "ci95": [
+              -0.002857142857142857,
+              0.05714285714285714
+            ],
+            "n_questions": 350
+          },
+          "activation - accept_all": {
+            "mean": 0.02857142857142857,
+            "ci95": [
+              -0.008571428571428572,
+              0.06285714285714286
+            ],
+            "n_questions": 350
+          },
+          "activation - reject_all": {
+            "mean": 0.03428571428571429,
+            "ci95": [
+              0.008571428571428572,
+              0.06285714285714286
+            ],
+            "n_questions": 350
+          }
+        }
+      },
+      "auroc_differences": {
+        "activation - output_linear | new_correct | all": {
+          "point": 0.09493175624928729,
+          "ci95": [
+            0.05074068898292411,
+            0.1427560360209474
+          ]
+        },
+        "activation - output_linear | old_correct | all": {
+          "point": 0.05909999999999993,
+          "ci95": [
+            0.01790878670930409,
+            0.1010617694503563
+          ]
+        },
+        "activation - output_linear | new_correct | revised": {
+          "point": 0.04184818481848179,
+          "ci95": [
+            -0.045833445143888714,
+            0.1263010025767585
+          ]
+        },
+        "activation - output_linear | old_correct | revised": {
+          "point": 0.035195957459310145,
+          "ci95": [
+            -0.035254775755853236,
+            0.10973907363452313
+          ]
+        }
+      },
+      "seed": 0,
+      "transfer": {}
+    },
+    {
+      "families": {
+        "output_linear": {
+          "old_correct": {
+            "auroc_all": 0.6512115384615385,
+            "auroc_all_ci95": [
+              0.6016545604445022,
+              0.6982619956740912
+            ],
+            "auroc_revised": 0.6012104118925905,
+            "auroc_revised_ci95": [
+              0.5206171265961537,
+              0.677560641874936
+            ],
+            "auroc_within_question": 0.6283783783783784,
+            "within_question_pairs": 148,
+            "brier": 0.21627082413196758,
+            "logloss": 0.6246527297490966,
+            "ece": 0.042773170670499884,
+            "sd": 0.1529413201090673
+          },
+          "new_correct": {
+            "auroc_all": 0.5313653862033982,
+            "auroc_all_ci95": [
+              0.48404585167284886,
+              0.5801344917541796
+            ],
+            "auroc_revised": 0.4602640264026402,
+            "auroc_revised_ci95": [
+              0.3834756477471316,
+              0.5354892108074674
+            ],
+            "auroc_within_question": 0.46938775510204084,
+            "within_question_pairs": 196,
+            "brier": 0.22689655484175603,
+            "logloss": 0.6457777817418797,
+            "ece": 0.015646355464947123,
+            "sd": 0.05783865610972333
+          },
+          "gate_difference_panel": {
+            "agent_accuracy": 0.39714285714285713,
+            "panel_accuracy": 0.42,
+            "beneficial_kept": 78,
+            "beneficial_lost": 23,
+            "harmful_blocked": 61,
+            "harmful_accepted": 61,
+            "unhelpful_accepted": 119,
+            "revisions_accepted": 258,
+            "revisions": 401
+          },
+          "gate_difference_agent": {
+            "agent_accuracy": 0.3942857142857143,
+            "panel_accuracy": 0.4142857142857143,
+            "beneficial_kept": 70,
+            "beneficial_lost": 31,
+            "harmful_blocked": 66,
+            "harmful_accepted": 56,
+            "unhelpful_accepted": 109,
+            "revisions_accepted": 235,
+            "revisions": 401
+          },
+          "gate_protect_panel": {
+            "agent_accuracy": 0.3942857142857143,
+            "panel_accuracy": 0.41714285714285715,
+            "beneficial_kept": 84,
+            "beneficial_lost": 17,
+            "harmful_blocked": 52,
+            "harmful_accepted": 70,
+            "unhelpful_accepted": 131,
+            "revisions_accepted": 285,
+            "revisions": 401
+          },
+          "gate_protect_agent": {
+            "agent_accuracy": 0.3933333333333333,
+            "panel_accuracy": 0.4114285714285714,
+            "beneficial_kept": 71,
+            "beneficial_lost": 30,
+            "harmful_blocked": 64,
+            "harmful_accepted": 58,
+            "unhelpful_accepted": 110,
+            "revisions_accepted": 239,
+            "revisions": 401
+          }
+        },
+        "output_hgb": {
+          "old_correct": {
+            "auroc_all": 0.604773076923077,
+            "auroc_all_ci95": [
+              0.5553255392683992,
+              0.6571724765680248
+            ],
+            "auroc_revised": 0.5568041600564075,
+            "auroc_revised_ci95": [
+              0.4771417251000412,
+              0.640511190476777
+            ],
+            "auroc_within_question": 0.6486486486486487,
+            "within_question_pairs": 148,
+            "brier": 0.22385299442355128,
+            "logloss": 0.6409986779399792,
+            "ece": 0.05881716770299271,
+            "sd": 0.1251282618100808
+          },
+          "new_correct": {
+            "auroc_all": 0.5865915087550971,
+            "auroc_all_ci95": [
+              0.5414513339355183,
+              0.6312053034835897
+            ],
+            "auroc_revised": 0.4861386138613861,
+            "auroc_revised_ci95": [
+              0.4126520166256157,
+              0.5626783106131341
+            ],
+            "auroc_within_question": 0.47959183673469385,
+            "within_question_pairs": 196,
+            "brier": 0.22407693869849113,
+            "logloss": 0.6404026268595754,
+            "ece": 0.0446734397292426,
+            "sd": 0.0806230067246979
+          },
+          "gate_difference_panel": {
+            "agent_accuracy": 0.38857142857142857,
+            "panel_accuracy": 0.39714285714285713,
+            "beneficial_kept": 71,
+            "beneficial_lost": 30,
+            "harmful_blocked": 59,
+            "harmful_accepted": 63,
+            "unhelpful_accepted": 128,
+            "revisions_accepted": 262,
+            "revisions": 401
+          },
+          "gate_difference_agent": {
+            "agent_accuracy": 0.36952380952380953,
+            "panel_accuracy": 0.3628571428571429,
+            "beneficial_kept": 40,
+            "beneficial_lost": 61,
+            "harmful_blocked": 70,
+            "harmful_accepted": 52,
+            "unhelpful_accepted": 59,
+            "revisions_accepted": 151,
+            "revisions": 401
+          },
+          "gate_protect_panel": {
+            "agent_accuracy": 0.3838095238095238,
+            "panel_accuracy": 0.3942857142857143,
+            "beneficial_kept": 71,
+            "beneficial_lost": 30,
+            "harmful_blocked": 54,
+            "harmful_accepted": 68,
+            "unhelpful_accepted": 111,
+            "revisions_accepted": 250,
+            "revisions": 401
+          },
+          "gate_protect_agent": {
+            "agent_accuracy": 0.3838095238095238,
+            "panel_accuracy": 0.3942857142857143,
+            "beneficial_kept": 67,
+            "beneficial_lost": 34,
+            "harmful_blocked": 58,
+            "harmful_accepted": 64,
+            "unhelpful_accepted": 99,
+            "revisions_accepted": 230,
+            "revisions": 401
+          }
+        },
+        "activation": {
+          "old_correct": {
+            "auroc_all": 0.7072807692307693,
+            "auroc_all_ci95": [
+              0.6566230825488507,
+              0.7514437440889706
+            ],
+            "auroc_revised": 0.6460720371349669,
+            "auroc_revised_ci95": [
+              0.5709795381516329,
+              0.7197440549464102
+            ],
+            "auroc_within_question": 0.6824324324324325,
+            "within_question_pairs": 148,
+            "brier": 0.20450965152847506,
+            "logloss": 0.5981410630857845,
+            "ece": 0.05142797511201307,
+            "sd": 0.1964648011711243
+          },
+          "new_correct": {
+            "auroc_all": 0.6535867782894038,
+            "auroc_all_ci95": [
+              0.6021863821368021,
+              0.702571627133664
+            ],
+            "auroc_revised": 0.5375577557755775,
+            "auroc_revised_ci95": [
+              0.46237746724985457,
+              0.6111487941429803
+            ],
+            "auroc_within_question": 0.6122448979591837,
+            "within_question_pairs": 196,
+            "brier": 0.21127973481790138,
+            "logloss": 0.6132714747404941,
+            "ece": 0.03310613403386073,
+            "sd": 0.14556764409147138
+          },
+          "gate_difference_panel": {
+            "agent_accuracy": 0.39904761904761904,
+            "panel_accuracy": 0.4,
+            "beneficial_kept": 65,
+            "beneficial_lost": 36,
+            "harmful_blocked": 76,
+            "harmful_accepted": 46,
+            "unhelpful_accepted": 122,
+            "revisions_accepted": 233,
+            "revisions": 401
+          },
+          "gate_difference_agent": {
+            "agent_accuracy": 0.3914285714285714,
+            "panel_accuracy": 0.38857142857142857,
+            "beneficial_kept": 47,
+            "beneficial_lost": 54,
+            "harmful_blocked": 86,
+            "harmful_accepted": 36,
+            "unhelpful_accepted": 91,
+            "revisions_accepted": 174,
+            "revisions": 401
+          },
+          "gate_protect_panel": {
+            "agent_accuracy": 0.39714285714285713,
+            "panel_accuracy": 0.4114285714285714,
+            "beneficial_kept": 77,
+            "beneficial_lost": 24,
+            "harmful_blocked": 62,
+            "harmful_accepted": 60,
+            "unhelpful_accepted": 132,
+            "revisions_accepted": 269,
+            "revisions": 401
+          },
+          "gate_protect_agent": {
+            "agent_accuracy": 0.3942857142857143,
+            "panel_accuracy": 0.4057142857142857,
+            "beneficial_kept": 63,
+            "beneficial_lost": 38,
+            "harmful_blocked": 73,
+            "harmful_accepted": 49,
+            "unhelpful_accepted": 123,
+            "revisions_accepted": 235,
+            "revisions": 401
+          }
+        }
+      },
+      "reference": {
+        "accept_all": {
+          "agent_accuracy": 0.36095238095238097,
+          "panel_accuracy": 0.37714285714285717
+        },
+        "reject_all": {
+          "agent_accuracy": 0.38095238095238093,
+          "panel_accuracy": 0.37142857142857144
+        },
+        "agent_optimal_not_a_panel_bound": {
+          "agent_accuracy": 0.47714285714285715,
+          "panel_accuracy": 0.48
+        },
+        "panel_optimal": {
+          "agent_accuracy": 0.43142857142857144,
+          "panel_accuracy": 0.48
+        }
+      },
+      "constant_training_rate": {
+        "old_correct": {
+          "brier": 0.23902664399092974,
+          "logloss": 0.6713458453993258,
+          "ece": 0.042857142857142885,
+          "auroc_all": 0.5
+        },
+        "new_correct": {
+          "brier": 0.23168310657596372,
+          "logloss": 0.6561743086753382,
+          "ece": 0.0,
+          "auroc_all": 0.5
+        }
+      },
+      "paired_panel": {
+        "difference_panel": {
+          "activation - output_linear": {
+            "mean": -0.02,
+            "ci95": [
+              -0.045714285714285714,
+              0.002857142857142857
+            ],
+            "n_questions": 350
+          },
+          "activation - output_hgb": {
+            "mean": 0.002857142857142857,
+            "ci95": [
+              -0.02857142857142857,
+              0.03142857142857143
+            ],
+            "n_questions": 350
+          },
+          "output_linear - accept_all": {
+            "mean": 0.04285714285714286,
+            "ci95": [
+              0.017142857142857144,
+              0.07142857142857142
+            ],
+            "n_questions": 350
+          },
+          "output_linear - reject_all": {
+            "mean": 0.04857142857142857,
+            "ci95": [
+              0.014285714285714285,
+              0.08571428571428572
+            ],
+            "n_questions": 350
+          },
+          "output_hgb - accept_all": {
+            "mean": 0.02,
+            "ci95": [
+              -0.008571428571428572,
+              0.04857142857142857
+            ],
+            "n_questions": 350
+          },
+          "output_hgb - reject_all": {
+            "mean": 0.025714285714285714,
+            "ci95": [
+              -0.008571428571428572,
+              0.06
+            ],
+            "n_questions": 350
+          },
+          "activation - accept_all": {
+            "mean": 0.022857142857142857,
+            "ci95": [
+              -0.011428571428571429,
+              0.05714285714285714
+            ],
+            "n_questions": 350
+          },
+          "activation - reject_all": {
+            "mean": 0.02857142857142857,
+            "ci95": [
+              0.0,
+              0.05714285714285714
+            ],
+            "n_questions": 350
+          }
+        },
+        "difference_agent": {
+          "activation - output_linear": {
+            "mean": -0.025714285714285714,
+            "ci95": [
+              -0.054285714285714284,
+              0.0
+            ],
+            "n_questions": 350
+          },
+          "activation - output_hgb": {
+            "mean": 0.025714285714285714,
+            "ci95": [
+              -0.002857142857142857,
+              0.05714285714285714
+            ],
+            "n_questions": 350
+          },
+          "output_linear - accept_all": {
+            "mean": 0.037142857142857144,
+            "ci95": [
+              0.008571428571428572,
+              0.06857142857142857
+            ],
+            "n_questions": 350
+          },
+          "output_linear - reject_all": {
+            "mean": 0.04285714285714286,
+            "ci95": [
+              0.011428571428571429,
+              0.07714285714285714
+            ],
+            "n_questions": 350
+          },
+          "output_hgb - accept_all": {
+            "mean": -0.014285714285714285,
+            "ci95": [
+              -0.04857142857142857,
+              0.02
+            ],
+            "n_questions": 350
+          },
+          "output_hgb - reject_all": {
+            "mean": -0.008571428571428572,
+            "ci95": [
+              -0.03428571428571429,
+              0.017142857142857144
+            ],
+            "n_questions": 350
+          },
+          "activation - accept_all": {
+            "mean": 0.011428571428571429,
+            "ci95": [
+              -0.025714285714285714,
+              0.04857142857142857
+            ],
+            "n_questions": 350
+          },
+          "activation - reject_all": {
+            "mean": 0.017142857142857144,
+            "ci95": [
+              -0.008571428571428572,
+              0.04285714285714286
+            ],
+            "n_questions": 350
+          }
+        },
+        "protect_panel": {
+          "activation - output_linear": {
+            "mean": -0.005714285714285714,
+            "ci95": [
+              -0.02857142857142857,
+              0.017142857142857144
+            ],
+            "n_questions": 350
+          },
+          "activation - output_hgb": {
+            "mean": 0.017142857142857144,
+            "ci95": [
+              -0.008571428571428572,
+              0.04285714285714286
+            ],
+            "n_questions": 350
+          },
+          "output_linear - accept_all": {
+            "mean": 0.04,
+            "ci95": [
+              0.017142857142857144,
+              0.06571428571428571
+            ],
+            "n_questions": 350
+          },
+          "output_linear - reject_all": {
+            "mean": 0.045714285714285714,
+            "ci95": [
+              0.011428571428571429,
+              0.08285714285714285
+            ],
+            "n_questions": 350
+          },
+          "output_hgb - accept_all": {
+            "mean": 0.017142857142857144,
+            "ci95": [
+              -0.014285714285714285,
+              0.04857142857142857
+            ],
+            "n_questions": 350
+          },
+          "output_hgb - reject_all": {
+            "mean": 0.022857142857142857,
+            "ci95": [
+              -0.011428571428571429,
+              0.06
+            ],
+            "n_questions": 350
+          },
+          "activation - accept_all": {
+            "mean": 0.03428571428571429,
+            "ci95": [
+              0.005714285714285714,
+              0.06285714285714286
+            ],
+            "n_questions": 350
+          },
+          "activation - reject_all": {
+            "mean": 0.04,
+            "ci95": [
+              0.008571428571428572,
+              0.07428571428571429
+            ],
+            "n_questions": 350
+          }
+        },
+        "protect_agent": {
+          "activation - output_linear": {
+            "mean": -0.005714285714285714,
+            "ci95": [
+              -0.03428571428571429,
+              0.02
+            ],
+            "n_questions": 350
+          },
+          "activation - output_hgb": {
+            "mean": 0.011428571428571429,
+            "ci95": [
+              -0.017142857142857144,
+              0.04
+            ],
+            "n_questions": 350
+          },
+          "output_linear - accept_all": {
+            "mean": 0.03428571428571429,
+            "ci95": [
+              0.005714285714285714,
+              0.06571428571428571
+            ],
+            "n_questions": 350
+          },
+          "output_linear - reject_all": {
+            "mean": 0.04,
+            "ci95": [
+              0.008571428571428572,
+              0.07428571428571429
+            ],
+            "n_questions": 350
+          },
+          "output_hgb - accept_all": {
+            "mean": 0.017142857142857144,
+            "ci95": [
+              -0.014285714285714285,
+              0.04857142857142857
+            ],
+            "n_questions": 350
+          },
+          "output_hgb - reject_all": {
+            "mean": 0.022857142857142857,
+            "ci95": [
+              -0.011428571428571429,
+              0.06
+            ],
+            "n_questions": 350
+          },
+          "activation - accept_all": {
+            "mean": 0.02857142857142857,
+            "ci95": [
+              -0.005714285714285714,
+              0.06285714285714286
+            ],
+            "n_questions": 350
+          },
+          "activation - reject_all": {
+            "mean": 0.03428571428571429,
+            "ci95": [
+              0.005714285714285714,
+              0.06285714285714286
+            ],
+            "n_questions": 350
+          }
+        }
+      },
+      "auroc_differences": {
+        "activation - output_linear | new_correct | all": {
+          "point": 0.12222139208600558,
+          "ci95": [
+            0.06154742867731218,
+            0.18384228074164988
+          ]
+        },
+        "activation - output_linear | old_correct | all": {
+          "point": 0.05606923076923087,
+          "ci95": [
+            0.015385839360927588,
+            0.0966026315424918
+          ]
+        },
+        "activation - output_linear | new_correct | revised": {
+          "point": 0.07729372937293733,
+          "ci95": [
+            -0.032701355162094436,
+            0.1807827722083465
+          ]
+        },
+        "activation - output_linear | old_correct | revised": {
+          "point": 0.04486162524237636,
+          "ci95": [
+            -0.024316484064956463,
+            0.11662554005428559
+          ]
+        }
+      },
+      "seed": 1,
+      "transfer": {}
+    },
+    {
+      "families": {
+        "output_linear": {
+          "old_correct": {
+            "auroc_all": 0.6632153846153845,
+            "auroc_all_ci95": [
+              0.610901366862256,
+              0.7121667405268225
+            ],
+            "auroc_revised": 0.6315294670662202,
+            "auroc_revised_ci95": [
+              0.5560343861501933,
+              0.7027926129289558
+            ],
+            "auroc_within_question": 0.6216216216216216,
+            "within_question_pairs": 148,
+            "brier": 0.21482713186421487,
+            "logloss": 0.6208880524332132,
+            "ece": 0.03715446893380002,
+            "sd": 0.1502050805534238
+          },
+          "new_correct": {
+            "auroc_all": 0.5862159813455285,
+            "auroc_all_ci95": [
+              0.5354146230809017,
+              0.6346600939430832
+            ],
+            "auroc_revised": 0.39607260726072613,
+            "auroc_revised_ci95": [
+              0.3300711379633402,
+              0.46558947113717697
+            ],
+            "auroc_within_question": 0.44387755102040816,
+            "within_question_pairs": 196,
+            "brier": 0.22724180919367096,
+            "logloss": 0.6486208142724285,
+            "ece": 0.07250352317688039,
+            "sd": 0.0850194364182394
+          },
+          "gate_difference_panel": {
+            "agent_accuracy": 0.40190476190476193,
+            "panel_accuracy": 0.42,
+            "beneficial_kept": 74,
+            "beneficial_lost": 27,
+            "harmful_blocked": 70,
+            "harmful_accepted": 52,
+            "unhelpful_accepted": 126,
+            "revisions_accepted": 252,
+            "revisions": 401
+          },
+          "gate_difference_agent": {
+            "agent_accuracy": 0.4,
+            "panel_accuracy": 0.41714285714285715,
+            "beneficial_kept": 63,
+            "beneficial_lost": 38,
+            "harmful_blocked": 79,
+            "harmful_accepted": 43,
+            "unhelpful_accepted": 113,
+            "revisions_accepted": 219,
+            "revisions": 401
+          },
+          "gate_protect_panel": {
+            "agent_accuracy": 0.3942857142857143,
+            "panel_accuracy": 0.41714285714285715,
+            "beneficial_kept": 86,
+            "beneficial_lost": 15,
+            "harmful_blocked": 50,
+            "harmful_accepted": 72,
+            "unhelpful_accepted": 140,
+            "revisions_accepted": 298,
+            "revisions": 401
+          },
+          "gate_protect_agent": {
+            "agent_accuracy": 0.38952380952380955,
+            "panel_accuracy": 0.4085714285714286,
+            "beneficial_kept": 67,
+            "beneficial_lost": 34,
+            "harmful_blocked": 64,
+            "harmful_accepted": 58,
+            "unhelpful_accepted": 107,
+            "revisions_accepted": 232,
+            "revisions": 401
+          }
+        },
+        "output_hgb": {
+          "old_correct": {
+            "auroc_all": 0.6315826923076924,
+            "auroc_all_ci95": [
+              0.5794932840450281,
+              0.6815482755433808
+            ],
+            "auroc_revised": 0.6160027028615078,
+            "auroc_revised_ci95": [
+              0.5387560811151442,
+              0.6890555084482318
+            ],
+            "auroc_within_question": 0.6486486486486487,
+            "within_question_pairs": 148,
+            "brier": 0.2202124328586804,
+            "logloss": 0.632818667245252,
+            "ece": 0.05495830751325213,
+            "sd": 0.1198435463091423
+          },
+          "new_correct": {
+            "auroc_all": 0.5550137824457648,
+            "auroc_all_ci95": [
+              0.5072727765296274,
+              0.6010498090141707
+            ],
+            "auroc_revised": 0.40603960396039607,
+            "auroc_revised_ci95": [
+              0.3327975171232877,
+              0.4830360775616089
+            ],
+            "auroc_within_question": 0.48214285714285715,
+            "within_question_pairs": 196,
+            "brier": 0.22959163766266552,
+            "logloss": 0.6530071205568319,
+            "ece": 0.08165959438011403,
+            "sd": 0.08504601434161221
+          },
+          "gate_difference_panel": {
+            "agent_accuracy": 0.3923809523809524,
+            "panel_accuracy": 0.40285714285714286,
+            "beneficial_kept": 77,
+            "beneficial_lost": 24,
+            "harmful_blocked": 57,
+            "harmful_accepted": 65,
+            "unhelpful_accepted": 137,
+            "revisions_accepted": 279,
+            "revisions": 401
+          },
+          "gate_difference_agent": {
+            "agent_accuracy": 0.37238095238095237,
+            "panel_accuracy": 0.38,
+            "beneficial_kept": 31,
+            "beneficial_lost": 70,
+            "harmful_blocked": 82,
+            "harmful_accepted": 40,
+            "unhelpful_accepted": 78,
+            "revisions_accepted": 149,
+            "revisions": 401
+          },
+          "gate_protect_panel": {
+            "agent_accuracy": 0.3923809523809524,
+            "panel_accuracy": 0.4114285714285714,
+            "beneficial_kept": 88,
+            "beneficial_lost": 13,
+            "harmful_blocked": 46,
+            "harmful_accepted": 76,
+            "unhelpful_accepted": 145,
+            "revisions_accepted": 309,
+            "revisions": 401
+          },
+          "gate_protect_agent": {
+            "agent_accuracy": 0.3780952380952381,
+            "panel_accuracy": 0.38857142857142857,
+            "beneficial_kept": 37,
+            "beneficial_lost": 64,
+            "harmful_blocked": 82,
+            "harmful_accepted": 40,
+            "unhelpful_accepted": 84,
+            "revisions_accepted": 161,
+            "revisions": 401
+          }
+        },
+        "activation": {
+          "old_correct": {
+            "auroc_all": 0.7085653846153845,
+            "auroc_all_ci95": [
+              0.6594221730656306,
+              0.7531824925871942
+            ],
+            "auroc_revised": 0.6456901110523533,
+            "auroc_revised_ci95": [
+              0.5691072436715384,
+              0.7200396562583421
+            ],
+            "auroc_within_question": 0.7027027027027027,
+            "within_question_pairs": 148,
+            "brier": 0.20474969834119597,
+            "logloss": 0.5988662640935817,
+            "ece": 0.03148487685300412,
+            "sd": 0.19281957782966194
+          },
+          "new_correct": {
+            "auroc_all": 0.6378342882084393,
+            "auroc_all_ci95": [
+              0.5866292800155414,
+              0.6843158943702035
+            ],
+            "auroc_revised": 0.4562046204620462,
+            "auroc_revised_ci95": [
+              0.3790056087032309,
+              0.5354959132133045
+            ],
+            "auroc_within_question": 0.5459183673469388,
+            "within_question_pairs": 196,
+            "brier": 0.21473569169664958,
+            "logloss": 0.6222203218729215,
+            "ece": 0.03298559714598885,
+            "sd": 0.14581944418223175
+          },
+          "gate_difference_panel": {
+            "agent_accuracy": 0.3819047619047619,
+            "panel_accuracy": 0.4057142857142857,
+            "beneficial_kept": 68,
+            "beneficial_lost": 33,
+            "harmful_blocked": 55,
+            "harmful_accepted": 67,
+            "unhelpful_accepted": 126,
+            "revisions_accepted": 261,
+            "revisions": 401
+          },
+          "gate_difference_agent": {
+            "agent_accuracy": 0.38857142857142857,
+            "panel_accuracy": 0.4114285714285714,
+            "beneficial_kept": 61,
+            "beneficial_lost": 40,
+            "harmful_blocked": 69,
+            "harmful_accepted": 53,
+            "unhelpful_accepted": 110,
+            "revisions_accepted": 224,
+            "revisions": 401
+          },
+          "gate_protect_panel": {
+            "agent_accuracy": 0.3933333333333333,
+            "panel_accuracy": 0.4085714285714286,
+            "beneficial_kept": 73,
+            "beneficial_lost": 28,
+            "harmful_blocked": 62,
+            "harmful_accepted": 60,
+            "unhelpful_accepted": 124,
+            "revisions_accepted": 257,
+            "revisions": 401
+          },
+          "gate_protect_agent": {
+            "agent_accuracy": 0.3933333333333333,
+            "panel_accuracy": 0.4085714285714286,
+            "beneficial_kept": 69,
+            "beneficial_lost": 32,
+            "harmful_blocked": 66,
+            "harmful_accepted": 56,
+            "unhelpful_accepted": 123,
+            "revisions_accepted": 248,
+            "revisions": 401
+          }
+        }
+      },
+      "reference": {
+        "accept_all": {
+          "agent_accuracy": 0.36095238095238097,
+          "panel_accuracy": 0.37714285714285717
+        },
+        "reject_all": {
+          "agent_accuracy": 0.38095238095238093,
+          "panel_accuracy": 0.37142857142857144
+        },
+        "agent_optimal_not_a_panel_bound": {
+          "agent_accuracy": 0.47714285714285715,
+          "panel_accuracy": 0.48
+        },
+        "panel_optimal": {
+          "agent_accuracy": 0.43142857142857144,
+          "panel_accuracy": 0.48
+        }
+      },
+      "constant_training_rate": {
+        "old_correct": {
+          "brier": 0.23741439909297052,
+          "logloss": 0.6679160415474907,
+          "ece": 0.0,
+          "auroc_all": 0.5
+        },
+        "new_correct": {
+          "brier": 0.23509637188208618,
+          "logloss": 0.663771184052016,
+          "ece": 0.0,
+          "auroc_all": 0.5
+        }
+      },
+      "paired_panel": {
+        "difference_panel": {
+          "activation - output_linear": {
+            "mean": -0.014285714285714285,
+            "ci95": [
+              -0.04,
+              0.011428571428571429
+            ],
+            "n_questions": 350
+          },
+          "activation - output_hgb": {
+            "mean": 0.002857142857142857,
+            "ci95": [
+              -0.022857142857142857,
+              0.03142857142857143
+            ],
+            "n_questions": 350
+          },
+          "output_linear - accept_all": {
+            "mean": 0.04285714285714286,
+            "ci95": [
+              0.014285714285714285,
+              0.07142857142857142
+            ],
+            "n_questions": 350
+          },
+          "output_linear - reject_all": {
+            "mean": 0.04857142857142857,
+            "ci95": [
+              0.017142857142857144,
+              0.08285714285714285
+            ],
+            "n_questions": 350
+          },
+          "output_hgb - accept_all": {
+            "mean": 0.025714285714285714,
+            "ci95": [
+              0.0,
+              0.054285714285714284
+            ],
+            "n_questions": 350
+          },
+          "output_hgb - reject_all": {
+            "mean": 0.03142857142857143,
+            "ci95": [
+              -0.002857142857142857,
+              0.06571428571428571
+            ],
+            "n_questions": 350
+          },
+          "activation - accept_all": {
+            "mean": 0.02857142857142857,
+            "ci95": [
+              -0.002857142857142857,
+              0.06
+            ],
+            "n_questions": 350
+          },
+          "activation - reject_all": {
+            "mean": 0.03428571428571429,
+            "ci95": [
+              0.0,
+              0.06857142857142857
+            ],
+            "n_questions": 350
+          }
+        },
+        "difference_agent": {
+          "activation - output_linear": {
+            "mean": -0.005714285714285714,
+            "ci95": [
+              -0.03142857142857143,
+              0.02
+            ],
+            "n_questions": 350
+          },
+          "activation - output_hgb": {
+            "mean": 0.03142857142857143,
+            "ci95": [
+              0.002857142857142857,
+              0.06
+            ],
+            "n_questions": 350
+          },
+          "output_linear - accept_all": {
+            "mean": 0.04,
+            "ci95": [
+              0.008571428571428572,
+              0.07428571428571429
+            ],
+            "n_questions": 350
+          },
+          "output_linear - reject_all": {
+            "mean": 0.045714285714285714,
+            "ci95": [
+              0.014285714285714285,
+              0.08
+            ],
+            "n_questions": 350
+          },
+          "output_hgb - accept_all": {
+            "mean": 0.002857142857142857,
+            "ci95": [
+              -0.0315,
+              0.04
+            ],
+            "n_questions": 350
+          },
+          "output_hgb - reject_all": {
+            "mean": 0.008571428571428572,
+            "ci95": [
+              -0.014285714285714285,
+              0.03142857142857143
+            ],
+            "n_questions": 350
+          },
+          "activation - accept_all": {
+            "mean": 0.03428571428571429,
+            "ci95": [
+              0.0,
+              0.06571428571428571
+            ],
+            "n_questions": 350
+          },
+          "activation - reject_all": {
+            "mean": 0.04,
+            "ci95": [
+              0.008571428571428572,
+              0.0714999999999996
+            ],
+            "n_questions": 350
+          }
+        },
+        "protect_panel": {
+          "activation - output_linear": {
+            "mean": -0.008571428571428572,
+            "ci95": [
+              -0.03428571428571429,
+              0.017142857142857144
+            ],
+            "n_questions": 350
+          },
+          "activation - output_hgb": {
+            "mean": -0.002857142857142857,
+            "ci95": [
+              -0.025714285714285714,
+              0.022857142857142857
+            ],
+            "n_questions": 350
+          },
+          "output_linear - accept_all": {
+            "mean": 0.04,
+            "ci95": [
+              0.017142857142857144,
+              0.06571428571428571
+            ],
+            "n_questions": 350
+          },
+          "output_linear - reject_all": {
+            "mean": 0.045714285714285714,
+            "ci95": [
+              0.011428571428571429,
+              0.08285714285714285
+            ],
+            "n_questions": 350
+          },
+          "output_hgb - accept_all": {
+            "mean": 0.03428571428571429,
+            "ci95": [
+              0.011428571428571429,
+              0.05714285714285714
+            ],
+            "n_questions": 350
+          },
+          "output_hgb - reject_all": {
+            "mean": 0.04,
+            "ci95": [
+              0.002857142857142857,
+              0.07714285714285714
+            ],
+            "n_questions": 350
+          },
+          "activation - accept_all": {
+            "mean": 0.03142857142857143,
+            "ci95": [
+              0.002857142857142857,
+              0.06285714285714286
+            ],
+            "n_questions": 350
+          },
+          "activation - reject_all": {
+            "mean": 0.037142857142857144,
+            "ci95": [
+              0.005714285714285714,
+              0.07142857142857142
+            ],
+            "n_questions": 350
+          }
+        },
+        "protect_agent": {
+          "activation - output_linear": {
+            "mean": 0.0,
+            "ci95": [
+              -0.025714285714285714,
+              0.022857142857142857
+            ],
+            "n_questions": 350
+          },
+          "activation - output_hgb": {
+            "mean": 0.02,
+            "ci95": [
+              -0.008571428571428572,
+              0.04857142857142857
+            ],
+            "n_questions": 350
+          },
+          "output_linear - accept_all": {
+            "mean": 0.03142857142857143,
+            "ci95": [
+              0.0,
+              0.06285714285714286
+            ],
+            "n_questions": 350
+          },
+          "output_linear - reject_all": {
+            "mean": 0.037142857142857144,
+            "ci95": [
+              0.005714285714285714,
+              0.06857142857142857
+            ],
+            "n_questions": 350
+          },
+          "output_hgb - accept_all": {
+            "mean": 0.011428571428571429,
+            "ci95": [
+              -0.025714285714285714,
+              0.04857142857142857
+            ],
+            "n_questions": 350
+          },
+          "output_hgb - reject_all": {
+            "mean": 0.017142857142857144,
+            "ci95": [
+              -0.005785714285714282,
+              0.04285714285714286
+            ],
+            "n_questions": 350
+          },
+          "activation - accept_all": {
+            "mean": 0.03142857142857143,
+            "ci95": [
+              0.002857142857142857,
+              0.06285714285714286
+            ],
+            "n_questions": 350
+          },
+          "activation - reject_all": {
+            "mean": 0.037142857142857144,
+            "ci95": [
+              0.005714285714285714,
+              0.07142857142857142
+            ],
+            "n_questions": 350
+          }
+        }
+      },
+      "auroc_differences": {
+        "activation - output_linear | new_correct | all": {
+          "point": 0.0516183068629108,
+          "ci95": [
+            0.011757492676904712,
+            0.09058609048862876
+          ]
+        },
+        "activation - output_linear | old_correct | all": {
+          "point": 0.04535,
+          "ci95": [
+            0.001793394313152308,
+            0.08832732369031576
+          ]
+        },
+        "activation - output_linear | new_correct | revised": {
+          "point": 0.060132013201320056,
+          "ci95": [
+            -0.016426608275445523,
+            0.13662064690847162
+          ]
+        },
+        "activation - output_linear | old_correct | revised": {
+          "point": 0.014160643986133148,
+          "ci95": [
+            -0.061666321880472025,
+            0.09202290053763591
+          ]
+        }
+      },
+      "seed": 2,
+      "transfer": {}
+    }
+  ]
+}

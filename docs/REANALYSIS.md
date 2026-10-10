@@ -228,11 +228,54 @@ What these measurements show, literally:
    same ordering (no interval was computed for that difference), so question difficulty alone
    does not appear to explain it. These are **post-time** predictors (states from before AND
    after the revision); they do not show that a gate using only pre-debate information could
-   protect correct first answers. That pre-only protection gate is now implemented
-   (`--time pre`, rule `protect`) but has not been run on these data.
+   protect correct first answers. §6 runs that pre-only protection gate (exploratory).
 4. **Whether a revision is correct remains near chance for every predictor** on revisions alone;
    activation-minus-output differences there are positive in all seeds but every interval
    includes zero.
+
+## 6. Exploratory: a pre-only protection gate (added after §5 was seen)
+
+`scripts/reanalysis.py --time pre --families output_linear output_hgb activation` at commit
+`3e5fc7a`; outputs in `artifacts/review/reanalysis_v3_pre/`. **Exploratory**: this was run after
+the §5 results were known and is not preregistered. Same data, folds and procedure as §5, but
+every predictor sees **only round-0 information**: the agent's first-answer distribution, its
+stated confidence and response format, agreement of its first answer with the other agents' first
+answers, and its round-0 states. The "protect" rule keeps the first answer when calibrated
+P(first answer correct) exceeds a threshold chosen on training questions (panel objective);
+it never looks at the revision.
+
+**Panel accuracy, protect rule** (seed 0 / 1 / 2): accept every revision 0.377; reject every
+revision 0.371; output logistic 0.426 / 0.417 / 0.417; output trees 0.403 / 0.394 / 0.411;
+activation 0.411 / 0.411 / 0.409; panel-optimal 0.480.
+
+| comparison (protect rule, panel objective) | seed 0 | seed 1 | seed 2 |
+|---|---|---|---|
+| output logistic − accept all | +0.049 [+0.023, +0.074] | +0.040 [+0.017, +0.066] | +0.040 [+0.017, +0.066] |
+| output logistic − reject all | +0.054 [+0.020, +0.091] | +0.046 [+0.011, +0.083] | +0.046 [+0.011, +0.083] |
+| activation − accept all | +0.034 [+0.006, +0.060] | +0.034 [+0.006, +0.063] | +0.031 [+0.003, +0.063] |
+| activation − output logistic | −0.014 [−0.034, +0.006] | −0.006 [−0.029, +0.017] | −0.009 [−0.034, +0.017] |
+
+**Ranking from round-0 information only, activation minus output logistic** (AUROC):
+P(first answer correct), all answers: +0.059 [+0.018, +0.101], +0.056 [+0.015, +0.097],
++0.045 [+0.002, +0.088]; within-question AUROC activation 0.716 / 0.682 / 0.703 vs output
+0.615 / 0.628 / 0.622. P(revised answer correct), all answers: +0.095 [+0.051, +0.143],
++0.122 [+0.062, +0.184], +0.052 [+0.012, +0.091]; on revisions only, every interval includes zero.
+
+What these measurements show, literally:
+
+1. A gate that never looks at the revision -- it only keeps first answers predicted to be correct
+   from round-0 information -- beats accepting every revision by about 4–5 panel points with
+   output features (intervals exclude zero in all three fold assignments), at least as much as
+   the post-time gates of §5.
+2. Round-0 activations rank first-answer correctness better than round-0 output features
+   (about +0.05 AUROC, intervals exclude zero in all three fold assignments; also higher within
+   questions), but the activation protection gate is not better than the output one (−0.6 to
+   −1.4 points; every interval includes zero).
+3. The cheaper explanation for (1), given §5: whether a revision is right is close to
+   unpredictable, so the usable information is mostly about whether the FIRST answer was right.
+
+Caveats: 1B model, ARC-Challenge, 350 questions, 64-token responses; three fold assignments of
+the same questions (stability, not replication); exploratory.
 
 ## Answer to the core research question, at this scale
 
@@ -247,7 +290,8 @@ adding activations improves on that gate is mixed across fold assignments (one o
 comparisons excludes zero, two touch it); no consistent gain is shown. Activations do add a modest, consistent
 improvement in ranking whether the agent's first answer was correct (~0.04 AUROC), which did not
 translate into a measurable panel gain at this sample size. Whether a proposed revision is
-correct is not predicted above chance by anything tested. All of this is at 350 questions with
+correct is not predicted above chance by anything tested. An exploratory pre-only protection gate
+(§6), which never looks at the revision, does at least as well as the post-time gates. All of this is at 350 questions with
 intervals of about ±3 panel points: effects of a few points are not ruled out in either direction.
 
 Scope of that claim: gemma-3-1b-it, ARC-Challenge, 350 questions, generations truncated at 64

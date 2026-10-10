@@ -159,6 +159,20 @@
       "median_tokens": 19.0
     }
   },
+  "position_fixture": {
+    "max_prob_diff_vs_model_logits": {
+      "readout_last": 0.0,
+      "generation_last": 0.0,
+      "stated_answer": 0.0,
+      "before_stated_answer": 0.0
+    },
+    "permissive_answer": "flagged letter_token_mismatch",
+    "positions_checked": [
+      "before_stated_answer",
+      "generation_last",
+      "stated_answer"
+    ]
+  },
   "batched_vs_single": {
     "max_abs_logprob_diff": 0.0,
     "min_last_layer_cosine": 1.0,

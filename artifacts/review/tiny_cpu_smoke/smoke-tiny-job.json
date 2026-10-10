@@ -166,11 +166,9 @@
  },
  "identity_sha256": "3f2ffcd46c612cd4cb6f8226a4a4db354dad9288bcd65891803b569f8dbfa614",
  "code": {
-  "git_sha": "925f51338373cade23ee469440d0383dfb7b4a32",
-  "git_dirty": true,
-  "git_dirty_files": [
-   "?? artifacts/review/reanalysis_v2/"
-  ]
+  "git_sha": "3e5fc7a3e4f137efec499a2e94fd7d61cce61ce9",
+  "git_dirty": false,
+  "git_dirty_files": []
  },
  "questions": [
   {
@@ -190,9 +188,9 @@
  ],
  "history": [
   {
-   "time": "2026-10-09T21:09:16-0400",
-   "git_sha": "925f51338373cade23ee469440d0383dfb7b4a32",
-   "git_dirty": true,
+   "time": "2026-10-09T23:27:37-0400",
+   "git_sha": "3e5fc7a3e4f137efec499a2e94fd7d61cce61ce9",
+   "git_dirty": false,
    "n_questions": 2,
    "execution": {
     "batch_size": 4,

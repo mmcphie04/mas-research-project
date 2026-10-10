@@ -1,0 +1,139 @@
+the run's tie_break 'round0_plurality' was never implemented; the rule actually applied was round0_then_agent0, so that is used
+runs/night2-debate: 1050 events, 350 questions, 401 revised; time=pre; families=['output_linear', 'output_hgb', 'activation']; tie-break=round0_then_agent0
+  seed 0 fold 0 done
+  seed 0 fold 1 done
+  seed 0 fold 2 done
+  seed 0 fold 3 done
+  seed 0 fold 4 done
+  seed 1 fold 0 done
+  seed 1 fold 1 done
+  seed 1 fold 2 done
+  seed 1 fold 3 done
+  seed 1 fold 4 done
+  seed 2 fold 0 done
+  seed 2 fold 1 done
+  seed 2 fold 2 done
+  seed 2 fold 3 done
+  seed 2 fold 4 done
+{
+ "reference": {
+  "accept_all": {
+   "agent_accuracy": 0.36095238095238097,
+   "panel_accuracy": 0.37714285714285717
+  },
+  "reject_all": {
+   "agent_accuracy": 0.38095238095238093,
+   "panel_accuracy": 0.37142857142857144
+  },
+  "agent_optimal_not_a_panel_bound": {
+   "agent_accuracy": 0.47714285714285715,
+   "panel_accuracy": 0.48
+  },
+  "panel_optimal": {
+   "agent_accuracy": 0.43142857142857144,
+   "panel_accuracy": 0.48
+  }
+ },
+ "primary_gates": {
+  "output_linear": {
+   "agent_accuracy": 0.4,
+   "panel_accuracy": 0.42,
+   "beneficial_kept": 85,
+   "beneficial_lost": 16,
+   "harmful_blocked": 57,
+   "harmful_accepted": 65,
+   "unhelpful_accepted": 129,
+   "revisions_accepted": 279,
+   "revisions": 401
+  },
+  "output_hgb": {
+   "agent_accuracy": 0.38571428571428573,
+   "panel_accuracy": 0.4085714285714286,
+   "beneficial_kept": 71,
+   "beneficial_lost": 30,
+   "harmful_blocked": 56,
+   "harmful_accepted": 66,
+   "unhelpful_accepted": 129,
+   "revisions_accepted": 266,
+   "revisions": 401
+  },
+  "activation": {
+   "agent_accuracy": 0.4,
+   "panel_accuracy": 0.42,
+   "beneficial_kept": 71,
+   "beneficial_lost": 30,
+   "harmful_blocked": 71,
+   "harmful_accepted": 51,
+   "unhelpful_accepted": 111,
+   "revisions_accepted": 233,
+   "revisions": 401
+  }
+ },
+ "paired_panel_primary": {
+  "activation - output_linear": {
+   "mean": 0.0,
+   "ci95": [
+    -0.022857142857142857,
+    0.022857142857142857
+   ],
+   "n_questions": 350
+  },
+  "activation - output_hgb": {
+   "mean": 0.011428571428571429,
+   "ci95": [
+    -0.014285714285714285,
+    0.037142857142857144
+   ],
+   "n_questions": 350
+  },
+  "output_linear - accept_all": {
+   "mean": 0.04285714285714286,
+   "ci95": [
+    0.017142857142857144,
+    0.06857142857142857
+   ],
+   "n_questions": 350
+  },
+  "output_linear - reject_all": {
+   "mean": 0.04857142857142857,
+   "ci95": [
+    0.014285714285714285,
+    0.08571428571428572
+   ],
+   "n_questions": 350
+  },
+  "output_hgb - accept_all": {
+   "mean": 0.03142857142857143,
+   "ci95": [
+    0.0,
+    0.06285714285714286
+   ],
+   "n_questions": 350
+  },
+  "output_hgb - reject_all": {
+   "mean": 0.037142857142857144,
+   "ci95": [
+    0.002857142857142857,
+    0.07142857142857142
+   ],
+   "n_questions": 350
+  },
+  "activation - accept_all": {
+   "mean": 0.04285714285714286,
+   "ci95": [
+    0.011428571428571429,
+    0.07428571428571429
+   ],
+   "n_questions": 350
+  },
+  "activation - reject_all": {
+   "mean": 0.04857142857142857,
+   "ci95": [
+    0.017142857142857144,
+    0.08
+   ],
+   "n_questions": 350
+  }
+ }
+}
+EXIT 0

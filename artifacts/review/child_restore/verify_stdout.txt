@@ -1,0 +1,2 @@
+independent: 120 questions, 3600 states, 9 layers x 64
+VERIFIED 6 chunk directories and a restored copy

@@ -1,0 +1,87 @@
+{
+  "job": "pilot-indep",
+  "identity_sha256": "f4f0b561e58e77e892a84579e19c27aa7157d69627c3697f11bb2fbf2cc31eb7",
+  "chunks": {
+    "pilot-indep-independent-c000": "ok",
+    "pilot-indep-independent-c001": "ok",
+    "pilot-indep-independent-c002": "ok",
+    "pilot-indep-independent-c003": "ok",
+    "pilot-indep-independent-c004": "ok",
+    "pilot-indep-independent-c005": "ok"
+  },
+  "views": {
+    "independent": {
+      "questions": 120,
+      "states": 3600,
+      "layers": 9,
+      "d_model": 64,
+      "by_phase_and_position": {
+        "peer_exposure/generation_last": 360,
+        "peer_exposure/readout_last": 360,
+        "post/before_stated_answer": 360,
+        "post/generation_last": 360,
+        "post/readout_last": 360,
+        "post/stated_answer": 360,
+        "pre/before_stated_answer": 360,
+        "pre/generation_last": 360,
+        "pre/readout_last": 360,
+        "pre/stated_answer": 360
+      }
+    }
+  },
+  "copied": [
+    "pilot-indep-independent",
+    "pilot-indep-independent-c000",
+    "pilot-indep-independent-c001",
+    "pilot-indep-independent-c002",
+    "pilot-indep-independent-c003",
+    "pilot-indep-independent-c004",
+    "pilot-indep-independent-c005",
+    "pilot-indep-job.json",
+    "pilot-indep-ledger.jsonl",
+    "pilot-indep-questions.jsonl",
+    "pilot-indep-status.json",
+    "pilot-job.json",
+    "pilot-questions.jsonl",
+    "pilot-round0-c000",
+    "pilot-round0-c001",
+    "pilot-round0-c002",
+    "pilot-round0-c003",
+    "pilot-round0-c004",
+    "pilot-round0-c005"
+  ],
+  "copy": {
+    "job": "pilot-indep",
+    "identity_sha256": "f4f0b561e58e77e892a84579e19c27aa7157d69627c3697f11bb2fbf2cc31eb7",
+    "chunks": {
+      "pilot-indep-independent-c000": "ok",
+      "pilot-indep-independent-c001": "ok",
+      "pilot-indep-independent-c002": "ok",
+      "pilot-indep-independent-c003": "ok",
+      "pilot-indep-independent-c004": "ok",
+      "pilot-indep-independent-c005": "ok"
+    },
+    "views": {
+      "independent": {
+        "questions": 120,
+        "states": 3600,
+        "layers": 9,
+        "d_model": 64,
+        "by_phase_and_position": {
+          "peer_exposure/generation_last": 360,
+          "peer_exposure/readout_last": 360,
+          "post/before_stated_answer": 360,
+          "post/generation_last": 360,
+          "post/readout_last": 360,
+          "post/stated_answer": 360,
+          "pre/before_stated_answer": 360,
+          "pre/generation_last": 360,
+          "pre/readout_last": 360,
+          "pre/stated_answer": 360
+        }
+      }
+    }
+  },
+  "copy_loads_identically": true,
+  "ok": true
+}

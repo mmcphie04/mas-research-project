@@ -1,6 +1,27 @@
 {
   "identity_sha256": "3f2ffcd46c612cd4cb6f8226a4a4db354dad9288bcd65891803b569f8dbfa614",
-  "torch_cuda": null,
+  "gpu_identity": {
+    "torch_cuda": null
+  },
+  "packages": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "pandas": "3.0.5",
+    "scikit-learn": "1.9.0",
+    "scipy": "1.18.1",
+    "torch": "2.13.0+cpu",
+    "transformers": "5.17.0",
+    "datasets": "5.0.1",
+    "vllm": null
+  },
+  "git_sha": "3e5fc7a3e4f137efec499a2e94fd7d61cce61ce9",
+  "likelihood_chunk": 256,
+  "positions": [
+    "readout_last",
+    "generation_last",
+    "stated_answer",
+    "before_stated_answer"
+  ],
   "coverage": {
     "exact_tokens": true,
     "n_questions": 120,
@@ -19,38 +40,74 @@
     "readout_batch_size": 3
   },
   "passed": true,
-  "seconds": 70.7,
+  "seconds": 44.8,
   "prompt_tokens": 535,
   "gen_tokens": 64,
   "readout_tokens": 604,
+  "extraction": {
+    "positions": [
+      "readout_last",
+      "generation_last",
+      "stated_answer",
+      "before_stated_answer"
+    ],
+    "likelihood_chunk": 256,
+    "path": "HFBackend.readout (hidden states, extra positions, option probabilities, response likelihood)"
+  },
   "generation": [
     {
       "batch": 2,
       "ok": true,
-      "seconds": 29.7,
-      "new_tokens": 64
+      "seconds": 18.5,
+      "new_tokens": 64,
+      "host_peak_rss_gb": 2.39,
+      "host_rss_gb": 2.0
     },
     {
       "batch": 4,
       "ok": true,
-      "seconds": 33.5,
-      "new_tokens": 64
+      "seconds": 20.4,
+      "new_tokens": 64,
+      "host_peak_rss_gb": 2.39,
+      "host_rss_gb": 2.09
     }
   ],
   "readout": [
     {
       "batch": 2,
       "ok": true,
-      "seconds": 2.8,
-      "finite_all_layers": true
+      "seconds": 2.4,
+      "finite_all_layers": true,
+      "readout_tokens_actual": 604,
+      "positions_extracted": [
+        "before_stated_answer",
+        "generation_last",
+        "stated_answer"
+      ],
+      "positions_missing": {},
+      "likelihood_computed": true,
+      "replay_exact": true,
+      "host_peak_rss_gb": 2.39,
+      "host_rss_gb": 2.03
     },
     {
-      "batch": 4,
+      "batch": 3,
       "ok": true,
-      "seconds": 4.7,
-      "finite_all_layers": true
+      "seconds": 3.5,
+      "finite_all_layers": true,
+      "readout_tokens_actual": 604,
+      "positions_extracted": [
+        "before_stated_answer",
+        "generation_last",
+        "stated_answer"
+      ],
+      "positions_missing": {},
+      "likelihood_computed": true,
+      "replay_exact": true,
+      "host_peak_rss_gb": 2.39,
+      "host_rss_gb": 2.09
     }
   ],
   "max_ok_generation_batch": 4,
-  "max_ok_readout_batch": 4
+  "max_ok_readout_batch": 3
 }
