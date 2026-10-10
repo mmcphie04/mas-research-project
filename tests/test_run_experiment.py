@@ -583,3 +583,25 @@ def test_notebook_main_stage_requires_and_creates_the_split():
     assert 'if STAGE == "main"' in split_cell and '"--seed", str(SPLIT_SEED)' in split_cell
     assert "assert got == want" in split_cell, "an existing split must match the current settings"
     assert "MAIN_N and SPLIT_SEED is not None" in src
+
+
+def test_pilot_report_handles_numeric_looking_question_ids(driver, tmp_path):
+    """MMLU-Pro ids are digit strings; pandas' JSON reader would turn them into integers and the
+    transcript/row merge would silently find nothing."""
+    import pandas as pd
+
+    driver.main(_args(tmp_path, "--pool", "pilot", "--pilot-size", "20", "--conditions", "debate",
+                      n=20, chunk=20))
+    for p in [*tmp_path.glob("t-debate*/agent_states.parquet")]:
+        r = pd.read_parquet(p)
+        r["question_id"] = r.question_id.str.replace("syn-", "", regex=False)  # "000123"-style ids
+        r.to_parquet(p, index=False)
+    for p in [*tmp_path.glob("t-debate*/transcripts.jsonl")]:
+        t = pd.read_json(p, lines=True, dtype={"question_id": str})
+        t["question_id"] = t.question_id.str.replace("syn-", "", regex=False)
+        t.to_json(p, orient="records", lines=True)
+    pr = _load("pilot_report")
+    out = tmp_path / "rep"
+    assert pr.main(["--out-root", str(tmp_path), "--name", "t", "--out", str(out),
+                    "--main-conditions", "debate"]) == 0
+    assert "### 000" in (out / "transcripts.md").read_text(), "transcripts did not match rows"

@@ -142,7 +142,8 @@ def main(argv=None) -> int:
     rng = np.random.default_rng(0)
     lines = [f"# Transcript sample: {args.name}\n", "Fixed random sample (seed 0) plus every malformed answer.\n"]
     for cond, d in views.items():
-        t_df = pd.read_json(d / TRANSCRIPTS_FILE, lines=True)
+        # ids as text: MMLU-Pro ids look numeric and read_json would turn them into integers
+        t_df = pd.read_json(d / TRANSCRIPTS_FILE, lines=True, dtype={"question_id": str})
         r = pd.read_parquet(d / ROWS_FILE)
         post = t_df[t_df.phase == "post"]
         pick = post.iloc[rng.choice(len(post), size=min(args.sample, len(post)), replace=False)]

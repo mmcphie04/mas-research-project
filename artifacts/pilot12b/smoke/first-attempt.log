@@ -1,0 +1,12 @@
+[05:01:16] === smoke-pilot12b: 2 pilot-pool questions x 4 conditions, dataset=mmlu-pro, model=google/gemma-3-12b-it, tokens=768, batch gen/readout=4/4
+[05:01:16]   code at 7f0ab975a6a0fd799e71c357a0dc1faa17a78930
+[05:02:51]   model loaded in 95s: 48 layers, d=3840
+[05:02:51]   job smoke-pilot12b: 1 chunks; history: ['created']
+[05:02:51]   token coverage over all 120 intended questions: {'exact_tokens': True, 'n_questions': 120, 'token_cap': 768, 'round0_prompt_tokens': {'p50': 283, 'p95': 506, 'max': 687}, 'round1_template_overhead': 94, 'worst_round1_prompt_tokens': 3085, 'worst_readout_tokens': 3858}
+[05:02:51]   stress (no passing stress report): the real generation and readout/extraction workload at the worst-case lengths, generation batches [4, 6, 8], readout batches [4, 6, 8] ...
+/content/mas-research-project/src/mad/backends/hf.py:330: RuntimeWarning: overflow encountered in cast
+  .cpu().numpy().astype(np.float16))
+/content/mas-research-project/src/mad/backends/hf.py:344: RuntimeWarning: overflow encountered in cast
+  hidden=stacked[i].float().cpu().numpy().astype(np.float16),
+[05:07:10]   stress FAILED in 258.8s: largest safe batch generation 8, readout None (report: smoke-pilot12b-stress.json)
+[05:07:10] stopping: the configured batch sizes do not fit the worst case. Lower them.

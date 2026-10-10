@@ -1,0 +1,17 @@
+[05:21:04] === smoke-pilot12b: 2 pilot-pool questions x 4 conditions, dataset=mmlu-pro, model=google/gemma-3-12b-it, tokens=768, batch gen/readout=8/4
+[05:21:04]   code at 5ff52b38e332546106c18463317f07a21b8b0ae1
+[05:22:44]   model loaded in 100s: 48 layers, d=3840
+[05:22:44]   job smoke-pilot12b: 1 chunks; history: ['created']
+[05:22:44]   token coverage over all 120 intended questions: {'exact_tokens': True, 'n_questions': 120, 'token_cap': 768, 'round0_prompt_tokens': {'p50': 283, 'p95': 506, 'max': 687}, 'round1_template_overhead': 94, 'worst_round1_prompt_tokens': 3085, 'worst_readout_tokens': 3858}
+[05:22:44]   stress (no passing stress report): the real generation and readout/extraction workload at the worst-case lengths, generation batches [8], readout batches [4] ...
+[05:24:12]   stress passed in 87.8s: largest safe batch generation 8, readout 4 (report: smoke-pilot12b-stress.json)
+[05:25:52]   c000: 2 questions in 100s (50 s/question)  {'device': 'NVIDIA A100-SXM4-40GB', 'peak_allocated_gb': 27.53, 'peak_reserved_gb': 28.87, 'total_gb': 42.41}
+[05:25:53]   position fixture passed: {'max_prob_diff_vs_model_logits': {'readout_last': 0.0, 'generation_last': 0.00242, 'stated_answer': 0.00033, 'before_stated_answer': 1e-05}, 'permissive_answer': 'flagged letter_token_mismatch', 'positions_checked': ['before_stated_answer', 'generation_last', 'stated_answer']}
+[05:25:54]   batched vs single readout: {'max_abs_logprob_diff': 0.375, 'min_last_layer_cosine': 0.99923, 'argmax_agree': '4/4'}
+[05:25:54]   smoke checks passed: all 49 layers x 3840, finite, non-degenerate, normalised, answers in each row's range, exposure semantics
+[05:25:54] VIEW self_reconsider: /content/mas_runs/smoke-pilot12b-self_reconsider  {'pre': {'stated_answer_parsed': 1.0, 'hit_token_cap': 0.0, 'stated_agrees_readout': 1.0, 'median_tokens': 176.5}, 'post': {'stated_answer_parsed': 1.0, 'hit_token_cap': 0.0, 'stated_agrees_readout': 1.0, 'median_tokens': 152.5}}
+[05:25:54] VIEW debate: /content/mas_runs/smoke-pilot12b-debate  {'pre': {'stated_answer_parsed': 1.0, 'hit_token_cap': 0.0, 'stated_agrees_readout': 1.0, 'median_tokens': 176.5}, 'post': {'stated_answer_parsed': 1.0, 'hit_token_cap': 0.0, 'stated_agrees_readout': 1.0, 'median_tokens': 133.0}}
+[05:25:54] VIEW debate_answer_only: /content/mas_runs/smoke-pilot12b-debate_answer_only  {'pre': {'stated_answer_parsed': 1.0, 'hit_token_cap': 0.0, 'stated_agrees_readout': 1.0, 'median_tokens': 176.5}, 'post': {'stated_answer_parsed': 1.0, 'hit_token_cap': 0.0, 'stated_agrees_readout': 1.0, 'median_tokens': 129.5}}
+[05:25:54] VIEW misleading_one: /content/mas_runs/smoke-pilot12b-misleading_one  {'pre': {'stated_answer_parsed': 1.0, 'hit_token_cap': 0.0, 'stated_agrees_readout': 1.0, 'median_tokens': 176.5}, 'post': {'stated_answer_parsed': 1.0, 'hit_token_cap': 0.0, 'stated_agrees_readout': 1.0, 'median_tokens': 153.5}}
+[05:25:54] SMOKE PASSED. 50 s/question with 4 conditions -> ~1.7 h for 120 questions (an overestimate: 2 questions batch poorly). {'device': 'NVIDIA A100-SXM4-40GB', 'peak_allocated_gb': 27.53, 'peak_reserved_gb': 28.87, 'total_gb': 42.41}
+[05:25:54] finished; failures this job: 0
