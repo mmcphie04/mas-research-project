@@ -27,7 +27,7 @@ class Generation:
 class Readout:
     """One canonical activation state plus the forced-choice answer distribution."""
 
-    hidden: np.ndarray  # (n_layers + 1, d_model), float16, at the readout position
+    hidden: np.ndarray  # (n_layers + 1, d_model), float32 in memory (stored as bfloat16), at the readout position
     letter_logprobs: np.ndarray  # (n_options,), float32, log-softmax over option letters
     answer_index: int  # argmax over letter_logprobs -- never fails
     n_tokens: int

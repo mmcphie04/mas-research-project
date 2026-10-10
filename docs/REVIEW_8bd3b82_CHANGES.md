@@ -62,3 +62,20 @@ All 206 tests pass after these changes (`uv run pytest -q`, 8 min 13 s, laptop C
 | split archived with the job | the exact assignment is kept as `<job>-split.json` (copied from wherever it was made; children copy the parent's); `verify_archive` requires it, checks its hash against the job identity and its coverage of the job's questions; child-only copies carry it | `test_split_assignment_travels_with_the_job_and_its_children` (incl. a tampered restored copy failing) |
 | candidate diagnostic | uses the parent's registered split by default and refuses a different one; samples explicitly per split (`--n-per-split`); records each question's split and the split hash; prompt checks (`--check`) go to `<parent>-candidates-check`, never the final output; the output-only comparator is a fitted model on the full letter distribution, candidate and endorsed probabilities, endorsement agreement and candidate positions (raw P(candidate) kept); probes and that model train on train + validation and are scored once on test | `test_candidates_follow_the_parents_registered_split`, updated `test_candidate_run_and_analysis` |
 | 12B reporting | no code change: the actual A100 smoke results (memory, timing, all-layer/position alignment, missingness, restored archive) will be reported before any main-run size is recommended; the 270M CPU checks are not 12B validation | — |
+
+
+## First A100 smoke attempt (2026-10-10): float16 storage overflowed; now bfloat16
+
+The smoke test's stress pass failed: every readout batch size produced non-finite stored states.
+Diagnosis on the A100: the model's bfloat16 hidden states are all finite, but one dimension
+reaches 163,840 at the readout position in layers 40-47 (over 800,000 at other positions), beyond
+float16's 65,504; the float16 cast turned 8 values per state into infinity. Fix: activations are
+stored as bfloat16 bit patterns (same 2 bytes; lossless on the GPU); readers decode to float32;
+old float16 shards still load. Tests: `test_massive_activations_survive_storage`,
+`test_old_float16_shards_still_load`, `test_round0_cache_keeps_values_beyond_float16_range`.
+
+Also measured in that stress pass (worst-case lengths: 3,085-token prompts generating 768 tokens;
+3,858-token readouts): generation took ~81 s for 768 steps at batch 4, 6 and 8 alike (~105 ms per
+step, ~2.5x the planning assumption of ~40 ms), with GPU memory reserved 32.5 / 36.3 / 40.1 GB;
+readout reserved 32.6 / 36.5 / 40.4 GB at batch 4 / 6 / 8 (40.96 GB card). docs/BUDGET.md's
+per-question costs are therefore too low; the pilot report will replace them.

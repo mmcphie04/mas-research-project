@@ -1,5 +1,7 @@
 """Activation storage.
 
+Values are bfloat16 (see ``to_bf16_bits`` for why not float16), 2 bytes each.
+
 Layout is LAYER-MAJOR -- each shard is (n_layers + 1, n_states, d_model) -- so reading one layer
 across every state is a contiguous read. That is what keeps a layer sweep affordable on a 13 GB
 machine: one layer of 18,000 states at d=3840 is ~138 MB, while the full tensor is ~6.8 GB.
@@ -19,6 +21,35 @@ import pandas as pd
 
 INDEX_FILE = "activation_index.parquet"
 SHARD_FMT = "acts_{shard:04d}.npy"
+
+# Storage format: bfloat16, kept as its raw 16-bit pattern in uint16 arrays (numpy has no native
+# bfloat16). Not float16: Gemma's residual stream has a few "massive activations" -- on
+# gemma-3-12b one dimension reaches 163,840 at the readout position in layers 40-47 (and over
+# 800,000 at other positions) -- far beyond float16's 65,504, so a float16 cast turned them into
+# infinity. bfloat16 has float32's range, the same 2 bytes, and is the model's own compute format
+# on the GPU, so storing it is lossless there. Readers decode to float32; old float16 shards
+# still load.
+BF16_NAN = 0x7FC0
+
+
+def to_bf16_bits(x) -> np.ndarray:
+    """float32 values -> bfloat16 bit patterns (uint16), round-to-nearest-even; NaN kept."""
+    f = np.ascontiguousarray(x, dtype=np.float32)
+    u = f.view(np.uint32)
+    out = ((u + np.uint32(0x7FFF) + ((u >> np.uint32(16)) & np.uint32(1))) >> np.uint32(16)).astype(np.uint16)
+    out[np.isnan(f)] = BF16_NAN
+    return out
+
+
+def from_bf16_bits(b) -> np.ndarray:
+    """bfloat16 bit patterns (uint16) -> float32."""
+    return (np.asarray(b, dtype=np.uint32) << np.uint32(16)).view(np.float32)
+
+
+def decode(arr) -> np.ndarray:
+    """Stored activations of either format -> float32."""
+    a = np.asarray(arr)
+    return from_bf16_bits(a) if a.dtype == np.uint16 else a.astype(np.float32)
 
 KEY_COLUMNS = ["run_id", "condition", "question_id", "agent_id", "phase", "position"]
 
@@ -47,7 +78,7 @@ class ActivationWriter:
         expected = (self.n_layers + 1, self.d_model)
         if hidden.shape != expected:
             raise ValueError(f"hidden shape {hidden.shape} != expected {expected}")
-        self._buf.append(hidden.astype(np.float16))
+        self._buf.append(to_bf16_bits(hidden))
         self._keys.append(dict(key))
         if len(self._buf) >= self.shard_size:
             self._flush()
@@ -71,7 +102,8 @@ class ActivationWriter:
         index.attrs["n_layers"] = self.n_layers
         index.attrs["d_model"] = self.d_model
         meta = pd.DataFrame(
-            [{"n_layers": self.n_layers, "d_model": self.d_model, "n_states": len(index)}]
+            [{"n_layers": self.n_layers, "d_model": self.d_model, "n_states": len(index),
+              "storage_dtype": "bfloat16"}]
         )
         index.to_parquet(self.run_dir / INDEX_FILE, index=False)
         meta.to_parquet(self.run_dir / "activation_meta.parquet", index=False)
@@ -111,9 +143,9 @@ class ActivationStore:
             arr = np.load(paths[int(shard)], mmap_mode="r")
             off = grp["offset"].to_numpy()
             if layouts.get(shard, "layer_major") == "row_major":
-                blocks.append(np.asarray(arr[off, layer], dtype=np.float32))
+                blocks.append(decode(arr[off, layer]))
             else:
-                blocks.append(np.asarray(arr[layer][off], dtype=np.float32))
+                blocks.append(decode(arr[layer][off]))
         full = np.concatenate(blocks, axis=0)
         if rows is None:
             return full

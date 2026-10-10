@@ -32,5 +32,5 @@ data:
 activations:
   layers: all
   positions: [readout_last]
-  dtype: float16
+  dtype: bfloat16   # storage format; float16 overflows on Gemma's massive activations
   shard_size: 500

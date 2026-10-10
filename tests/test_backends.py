@@ -55,7 +55,7 @@ def test_generate_and_readout_agree_on_shape():
     reads = backend.readout([prompt + gens[0].text], [4], meta=meta)
     r = reads[0]
     assert r.hidden.shape == (backend.n_layers + 1, backend.d_model)
-    assert r.hidden.dtype == np.float16
+    assert r.hidden.dtype == np.float32  # in memory; stored as bfloat16
     assert r.letter_logprobs.shape == (4,)
     assert 0 <= r.answer_index < 4
     assert 0.0 < r.confidence <= 1.0

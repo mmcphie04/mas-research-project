@@ -1,12 +1,13 @@
 import numpy as np
 
-from mad.store import ActivationStore, ActivationWriter, storage_bytes
+from mad.store import ActivationStore, ActivationWriter, from_bf16_bits, storage_bytes, to_bf16_bits
 
 
 def test_round_trip_is_bitwise_and_layer_major(tmp_path):
     n_layers, d_model, n = 5, 16, 23
     rng = np.random.default_rng(0)
-    originals = [rng.normal(size=(n_layers + 1, d_model)).astype(np.float16) for _ in range(n)]
+    # values exactly representable in bfloat16 (the storage format) round-trip bitwise
+    originals = [from_bf16_bits(to_bf16_bits(rng.normal(size=(n_layers + 1, d_model)))) for _ in range(n)]
 
     w = ActivationWriter(tmp_path, n_layers, d_model, shard_size=7)  # forces multiple shards
     for i, h in enumerate(originals):
@@ -123,3 +124,29 @@ def test_merge_refuses_mismatched_shapes(tmp_path):
         assert "differing shapes" in str(exc)
     else:
         raise AssertionError("merging runs with different d_model must fail loudly")
+
+
+def test_massive_activations_survive_storage(tmp_path):
+    """Regression: gemma-3-12b reaches |x| = 163,840 at the readout position (layers 40-47) and
+    over 800,000 elsewhere; float16 (max 65,504) stored those as infinity."""
+    big = np.array([[1.5, -163840.0, 815104.0, 3.0e5]], dtype=np.float32)
+    bits = to_bf16_bits(big)
+    back = from_bf16_bits(bits)
+    assert np.isfinite(back).all() and np.allclose(back, big, rtol=1e-2)
+    assert np.isnan(from_bf16_bits(to_bf16_bits(np.array([np.nan], np.float32)))).all()
+    w = ActivationWriter(tmp_path, 1, 4)
+    w.add({"run_id": "r", "condition": "c", "question_id": "q", "agent_id": 0, "phase": "pre",
+           "position": "readout_last"}, np.vstack([big, big]))
+    w.close()
+    x = ActivationStore(tmp_path).load_layer(1)
+    assert np.isfinite(x).all() and np.allclose(x[0], big[0], rtol=1e-2)
+
+
+def test_old_float16_shards_still_load(tmp_path):
+    w = ActivationWriter(tmp_path, 1, 2)
+    w.add({"run_id": "r", "condition": "c", "question_id": "q", "agent_id": 0, "phase": "pre",
+           "position": "readout_last"}, np.ones((2, 2)))
+    w.close()
+    shard = tmp_path / "acts_0000.npy"
+    np.save(shard, np.full((2, 1, 2), 0.5, dtype=np.float16))  # what an old run wrote
+    assert np.allclose(ActivationStore(tmp_path).load_layer(0), 0.5)

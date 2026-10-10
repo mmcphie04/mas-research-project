@@ -203,7 +203,7 @@ class StubBackend(Backend):
             logprobs = logits - np.log(np.exp(logits).sum())
             out.append(
                 Readout(
-                    hidden=hidden.astype(np.float16),
+                    hidden=hidden.astype(np.float32),
                     letter_logprobs=logprobs.astype(np.float32),
                     answer_index=int(np.argmax(logprobs)),
                     n_tokens=max(1, len(text) // 4),
@@ -229,7 +229,7 @@ class StubBackend(Backend):
                 if not parsed.ok:
                     missing[p] = f"answer_{parsed.status}"
                     continue
-            extra[p] = (hidden + rng.normal(scale=0.1, size=hidden.shape)).astype(np.float16)
+            extra[p] = (hidden + rng.normal(scale=0.1, size=hidden.shape)).astype(np.float32)
             extra_lp[p] = logprobs.astype(np.float32)
             positions[p] = [-1, -1]  # the stub has no tokens
         al = {"positions": positions, "missing": missing, "replay_exact": None}

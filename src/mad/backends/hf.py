@@ -51,8 +51,8 @@ class HFBackend(Backend):
         self.cfg = cfg
         mc = cfg.model
         self.device = mc.device
-        # float16 matmul is unsupported or pathologically slow on most CPUs; compute in fp32 and
-        # cast activations to fp16 only at the storage boundary.
+        # float16 matmul is unsupported or pathologically slow on most CPUs; compute in fp32 there.
+        # Activations are stored as bfloat16 either way (mad.store).
         compute_dtype = torch.float32 if self.device == "cpu" else getattr(torch, mc.dtype)
 
         self.tokenizer = AutoTokenizer.from_pretrained(mc.repo_id, revision=mc.revision)
@@ -326,8 +326,7 @@ class HFBackend(Backend):
                 logprobs = torch.log_softmax(letter_logits, dim=-1).cpu().numpy()
                 extra, extra_lp = {}, {}
                 for name, j in info["found"].items():
-                    extra[name] = (torch.stack([h[i, pad + j, :] for h in hs], dim=0).float()
-                                   .cpu().numpy().astype(np.float16))
+                    extra[name] = torch.stack([h[i, pad + j, :] for h in hs], dim=0).float().cpu().numpy()
                     extra_lp[name] = self.letter_logprobs_from_hidden(hs[-1][i, pad + j, :], n)
                 alignment = {
                     "positions": {k: [j, int(seq[j])] for k, j in info["found"].items()},
@@ -341,7 +340,7 @@ class HFBackend(Backend):
                 }
                 out.append(
                     Readout(
-                        hidden=stacked[i].float().cpu().numpy().astype(np.float16),
+                        hidden=stacked[i].float().cpu().numpy(),  # float32; stored as bfloat16
                         letter_logprobs=logprobs.astype(np.float32),
                         answer_index=int(np.argmax(logprobs)),
                         n_tokens=len(seq),

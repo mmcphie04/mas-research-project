@@ -56,7 +56,7 @@ from mad.provenance import (
     write_completion,
     write_manifest,
 )
-from mad.store import ActivationWriter
+from mad.store import ActivationWriter, decode, to_bf16_bits
 
 
 class _NullGen:
@@ -227,15 +227,15 @@ def save_round0(r0: Round0, out_dir: Path, identity: dict) -> Path:
                 "extra_logprobs": {k: [float(x) for x in v] for k, v in r.extra_logprobs.items()},
                 "alignment": r.alignment,
             }) + "\n")
-    hidden = {"readout_last": np.stack([r.hidden for r in r0.reads])}
+    hidden = {"readout_last": np.stack([r.hidden for r in r0.reads]).astype(np.float32)}
     for pos in sorted({p for r in r0.reads for p in r.extra}):
-        arr = np.full_like(hidden["readout_last"], np.nan)
+        arr = np.full_like(hidden["readout_last"], np.nan)  # NaN marks a missing position
         for i, r in enumerate(r0.reads):
             if pos in r.extra:
                 arr[i] = r.extra[pos]
         hidden[pos] = arr
     for pos, arr in hidden.items():
-        np.save(tmp / R0_HIDDEN.format(pos=pos), arr)
+        np.save(tmp / R0_HIDDEN.format(pos=pos), to_bf16_bits(arr))  # bfloat16, as every shard
     (tmp / "manifest.json").write_text(json.dumps({**identity, "seed": r0.seed,
                                                    "n_records": len(r0.metas)}, indent=2))
     write_completion(tmp, row_counts={"records": len(r0.metas)},
@@ -262,7 +262,7 @@ def load_round0(out_dir: Path, identity: dict) -> Round0 | None:
         if sha256_file(out_dir / name) != h:
             raise RuntimeError(f"{out_dir / name} fails its checksum; refusing to reuse round 0")
     recs = [json.loads(line) for line in (out_dir / R0_RECORDS).read_text().splitlines()]
-    hidden = {p.name[len("round0_hidden_"):-4]: np.load(p) for p in out_dir.glob("round0_hidden_*.npy")}
+    hidden = {p.name[len("round0_hidden_"):-4]: decode(np.load(p)) for p in out_dir.glob("round0_hidden_*.npy")}
     metas, messages, prompts, gens, reads = [], [], [], [], []
     for i, rec in enumerate(recs):
         metas.append(rec["meta"])

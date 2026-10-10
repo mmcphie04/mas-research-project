@@ -99,7 +99,7 @@ class DataConfig:
 class ActivationConfig:
     layers: str | list[int] = "all"
     positions: list[str] = field(default_factory=lambda: ["readout_last"])
-    dtype: str = "float16"
+    dtype: str = "bfloat16"  # storage format (fixed; float16 overflows on Gemma's massive activations)
     shard_size: int = 500
     # positions per chunk when computing the response likelihood (memory only, not values)
     likelihood_chunk: int = 256

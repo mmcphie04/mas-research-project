@@ -231,3 +231,19 @@ def test_saved_round0_for_other_questions_is_refused(tmp_path):
     run_chunk(cfg, _qs(4), conds, round0_dir=tmp_path / "r0", job="j", chunk="c000")
     with pytest.raises(RuntimeError, match="does not match"):
         run_chunk(cfg, _qs(5), [dict(CONDS[1])], round0_dir=tmp_path / "r0", job="j", chunk="c000")
+
+
+def test_round0_cache_keeps_values_beyond_float16_range(tmp_path):
+    """The saved round 0 must hold Gemma-sized activations finitely (stored as bfloat16)."""
+    import numpy as np
+
+    import mad.multi as M
+
+    cfg = make_cfg(tmp_path, run_id="b", n_questions=2)
+    _, r0 = M.run_chunk(cfg, _qs(2), [dict(CONDS[0])], round0_dir=tmp_path / "r0", job="j", chunk="c000")
+    r0.reads[0].hidden[40 % r0.reads[0].hidden.shape[0], 0] = 163840.0
+    ident = {"job": "j", "chunk": "c000", "question_ids": ["q0", "q1"], "seed": M.round0_seed(cfg, "c000")}
+    M.save_round0(r0, tmp_path / "r0b", ident)
+    back = M.load_round0(tmp_path / "r0b", ident)
+    h = back.reads[0].hidden
+    assert np.isfinite(h).all() and abs(h.max() - 163840.0) / 163840.0 < 1e-2

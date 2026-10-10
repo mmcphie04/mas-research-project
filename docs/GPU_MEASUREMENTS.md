@@ -4,6 +4,13 @@ Everything below needs the model on a GPU and cannot be recomputed after the run
 without paying for inference again. "Verified" means checked on CPU with the 270M Gemma 3 (same
 tokenizer family), not on the 12B. **No 12B measurement has been made yet.**
 
+**Storage format: bfloat16** (2 bytes, the model's own compute format on the GPU, so lossless
+there). The first A100 smoke attempt (2026-10-10) found that float16 cannot hold gemma-3-12b's
+residual stream: one dimension reaches |x| = 163,840 at the readout position in layers 40-47
+(over 800,000 at other positions, e.g. the first token), beyond float16's 65,504, so those values
+were stored as infinity. The model's own bfloat16 values were all finite. Stored activations are
+now bfloat16 bit patterns; readers decode to float32; older float16 runs still load.
+
 ## Saved for every agent state
 
 | measurement | where | phases | CPU-verified |

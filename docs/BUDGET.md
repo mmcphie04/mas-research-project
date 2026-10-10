@@ -1,5 +1,9 @@
 # GPU budget and disk: estimates before any 12B run
 
+> **Measured 2026-10-10 (first A100 stress pass):** ~105 ms per generation step at batch 4-8 at
+> the worst-case lengths, not the ~40 ms assumed below, so the generation times below are about
+> 2.5x too low. Use the pilot report's measured seconds per question instead.
+
 **Status:** first-principles estimates. Nothing has run on a GPU. The smoke test measures the
 real seconds per question and memory; the pilot report (`scripts/pilot_report.py`) replaces
 every number here with a measured one. Set the main-run size only after that.
