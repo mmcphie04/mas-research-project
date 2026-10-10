@@ -14,7 +14,8 @@ tokenizer family), not on the 12B. **No 12B measurement has been made yet.**
 | hidden states at `stated_answer` (the letter in the agent's own final answer line) | shards | pre, post when the answer parses | yes |
 | hidden states at `before_stated_answer` (the token whose output predicts that letter) | shards | pre, post when the answer parses | yes |
 | option-letter distribution at each extra position (letter rows of the output layer, with the model's soft-capping) | `pos_<name>_logprobs` | as above | yes — equals the model's own logits at the readout position |
-| token index and token id of each extra position; reason for each missing position | `pos_<name>_token_index/_id/_missing` | as above | yes |
+| token index and token id of each extra position; reason for each missing position (incl. `letter_token_mismatch`: the stated letter is not the standalone token the readout scores, so neither stated-answer state is stored) | `pos_<name>_token_index/_id/_missing` | as above | yes; the mismatch flag has a test written (not yet run) |
+| readout input token counts (prompt part, own-response part) | `readout_prompt_tokens`, `readout_response_tokens` | all | test written (not yet run) |
 | exact-replay flag: the readout input is the generation-time token sequence | `replay_exact` | pre, post | yes (the readout is built from generated ids, not re-tokenised text) |
 | response log-likelihood at temperature 1 (mean, min, sum of token log-probabilities) | `response_logprob_*` | pre, post | yes — equals full-sequence logits |
 | generated token ids, stop reason (stop token or cap), prompt and response token counts | transcripts, rows | pre, post | yes |
@@ -30,7 +31,7 @@ tokenizer family), not on the 12B. **No 12B measurement has been made yet.**
 | model commit, tokenizer, chat template hash, special tokens, letter token ids, dtype | job identity | yes |
 | GPU name, memory, CUDA, NVIDIA driver, package versions | job history (each session) | partly (no GPU on CPU) |
 | token-length coverage of the whole intended question pool | `<name>-stress.json`, log | yes |
-| worst-case memory at each candidate batch size (generation and readout), finite values at all layers | `<name>-stress.json` | CPU only (no CUDA peaks) |
+| worst-case memory of the REAL workload at the configured batch sizes (plus optional extras): `generate` at full length, and `readout()` with all layers, all positions, option probabilities and the response likelihood; GPU allocated/reserved and host resident peaks; finite values; with the code, package, GPU and length context that decides whether it may be reused | `<name>-stress.json` | 270M on CPU, test written (not yet run) |
 | batched vs one-at-a-time readout agreement | smoke report | yes (exact in fp32); **bf16 not verified** |
 | stage timings (round 0, generation, readouts, writes) per chunk; session wall time | status file, ledger | yes |
 
@@ -55,10 +56,18 @@ tokenizer family), not on the 12B. **No 12B measurement has been made yet.**
 
 ## Must be checked on the first 12B run (the smoke test does each)
 
-1. Hidden states come back for all 49 layers at every requested position, finite and not
-   degenerate.
+1. The model is 48 decoder layers × 3,840 (49 stored layers); every stored layer is finite and
+   not degenerate, at every requested position.
 2. The letter-in-context check passes on the 12B tokenizer (it runs at model load).
-3. Batched and one-at-a-time readouts agree in bf16 within tolerance.
-4. Every generated row replays exactly (`replay_exact` true).
-5. Memory at the worst-case lengths of the actual pool, at batch 4, 6 and 8.
-6. Real seconds per question, per stage.
+3. A fixed own-response transcript, with the agent's earlier answer and two peers' answers as
+   distracting answer lines in the prompt: all four positions found on the right token ids; the
+   stated letter is the scored letter token; the preceding token predicts it; option
+   probabilities at every position match the model's own full logits within 0.02 (bf16); the
+   prompt-only (exposure) readout ends at the prompt's last token and has no stated-answer
+   states; a permissive `Answer: C` is either stored on the scored letter token or flagged.
+4. Batched and one-at-a-time readouts, both fed the generated token ids, agree in bf16.
+5. Every generated row replays exactly (`replay_exact` true); every record finite and normalised
+   (checked before any chunk is marked complete).
+6. Memory of the full extraction workload at the pool's worst-case lengths, at the configured
+   batch sizes.
+7. Real seconds per question, per stage.

@@ -82,9 +82,15 @@ def main(argv=None) -> int:
         return bank.layer(L)[lookup]
 
     if args.split_manifest:
-        assign = json.loads(Path(args.split_manifest).read_text())["assignment"]
-        test = r.question_id.map(assign).eq("test").to_numpy()
-        folds = [(~test, test)]
+        sys.path.insert(0, str(ROOT / "scripts"))
+        from make_split import load_split
+
+        # every question must be assigned; an unmapped one is an error, never silently "train"
+        assign, _ = load_split(args.split_manifest, sorted(set(r.question_id)), allow_subset=True)
+        split = r.question_id.map(assign)
+        test = split.eq("test").to_numpy()
+        train = split.isin(["train", "validation"]).to_numpy()
+        folds = [(train, test)]
     else:
         folds = list(GroupKFold(n_splits=5).split(np.zeros(len(r)), groups=g))
         folds = [(np.isin(np.arange(len(r)), a), np.isin(np.arange(len(r)), b)) for a, b in folds]

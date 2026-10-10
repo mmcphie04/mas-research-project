@@ -138,11 +138,14 @@ by the review before the rerun, not chosen from its results.
   With τ on the calibrated scale and the panel objective, the output-logistic, activation,
   combined and stacked gates gain +1.4 to +4.6 panel points, with intervals excluding zero in one
   or two of three fold assignments each (same 350 questions; stability, not replication).
-- **Unchanged:** activations are not shown to raise panel accuracy over the output-logistic gate
-  (−1.4 to +2.3 points, every interval includes or touches zero); revisions' correctness is near
-  chance for every predictor.
+- **Mixed:** whether activations raise panel accuracy over the output-logistic gate: −1.4 to +2.3
+  points across nine family × fold-assignment comparisons; one interval excludes zero (combined,
+  seed 2), two touch it. (An earlier version of this note said every interval included or
+  touched zero; that was wrong.) **Unchanged:** revisions' correctness is near chance for every
+  predictor.
 - **Newly quantified:** activations rank whether the first answer was correct about 0.04 AUROC
   better than output features (stacked: interval excludes zero in all three fold assignments).
+  These use post-time states; they do not establish a pre-debate protection gate.
 
 ## 7. Deliverables
 

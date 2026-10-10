@@ -42,6 +42,21 @@ def boot_ci(per_question: pd.Series, n_boot: int = 2000, seed: int = 0) -> tuple
     return float(lo), float(hi)
 
 
+def room_above_better(best: pd.Series, vote: pd.Series, after: pd.Series,
+                      n_boot: int = 2000, seed: int = 0) -> dict:
+    """mean(best) - max(mean(vote), mean(after)), with a question-resampling interval in which
+    the max is recomputed inside each draw."""
+    b, v, a = (x.to_numpy(float) for x in (best, vote, after))
+    point = float(b.mean() - max(v.mean(), a.mean()))
+    rng = np.random.default_rng(seed)
+    idx = rng.integers(0, len(b), size=(n_boot, len(b)))
+    draws = b[idx].mean(1) - np.maximum(v[idx].mean(1), a[idx].mean(1))
+    lo, hi = np.quantile(draws, [0.025, 0.975])
+    return {"mean": round(point, 4), "ci95": [round(float(lo), 4), round(float(hi), 4)],
+            "n_questions": int(len(b)),
+            "better_baseline": "vote_of_3" if v.mean() >= a.mean() else "after_round_1"}
+
+
 def stat(series: pd.Series) -> dict:
     lo, hi = boot_ci(series)
     return {"mean": round(float(series.mean()), 4), "ci95": [round(lo, 4), round(hi, 4)],
@@ -79,7 +94,6 @@ def summarize(run_dir: Path, tie_break: str) -> tuple[dict, pd.Series]:
     any_pre = ev.groupby("question_id").pre_correct.max().reindex(vote.index).astype(float)
     any_post = ev.groupby("question_id").post_correct.max().reindex(vote.index).astype(float)
     pooled = pool_vote(ev, tie_break).reindex(vote.index)
-    better = np.maximum(vote, after)
 
     revs = {}
     for k in ("beneficial", "harmful", "unhelpful"):
@@ -100,7 +114,11 @@ def summarize(run_dir: Path, tie_break: str) -> tuple[dict, pd.Series]:
         "panel_optimal": stat(best),
         "after_minus_vote": stat(after - vote),
         "room_for_a_gate_panel_optimal_minus_after": stat(best - after),
-        "room_above_better_baseline_per_question": stat(best - better),
+        # headline: the ceiling minus the better of the two baseline POLICIES (vote of 3 or
+        # accept every revision), the max taken over means and recomputed in every bootstrap draw
+        "room_above_better_baseline": room_above_better(best, vote, after),
+        # an oracle that picks the better baseline separately for each question; not a baseline
+        "per_question_oracle_room_above_baselines": stat(best - np.maximum(vote, after)),
         "vote_of_all_6_answers": stat(pooled),
         "correct_answer_present_initially": stat(any_pre),
         "correct_answer_present_after": stat(any_post),

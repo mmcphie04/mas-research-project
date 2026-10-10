@@ -76,3 +76,13 @@ def test_multiple_fields_last_valid_wins():
 def test_confidence_is_line_anchored():
     assert parse_confidence("My confidence: 90 is not a field\nConfidence: 40") == 40.0
     assert parse_confidence("no confidence line") != parse_confidence("no confidence line")  # nan
+
+
+def test_a_final_field_with_a_letter_beyond_J_is_still_the_final_field():
+    """Regression: the field pattern used to see only A-J, so (Z) was invisible and (A) won."""
+    p = parse_answer_field("Answer: (A)\nAnswer: (Z)", 10)
+    assert p.status == "out_of_range" and p.index == -1 and p.n_fields == 2
+    assert parse_answer_field("Answer: (A)\nAnswer: K", 10).status == "out_of_range"
+    # the reported prose misreads stay fixed
+    for t in ("Answer: cannot determine.", "Answer: Because B", "Answer: Analysis"):
+        assert parse_answer_field(t, 10).index == -1

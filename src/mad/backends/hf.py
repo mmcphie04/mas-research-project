@@ -24,6 +24,19 @@ from mad.permute import LETTERS
 from mad.prompts import READOUT_SUFFIX
 
 
+def _host_memory() -> dict:
+    """Host resident memory: current, and the process peak so far (Linux units)."""
+    import resource
+
+    out = {"host_peak_rss_gb": round(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1e6, 2)}
+    try:
+        with open("/proc/self/statm") as fh:
+            out["host_rss_gb"] = round(int(fh.read().split()[1]) * os.sysconf("SC_PAGE_SIZE") / 1e9, 2)
+    except OSError:
+        pass
+    return out
+
+
 class HFBackend(Backend):
     name = "hf"
 
@@ -322,6 +335,8 @@ class HFBackend(Backend):
                     "replay_exact": info["replay_exact"],
                     "n_prompt_tokens": info["n_prompt"],
                     "n_response_tokens": info["n_gen"],
+                    **({"stated_token_id_observed": info["stated_token_id_observed"]}
+                       if "stated_token_id_observed" in info else {}),
                     **self._response_logprobs(hs[-1][i], pad, info["n_prompt"], seq),
                 }
                 out.append(
@@ -339,12 +354,13 @@ class HFBackend(Backend):
         return out
 
     def _response_logprobs(self, h_final, pad: int, n_prompt: int, seq: list[int],
-                           chunk: int = 256) -> dict:
+                           chunk: int | None = None) -> dict:
         """Log-probability (temperature 1) the model assigns to each token of its own response,
         summarised as mean / min / sum. Computed from the final hidden states with the output
         projection applied in chunks of positions, never as a full sequence x vocabulary tensor.
         Empty for prompt-only readouts."""
         torch = self.torch
+        chunk = chunk or self.cfg.activations.likelihood_chunk
         n_gen = len(seq) - n_prompt - len(self.tokenizer.encode(READOUT_SUFFIX, add_special_tokens=False))
         if n_gen <= 0:
             return {}
@@ -386,7 +402,7 @@ class HFBackend(Backend):
                 gen, replay = tok.encode(text[gs:], add_special_tokens=False), None
         seq = prompt_ids + gen + suffix_ids
         P = len(prompt_ids)
-        found, missing = {}, {}
+        found, missing, extra_info = {}, {}, {}
         if "generation_last" in positions:
             # last token before the suffix: the last generated token, or for a prompt-only
             # readout (peer exposure) the last prompt token
@@ -405,6 +421,13 @@ class HFBackend(Backend):
                     missing.update({p: f"answer_{parsed.status}" for p in wants})
                 elif k is None:
                     missing.update({p: "letter_not_aligned" for p in wants})
+                elif seq[P + k] != self._letter_ids[parsed.index]:
+                    # The token holding the stated letter is not the standalone letter token the
+                    # readout scores (e.g. " C" after a space in a permissive "Answer: C"). Its
+                    # state and the preceding token's letter distribution would not measure the
+                    # same thing, so neither is stored; the observed id is kept for audit.
+                    missing.update({p: "letter_token_mismatch" for p in wants})
+                    extra_info["stated_token_id_observed"] = int(seq[P + k])
                 else:
                     if "stated_answer" in positions:
                         found["stated_answer"] = P + k
@@ -416,7 +439,7 @@ class HFBackend(Backend):
                         else:
                             missing["before_stated_answer"] = "outside_own_response"
         return seq, {"found": found, "missing": missing, "replay_exact": replay,
-                     "n_prompt": P, "n_gen": len(gen)}
+                     "n_prompt": P, "n_gen": len(gen), **extra_info}
 
     def _token_of_char(self, gen: list[int], char: int) -> int | None:
         """Index of the generated token that contains character ``char`` of the decoded response,
@@ -452,17 +475,35 @@ class HFBackend(Backend):
 
     def stress(self, prompt_tokens: int, gen_tokens: int, readout_tokens: int,
                gen_batches: list[int], readout_batches: list[int]) -> dict:
-        """Worst-case memory at each candidate batch size: full-length prompts forced to
-        generate the whole token budget, then a readout at the longest transcript length.
-        Out-of-memory at a size is recorded, not raised. For the smoke run / first session."""
+        """Worst-case memory of the REAL workload at each batch size.
+
+        Generation: full-length prompts forced to generate the whole token budget through
+        ``model.generate`` (the call ``generate()`` makes). Readout: ``self.readout()`` itself --
+        hidden states for every layer, every configured extra position with its option
+        probabilities, and the chunked response likelihood -- on synthetic transcripts of the
+        longest length the protocol can produce, ending in a valid answer line so the stated-answer
+        positions are extracted too. Out-of-memory at a size is recorded, not raised. Peaks:
+        GPU allocated and reserved, and host resident memory.
+        """
         torch = self.torch
-        filler = self.tokenizer.encode("The panel weighed each option in turn. " * 400,
-                                       add_special_tokens=False)
+        tok = self.tokenizer
+        filler = tok.encode("The panel weighed each option in turn. " * 400, add_special_tokens=False)
         while len(filler) < max(prompt_tokens, readout_tokens):
             filler = filler * 2
         cuda = self.device.startswith("cuda")
+        tail = tok.encode("\nAnswer: (B)\nConfidence: 80", add_special_tokens=False)
+        resp_ids = filler[: max(gen_tokens - len(tail), 1)] + tail
+        suffix = len(tok.encode(READOUT_SUFFIX, add_special_tokens=False))
+        prompt_text = tok.decode(filler[: max(readout_tokens - len(resp_ids) - suffix, 1)])
+        text = prompt_text + tok.decode(resp_ids)
+        meta = {"gen_start_char": len(prompt_text), "gen_token_ids": resp_ids}
         report = {"prompt_tokens": prompt_tokens, "gen_tokens": gen_tokens,
-                  "readout_tokens": readout_tokens, "generation": [], "readout": []}
+                  "readout_tokens": readout_tokens, "extraction": {
+                      "positions": list(self.cfg.activations.positions),
+                      "likelihood_chunk": self.cfg.activations.likelihood_chunk,
+                      "path": "HFBackend.readout (hidden states, extra positions, option "
+                              "probabilities, response likelihood)"},
+                  "generation": [], "readout": []}
 
         def attempt(fn):
             if cuda:
@@ -471,11 +512,12 @@ class HFBackend(Backend):
             t = time.time()
             try:
                 extra = fn()
-                return {"ok": True, "seconds": round(time.time() - t, 1), **extra, **self._peaks(cuda)}
+                return {"ok": True, "seconds": round(time.time() - t, 1), **extra,
+                        **self._peaks(cuda), **_host_memory()}
             except Exception as exc:  # OutOfMemoryError on CUDA; recorded, not raised
                 if "out of memory" not in str(exc).lower() and type(exc).__name__ != "OutOfMemoryError":
                     raise
-                return {"ok": False, "error": "out_of_memory", **self._peaks(cuda)}
+                return {"ok": False, "error": "out_of_memory", **self._peaks(cuda), **_host_memory()}
             finally:
                 if cuda:
                     torch.cuda.empty_cache()
@@ -487,17 +529,21 @@ class HFBackend(Backend):
                     g = self.model.generate(input_ids=ids, attention_mask=torch.ones_like(ids),
                                             max_new_tokens=gen_tokens, min_new_tokens=gen_tokens,
                                             do_sample=True, temperature=0.7, top_p=0.95,
-                                            pad_token_id=self.tokenizer.pad_token_id)
+                                            pad_token_id=tok.pad_token_id)
                 return {"new_tokens": int(g.shape[1] - prompt_tokens)}
             report["generation"].append({"batch": b, **attempt(gen)})
         for b in readout_batches:
             def ro(b=b):
-                ids = torch.tensor([filler[:readout_tokens]] * b, device=self.device)
-                with torch.no_grad():
-                    res = self.model(input_ids=ids, attention_mask=torch.ones_like(ids),
-                                     output_hidden_states=True, logits_to_keep=1, use_cache=False)
-                finite = all(bool(torch.isfinite(h[:, -1, :]).all()) for h in res.hidden_states)
-                return {"finite_all_layers": finite}
+                reads = self.readout([text] * b, [10] * b, meta=[meta] * b, batch_size=b)
+                r = reads[0]
+                finite = all(np.isfinite(x.hidden.astype(np.float32)).all()
+                             and all(np.isfinite(v.astype(np.float32)).all() for v in x.extra.values())
+                             and np.isfinite(x.letter_logprobs).all() for x in reads)
+                return {"finite_all_layers": bool(finite), "readout_tokens_actual": r.n_tokens,
+                        "positions_extracted": sorted(r.extra),
+                        "positions_missing": r.alignment.get("missing", {}),
+                        "likelihood_computed": "response_logprob_mean" in r.alignment,
+                        "replay_exact": r.alignment.get("replay_exact")}
             report["readout"].append({"batch": b, **attempt(ro)})
         ok_g = [r["batch"] for r in report["generation"] if r["ok"]]
         ok_r = [r["batch"] for r in report["readout"] if r["ok"] and r.get("finite_all_layers")]

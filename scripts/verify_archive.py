@@ -3,11 +3,13 @@
     python scripts/verify_archive.py --out-root /content/drive/MyDrive/mas_runs --name pilot12b
     python scripts/verify_archive.py --out-root ARCHIVE --name pilot12b --copy-to /tmp/restore
 
-Run it after a session and before deleting anything from the runtime. ``--copy-to`` also copies
-the whole job (job file, question snapshot, round-0 caches, chunks, views) to another location,
-verifies the copy there, and checks that its activations load identically -- the recovery test
-for an archive that will outlive the runtime. Views reference chunk files: archive the chunks
-and round-0 caches, never only the views. Writes ``<name>-verify.json``; exits 1 on any failure.
+Run it after a session and before deleting anything from the runtime. ``--copy-to`` copies the
+job's complete archive set (see ``archive_set``: including, for a child job, the parent's round-0
+caches its activations point into) to another location, verifies the copy there, and checks
+that its activations load identically -- the recovery test for an archive that will outlive the
+runtime. Views reference chunk files: archive the whole set, never only the views. Views are
+also rebuilt from the verified chunks and compared with the stored ones. Writes
+``<name>-verify.json``; exits 1 on any failure.
 """
 
 from __future__ import annotations
@@ -27,16 +29,37 @@ from mad.job import JobMismatch, verify_archive, view_dirs  # noqa: E402
 from mad.store import ActivationStore  # noqa: E402
 
 
-def copy_job(src: Path, dst: Path, name: str) -> None:
+def archive_set(src: Path, name: str) -> list[Path]:
+    """Every file and directory a job needs to be verified and loaded elsewhere: everything named
+    ``<name>-*`` (job file, question snapshot, split, status, ledger, stress and pilot reports,
+    round-0 caches, chunks, views) -- plus, for a child job, its parent's job file, question
+    snapshot and round-0 caches, which the child's activation index points into."""
+    items = [p for p in sorted(src.glob(f"{name}-*")) if ".tmp-" not in p.name and ".verify-" not in p.name]
+    job = json.loads((src / f"{name}-job.json").read_text())
+    parent = job["identity"].get("parent", {}).get("name")
+    if parent:
+        for f in (f"{parent}-job.json", f"{parent}-questions.jsonl"):
+            if not (src / f).exists():
+                raise JobMismatch(f"child {name} needs {f}, which is missing from {src}")
+            items.append(src / f)
+        r0 = sorted(p for p in src.glob(f"{parent}-round0-*") if ".tmp-" not in p.name)
+        if not r0:
+            raise JobMismatch(f"child {name} references {parent}'s round 0, which is missing")
+        items += r0  # (a child's parent always owns its round 0: children cannot be parents)
+    return list(dict.fromkeys(items))
+
+
+def copy_job(src: Path, dst: Path, name: str) -> list[str]:
     dst.mkdir(parents=True, exist_ok=True)
-    for p in src.glob(f"{name}-*"):
-        if ".tmp-" in p.name:
-            continue
+    copied = []
+    for p in archive_set(src, name):
         target = dst / p.name
         if p.is_dir():
             shutil.copytree(p, target, dirs_exist_ok=True)
         else:
             shutil.copy2(p, target)
+        copied.append(p.name)
+    return copied
 
 
 def main(argv=None) -> int:
@@ -50,7 +73,7 @@ def main(argv=None) -> int:
         report = verify_archive(root, args.name)
         if args.copy_to:
             dst = Path(args.copy_to)
-            copy_job(root, dst, args.name)
+            report["copied"] = copy_job(root, dst, args.name)
             report["copy"] = verify_archive(dst, args.name)
             for cond, d in view_dirs(root, args.name).items():
                 a, b = ActivationStore(d), ActivationStore(dst / d.name)

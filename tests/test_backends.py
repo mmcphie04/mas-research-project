@@ -229,3 +229,33 @@ def test_hf_response_logprobs_match_full_logits():
     ref = torch.stack([lp[len(pid) - 1 + k, t] for k, t in enumerate(gen)]).numpy()
     assert abs(r.alignment["response_logprob_mean"] - ref.mean()) < 1e-3
     assert abs(r.alignment["response_logprob_min"] - ref.min()) < 1e-3
+
+
+@pytest.mark.skipif(not HF_AVAILABLE, reason="transformers not installed (uv sync --extra hf)")
+def test_hf_stress_exercises_the_full_extraction_path():
+    backend = _tiny(POS, **{"model.max_new_tokens": 16})
+    rep = backend.stress(prompt_tokens=60, gen_tokens=16, readout_tokens=120,
+                         gen_batches=[2], readout_batches=[2])
+    r = rep["readout"][0]
+    assert r["ok"] and r["finite_all_layers"] and r["likelihood_computed"] and r["replay_exact"]
+    assert set(r["positions_extracted"]) == {"generation_last", "stated_answer", "before_stated_answer"}
+    assert "host_peak_rss_gb" in r and rep["extraction"]["likelihood_chunk"] == 256
+    assert rep["generation"][0]["new_tokens"] == 16
+
+
+@pytest.mark.skipif(not HF_AVAILABLE, reason="transformers not installed (uv sync --extra hf)")
+def test_hf_position_fixture_from_the_smoke_test_passes():
+    """The smoke test's fixed own-response check: distracting answer lines in the prompt, all
+    positions on the right tokens, option probabilities equal to the model's full logits."""
+    import importlib.util
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    spec = importlib.util.spec_from_file_location("run_experiment", root / "scripts" / "run_experiment.py")
+    drv = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(drv)
+    cfg = load_config("configs/base.yaml", "configs/smoke_tiny.yaml", **{"activations.positions": POS})
+    out = drv.position_fixture(build_backend(cfg), cfg)
+    assert set(out["positions_checked"]) == {"generation_last", "stated_answer", "before_stated_answer"}
+    assert max(out["max_prob_diff_vs_model_logits"].values()) < 0.02
+    assert out["permissive_answer"] in ("stored (letter token matches)", "flagged letter_token_mismatch")

@@ -73,7 +73,8 @@ def run_candidates(cfg, questions, out_dir: Path, backend=None, extra_manifest=N
     cfg.run_id = out_dir.name
     write_manifest(cfg, run_dir=tmp, extra={"prompt_template_hashes": prompt_hashes(P.TEMPLATES),
                                             "kind": "candidates", "question_ids": [q.question_id for q in questions],
-                                            "contexts": CONTEXTS, **(extra_manifest or {})})
+                                            "contexts": CONTEXTS, "backend": backend.describe(),
+                                            **(extra_manifest or {})})
     recs, texts, metas, nopt = [], [], [], []
     for q in questions:
         for k, item in enumerate(items_for(q, perms[q.question_id], cfg.seed)):
@@ -98,6 +99,9 @@ def run_candidates(cfg, questions, out_dir: Path, backend=None, extra_manifest=N
         if "generation_last" in r.extra:
             writer.add({**key, "position": "generation_last"}, r.extra["generation_last"])
         lp = r.letter_logprobs
+        al = r.alignment or {}
+        rec.update({"readout_tokens": r.n_tokens, "prompt_tokens": al.get("n_prompt_tokens", -1),
+                    "generation_last_token": (al.get("positions", {}).get("generation_last") or [-1, -1])[1]})
         rec.update({"readout_logprobs": ",".join(f"{v:.5f}" for v in lp), "readout_answer": r.answer_index,
                     "p_candidate": float(np.exp(lp[rec["candidate"]])),
                     "p_endorsed": float(np.exp(lp[rec["endorsed"]])) if rec["endorsed"] >= 0 else np.nan,
@@ -106,8 +110,12 @@ def run_candidates(cfg, questions, out_dir: Path, backend=None, extra_manifest=N
     index = writer.close()
     rows = pd.DataFrame(recs)
     rows.to_parquet(tmp / ROWS, index=False)
+    # the exact rendered prompts, for audit (the readout appends READOUT_SUFFIX to each)
+    pd.DataFrame({"question_id": [m["question_id"] for m in metas], "item": [m["item"] for m in metas],
+                  "phase": [m["phase"] for m in metas], "prompt": texts}).to_json(
+        tmp / "prompts.jsonl", orient="records", lines=True)
     hashes = {p.name: sha256_file(p) for p in writer.shard_paths}
-    for f in (ROWS, "activation_index.parquet", "activation_meta.parquet"):
+    for f in (ROWS, "prompts.jsonl", "activation_index.parquet", "activation_meta.parquet"):
         hashes[f] = sha256_file(tmp / f)
     write_completion(tmp, {"candidate_states": len(rows), "activation_states": len(index)}, hashes)
     if out_dir.exists():

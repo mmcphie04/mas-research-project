@@ -101,6 +101,8 @@ class ActivationConfig:
     positions: list[str] = field(default_factory=lambda: ["readout_last"])
     dtype: str = "float16"
     shard_size: int = 500
+    # positions per chunk when computing the response likelihood (memory only, not values)
+    likelihood_chunk: int = 256
 
 
 @dataclass

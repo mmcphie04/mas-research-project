@@ -217,14 +217,19 @@ What these measurements show, literally:
    §4, the change comes from the corrected procedure (calibrated-scale τ, panel objective). The
    three fold assignments reuse the same 350 questions, so their agreement in direction is
    stability, not three confirmations.
-2. **Activations are not shown to raise panel accuracy over the output-logistic gate.** The
-   activation, combined and stacked gates are within about ±2 points of it, and each interval
-   includes or touches zero.
+2. **Whether activations raise panel accuracy over the output-logistic gate is mixed across these
+   exploratory fold assignments.** The nine differences (activation, combined, stacked × three
+   seeds) range from −1.4 to +2.3 points. One interval excludes zero (combined, seed 2: +0.023
+   [+0.003, +0.046]), two touch it (activation and stacked, seed 2), and six include it. That
+   does not establish a panel gain from activations, and it does not rule one out.
 3. **Activations rank whether the agent's FIRST answer was correct better than output features
    do**, by about 0.04 AUROC: for the stacked combination the interval excludes zero in all three
    fold assignments; for activations alone, in two of three. The within-question AUROCs show the
    same ordering (no interval was computed for that difference), so question difficulty alone
-   does not appear to explain it.
+   does not appear to explain it. These are **post-time** predictors (states from before AND
+   after the revision); they do not show that a gate using only pre-debate information could
+   protect correct first answers. That pre-only protection gate is now implemented
+   (`--time pre`, rule `protect`) but has not been run on these data.
 4. **Whether a revision is correct remains near chance for every predictor** on revisions alone;
    activation-minus-output differences there are positive in all seeds but every interval
    includes zero.
@@ -237,8 +242,9 @@ What these measurements show, literally:
 
 **No demonstrated incremental activation benefit to panel accuracy under the tested 1B
 protocol.** With the corrected procedure (§5), gates built from output features alone already
-improve on accepting every revision by a few panel points in some fold assignments, and adding
-activations does not measurably improve on that gate. Activations do add a modest, consistent
+improve on accepting every revision by a few panel points in some fold assignments. Whether
+adding activations improves on that gate is mixed across fold assignments (one of nine
+comparisons excludes zero, two touch it); no consistent gain is shown. Activations do add a modest, consistent
 improvement in ranking whether the agent's first answer was correct (~0.04 AUROC), which did not
 translate into a measurable panel gain at this sample size. Whether a proposed revision is
 correct is not predicted above chance by anything tested. All of this is at 350 questions with

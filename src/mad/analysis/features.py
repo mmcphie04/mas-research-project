@@ -31,7 +31,7 @@ import pandas as pd
 from mad.analysis.labels import build_events
 from mad.debate import ROWS_FILE
 
-TIMES = ("pre", "exposure", "post")
+TIMES = ("pre", "exposure", "post", "post_all")  # post_all: post, with all three stages' states
 PAD = -30.0
 
 
@@ -87,8 +87,19 @@ def load_events(run_dir: str | Path, require_full: bool = True) -> tuple[pd.Data
         for c in ("answer_source", "stop_reason", "freetext_parse_ok", "freetext_agrees_readout",
                   "stated_status", "shown_peer_answers", "response_logprob_mean", "response_logprob_min"):
             ev[f"{phase}_{c}"] = sub[c].to_numpy() if c in sub.columns else np.nan
+    # option distributions at the extra token positions, per phase (empty array where absent)
+    positions = sorted(c[len("pos_"):-len("_logprobs")] for c in rows.columns
+                       if c.startswith("pos_") and c.endswith("_logprobs"))
+    for phase, tag in (("pre", "pre"), ("peer_exposure", "exposure"), ("post", "post")):
+        sub = rows[rows.phase == phase].set_index(k)
+        if not len(sub):
+            continue
+        sub = sub.reindex(pd.MultiIndex.from_frame(ev[k]))
+        for p in positions:
+            ev[f"lp_{tag}@{p}"] = sub[f"pos_{p}_logprobs"].map(_parse_lp).to_numpy()
     ev.attrs["lp_source"] = rows.attrs["lp_source"]
     ev.attrs["has_exposure"] = "lp_exposure" in ev.columns
+    ev.attrs["positions_with_probabilities"] = positions
     return ev, rows
 
 
@@ -122,10 +133,32 @@ def _shown(s) -> list[int]:
     return [int(x) for x in str(s).split(",") if x not in ("", "nan")] if isinstance(s, str) else []
 
 
-def output_features(ev: pd.DataFrame, time: str) -> tuple[np.ndarray, list[str]]:
-    """Output-only features available at ``time`` (see module docstring). Returns (X, names)."""
+def _position_block(cols, ev, tag, p, old, new, width):
+    """Option distribution at token position ``p`` in phase ``tag``, with explicit missingness:
+    where the state does not exist (no valid stated answer, a flagged letter token, or a
+    prompt-only readout) every value is 0 and ``missing`` is 1."""
+    lps = ev[f"lp_{tag}@{p}"]
+    present = np.array([isinstance(v, np.ndarray) and len(v) > 0 for v in lps])
+    filled = [v if ok else np.full(width, PAD) for v, ok in zip(lps, present, strict=True)]
+    sub: dict[str, np.ndarray] = {}
+    _dist_block(sub, f"{tag}@{p}", filled, old, new, width)
+    for k, v in sub.items():
+        cols[f"pos:{k}"] = np.where(present, v, 0.0)
+    cols[f"pos:missing@{tag}@{p}"] = (~present).astype(float)
+
+
+def output_features(ev: pd.DataFrame, time: str, positions: tuple[str, ...] | list[str] = ()
+                    ) -> tuple[np.ndarray, list[str]]:
+    """Output-only features available at ``time`` (see module docstring). Returns (X, names).
+
+    ``positions``: extra token positions whose saved option distributions are added -- the
+    position-matched output control for an activation probe at that position. Availability:
+    a phase's distribution is used only if that phase exists by ``time``; stated-answer positions
+    never exist in the exposure state (a prompt-only readout)."""
     if time not in TIMES:
         raise ValueError(f"time must be one of {TIMES}")
+    if time == "post_all":
+        time = "post"  # same output information; only the activation phases differ
     if ev.attrs.get("lp_source", "none") == "none" or "lp_pre" not in ev.columns:
         raise SchemaError("output features need full answer distributions")
     if time == "exposure" and not ev.attrs.get("has_exposure"):
@@ -179,9 +212,22 @@ def output_features(ev: pd.DataFrame, time: str) -> tuple[np.ndarray, list[str]]
         cols["shown_agree_new"] = np.array([sum(x == n for x in s) for s, n in zip(shown, new, strict=True)], float)
         for j in range(width):
             cols[f"new_is_{j}"] = (new == j).astype(float)
+    for p in positions:
+        if p == "readout_last":
+            continue  # already the main readout blocks
+        if p not in ev.attrs.get("positions_with_probabilities", []):
+            raise SchemaError(f"this run saved no option probabilities at position {p!r}")
+        phases = ["pre"]
+        if time in ("exposure", "post") and p == "generation_last" and f"lp_exposure@{p}" in ev.columns:
+            phases.append("exposure")
+        if time == "post":
+            phases.append("post")
+        for tag in phases:  # P(new answer) only once the new answer exists
+            _position_block(cols, ev, tag, p, old, new if time == "post" else None, width)
     names = list(cols)
     return np.column_stack([cols[k] for k in names]).astype(float), names
 
 
 # Phases whose ACTIVATIONS a predictor at each time may use.
-ACTIVATION_PHASES = {"pre": ("pre",), "exposure": ("pre", "peer_exposure"), "post": ("pre", "post")}
+ACTIVATION_PHASES = {"pre": ("pre",), "exposure": ("pre", "peer_exposure"), "post": ("pre", "post"),
+                     "post_all": ("pre", "peer_exposure", "post")}

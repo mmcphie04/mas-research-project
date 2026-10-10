@@ -50,19 +50,25 @@ from mad.analysis.stats import (  # noqa: E402
 )
 
 LAYER_FRACS = (0.25, 0.5, 0.65, 0.8, 0.92, 1.0)
-ALL = ("output_linear", "output_hgb", "activation", "combined", "stacked")
+ALL = ("output_linear", "output_hgb", "output_readout_only", "activation", "combined", "stacked")
 
 
 # ----------------------------------------------------------------------------- data
 
 
-def prepare(run_dir, time, position, exposure_position, families):
+def prepare(run_dir, time, position, exposure_position, families, output_positions=()):
     """Events and per-family feature sources at one information time. Questions with any
-    missing required state are dropped whole (so panel votes stay complete) and counted."""
+    missing required state are dropped whole (so panel votes stay complete) and counted.
+
+    ``output_positions``: extra token positions whose saved option distributions join the output
+    features -- the position-matched control for activations at that position. The readout-only
+    output baseline is then kept as the ``output_readout_only`` ablation."""
     ev, _ = load_events(run_dir)
-    Xout, names = output_features(ev, time)
+    Xout, names = output_features(ev, time, output_positions)
+    Xbase, base_names = output_features(ev, time)
     report = {"events_total": int(len(ev)), "lp_source": ev.attrs["lp_source"], "time": time,
-              "output_features": names}
+              "output_positions": list(output_positions), "output_features": names,
+              "output_features_readout_only": base_names}
     need_act = any(f in ("activation", "combined", "stacked") for f in families)
     bank = StateBank(run_dir) if need_act else None
     keep = np.ones(len(ev), bool)
@@ -77,7 +83,7 @@ def prepare(run_dir, time, position, exposure_position, families):
     attrs = dict(ev.attrs)
     ev = ev[keep].reset_index(drop=True)
     ev.attrs.update(attrs)
-    Xout = Xout[keep]
+    Xout, Xbase = Xout[keep], Xbase[keep]
     cache: dict[int, np.ndarray] = {}
 
     def act(layer):
@@ -92,7 +98,9 @@ def prepare(run_dir, time, position, exposure_position, families):
 
     layers = sorted({int(bank.n_layers * f) for f in LAYER_FRACS}) if need_act else []
     feats = {fam: G.Features(fam, output=Xout, act=act, layers=layers)
-             for fam in families if fam != "stacked"}
+             for fam in families if fam not in ("stacked", "output_readout_only")}
+    if "output_readout_only" in families:
+        feats["output_readout_only"] = G.Features("output_linear", output=Xbase)
     report.update({"events_used": int(len(ev)), "questions_used": int(ev.question_id.nunique()),
                    "revised_used": int(ev.revised.sum()), "position": position,
                    "exposure_position": exposure_position if time == "exposure" else None,
@@ -125,8 +133,8 @@ class Stacked:
             sel_cal[t] = G.crossfit_calibrate(oof, y[t], folds)
             self.calibrators[t] = PlattScaler().fit(oof, y[t])
             self.stackers[t] = G.linear(1.0).fit(Z, y[t])
-        self.tau = {o: G.choose_tau(ev_sel, sel_cal["new"], sel_cal["old"], o, tie_break)[0]
-                    for o in G.OBJECTIVES}
+        self.tau = G.choose_all_taus(ev_sel, sel_cal["new"], sel_cal["old"], tie_break)
+        self.train_rate = {t: float(np.mean(y[t])) for t in y}
         self.params = {t: {"weights": [float(w) for w in self.stackers[t][-1].coef_[0]]} for t in y}
         return self
 
@@ -207,8 +215,9 @@ def paired_panel(ev, a, b, tie_break, n_boot=2000, seed=0):
             "n_questions": int(len(d))}
 
 
-def evaluate(ev, P, tie_break, families, seed):
-    """Metrics on held-out rows. ``P[fam]`` holds old/new raw/cal and accept_<objective>.
+def evaluate(ev, P, tie_break, families, seed, const=None):
+    """Metrics on held-out rows. ``P[fam]`` holds old/new raw/cal and accept_<gate key>.
+    ``const`` = {"old": array, "new": array}: the training base rate for each held-out row.
     Agent-level intervals resample QUESTIONS (agents of one question are correlated)."""
     y_old, y_new = ev.pre_correct.to_numpy().astype(int), ev.post_correct.to_numpy().astype(int)
     g = ev.question_id.to_numpy()
@@ -231,9 +240,9 @@ def evaluate(ev, P, tie_break, families, seed):
                 "logloss": log_loss(y, np.clip(s, 1e-6, 1 - 1e-6), labels=[0, 1]),
                 "ece": expected_calibration_error(s, y), "sd": float(np.std(s)),
             }
-        for o in G.OBJECTIVES:
-            acc = p[f"accept_{o}"]
-            fr[f"gate_{o}"] = {
+        for key in G.GATE_KEYS:
+            acc = p[f"accept_{key}"]
+            fr[f"gate_{key}"] = {
                 "agent_accuracy": float(np.mean(np.where(acc, y_new, y_old))),
                 "panel_accuracy": float(panel_table(ev, acc, tie_break).panel_correct.mean()),
                 "beneficial_kept": int((acc & (lab == "beneficial")).sum()),
@@ -251,11 +260,20 @@ def evaluate(ev, P, tie_break, families, seed):
     res["reference"] = {k: {"agent_accuracy": float(np.mean(np.where(v, y_new, y_old))),
                             "panel_accuracy": float(panel_table(ev, v, tie_break).panel_correct.mean())}
                         for k, v in ref.items()}
-    gates = {**{f: P[f]["accept_panel"] for f in families}, **ref}
-    pairs = [(a, b) for a in ("activation", "combined", "stacked") for b in ("output_linear", "output_hgb")]
-    pairs += [(f, r) for f in families for r in ("accept_all", "reject_all")]
-    res["paired_panel"] = {f"{a} - {b}": paired_panel(ev, gates[a], gates[b], tie_break, seed=seed)
-                           for a, b in pairs if a in gates and b in gates}
+    if const is not None:  # a predictor that knows nothing: always the training base rate
+        res["constant_training_rate"] = {
+            f"{t}_correct": {"brier": brier_score_loss(y, const[t]),
+                             "logloss": log_loss(y, np.clip(const[t], 1e-6, 1 - 1e-6), labels=[0, 1]),
+                             "ece": expected_calibration_error(const[t], y), "auroc_all": 0.5}
+            for t, y in (("old", y_old), ("new", y_new))}
+    res["paired_panel"] = {}
+    for key in G.GATE_KEYS:  # primary: difference_panel
+        gates = {**{f: P[f][f"accept_{key}"] for f in families}, **ref}
+        pairs = [(a, b) for a in ("activation", "combined", "stacked")
+                 for b in ("output_linear", "output_hgb", "output_readout_only")]
+        pairs += [(f, r) for f in families for r in ("accept_all", "reject_all")]
+        res["paired_panel"][key] = {f"{a} - {b}": paired_panel(ev, gates[a], gates[b], tie_break, seed=seed)
+                                    for a, b in pairs if a in gates and b in gates}
     res["auroc_differences"] = {}
     for a in ("activation", "combined", "stacked"):
         if a in P and "output_linear" in P:
@@ -281,16 +299,16 @@ def export_rows(ev, P, families, tag, split_col):
         df.insert(0, "seed", tag)
         for k in ("old_raw", "new_raw", "old_cal", "new_cal"):
             df[k] = P[fam][k]
-        for o in G.OBJECTIVES:
-            df[f"tau_{o}"] = P[fam][f"tau_{o}"]
-            df[f"accept_{o}"] = P[fam][f"accept_{o}"]
+        for key in G.GATE_KEYS:
+            df[f"tau_{key}"] = P[fam][f"tau_{key}"]
+            df[f"accept_{key}"] = P[fam][f"accept_{key}"]
         out.append(df)
     return pd.concat(out, ignore_index=True)
 
 
 def export_panel(ev, P, ref, families, tie_break, tag):
     out = []
-    gates = {f"{f}|{o}": P[f][f"accept_{o}"] for f in families for o in G.OBJECTIVES}
+    gates = {f"{f}|{key}": P[f][f"accept_{key}"] for f in families for key in G.GATE_KEYS}
     gates.update({f"{k}|reference": v for k, v in ref.items()})
     for name, acc in gates.items():
         t = panel_table(ev, acc, tie_break).reset_index()
@@ -307,10 +325,10 @@ def export_panel(ev, P, ref, families, tie_break, tag):
 
 def _blank(n, families):
     P = {f: {k: np.full(n, np.nan) for k in ("old_raw", "new_raw", "old_cal", "new_cal",
-                                              "tau_panel", "tau_agent")} for f in families}
+                                              *(f"tau_{g}" for g in G.GATE_KEYS))} for f in families}
     for f in families:
-        for o in G.OBJECTIVES:
-            P[f][f"accept_{o}"] = np.ones(n, bool)
+        for key in G.GATE_KEYS:
+            P[f][f"accept_{key}"] = np.ones(n, bool)
     return P
 
 
@@ -318,17 +336,22 @@ def _fill(P, fitted, sc, mask, rev, families):
     for fam in families:
         for key, v in sc[fam].items():
             P[fam][key][mask] = v
-        for o in G.OBJECTIVES:
-            tau = tau_of(fitted[fam])[o]
-            P[fam][f"tau_{o}"][mask] = tau
-            P[fam][f"accept_{o}"][mask] = G.gate_accept(sc[fam]["new_cal"], sc[fam]["old_cal"], rev[mask], tau)
+        for key in G.GATE_KEYS:
+            tau = tau_of(fitted[fam])[key]
+            P[fam][f"tau_{key}"][mask] = tau
+            P[fam][f"accept_{key}"][mask] = G.gate_accept(sc[fam]["new_cal"], sc[fam]["old_cal"],
+                                                          rev[mask], tau, G.split_key(key)[0])
+
+
+def _train_rate(f):
+    return f.train_rate if isinstance(f, Stacked) else f["train_rate"]
 
 
 def run_cv(ev, feats, families, tie_break, seeds, k_outer=5, transfer=None):
     """``transfer``: {name: (events, feats)} of other conditions on the same questions. Gates
     fitted on this run's training questions are applied, frozen, to their held-out questions."""
     transfer = transfer or {}
-    results, rows, panels, choices = [], [], [], []
+    results, rows, panels, choices, t_rows, t_panels = [], [], [], [], [], []
     rev = (ev.revised == 1).to_numpy()
     uq = np.array(sorted(set(ev.question_id)))
     for seed in seeds:
@@ -337,10 +360,13 @@ def run_cv(ev, feats, families, tie_break, seeds, k_outer=5, transfer=None):
         fold = ev.question_id.map(fold_of).to_numpy()
         P = _blank(len(ev), families)
         PT = {n: _blank(len(e), families) for n, (e, _) in transfer.items()}
+        const = {"old": np.full(len(ev), np.nan), "new": np.full(len(ev), np.nan)}
         for k in range(k_outer):
             tr, te = fold != k, fold == k
             fitted = fit_all(ev, feats, families, tr, tie_break, "cv")
             _fill(P, fitted, score_all(fitted, feats, te), te, rev, families)
+            for t in const:
+                const[t][te] = _train_rate(fitted[families[0]])[t]
             test_q = set(ev.question_id[te])
             for n, (e, f_t) in transfer.items():
                 m = e.question_id.isin(test_q).to_numpy()
@@ -348,18 +374,21 @@ def run_cv(ev, feats, families, tie_break, seeds, k_outer=5, transfer=None):
             for fam in families:
                 choices.append({"seed": seed, "fold": k, "family": fam, **choices_of(fitted[fam])})
             print(f"  seed {seed} fold {k} done", flush=True)
-        res, ref = evaluate(ev, P, tie_break, families, seed)
+        res, ref = evaluate(ev, P, tie_break, families, seed, const)
         res["seed"] = seed
         res["transfer"] = {}
         for n, (e, _) in transfer.items():
             covered = ~np.isnan(PT[n][families[0]]["new_cal"])
             e2 = e[covered].reset_index(drop=True)
             P2 = {f: {k: v[covered] for k, v in PT[n][f].items()} for f in families}
-            res["transfer"][n] = evaluate(e2, P2, tie_break, families, seed)[0]
+            res["transfer"][n], ref2 = evaluate(e2, P2, tie_break, families, seed)
+            t_rows.append(export_rows(e2, P2, families, seed, e2.question_id.map(fold_of)).assign(transfer_run=n))
+            t_panels.append(export_panel(e2, P2, ref2, families, tie_break, seed).assign(transfer_run=n))
         results.append(res)
         rows.append(export_rows(ev, P, families, seed, fold))
         panels.append(export_panel(ev, P, ref, families, tie_break, seed))
-    return results, pd.concat(rows), pd.concat(panels), choices
+    transfer_out = (pd.concat(t_rows), pd.concat(t_panels)) if t_rows else None
+    return results, pd.concat(rows), pd.concat(panels), choices, transfer_out
 
 
 def run_split(ev, feats, families, tie_break, manifest, transfer=None):
@@ -371,32 +400,35 @@ def run_split(ev, feats, families, tie_break, manifest, transfer=None):
     fitted = fit_all(ev, feats, families, tr, tie_break, "split", va=va)
     sc = score_all(fitted, feats, te)  # the only time test rows are scored
     ev_te = ev[te].reset_index(drop=True)
-    P = {}
-    for fam in families:
-        P[fam] = dict(sc[fam])
-        for o in G.OBJECTIVES:
-            tau = tau_of(fitted[fam])[o]
-            P[fam][f"tau_{o}"] = np.full(int(te.sum()), tau)
-            P[fam][f"accept_{o}"] = G.gate_accept(sc[fam]["new_cal"], sc[fam]["old_cal"], rev[te], tau)
-    res, ref = evaluate(ev_te, P, tie_break, families, 0)
+    def frozen(scores, revised, n):
+        out = {}
+        for fam in families:
+            out[fam] = dict(scores[fam])
+            for key in G.GATE_KEYS:
+                tau = tau_of(fitted[fam])[key]
+                out[fam][f"tau_{key}"] = np.full(n, tau)
+                out[fam][f"accept_{key}"] = G.gate_accept(scores[fam]["new_cal"], scores[fam]["old_cal"],
+                                                          revised, tau, G.split_key(key)[0])
+        return out
+
+    P = frozen(sc, rev[te], int(te.sum()))
+    rate = _train_rate(fitted[families[0]])
+    const = {t: np.full(int(te.sum()), rate[t]) for t in rate}
+    res, ref = evaluate(ev_te, P, tie_break, families, 0, const)
     res["split_sizes"] = {s: int(ev[split == s].question_id.nunique()) for s in ("train", "validation", "test")}
     res["transfer"] = {}
+    t_rows, t_panels = [], []
     for n, (e, f_t) in (transfer or {}).items():
         m = (e.question_id.map(manifest) == "test").to_numpy()
-        sc_t = score_all(fitted, f_t, m)
         e2 = e[m].reset_index(drop=True)
-        P2 = {}
-        for fam in families:
-            P2[fam] = dict(sc_t[fam])
-            for o in G.OBJECTIVES:
-                tau = tau_of(fitted[fam])[o]
-                P2[fam][f"tau_{o}"] = np.full(int(m.sum()), tau)
-                P2[fam][f"accept_{o}"] = G.gate_accept(sc_t[fam]["new_cal"], sc_t[fam]["old_cal"],
-                                                       (e2.revised == 1).to_numpy(), tau)
-        res["transfer"][n] = evaluate(e2, P2, tie_break, families, 0)[0]
+        P2 = frozen(score_all(fitted, f_t, m), (e2.revised == 1).to_numpy(), int(m.sum()))
+        res["transfer"][n], ref2 = evaluate(e2, P2, tie_break, families, 0)
+        t_rows.append(export_rows(e2, P2, families, "split", "test").assign(transfer_run=n))
+        t_panels.append(export_panel(e2, P2, ref2, families, tie_break, "split").assign(transfer_run=n))
     choices = [{"split": "train/validation", "family": f, **choices_of(fitted[f])} for f in families]
+    transfer_out = (pd.concat(t_rows), pd.concat(t_panels)) if t_rows else None
     return ([res], export_rows(ev_te, P, families, "split", "test"),
-            export_panel(ev_te, P, ref, families, tie_break, "split"), choices)
+            export_panel(ev_te, P, ref, families, tie_break, "split"), choices, transfer_out)
 
 
 def main(argv=None) -> int:
@@ -406,19 +438,31 @@ def main(argv=None) -> int:
     ap.add_argument("--mode", choices=["cv", "split"], default="cv")
     ap.add_argument("--split-manifest", help="from scripts/make_split.py; required for --mode split")
     ap.add_argument("--seeds", type=int, nargs="+", default=[0, 1, 2])
-    ap.add_argument("--time", choices=["pre", "exposure", "post"], default="post")
+    ap.add_argument("--time", choices=["pre", "exposure", "post", "post_all"], default="post",
+                    help="information time; post_all = post with pre, exposure and post states")
     ap.add_argument("--position", default="readout_last")
+    ap.add_argument("--output-positions", nargs="*", default=None,
+                    help="extra positions whose option distributions join the output features "
+                         "(default: the activation --position when it is not readout_last; "
+                         "pass with no values for none)")
     ap.add_argument("--exposure-position", default="readout_last")
     ap.add_argument("--families", nargs="+", default=list(ALL), choices=list(ALL))
     ap.add_argument("--tie-break", help="default: the run manifest's debate.tie_break")
+    ap.add_argument("--allow-unregistered-split", action="store_true",
+                    help="exploration only: accept a split manifest the run did not record")
     ap.add_argument("--transfer-runs", nargs="*", default=[],
                     help="other conditions' runs on the same questions: gates fitted here are "
                          "applied to them, frozen, on held-out questions")
     args = ap.parse_args(argv)
     run = Path(args.run)
+    out_pos = args.output_positions
+    if out_pos is None:
+        out_pos = [] if args.position == "readout_last" else [args.position]
     fams = set(args.families)
     if "stacked" in fams:
         fams |= set(Stacked.BASES)
+    if not out_pos:
+        fams.discard("output_readout_only")  # identical to output_linear without extra positions
     fams = [f for f in ALL if f in fams]
     man = json.loads((run / "manifest.json").read_text())
     tie = args.tie_break or man.get("config", {}).get("debate", {}).get("tie_break", "round0_then_agent0")
@@ -426,35 +470,56 @@ def main(argv=None) -> int:
         print(f"the run's tie_break {tie!r} was never implemented; the rule actually applied was "
               "round0_then_agent0, so that is used")
         tie = "round0_then_agent0"
-    ev, feats, report = prepare(run, args.time, args.position, args.exposure_position, fams)
+    ev, feats, report = prepare(run, args.time, args.position, args.exposure_position, fams, out_pos)
     print(f"{run}: {report['events_used']} events, {report['questions_used']} questions, "
           f"{report['revised_used']} revised; time={args.time}; families={fams}; tie-break={tie}")
     transfer = {}
     for t in args.transfer_runs:
-        e_t, f_t, rep_t = prepare(Path(t), args.time, args.position, args.exposure_position, fams)
+        e_t, f_t, rep_t = prepare(Path(t), args.time, args.position, args.exposure_position, fams, out_pos)
         if rep_t["output_features"] != report["output_features"]:
             raise SystemExit(f"{t}: output features differ from {run}; transfer needs the same columns")
         transfer[Path(t).name] = (e_t, f_t)
     if args.mode == "split":
         if not args.split_manifest:
             raise SystemExit("--mode split needs --split-manifest")
-        manifest = json.loads(Path(args.split_manifest).read_text())["assignment"]
-        results, rows, panels, choices = run_split(ev, feats, fams, tie, manifest, transfer)
+        sys.path.insert(0, str(ROOT / "scripts"))
+        from make_split import load_split
+
+        qids = set(ev.question_id)
+        for e_t, _ in transfer.values():
+            qids |= set(e_t.question_id)
+        manifest, smeta = load_split(args.split_manifest, sorted(qids), allow_subset=True)
+        registered = man.get("split_assignment_sha256")
+        if registered != smeta["assignment_sha256"]:
+            if not args.allow_unregistered_split:
+                raise SystemExit(f"{run} was collected with split {registered}, not this manifest's "
+                                 f"{smeta['assignment_sha256']}. A preregistered analysis uses the split "
+                                 "the job recorded; --allow-unregistered-split only for exploration.")
+            print("WARNING: split manifest not registered with this run; results are exploratory")
+        report["split"] = {"assignment_sha256": smeta["assignment_sha256"], "registered_with_run": registered,
+                           "counts_in_manifest": smeta["counts"]}
+        results, rows, panels, choices, t_out = run_split(ev, feats, fams, tie, manifest, transfer)
     else:
-        results, rows, panels, choices = run_cv(ev, feats, fams, tie, args.seeds, transfer=transfer)
+        results, rows, panels, choices, t_out = run_cv(ev, feats, fams, tie, args.seeds, transfer=transfer)
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     report.update({"run": str(run), "mode": args.mode, "tie_break": tie, "families": fams,
-                   "threshold_objectives": {"primary": "panel", "secondary": "agent"},
+                   "gates": {"keys": list(G.GATE_KEYS), "primary": G.PRIMARY_GATE,
+                             "rules": {"difference": "accept iff P(new) - P(old) > tau",
+                                       "protect": "accept iff P(old) <= tau (keep confident first answers)"},
+                             "objectives": {"panel": "primary", "agent": "secondary"}},
                    "results": results})
     (out / "results.json").write_text(json.dumps(report, indent=2, default=str))
     rows.to_csv(out / "predictions.csv", index=False)
     panels.to_csv(out / "panel.csv", index=False)
     (out / "choices.json").write_text(json.dumps(choices, indent=1, default=str))
+    if t_out is not None:
+        t_out[0].to_csv(out / "transfer_predictions.csv", index=False)
+        t_out[1].to_csv(out / "transfer_panel.csv", index=False)
     r0 = results[0]
     print(json.dumps({"reference": r0["reference"],
-                      "gates_panel_objective": {f: v["gate_panel"] for f, v in r0["families"].items()},
-                      "paired_panel": r0["paired_panel"]}, indent=1))
+                      "primary_gates": {f: v[f"gate_{G.PRIMARY_GATE}"] for f, v in r0["families"].items()},
+                      "paired_panel_primary": r0["paired_panel"][G.PRIMARY_GATE]}, indent=1))
     return 0
 
 

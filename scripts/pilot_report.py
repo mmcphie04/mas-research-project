@@ -1,7 +1,7 @@
 """One pilot report: instrument quality, headroom, class support, runtime, disk and power.
 
     python scripts/pilot_report.py --out-root /content/drive/MyDrive/mas_runs --name pilot12b \\
-        --main-n 1200 1800 2400 --main-conditions 3 --out pilot12b-report
+        --main-n 600 900 1200 --main-conditions self_reconsider debate --out pilot12b-report
 
 The pilot chooses instrument settings and an affordable scope. It does not test the activation
 hypothesis, and nothing here should be read as evidence for or against it.
@@ -55,7 +55,8 @@ def main(argv=None) -> int:
     ap.add_argument("--out-root", required=True)
     ap.add_argument("--name", required=True)
     ap.add_argument("--main-n", type=int, nargs="+", default=[1200, 1800, 2400])
-    ap.add_argument("--main-conditions", type=int, default=3)
+    ap.add_argument("--main-conditions", nargs="+", default=["self_reconsider", "debate"],
+                    help="the conditions planned for the main run, each priced from its own timings")
     ap.add_argument("--test-fraction", type=float, default=0.5)
     ap.add_argument("--sample", type=int, default=12, help="transcripts sampled per condition")
     ap.add_argument("--out", required=True)
@@ -65,9 +66,16 @@ def main(argv=None) -> int:
     job = json.loads((root / f"{args.name}-job.json").read_text())
     tie = job["identity"]["config"]["debate"]["tie_break"]
     views = view_dirs(root, args.name)
-    n_q = len(job["questions"])
-    rep = {"job": args.name, "questions": n_q, "conditions": {}, "caveat":
+    conds_job = list(job["identity"]["conditions"])
+    done_chunks = [i for i, members in enumerate(job["chunks"]) if members and all(
+        (root / f"{args.name}-{c}-{chunk_tag(i)}" / "completion.json").exists() for c in conds_job)]
+    n_done = sum(len(job["chunks"][i]) for i in done_chunks)  # projections use COMPLETED questions
+    rep = {"job": args.name, "questions_in_job": len(job["questions"]), "questions_completed": n_done,
+           "conditions": {}, "caveat":
            "pilot data choose instrument settings and scope; they do not test the activation hypothesis"}
+    missing_plan = [c for c in args.main_conditions if c not in conds_job]
+    if missing_plan:
+        raise SystemExit(f"planned conditions {missing_plan} were not in the pilot; cannot price them")
 
     # ---- quality, headroom, class support (per condition)
     disc_rates = {}
@@ -78,23 +86,29 @@ def main(argv=None) -> int:
         a = apply_policy(ev, policy_accept(ev, "mad_standard"), tie).set_index("question_id").panel_correct
         b = apply_policy(ev, policy_accept(ev, "round0_plurality"), tie).set_index("question_id").panel_correct
         disc_rates[cond] = float((a != b.reindex(a.index)).mean())
-    rep["accept_all_vs_reject_all_discordance"] = disc_rates
+    # descriptive only: how often accepting vs rejecting every revision changes the panel outcome.
+    # It does not bound how often two LEARNED gates disagree.
+    rep["accept_all_vs_reject_all_panel_discordance"] = disc_rates
 
-    # ---- runtime
+    # ---- runtime: each condition priced from its OWN stage timings
     status = json.loads((root / f"{args.name}-status.json").read_text())
-    t = pd.DataFrame(status["timings"])
-    spq = float(t.seconds.sum() / t.questions.sum()) if len(t) else float("nan")
-    stage_tot = {}
+    t = pd.DataFrame([x for x in status["timings"] if x.get("stages")])
+    n_t = int(t.questions.sum()) if len(t) else 0
+    stage_tot: dict[str, float] = {}
     for st in t.get("stages", []):
-        for k, v in (st or {}).items():
+        for k, v in st.items():
             stage_tot[k] = stage_tot.get(k, 0.0) + float(v)
-    n_cond = len(job["identity"]["conditions"])
-    r0_share = stage_tot.get("round0_s", 0.0) / max(t.seconds.sum(), 1e-9) if len(t) else float("nan")
-    per_cond = (1 - r0_share) / max(n_cond, 1)
-    spq_main = spq * (r0_share + per_cond * args.main_conditions)
-    rep["runtime"] = {"seconds_per_question_measured": round(spq, 1), "conditions_measured": n_cond,
+    per_cond_s = {c: sum(v for k, v in stage_tot.items() if k.startswith(f"{c}/")) / max(n_t, 1)
+                  for c in conds_job}
+    r0_s = stage_tot.get("round0_s", 0.0) / max(n_t, 1)
+    total_s = float(t.seconds.sum()) / max(n_t, 1) if n_t else float("nan")
+    overhead_s = total_s - r0_s - sum(per_cond_s.values())  # loading/saving round 0, bookkeeping
+    spq_main = r0_s + overhead_s + sum(per_cond_s[c] for c in args.main_conditions)
+    rep["runtime"] = {"questions_timed": n_t, "seconds_per_question_measured": round(total_s, 1),
+                      "seconds_per_question_by_part": {"round0": round(r0_s, 1), "overhead": round(overhead_s, 1),
+                                                       **{c: round(v, 1) for c, v in per_cond_s.items()}},
                       "stage_seconds_total": {k: round(v, 1) for k, v in sorted(stage_tot.items())},
-                      "round0_share_of_time": round(r0_share, 3),
+                      "planned_conditions": args.main_conditions,
                       "seconds_per_question_projected": round(spq_main, 1),
                       "projected_gpu_hours": {n: round(float(spq_main * n / 3600), 1) for n in args.main_n}}
     ledger = root / f"{args.name}-ledger.jsonl"
@@ -103,14 +117,14 @@ def main(argv=None) -> int:
         ends = [e["session_seconds"] for e in ev_l if e["event"] == "session_end"]
         rep["runtime"]["session_wall_hours_total"] = round(sum(ends) / 3600, 2)
 
-    # ---- disk
-    r0 = sum(dir_bytes(root / f"{args.name}-round0-{chunk_tag(i)}") for i in range(len(job["chunks"])))
-    cond_b = {c: sum(dir_bytes(root / f"{args.name}-{c}-{chunk_tag(i)}") for i in range(len(job["chunks"])))
-              for c in job["identity"]["conditions"]}
-    per_q_r0, per_q_cond = r0 / n_q, (np.mean(list(cond_b.values())) / n_q if cond_b else 0)
-    rep["disk"] = {"round0_bytes": r0, "condition_bytes": cond_b,
-                   "projected_gb": {n: round(float((per_q_r0 + per_q_cond * args.main_conditions) * n / 1e9), 1)
-                                    for n in args.main_n}}
+    # ---- disk, per COMPLETED question, each condition from its own bytes
+    r0 = sum(dir_bytes(root / f"{args.name}-round0-{chunk_tag(i)}") for i in done_chunks)
+    cond_b = {c: sum(dir_bytes(root / f"{args.name}-{c}-{chunk_tag(i)}") for i in done_chunks)
+              for c in conds_job}
+    per_q = {"round0": r0 / max(n_done, 1), **{c: b / max(n_done, 1) for c, b in cond_b.items()}}
+    per_q_main = per_q["round0"] + sum(per_q[c] for c in args.main_conditions)
+    rep["disk"] = {"bytes_per_completed_question": {k: int(v) for k, v in per_q.items()},
+                   "projected_gb": {n: round(float(per_q_main * n / 1e9), 1) for n in args.main_n}}
 
     # ---- power sensitivity
     rows = []
@@ -121,8 +135,8 @@ def main(argv=None) -> int:
                          "test_questions_needed": need,
                          "total_questions_at_test_fraction": int(np.ceil(need / args.test_fraction))})
     rep["power"] = {"test_fraction": args.test_fraction, "table": rows,
-                    "note": "discordance between two learned gates is unknown before the main run; the "
-                            "pilot's accept-all vs reject-all discordance is an upper reference"}
+                    "note": "how often two learned gates decide a question differently is unknown "
+                            "before the main run; the table spans a range of plausible values"}
 
     # ---- transcripts for reading by hand
     rng = np.random.default_rng(0)
@@ -143,7 +157,7 @@ def main(argv=None) -> int:
 
     (out / "report.json").write_text(json.dumps(rep, indent=2, default=str))
     md = [f"# Pilot report: {args.name}\n\n_{rep['caveat']}._\n\n",
-          "| condition | 1 agent | vote of 3 | after round 1 | panel optimal | room above better baseline | "
+          "| condition | 1 agent | vote of 3 | after round 1 | panel optimal | panel optimal − better baseline | "
           "parsed (pre/post) | cap hit (pre/post) | B / H / U (distinct q) |\n|---|---|---|---|---|---|---|---|---|\n"]
     for cond, s in rep["conditions"].items():
         def f(k, s=s):
@@ -152,13 +166,14 @@ def main(argv=None) -> int:
         bhu = " / ".join(f"{s['revisions'][k]['events']} ({s['revisions'][k]['distinct_questions']})"
                          for k in ("beneficial", "harmful", "unhelpful"))
         md.append(f"| {cond} | {f('one_agent_accuracy')} | {f('vote_of_3')} | {f('after_round_1')} | "
-                  f"{f('panel_optimal')} | {f('room_above_better_baseline_per_question')} | "
+                  f"{f('panel_optimal')} | {f('room_above_better_baseline')} | "
                   f"{g0['stated_answer_parsed']:.3f} / {g1['stated_answer_parsed']:.3f} | "
                   f"{g0.get('hit_token_cap', float('nan')):.3f} / {g1.get('hit_token_cap', float('nan')):.3f} | {bhu} |\n")
     rt = rep["runtime"]
-    md.append(f"\n**Runtime:** {rt['seconds_per_question_measured']} s/question measured over {n_cond} "
-              f"conditions; projected {rt['seconds_per_question_projected']} s/question for "
-              f"{args.main_conditions}; GPU-hours {rt['projected_gpu_hours']}.\n")
+    md.append(f"\n**Runtime:** {rt['seconds_per_question_measured']} s/question measured over "
+              f"{rt['questions_timed']} completed questions ({rt['seconds_per_question_by_part']}); projected "
+              f"{rt['seconds_per_question_projected']} s/question for {', '.join(args.main_conditions)}; "
+              f"GPU-hours {rt['projected_gpu_hours']}.\n")
     md.append(f"\n**Disk:** projected GB {rep['disk']['projected_gb']}.\n")
     md.append("\n**Power** (test questions needed, 80% power, two-sided 5%):\n\n| discordant | effect | test q | total q |\n|---|---|---|---|\n")
     for r_ in rows:

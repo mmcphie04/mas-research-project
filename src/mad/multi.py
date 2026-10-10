@@ -95,6 +95,28 @@ def wrong_target(seed: int, kind: str, qid: str, agent: int, gold: int, pre: int
     return int(stable_rng(seed, kind, "target", qid, agent).choice(eligible))
 
 
+class InvalidRecords(RuntimeError):
+    """Readouts that must not be saved as a completed chunk."""
+
+
+def validate_reads(reads, metas, where: str) -> None:
+    """Finite states at every layer and position, normalised distributions, and an exact replay
+    wherever one was checked. Raised BEFORE a completion record is written, so a chunk with bad
+    records fails (and is redone) instead of being archived as complete."""
+    for r, m in zip(reads, metas, strict=True):
+        tag = f"{where} {m.get('question_id')} agent {m.get('agent_id')} {m.get('phase')}"
+        if not np.isfinite(r.hidden.astype(np.float32)).all():
+            raise InvalidRecords(f"non-finite readout state: {tag}")
+        for pos, h in r.extra.items():
+            if not np.isfinite(h.astype(np.float32)).all():
+                raise InvalidRecords(f"non-finite {pos} state: {tag}")
+        for name, lp in [("readout", r.letter_logprobs), *r.extra_logprobs.items()]:
+            if not np.isfinite(lp).all() or abs(float(np.exp(lp).sum()) - 1) > 1e-3:
+                raise InvalidRecords(f"invalid {name} letter distribution: {tag}")
+        if r.alignment.get("replay_exact") is False:
+            raise InvalidRecords(f"readout did not replay the generated tokens exactly: {tag}")
+
+
 def request_id(job: str, chunk: str, phase: str, condition: str, qid: str, agent: int) -> str:
     return f"{job}/{chunk}/{condition}/{phase}/{qid}/a{agent}"
 
@@ -177,6 +199,7 @@ def generate_round0(cfg, questions, backend, perms, job="dev", chunk="c000") -> 
     n_opts = {q.question_id: q.n_options for q in questions}
     ro_meta = [{**m, "gen_token_ids": g.token_ids} for m, g in zip(metas, gens, strict=True)]
     reads = backend.readout(texts, [n_opts[m["question_id"]] for m in metas], meta=ro_meta)
+    validate_reads(reads, metas, "round 0")
     return Round0(metas, messages, prompts, gens, reads, seed)
 
 
@@ -420,6 +443,7 @@ def run_condition(cfg, questions, cond, r0: Round0, backend, perms, gold, final_
     t_stage = time.time()
     reads_pe = backend.readout(prompts1, [n_opts[m["question_id"]] for m in metas1], meta=metas_pe)
     timings["exposure_readout_s"] = round(time.time() - t_stage, 2)
+    validate_reads(reads_pe, metas_pe, f"{name} exposure")
     for m, read in zip(metas_pe, reads_pe, strict=True):
         row = _row(cfg, m, _NullGen(), read, n_opts[m["question_id"]], gold, perms)
         row["post_equals_peer_majority"] = int(row["answer"] == m["peer_majority"])
@@ -435,6 +459,7 @@ def run_condition(cfg, questions, cond, r0: Round0, backend, perms, gold, final_
     t_stage = time.time()
     reads1 = backend.readout(texts1, [n_opts[m["question_id"]] for m in metas1], meta=ro_meta1)
     timings["readout_s"] = round(time.time() - t_stage, 2)
+    validate_reads(reads1, metas1, f"{name} post")
     t_stage = time.time()
     for i, (m, gen, read) in enumerate(zip(metas1, gens1, reads1, strict=True)):
         row = _row(cfg, m, gen, read, n_opts[m["question_id"]], gold, perms)

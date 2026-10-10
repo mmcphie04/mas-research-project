@@ -73,17 +73,26 @@ probabilities and the observable debate already tell us, well enough to change p
 
 ## 5. Analysis (`scripts/reanalysis.py --mode split`)
 
-- **Split** (`scripts/make_split.py`): main-pool questions into train / validation / test
+- **Split** (`scripts/make_split.py`, selection mode): made **before any main-pool question is
+  generated**, from the same deterministic selection the driver makes; train / validation / test
   `[37.5 / 12.5 / 50%]`, stratified by subject, seed `[...]`, by question (all agents,
-  conditions and child jobs of a question on the same side). The manifest records the job
-  identity hash. Frozen before any main-pool outcome is examined.
+  conditions and child jobs of a question on the same side). The main job is started with
+  `--split-manifest`: the driver refuses a split that does not cover exactly its questions and
+  records the assignment hash in the job identity; children inherit it. The analysis refuses a
+  manifest whose hash, split names, partitions or membership are wrong, or which the run did not
+  record (`load_split`).
 - **Fitting:** layer, regularisation and tree settings by grouped cross-validated AUROC within
   train. Models refit on all of train.
-- **Calibration and threshold:** Platt calibrators fitted on validation; the gate accepts a
-  revision iff calibrated P(new) − calibrated P(old) > τ; τ chosen on validation over a grid that
-  includes −∞ (accept every revision) and +∞ (reject every revision), maximising **panel
-  accuracy** under the declared tie-break (agent-accuracy τ reported as a secondary rule). The
-  test set is scored once, with everything frozen.
+- **Calibration and threshold:** Platt calibrators fitted on validation; the primary gate accepts
+  a revision iff calibrated P(new) − calibrated P(old) > τ ("difference" rule); τ chosen on
+  validation over a grid that includes −∞ (accept every revision) and +∞ (reject every
+  revision), maximising **panel accuracy** under the declared tie-break. Reported as secondary:
+  the agent-accuracy τ, and the "protect" rule (keep the first answer iff calibrated P(old) > τ).
+  The test set is scored once, with everything frozen.
+- **Output controls at the activation position:** for a probe at a position other than
+  `readout_last`, the output-only baseline also gets the option distribution saved at that same
+  position (with explicit missingness) -- the position-matched control; the readout-only output
+  baseline is kept as an ablation (`output_readout_only`).
 - **Primary outcome — `[choose before the main run]`:**
   - *Option 1 (current draft):* paired difference in test panel accuracy, `combined` gate minus
     `output_linear` gate, in `debate`; 95% interval from resampling test questions. At N = 900
@@ -92,10 +101,15 @@ probabilities and the observable debate already tell us, well enough to change p
   - *Option 2 (better powered):* paired difference in held-out AUROC for P(new correct),
     `combined` minus `output_linear`, on all agent answers and on revisions, in `debate`;
     intervals resample questions. Panel accuracy co-primary, reported with its interval.
-- **Secondary:** every family against `output_linear` and `output_hgb`; every gate against
+- **Secondary:** a pre-only protection gate (`--time pre`, rule `protect`): keep the first answer
+  when its predicted correctness from pre-debate information alone exceeds a validation-chosen
+  threshold -- distinct from predicting that a replacement is right; post time with all three
+  stages' states (`--time post_all`) against pre + post; every family against `output_linear`
+  and `output_hgb`; every gate against
   accept-all and reject-all; beneficial revisions lost vs harmful revisions blocked; AUROC
-  overall, on revisions and within question (difficulty guard); calibration (Brier, ECE, against a
-  constant base-rate predictor); the `exposure` and `pre` information times; the other
+  overall, on revisions and within question (difficulty guard), for old- and new-answer
+  correctness separately; calibration (Brier, log-loss, ECE) against a constant predictor that
+  always outputs the training base rate (exported as `constant_training_rate`); the `exposure` and `pre` information times; the other
   positions; the panel-optimal ceiling (best of ≤ 8 accept patterns per question) and the
   agent-optimal policy (accept only wrong→right), labelled as such; transfer of gates fixed on
   `debate` to `self_reconsider` and `debate_answer_only` on the same held-out questions
@@ -137,7 +151,24 @@ pilot), batch sizes, N, which optional conditions run in full or on a subset. **
 change:** the primary outcome, decision rule, predictor families, threshold objective, or the
 retained activation positions.
 
-## 8. Sample size
+## 8. Freeze checklist (all decided and dated before the main run)
+
+| item | current default | decided |
+|---|---|---|
+| primary outcome and comparator (§5 option 1 or 2) | `combined` vs `output_linear`, `debate` | `[ ]` |
+| activation position for the primary analysis | `readout_last` | `[ ]` |
+| N (main questions) and conditions | 900; `debate`, `self_reconsider` | `[ ]` |
+| split fractions and seed | 37.5 / 12.5 / 50; seed `[...]` | `[ ]` |
+| equivalence tolerance in the decision rule | 2 panel points / 0.02 AUROC | `[ ]` |
+| stopping rule | below | `[ ]` |
+
+**Stopping rule (draft):** collect exactly the N questions in the split manifest; no outcome on
+any main-pool question is examined until collection ends. Collection stops early only for a
+technical failure that cannot be fixed without changing the protocol, or when the compute budget
+`[... A100-hours]` is exhausted; in either case the completed chunks are analysed as they stand
+and the shortfall is reported. Collection is never stopped or extended because of results.
+
+## 9. Sample size
 
 `N` and the split are set from the pilot's measured seconds per question and the power table
 (docs/BUDGET.md), within a total of `[10–20]` A100-hours, before any main-pool outcome is seen.

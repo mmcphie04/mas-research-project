@@ -25,8 +25,10 @@ brevity instruction, assume ~450 steps for the longest of 8 (MMLU-Pro math runs 
 
 Uncertainty is about ±50%. Batch 8 is plausible but unverified: Gemma 3 uses 1,024-token sliding
 windows in 5 of 6 layers, so the generation cache at the worst-case length is ~0.6 GB per
-sequence, not ~1.5 GB. The smoke test's stress pass tries batches 4, 6 and 8 at the worst-case
-lengths of the actual question pool and reports the largest that fits.
+sequence, not ~1.5 GB. Start at batch 4. The smoke test's stress pass runs the real generation
+and the full readout/extraction workload at the worst-case lengths of the actual question pool;
+pass `--stress-batches 6 8` to test larger sizes too, and raise the batch size only to one that
+passed there.
 
 ## Plans
 

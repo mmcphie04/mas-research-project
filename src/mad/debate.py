@@ -303,6 +303,9 @@ def _row(cfg, meta, gen, read, n_options, gold_display, perms) -> dict:
     # where each extra position is, why it is missing, and the option probabilities there
     al = getattr(read, "alignment", None) or {}
     row["replay_exact"] = al.get("replay_exact")
+    # token counts of the readout input: prompt part, and the agent's own response part
+    row["readout_prompt_tokens"] = al.get("n_prompt_tokens", -1)
+    row["readout_response_tokens"] = al.get("n_response_tokens", -1)
     for k in ("response_logprob_mean", "response_logprob_min", "response_logprob_sum"):
         row[k] = al.get(k, np.nan)
     for p in cfg.activations.positions:

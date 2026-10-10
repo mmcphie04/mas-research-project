@@ -8,7 +8,8 @@ Grammar. An ANSWER FIELD is a whole line of the form
 
     [markdown]  Answer [markdown] :  [markdown]  ( X )  [markdown or "."]
 
-where X is ONE UPPERCASE option letter. Leading list/quote/emphasis markup (``*``, ``_``, ``#``,
+where X is ONE UPPERCASE letter (any of A-Z: a letter beyond the question's options is still
+recognised as an answer field, and then makes the response invalid). Leading list/quote/emphasis markup (``*``, ``_``, ``#``,
 ``>``, spaces) and trailing emphasis or a full stop are allowed, nothing else. This documented
 form has status ``strict``. Two further forms are accepted with status ``permissive``, because
 they are unambiguous:
@@ -39,9 +40,12 @@ LETTERS = "ABCDEFGHIJ"
 
 _PRE = r"^[ \t>*_#-]*"
 _KEY = r"(?i:answer)[*_]*[ \t]*:[*_ \t]*"
-STRICT_RE = re.compile(_PRE + r"Answer[*_]*[ \t]*:[*_ \t]*\(([A-J])\)[*_ \t.]*$", re.MULTILINE)
+# Any single UPPERCASE letter is syntactically an answer; whether it is a valid OPTION is decided
+# afterwards. Matching only A-J let "Answer: (A)\nAnswer: (Z)" keep A, because the final (Z)
+# field was invisible to the parser.
+STRICT_RE = re.compile(_PRE + r"Answer[*_]*[ \t]*:[*_ \t]*\(([A-Z])\)[*_ \t.]*$", re.MULTILINE)
 FIELD_RE = re.compile(
-    _PRE + _KEY + r"(?:\(([A-J])\)|([A-J])\)|([A-J])(?=[*_ \t.]*$))", re.MULTILINE
+    _PRE + _KEY + r"(?:\(([A-Z])\)|([A-Z])\)|([A-Z])(?=[*_ \t.]*$))", re.MULTILINE
 )
 CONF_RE = re.compile(r"^[ \t>*_#-]*(?i:confidence)[*_]*[ \t]*:[*_ \t]*(\d{1,3})\b", re.MULTILINE)
 
@@ -68,7 +72,7 @@ def parse_answer_field(text: str, n_options: int) -> AnswerParse:
     last = fields[-1]
     group = next(g for g in (1, 2, 3) if last.group(g) is not None)
     letter, start = last.group(group), last.start(group)
-    idx = LETTERS.index(letter)
+    idx = ord(letter) - ord("A")
     if idx >= n_options:
         return AnswerParse(-1, OUT_OF_RANGE, start, len(fields))
     line_end = text.find("\n", last.start())

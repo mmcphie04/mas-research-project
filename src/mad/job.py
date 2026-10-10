@@ -40,7 +40,7 @@ from mad.provenance import COMPLETION, MANIFEST, git_state, is_complete, sha256_
 # composition the work is done, not what is computed -- plus the job's size, which may grow
 # (the question list itself is checked separately). Everything else is identity.
 EXECUTION_FIELDS = ("run_id", "out_dir", "model.batch_size", "model.readout_batch_size",
-                    "data.n_questions")
+                    "activations.likelihood_chunk", "data.n_questions")
 
 
 def question_sha256(q: Question) -> str:
@@ -214,7 +214,8 @@ def check_chunk_dir(run_dir: Path, job: dict, i: int) -> None:
 VIEW_FILE = "view.json"
 
 
-def build_view(out_root: Path, job: dict, cond: str, *, verify_hashes: bool = True) -> Path | None:
+def build_view(out_root: Path, job: dict, cond: str, *, verify_hashes: bool = True,
+               force: bool = False, out: Path | None = None) -> Path | None:
     """A validated, read-only view over one condition's complete chunks. Copies no arrays.
 
     The view's activation index points at the chunk directories' shard files. It is rebuilt
@@ -222,6 +223,10 @@ def build_view(out_root: Path, job: dict, cond: str, *, verify_hashes: bool = Tr
     every chunk belongs to this job and holds its recorded questions; every shard matches the
     checksum written when it was produced (unless ``verify_hashes`` is off); state keys are
     unique; and each included question has exactly n_agents x 3 states.
+
+    When the existing view's chunk stamp is unchanged this returns WITHOUT reading any bytes --
+    a cache, not a check. ``verify_archive`` is the byte-level check; it rebuilds every view
+    (``force=True``, into ``out``) and compares it with the stored one.
     """
     out_root = Path(out_root)
     name = job["identity"]["name"]
@@ -234,9 +239,10 @@ def build_view(out_root: Path, job: dict, cond: str, *, verify_hashes: bool = Tr
             parts.append((i, d, sha256_file(d / COMPLETION)))
     if not parts:
         return None
-    out = out_root / f"{name}-{cond}"
+    out = Path(out) if out is not None else out_root / f"{name}-{cond}"
     stamp = [[i, d.name, h] for i, d, h in parts]
-    if (out / VIEW_FILE).exists() and json.loads((out / VIEW_FILE).read_text()).get("chunks") == stamp:
+    if (not force and (out / VIEW_FILE).exists()
+            and json.loads((out / VIEW_FILE).read_text()).get("chunks") == stamp):
         return out
 
     rows, idx, transcripts, metas = [], [], [], []
@@ -280,6 +286,8 @@ def build_view(out_root: Path, job: dict, cond: str, *, verify_hashes: bool = Tr
     (tmp / MANIFEST).write_text(json.dumps({
         "run_id": out.name, "view_of": [d.name for _, d, _ in parts], "condition": cond,
         "config": first.get("config"), "job_identity_sha256": job["identity_sha256"],
+        "split_assignment_sha256": (job["identity"].get("split") or {}).get("assignment_sha256"),
+        "parent_job": (job["identity"].get("parent") or {}).get("name"),
         "prompt_template_hashes": first.get("prompt_template_hashes"),
     }, indent=2, default=str))
     (tmp / VIEW_FILE).write_text(json.dumps({
@@ -352,6 +360,7 @@ def verify_archive(out_root: Path, name: str) -> dict:
                 report["chunks"][d.name] = "ok"
     n_agents = job["identity"]["config"]["debate"]["n_agents"]
     for cond, d in view_dirs(out_root, name).items():
+        _compare_with_rebuild(out_root, job, cond, d)
         rows = pd.read_parquet(d / ROWS_FILE)
         store = ActivationStore(d)
         ix = store.index
@@ -376,6 +385,25 @@ def verify_archive(out_root: Path, name: str) -> dict:
                                       ix.groupby(["phase", "position"]).size().items()},
         }
     return report
+
+
+def _compare_with_rebuild(out_root: Path, job: dict, cond: str, view: Path) -> None:
+    """A view's tables are derived data: rebuild them from the (already verified) chunks beside
+    the stored view and require them to be identical, so an edited or stale view cannot pass."""
+    tmp = view.with_name(view.name + f".verify-{os.getpid()}")
+    try:
+        build_view(out_root, job, cond, verify_hashes=False, force=True, out=tmp)
+        for f in (ROWS_FILE, "activation_index.parquet"):
+            a, b = pd.read_parquet(view / f), pd.read_parquet(tmp / f)
+            if not a.equals(b):
+                raise JobMismatch(f"{view.name}/{f} differs from a rebuild from the verified chunks")
+        if (view / TRANSCRIPTS_FILE).read_bytes() != (tmp / TRANSCRIPTS_FILE).read_bytes():
+            raise JobMismatch(f"{view.name}/{TRANSCRIPTS_FILE} differs from a rebuild")
+        if json.loads((view / VIEW_FILE).read_text())["chunks"] != json.loads((tmp / VIEW_FILE).read_text())["chunks"]:
+            raise JobMismatch(f"{view.name}/{VIEW_FILE} lists different chunks than a rebuild")
+    finally:
+        if tmp.exists():
+            shutil.rmtree(tmp)
 
 
 def view_dirs(out_root: Path, name: str) -> dict[str, Path]:

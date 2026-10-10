@@ -1,7 +1,8 @@
 """Revision gates: fit on training questions, choose the threshold on the SAME calibrated score
 used at evaluation, score held-out questions once.
 
-A gate accepts an agent's revision iff  P(new answer correct) - P(old answer correct) > tau.
+A gate accepts an agent's revision iff  P(new answer correct) - P(old answer correct) > tau
+(rule "difference"), or iff P(old answer correct) <= tau (rule "protect"; see RULES).
 Non-revised agents are unaffected. tau = -inf is accept-every-revision, +inf is reject-every-
 revision; both are always candidates, so a learned gate can never be forced to do worse on its
 selection data than either endpoint.
@@ -41,7 +42,16 @@ from mad.analysis.stats import auroc
 C_GRID = (1e-4, 1e-3, 1e-2, 1e-1)
 HGB_GRID = ({"max_iter": 100, "max_depth": 3}, {"max_iter": 300, "max_depth": 3})
 TAU_GRID = np.concatenate([[-np.inf], np.round(np.linspace(-0.5, 0.5, 41), 4), [np.inf]])
+PROTECT_GRID = np.concatenate([[-np.inf], np.round(np.linspace(0.0, 1.0, 41), 4), [np.inf]])
 OBJECTIVES = ("panel", "agent")
+# Two gate rules. "difference": accept a revision iff P(new correct) - P(old correct) > tau.
+# "protect": keep the first answer iff P(old correct) > tau, i.e. accept a revision iff
+# P(old correct) <= tau -- it never predicts whether the replacement will be right. Used at the
+# "pre" information time, it is the pre-only protection gate. (+inf accepts every revision under
+# "protect"; -inf rejects every one.)
+RULES = ("difference", "protect")
+GATE_KEYS = tuple(f"{r}_{o}" for r in RULES for o in OBJECTIVES)
+PRIMARY_GATE = "difference_panel"
 
 
 def linear(C):
@@ -81,8 +91,15 @@ def crossfit_calibrate(raw, y, fold) -> np.ndarray:
     return out
 
 
-def gate_accept(p_new, p_old, revised, tau) -> np.ndarray:
+def gate_accept(p_new, p_old, revised, tau, rule: str = "difference") -> np.ndarray:
+    if rule == "protect":
+        return (p_old <= tau) | ~revised
     return ((p_new - p_old) > tau) | ~revised
+
+
+def split_key(key: str) -> tuple[str, str]:
+    rule, obj = key.split("_", 1)
+    return rule, obj
 
 
 def objective_value(ev, accept, objective, tie_break) -> float:
@@ -92,14 +109,25 @@ def objective_value(ev, accept, objective, tie_break) -> float:
     return float(np.mean(np.where(accept, y_new, y_old)))
 
 
-def choose_tau(ev, p_new, p_old, objective, tie_break) -> tuple[float, float]:
-    """(tau, objective value) over TAU_GRID, on the calibrated scores given."""
+def choose_tau(ev, p_new, p_old, objective, tie_break, rule: str = "difference") -> tuple[float, float]:
+    """(tau, objective value) over the rule's grid, on the calibrated scores given. Ties go to
+    the threshold nearest 0 (difference) or nearest 0.5 (protect)."""
     rev = (ev.revised == 1).to_numpy()
-    vals = [objective_value(ev, gate_accept(p_new, p_old, rev, t), objective, tie_break) for t in TAU_GRID]
+    grid, centre = (PROTECT_GRID, 0.5) if rule == "protect" else (TAU_GRID, 0.0)
+    vals = [objective_value(ev, gate_accept(p_new, p_old, rev, t, rule), objective, tie_break) for t in grid]
     best = max(vals)
-    cands = [t for t, v in zip(TAU_GRID, vals, strict=True) if v == best]
-    tau = min(cands, key=lambda t: abs(t))
+    cands = [t for t, v in zip(grid, vals, strict=True) if v == best]
+    tau = min(cands, key=lambda t: abs(t - centre))
     return float(tau), float(best)
+
+
+def choose_all_taus(ev, p_new, p_old, tie_break) -> dict:
+    """A threshold for every (rule, objective), all on the same calibrated scores."""
+    out = {}
+    for key in GATE_KEYS:
+        rule, obj = split_key(key)
+        out[key] = choose_tau(ev, p_new, p_old, obj, tie_break, rule)[0]
+    return out
 
 
 # ----------------------------------------------------------------------------- feature sources
@@ -157,8 +185,8 @@ def fit_crossfit(F: Features, ev: pd.DataFrame, tr: np.ndarray, tie_break: str) 
         out["models"][t] = make().fit(X, y)
         out["params"][t] = prm
     sub = ev[tr].reset_index(drop=True)
-    out["tau"] = {o: choose_tau(sub, out["oof_cal"]["new"], out["oof_cal"]["old"], o, tie_break)[0]
-                  for o in OBJECTIVES}
+    out["tau"] = choose_all_taus(sub, out["oof_cal"]["new"], out["oof_cal"]["old"], tie_break)
+    out["train_rate"] = {"old": float(targets["old"].mean()), "new": float(targets["new"].mean())}
     return out
 
 
@@ -175,8 +203,9 @@ def fit_validation(F: Features, ev: pd.DataFrame, tr, va, tie_break: str) -> dic
         out["models"][t], out["params"][t], out["calibrators"][t] = model, prm, cal
         out["val_raw"][t], out["val_cal"][t] = raw, cal.transform(raw)
     sub = ev[va].reset_index(drop=True)
-    out["tau"] = {o: choose_tau(sub, out["val_cal"]["new"], out["val_cal"]["old"], o, tie_break)[0]
-                  for o in OBJECTIVES}
+    out["tau"] = choose_all_taus(sub, out["val_cal"]["new"], out["val_cal"]["old"], tie_break)
+    out["train_rate"] = {"old": float(ev.pre_correct.to_numpy()[tr].mean()),
+                         "new": float(ev.post_correct.to_numpy()[tr].mean())}
     return out
 
 

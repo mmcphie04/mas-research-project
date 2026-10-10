@@ -70,9 +70,10 @@ def test_threshold_is_chosen_on_the_calibrated_scale_used_at_evaluation():
     F = G.Features("output_linear", output=X)
     tr = np.ones(len(ev), bool)
     f = G.fit_crossfit(F, ev, tr, "round0_then_agent0")
-    for o in G.OBJECTIVES:
-        tau, best = G.choose_tau(ev, f["oof_cal"]["new"], f["oof_cal"]["old"], o, "round0_then_agent0")
-        assert f["tau"][o] == tau
+    for key in G.GATE_KEYS:
+        rule, o = G.split_key(key)
+        tau, best = G.choose_tau(ev, f["oof_cal"]["new"], f["oof_cal"]["old"], o, "round0_then_agent0", rule)
+        assert f["tau"][key] == tau
     s = G.score(f, F, tr)
     assert np.allclose(s["new_cal"], f["calibrators"]["new"].transform(s["new_raw"]))
     assert not np.allclose(s["new_cal"], s["new_raw"]), "the test needs a non-identity calibrator"
@@ -127,7 +128,8 @@ def test_cv_route_end_to_end_exports_everything(stub_view, tmp_path):
     res = json.loads((tmp_path / "results.json").read_text())
     assert res["activation_phases"] == ["pre", "peer_exposure"]
     pred = pd.read_csv(tmp_path / "predictions.csv")
-    assert {"old_raw", "old_cal", "new_cal", "tau_panel", "accept_panel", "pre_answer",
+    assert {"old_raw", "old_cal", "new_cal", "tau_difference_panel", "accept_difference_panel",
+            "accept_protect_panel", "pre_answer",
             "post_answer", "gold_display"} <= set(pred.columns)
     assert set(pred.family) == {"output_linear", "activation", "stacked"}
     panel = pd.read_csv(tmp_path / "panel.csv")
@@ -154,10 +156,85 @@ def test_split_route_scores_only_test_questions(stub_view, tmp_path):
     assign = json.loads(split.read_text())["assignment"]
     R = _load("reanalysis")
     out = tmp_path / "o"
-    assert R.main(["--run", str(stub_view / "s-debate"), "--out", str(out), "--mode", "split",
-                   "--split-manifest", str(split), "--families", "output_linear", "activation"]) == 0
+    args = ["--run", str(stub_view / "s-debate"), "--out", str(out), "--mode", "split",
+            "--split-manifest", str(split), "--families", "output_linear", "activation"]
+    with pytest.raises(SystemExit, match="collected with split"):
+        R.main(args)  # made AFTER collection: not the preregistered route
+    assert R.main([*args, "--allow-unregistered-split"]) == 0
     pred = pd.read_csv(out / "predictions.csv")
     assert set(pred.question_id.map(assign)) == {"test"}
+
+
+def test_registered_split_route_end_to_end(tmp_path):
+    """make_split BEFORE generation -> the driver binds it -> reanalysis accepts only that split."""
+    ms, drv, R = _load("make_split"), _load("run_experiment"), _load("reanalysis")
+    split = tmp_path / "m-split.json"
+    assert ms.main(["--dataset", "synthetic", "--pool", "main", "--n-questions", "60", "--fracs", "0.5",
+                    "0.2", "0.3", "--seed", "3", "--out", str(split)]) == 0
+    assert drv.main(["--config", *STUB, "--out-root", str(tmp_path), "--name", "m", "--dataset", "synthetic",
+                     "--n-questions", "60", "--chunk", "20", "--conditions", "debate",
+                     "--split-manifest", str(split)]) == 0
+    sha = json.loads(split.read_text())["meta"]["assignment_sha256"]
+    assert json.loads((tmp_path / "m-job.json").read_text())["identity"]["split"]["assignment_sha256"] == sha
+    assert json.loads((tmp_path / "m-debate" / "manifest.json").read_text())["split_assignment_sha256"] == sha
+    out = tmp_path / "o"
+    assert R.main(["--run", str(tmp_path / "m-debate"), "--out", str(out), "--mode", "split",
+                   "--split-manifest", str(split), "--families", "output_linear"]) == 0
+    assert json.loads((out / "results.json").read_text())["split"]["registered_with_run"] == sha
+
+
+def test_split_integrity_and_membership_are_enforced(tmp_path):
+    ms, drv = _load("make_split"), _load("run_experiment")
+    split = tmp_path / "s.json"
+    ms.main(["--dataset", "synthetic", "--n-questions", "40", "--seed", "1", "--out", str(split)])
+    with pytest.raises(SystemExit, match="covers 40 questions"):  # split made for a different selection
+        drv.main(["--config", *STUB, "--out-root", str(tmp_path), "--name", "x", "--dataset", "synthetic",
+                  "--n-questions", "30", "--chunk", "10", "--conditions", "debate", "--split-manifest", str(split)])
+    data = json.loads(split.read_text())
+    q = next(iter(data["assignment"]))
+    data["assignment"][q] = "train" if data["assignment"][q] != "train" else "test"  # tampered
+    bad = tmp_path / "bad.json"
+    bad.write_text(json.dumps(data))
+    with pytest.raises(SystemExit, match="recorded hash"):
+        ms.load_split(bad)
+    data2 = json.loads(split.read_text())
+    data2["assignment"][q] = "holdout"
+    data2["meta"]["assignment_sha256"] = ms.assignment_sha256(data2["assignment"])
+    bad.write_text(json.dumps(data2))
+    with pytest.raises(SystemExit, match="invalid split names"):
+        ms.load_split(bad)
+
+
+def test_child_job_keeps_its_parents_split(tmp_path):
+    ms, drv = _load("make_split"), _load("run_experiment")
+    split = tmp_path / "p-split.json"
+    ms.main(["--dataset", "synthetic", "--n-questions", "40", "--seed", "1", "--out", str(split)])
+    drv.main(["--config", *STUB, "--out-root", str(tmp_path), "--name", "p", "--dataset", "synthetic",
+              "--n-questions", "40", "--chunk", "20", "--conditions", "debate", "--split-manifest", str(split)])
+    assert drv.main(["--config", *STUB, "--out-root", str(tmp_path), "--name", "k", "--parent", "p",
+                     "--subset-n", "20", "--conditions", "independent"]) == 0
+    p_split = json.loads((tmp_path / "p-job.json").read_text())["identity"]["split"]
+    assert json.loads((tmp_path / "k-job.json").read_text())["identity"]["split"] == p_split
+
+
+def test_candidate_analysis_rejects_unmapped_questions(tmp_path):
+    drv, rc, ac = _load("run_experiment"), _load("run_candidates"), _load("analyze_candidates")
+    drv.main(["--config", *STUB, "--out-root", str(tmp_path), "--name", "p", "--dataset", "synthetic",
+              "--n-questions", "30", "--chunk", "15", "--conditions", "debate"])
+    rc.main(["--config", *STUB, "--out-root", str(tmp_path), "--parent", "p", "--n", "30"])
+    ms = _load("make_split")
+    split = tmp_path / "s.json"
+    ms.main(["--out-root", str(tmp_path), "--name", "p", "--seed", "2", "--out", str(split)])
+    data = json.loads(split.read_text())
+    data["assignment"].pop(next(iter(data["assignment"])))  # one question unmapped
+    data["meta"]["assignment_sha256"] = ms.assignment_sha256(data["assignment"])
+    split.write_text(json.dumps(data))
+    with pytest.raises(SystemExit, match="not in the split"):
+        ac.main(["--run", str(tmp_path / "p-candidates"), "--out", str(tmp_path / "a"),
+                 "--split-manifest", str(split)])
+    with pytest.raises(SystemExit, match="already complete"):
+        rc.main(["--config", *STUB, "--out-root", str(tmp_path), "--parent", "p", "--n", "30"])
+
 
 
 def test_transfer_applies_frozen_gates_to_another_condition(stub_view, tmp_path):
@@ -167,3 +244,55 @@ def test_transfer_applies_frozen_gates_to_another_condition(stub_view, tmp_path)
     res = json.loads((tmp_path / "results.json").read_text())
     tr = res["results"][0]["transfer"]["s-self_reconsider"]
     assert "output_linear" in tr["families"] and tr["reference"]["accept_all"]["panel_accuracy"] >= 0
+
+
+def test_protect_gate_uses_only_the_old_answer_probability():
+    ev, _ = _events(n_q=40, seed=7, p_rev=0.6)
+    rev = (ev.revised == 1).to_numpy()
+    p_old = np.linspace(0.05, 0.95, len(ev))
+    a = G.gate_accept(np.zeros(len(ev)), p_old, rev, 0.5, "protect")
+    b = G.gate_accept(np.ones(len(ev)), p_old, rev, 0.5, "protect")
+    assert (a == b).all(), "the protect rule must not depend on P(new)"
+    assert G.gate_accept(np.zeros(len(ev)), p_old, rev, np.inf, "protect").all()
+    assert (G.gate_accept(np.zeros(len(ev)), p_old, rev, -np.inf, "protect") == ~rev).all()
+
+
+def test_future_response_fields_cannot_change_pre_or_exposure_features(stub_view):
+    ev, _ = load_events(stub_view / "s-debate")
+    base = {t: output_features(ev, t, ["generation_last", "stated_answer"])[0] for t in ("pre", "exposure")}
+    fut = ev.copy()
+    fut.attrs.update(ev.attrs)
+    fut["post_answer"] = (fut.post_answer + 1) % fut.n_options
+    fut["post_rationale_chars"] = fut.post_rationale_chars * 3 + 7
+    fut["post_verbalized"] = 1.0
+    for c in [c for c in fut.columns if c.startswith("lp_post")]:
+        fut[c] = fut[c].map(lambda v: v[::-1] if isinstance(v, np.ndarray) else v)
+    for c in ("post_answer_source", "post_stop_reason", "post_freetext_parse_ok",
+              "post_freetext_agrees_readout", "post_response_logprob_mean", "post_response_logprob_min"):
+        fut[c] = "x" if fut[c].dtype == object else -1
+    for t in ("pre", "exposure"):
+        assert np.array_equal(output_features(fut, t, ["generation_last", "stated_answer"])[0], base[t]), t
+
+
+def test_position_matched_output_features_have_explicit_missingness(stub_view):
+    ev, _ = load_events(stub_view / "s-debate")
+    X, names = output_features(ev, "post", ["stated_answer"])
+    assert "pos:missing@pre@stated_answer" in names and "pos:p_new@post@stated_answer" in names
+    assert not any("exposure@stated_answer" in n for n in names), "no stated answer at exposure"
+    miss = X[:, names.index("pos:missing@post@stated_answer")]
+    pnew = X[:, names.index("pos:p_new@post@stated_answer")]
+    assert ((miss == 1) <= (pnew == 0)).all(), "missing positions must contribute zeros"
+
+
+def test_readout_only_ablation_and_constant_baseline_are_exported(stub_view, tmp_path):
+    R = _load("reanalysis")
+    assert R.main(["--run", str(stub_view / "s-debate"), "--out", str(tmp_path), "--seeds", "0",
+                   "--position", "stated_answer", "--families", "output_linear", "output_readout_only",
+                   "activation", "--transfer-runs", str(stub_view / "s-self_reconsider")]) == 0
+    res = json.loads((tmp_path / "results.json").read_text())
+    assert res["output_positions"] == ["stated_answer"]
+    assert len(res["output_features"]) > len(res["output_features_readout_only"])
+    r0 = res["results"][0]
+    assert "output_readout_only" in r0["families"] and "constant_training_rate" in r0
+    assert "gate_protect_panel" in r0["families"]["activation"]
+    assert (tmp_path / "transfer_predictions.csv").exists() and (tmp_path / "transfer_panel.csv").exists()

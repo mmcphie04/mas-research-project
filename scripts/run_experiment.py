@@ -37,6 +37,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(ROOT / "scripts"))
 
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
@@ -146,11 +147,20 @@ def diagnostics(run_dir: Path) -> dict:
 # ----------------------------------------------------------------------------- smoke checks
 
 
+# Known (decoder layers, width) for models this project uses: the smoke test asserts them.
+EXPECTED_SHAPES = {"google/gemma-3-12b-it": (48, 3840), "google/gemma-3-1b-it": (26, 1152),
+                   "google/gemma-3-270m-it": (18, 640)}
+
+
 def smoke_checks(res: dict, r0, backend, cfg, n_q: int) -> dict:
     """Assert the outputs are the shape the analysis expects AND that the values are sane."""
     n_agents = cfg.debate.n_agents
     n_layers = backend.n_layers
     d_model = backend.d_model
+    want = EXPECTED_SHAPES.get(cfg.model.repo_id)
+    if cfg.model.backend != "stub" and want:
+        assert (n_layers, d_model) == want, f"{cfg.model.repo_id}: {n_layers} x {d_model}, expected {want}"
+    extra_pos = [p for p in cfg.activations.positions if p != "readout_last"]
     report = {}
     for cond, r in res.items():
         rows = r.rows
@@ -158,10 +168,10 @@ def smoke_checks(res: dict, r0, backend, cfg, n_q: int) -> dict:
         assert len(rows) == n_q * n_agents * 3, f"{cond}: {len(rows)} rows"
         store = ActivationStore(r.run_dir)
         assert store.n_layers == n_layers, f"{cond}: {store.n_layers} layers, expected {n_layers}"
-        for layer in sorted({0, n_layers // 2, n_layers}):
+        for layer in store.layer_range():  # every stored layer, not a sample
             x = store.load_layer(layer)
-            assert x.shape[1] == d_model, f"{cond}: layer {layer} shape {x.shape}"
-            assert np.isfinite(x).all(), f"{cond}: non-finite activations at layer {layer}"
+            assert x.shape == (len(store.index), d_model), f"{cond}: layer {layer} shape {x.shape}"
+            assert np.isfinite(x).all(), f"{cond}: non-finite stored values at layer {layer}"
         assert x.std(axis=0).max() > 0, f"{cond}: every stored state is identical"
         positions = store.index.position.value_counts().to_dict()
         assert positions.get("readout_last") == len(rows), f"{cond}: readout states {positions}"
@@ -171,15 +181,23 @@ def smoke_checks(res: dict, r0, backend, cfg, n_q: int) -> dict:
             assert abs(np.exp(lp).sum() - 1) < 1e-3, f"{cond}: answer distribution not normalised"
             assert 0 <= row.readout_answer < row.n_options and 0 <= row.answer < row.n_options
         missing = {}
-        for p in cfg.activations.positions:
-            if p == "readout_last":
-                continue
+        for p in extra_pos:
             col = rows[f"pos_{p}_logprobs"]
             for v in col[col != ""]:
                 lp = np.array([float(x) for x in v.split(",")])
                 assert abs(np.exp(lp).sum() - 1) < 1e-3, f"{cond}: {p} distribution not normalised"
             reasons = rows[f"pos_{p}_missing"]
             missing[p] = reasons[reasons != ""].value_counts().to_dict()
+        # exposure: a prompt-only readout -- its generation_last is the prompt's last token, and
+        # it has no stated-answer states, by design
+        exp = rows[rows.phase == "peer_exposure"]
+        if "generation_last" in extra_pos and cfg.model.backend != "stub":
+            assert (exp.pos_generation_last_token_index == exp.readout_prompt_tokens - 1).all(), \
+                f"{cond}: exposure generation_last is not the last prompt token"
+        for p in ("stated_answer", "before_stated_answer"):
+            if p in extra_pos:
+                assert (exp[f"pos_{p}_missing"] == "no_generated_response").all(), \
+                    f"{cond}: exposure rows should have no {p} state"
         gen_rows = rows[rows.phase != "peer_exposure"]
         replay = gen_rows.replay_exact.value_counts(dropna=False).to_dict()
         if hasattr(backend, "count_tokens"):  # a real tokenizer: every generated row must replay exactly
@@ -189,12 +207,15 @@ def smoke_checks(res: dict, r0, backend, cfg, n_q: int) -> dict:
                         "answer_source": rows.answer_source.value_counts().to_dict(),
                         "stated_status": rows.stated_status.value_counts().to_dict(),
                         **diagnostics(r.run_dir)}
-    if hasattr(backend, "count_tokens"):  # a real model: batched and one-at-a-time must agree
+    if hasattr(backend, "count_tokens"):  # a real model
+        report["position_fixture"] = position_fixture(backend, cfg)
         k = min(4, len(r0.prompts))
         texts = [p + g.text for p, g in zip(r0.prompts[:k], r0.gens[:k], strict=True)]
         n_opts = [len(r.letter_logprobs) for r in r0.reads[:k]]
-        single = backend.readout(texts, n_opts, meta=r0.metas[:k], batch_size=1)
-        batched = backend.readout(texts, n_opts, meta=r0.metas[:k], batch_size=k)
+        # the generated ids go in, so both readouts replay the exact generated sequence
+        meta = [{**m, "gen_token_ids": g.token_ids} for m, g in zip(r0.metas[:k], r0.gens[:k], strict=True)]
+        single = backend.readout(texts, n_opts, meta=meta, batch_size=1)
+        batched = backend.readout(texts, n_opts, meta=meta, batch_size=k)
         dlp = max(float(np.abs(a.letter_logprobs - b.letter_logprobs).max())
                   for a, b in zip(single, batched, strict=True))
         cos = min(float(np.dot(a.hidden[-1].astype(np.float32), b.hidden[-1].astype(np.float32))
@@ -202,14 +223,87 @@ def smoke_checks(res: dict, r0, backend, cfg, n_q: int) -> dict:
                            * np.linalg.norm(b.hidden[-1].astype(np.float32)) + 1e-9))
                   for a, b in zip(single, batched, strict=True))
         agree = sum(a.answer_index == b.answer_index for a, b in zip(single, batched, strict=True))
+        assert all(x.alignment.get("replay_exact") for x in single + batched), "batched/single readout not exact"
         report["batched_vs_single"] = {"max_abs_logprob_diff": round(dlp, 4),
                                        "min_last_layer_cosine": round(cos, 5), "argmax_agree": f"{agree}/{k}"}
         log(f"  batched vs single readout: {report['batched_vs_single']}")
         # gross disagreement means padding or position handling is wrong, not numerical noise
         assert cos > 0.95 and dlp < 0.5, f"batched and single readouts disagree: {report['batched_vs_single']}"
-    log(f"  smoke checks passed: {n_layers + 1} layers x {d_model}, finite, non-degenerate, "
-        f"normalised, answers in each row's range")
+    log(f"  smoke checks passed: all {n_layers + 1} layers x {d_model}, finite, non-degenerate, "
+        f"normalised, answers in each row's range, exposure semantics")
     return report
+
+
+def position_fixture(backend, cfg, tol: float = 0.02) -> dict:
+    """A fixed transcript with a known own answer and DISTRACTING answer lines in the prompt (the
+    agent's earlier answer and two peers'). Checks: every configured position is found, on the
+    right token id; the stated letter is the standalone letter token being scored; the token
+    before it is the one predicting it; generation_last is the response's last token; and the
+    option probabilities at every position match the model's own full logits within ``tol``
+    (probability units; bf16-safe). Then the exposure (prompt-only) readout, and a permissive
+    answer whose letter token may differ from the scored one."""
+    import torch
+
+    from mad.permute import identity_permutation
+
+    tok, L = backend.tokenizer, backend._letter_ids
+    base = P.round0_messages(persona=cfg.debate.personas[0], subject="physics",
+                             question="Which quantity is conserved in an elastic collision?",
+                             options=["mass only", "momentum only", "kinetic energy and momentum", "neither"],
+                             perm=identity_permutation(4), ask_confidence=True)
+    msgs = P.round1_messages(base=base, own_response="Earlier view.\nAnswer: (B)\nConfidence: 50",
+                             peer_responses=["Peer reasoning.\nAnswer: (A)\nConfidence: 90",
+                                             "Other reasoning.\nAnswer: (D)\nConfidence: 80"])
+    prompt = backend.render(msgs)
+    response = "Both are conserved in an elastic collision.\nAnswer: (C)\nConfidence: 70"
+    gen = tok.encode(response, add_special_tokens=False)
+    r = backend.readout([prompt + response], [4], meta=[{"gen_start_char": len(prompt), "gen_token_ids": gen}],
+                        batch_size=1)[0]
+    seq = tok.encode(prompt, add_special_tokens=False) + gen + tok.encode(P.READOUT_SUFFIX, add_special_tokens=False)
+    pos = r.alignment["positions"]
+    want = [p for p in cfg.activations.positions if p != "readout_last"]
+    assert set(want) <= set(pos), f"fixture: positions {sorted(pos)} missing {set(want) - set(pos)}"
+    for name, (j, tid) in pos.items():
+        assert seq[j] == tid, f"fixture: {name} token id {tid} is not the input token {seq[j]}"
+    if "stated_answer" in pos:
+        assert pos["stated_answer"][1] == L[2], "fixture: stated-answer token is not the scored letter C"
+    if "before_stated_answer" in pos:
+        assert pos["before_stated_answer"][0] == pos["stated_answer"][0] - 1
+    if "generation_last" in pos:
+        assert pos["generation_last"][0] == len(seq) - len(tok.encode(P.READOUT_SUFFIX, add_special_tokens=False)) - 1
+    with torch.no_grad():
+        logits = backend.model(input_ids=torch.tensor([seq], device=backend.device), use_cache=False).logits[0]
+    diffs = {}
+    for name, (j, _) in [("readout_last", (len(seq) - 1, None)), *pos.items()]:
+        ref = torch.softmax(logits[j, L[:4]].float(), -1).cpu().numpy()
+        got = np.exp(r.letter_logprobs if name == "readout_last" else r.extra_logprobs[name])
+        diffs[name] = round(float(np.abs(ref - got).max()), 5)
+        assert diffs[name] < tol, f"fixture: {name} option probabilities differ from the model's logits by {diffs[name]}"
+    del logits
+    exp = backend.readout([prompt], [4], meta=[{"gen_start_char": None}], batch_size=1)[0]
+    n_prompt = len(tok.encode(prompt, add_special_tokens=False))
+    if "generation_last" in want:
+        assert exp.alignment["positions"]["generation_last"][0] == n_prompt - 1, "exposure: not the prompt end"
+    for p in ("stated_answer", "before_stated_answer"):
+        if p in want:
+            assert exp.alignment["missing"].get(p) == "no_generated_response", f"exposure: unexpected {p}"
+    perm_resp = "Both are conserved.\nAnswer: C"  # permissive form
+    pg = tok.encode(perm_resp, add_special_tokens=False)
+    rp = backend.readout([prompt + perm_resp], [4], meta=[{"gen_start_char": len(prompt), "gen_token_ids": pg}],
+                         batch_size=1)[0]
+    if "stated_answer" in want:
+        if "stated_answer" in rp.alignment["positions"]:
+            assert rp.alignment["positions"]["stated_answer"][1] == L[2], "permissive: a non-letter token was stored"
+            permissive = "stored (letter token matches)"
+        else:
+            assert rp.alignment["missing"]["stated_answer"] == "letter_token_mismatch", rp.alignment["missing"]
+            permissive = "flagged letter_token_mismatch"
+    else:
+        permissive = "not requested"
+    out = {"max_prob_diff_vs_model_logits": diffs, "permissive_answer": permissive,
+           "positions_checked": sorted(pos)}
+    log(f"  position fixture passed: {out}")
+    return out
 
 
 def coverage(cfg, backend, questions) -> dict:
@@ -271,6 +365,43 @@ def gpu_identity() -> dict:
     return out
 
 
+def stress_context(job: dict, cfg, cov: dict) -> dict:
+    """Everything a stress result depends on, recorded beside it."""
+    from mad.provenance import git_state
+
+    return {"identity_sha256": job["identity_sha256"], "gpu_identity": gpu_identity(),
+            "packages": package_versions(), "git_sha": git_state()["git_sha"],
+            "likelihood_chunk": cfg.activations.likelihood_chunk,
+            "positions": list(cfg.activations.positions), "coverage": cov}
+
+
+def stress_reusable(prior: dict, now: dict, batch: int | None = None,
+                    readout_batch: int | None = None) -> tuple[bool, str]:
+    """May an earlier stress result stand in for running it again? Only if it tested these
+    batch sizes, lengths at least as long, and the same model, code, packages, GPU and
+    extraction settings. Returns (reusable, reason when not)."""
+    if not prior or not prior.get("passed"):
+        return False, "no passing stress report"
+    for k in ("identity_sha256", "gpu_identity", "packages", "git_sha", "likelihood_chunk", "positions"):
+        if prior.get(k) != now.get(k):
+            return False, f"{k} changed since the stress report"
+    pc, nc = prior.get("coverage", {}), now.get("coverage", {})
+    for k in ("worst_round1_prompt_tokens", "worst_readout_tokens", "token_cap"):
+        if nc.get(k, 0) > pc.get(k, -1):
+            return False, f"{k} {nc.get(k)} exceeds the tested {pc.get(k)}"
+    cfgd = prior.get("configured", {})
+    b = batch if batch is not None else now.get("batch_size")
+    rb = readout_batch if readout_batch is not None else now.get("readout_batch_size")
+    ok_g = {r["batch"] for r in prior.get("generation", []) if r.get("ok")}
+    ok_r = {r["batch"] for r in prior.get("readout", [])
+            if r.get("ok") and r.get("finite_all_layers") and r.get("likelihood_computed")}
+    if (b or cfgd.get("batch_size")) not in ok_g:
+        return False, f"generation batch {b} was not tested and passed"
+    if (rb or cfgd.get("readout_batch_size")) not in ok_r:
+        return False, f"readout batch {rb} was not tested and passed"
+    return True, ""
+
+
 class Ledger:
     """Append-only budget ledger, one JSON line per event, kept beside the job on the output
     drive -- so model loading, stress passes, failed work and every session's wall time are
@@ -310,9 +441,13 @@ def main(argv=None) -> int:
                     help="resume a job created at a different commit (recorded in the job history)")
     ap.add_argument("--skip-hash-check", action="store_true", help="skip shard checksums when merging")
     ap.add_argument("--smoke", action="store_true", help="2 questions, check everything, report, stop")
-    ap.add_argument("--stress-batches", type=int, nargs="+", default=[4, 6, 8],
-                    help="generation and readout batch sizes to try in the worst-case memory pass")
+    ap.add_argument("--stress-batches", type=int, nargs="+", default=None,
+                    help="EXTRA batch sizes to try in the worst-case memory pass, for information; "
+                         "the configured sizes are always tested and must pass themselves")
     ap.add_argument("--skip-stress", action="store_true", help="never run the memory stress pass")
+    ap.add_argument("--split-manifest", help="frozen split from scripts/make_split.py: must cover exactly this "
+                                             "job's questions (a child's must be its parent's); its hash "
+                                             "becomes part of the job identity")
     ap.add_argument("--parent", help="child job: take round 0 from this job's saved caches")
     ap.add_argument("--subset-n", type=int, help="child job: the first N questions of the parent")
     args = ap.parse_args(argv)
@@ -337,6 +472,8 @@ def main(argv=None) -> int:
         if args.smoke:
             raise SystemExit("--smoke and --parent cannot be combined")
         parent = json.loads((out_root / f"{args.parent}-job.json").read_text())
+        if parent["identity"].get("parent"):
+            raise SystemExit(f"{args.parent} is itself a child job and owns no round 0; use its parent")
         # A child's configuration IS its parent's: rebuilt from the parent's recorded identity,
         # with only execution settings (batch sizes) taken from this command line.
         from mad.config import config_from_dict
@@ -401,6 +538,14 @@ def main(argv=None) -> int:
             chunk_size=chunk, conditions={c["name"]: CONDITION_SPECS[c["name"]] for c in conds_all},
             templates_hash=prompt_hashes(P.TEMPLATES), backend_desc=desc, master_ids_sha=master_sha)
         chunks = None
+    if args.split_manifest and not args.smoke:
+        from make_split import load_split
+
+        _, smeta = load_split(args.split_manifest, [q.question_id for q in intended], allow_subset=bool(parent))
+        split_info = {"assignment_sha256": smeta["assignment_sha256"], "counts": smeta["counts"]}
+        if parent and parent["identity"].get("split") and parent["identity"]["split"] != split_info:
+            raise SystemExit("a child job must use its parent's split manifest")
+        identity["split"] = split_info
     execution = {"batch_size": cfg.model.batch_size, "readout_batch_size": cfg.model.readout_batch_size,
                  "packages": package_versions(), **gpu_identity()}
     job = open_job(out_root, identity, questions, allow_code_change=args.allow_code_change,
@@ -413,21 +558,24 @@ def main(argv=None) -> int:
     stress_path = out_root / f"{name}-stress.json"
     if backend is not None and hasattr(backend, "stress") and not args.skip_stress:
         prior = json.loads(stress_path.read_text()) if stress_path.exists() else {}
-        same = (prior.get("identity_sha256") == job["identity_sha256"]
-                and prior.get("gpu") == gpu_identity().get("gpu") and prior.get("passed"))
-        if same:
-            log(f"  stress already passed for this job on this GPU ({stress_path.name}); not repeating")
+        rb = cfg.model.readout_batch_size or cfg.model.batch_size
+        now = stress_context(job, cfg, cov)
+        reuse, why = stress_reusable(prior, now, cfg.model.batch_size, rb)
+        if reuse:
+            log(f"  stress report {stress_path.name} covers these settings; not repeating")
         else:
-            log(f"  stress: worst-case generation and readout at batches {args.stress_batches} ...")
+            gen_b = sorted(set(args.stress_batches or []) | {cfg.model.batch_size})
+            ro_b = sorted(set(args.stress_batches or []) | {rb})
+            log(f"  stress ({why}): the real generation and readout/extraction workload at the "
+                f"worst-case lengths, generation batches {gen_b}, readout batches {ro_b} ...")
             t = time.time()
             rep = backend.stress(cov["worst_round1_prompt_tokens"], cfg.model.max_new_tokens,
-                                 cov["worst_readout_tokens"], args.stress_batches, args.stress_batches)
-            rb = cfg.model.readout_batch_size or cfg.model.batch_size
-            passed = (any(r["ok"] and r["batch"] >= cfg.model.batch_size for r in rep["generation"])
-                      and any(r["ok"] and r.get("finite_all_layers") and r["batch"] >= rb
-                              for r in rep["readout"]))
-            rec = {"identity_sha256": job["identity_sha256"], **gpu_identity(), "coverage": cov,
-                   "configured": {"batch_size": cfg.model.batch_size, "readout_batch_size": rb},
+                                 cov["worst_readout_tokens"], gen_b, ro_b)
+            # the CONFIGURED sizes must themselves pass; a bigger passing size is not enough
+            passed = (any(r["ok"] and r["batch"] == cfg.model.batch_size for r in rep["generation"])
+                      and any(r["ok"] and r.get("finite_all_layers") and r.get("likelihood_computed")
+                              and r["batch"] == rb for r in rep["readout"]))
+            rec = {**now, "configured": {"batch_size": cfg.model.batch_size, "readout_batch_size": rb},
                    "passed": passed, "seconds": round(time.time() - t, 1), **rep}
             stress_path.write_text(json.dumps(rec, indent=2))
             ledger("stress", seconds=rec["seconds"], passed=passed,
@@ -485,7 +633,9 @@ def main(argv=None) -> int:
                           "question_ids": parent["chunks"][i]} if parent else None)
             res, r0 = run_chunk(cfg, part, conds, backend=backend, job=name, chunk=tag,
                                 round0_dir=out_root / f"{name}-round0-{tag}", run_dirs=dirs,
-                                extra_manifest={"job_identity_sha256": job["identity_sha256"]},
+                                extra_manifest={"job_identity_sha256": job["identity_sha256"],
+                                                "split_assignment_sha256":
+                                                    (job["identity"].get("split") or {}).get("assignment_sha256")},
                                 parent_round0=parent_r0)
         except Exception as exc:
             consecutive += 1

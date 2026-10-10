@@ -5,25 +5,32 @@ project is looking for needs roughly 600 to 4,000 questions, depending on the ef
 whether only changed answers count, so on the laptop it takes days. Colab Pro for Education
 provides an A100 with 40 GB, which fits Gemma-3-12B, the model the plan was written for.
 
-## Two ways to run
+## Where results must live
 
-**Google's official Colab CLI (preferred).** `google-colab-cli` from the `googlecolab` organisation
-drives a Colab runtime from the laptop: `colab new -s mas --gpu A100`, `colab upload`,
-`colab exec -f script.py`, `colab download`, `colab usage`, `colab stop`. This is the sanctioned way
-to control Colab from outside a browser; unofficial tunnels into a runtime are what Colab's terms
-prohibit. Installed in WSL with `uv tool install google-colab-cli`, and it signs in through
-Application Default Credentials (needs `gcloud`, installed user-locally at `~/google-cloud-sdk`).
-Pass `--auth=adc` explicitly — the CLI's own help and its bundled docs disagree about the default.
+**Every collection run writes to a verified persistent destination: Google Drive, through the
+notebook.** A Colab runtime's own disk disappears when the session ends. Nothing in this project
+copies results off the runtime continuously; the only built-in persistence is writing directly
+to the Drive mount. After each session, run `scripts/verify_archive.py` (the notebook does), and
+before deleting anything, verify an independent second copy with `--copy-to`.
 
-Known limits, from the CLI's bundled agent guide (`colab skill`):
-- `colab exec -f script.py` sends one file. The `mad` package must be uploaded as well.
-- `colab drivemount` and `colab auth` need a person at the terminal, so unattended runs should
-  download finished chunks to the laptop rather than depend on Drive.
-- Whether a job keeps running after the local command disconnects is not documented. Long runs
-  should launch as a background process on the runtime and be checked with short commands.
+## Two ways to control Colab
 
-**The notebook (fallback).** Open `notebooks/colab_runner.ipynb` in Colab and run all cells; results
-go to Google Drive under `MyDrive/mas_runs/`. Instructions follow.
+**The notebook (use this for collection).** Open `notebooks/colab_runner.ipynb` in Colab and run
+all cells; it mounts Drive and writes results under `MyDrive/mas_runs/`. Instructions follow.
+
+**Google's official Colab CLI (short checks only).** `google-colab-cli` from the `googlecolab`
+organisation drives a runtime from the laptop: `colab new -s mas --gpu A100`, `colab upload`,
+`colab exec -f script.py`, `colab download`, `colab usage`, `colab stop`. This is the sanctioned
+way to control Colab from outside a browser; unofficial tunnels into a runtime are what Colab's
+terms prohibit. Installed in WSL with `uv tool install google-colab-cli`; signs in through
+Application Default Credentials (`gcloud`, user-locally at `~/google-cloud-sdk`). Pass
+`--auth=adc` explicitly — the CLI's help and its bundled docs disagree about the default.
+Limits that rule it out for collection:
+- `colab drivemount` needs a person at the terminal, so a CLI session cannot write to Drive
+  unattended, and **no download/backup loop is implemented here**: results would live only on
+  the runtime's disk until someone runs `colab download`.
+- Whether a job keeps running after the local command disconnects is not documented.
+- `colab exec -f script.py` sends one file; the `mad` package must be uploaded as well.
 
 ## One-time setup
 
@@ -81,7 +88,7 @@ progress, per-chunk timings and memory peaks, and every failure.
 
 ### Commands (what the notebook runs)
 
-Run from a checkout of the pinned commit. Nothing below has been run on a GPU yet.
+Run from a checkout of the pinned commit, writing to Drive. Nothing below has been run on a GPU.
 
 ```bash
 R=/content/drive/MyDrive/mas_runs
@@ -89,55 +96,77 @@ CFG="--config configs/base.yaml configs/colab_12b.yaml --out-root $R"
 PILOT="--name pilot12b --dataset mmlu-pro --pool pilot --n-questions 120 --chunk 20 \
        --conditions self_reconsider debate debate_answer_only misleading_one"
 
-# 1. smoke: worst-case memory stress at batches 4/6/8 over the pilot pool's real token lengths,
-#    then 2 questions through all four conditions with value checks (throwaway job smoke-pilot12b)
-python scripts/run_experiment.py $CFG $PILOT --smoke
-#    read $R/smoke-pilot12b-stress.json and -smoke-report.json; raise model.batch_size with
-#    --set model.batch_size=8 only if the stress report shows it fits
+# 0. confirm free Drive space first (pilot + extras + main plan B ~ 27-30 GB, plus margin)
 
-# 2. pilot: the 120-question pilot pool, all four conditions, capped at 4 hours
+# 1. smoke (throwaway job smoke-pilot12b): stress of the REAL generation + readout/extraction
+#    workload (all layers, all four positions, option probabilities, response likelihood) at
+#    the configured batch size (4) over the pilot pool's measured worst-case lengths; then 2
+#    questions through all four conditions; all 49 layers checked; a fixed own-response
+#    transcript with distracting peer answers checked against the model's own logits
+python scripts/run_experiment.py $CFG $PILOT --smoke
+#    read $R/smoke-pilot12b-stress.json and $R/smoke-pilot12b-smoke-report.json. To try a
+#    larger batch, rerun with --stress-batches 6 8 (informational) and then, if it passes with
+#    the full extraction path, --set model.batch_size=8; the job re-stresses at the new size.
+
+# 2. pilot: the 120 pilot-pool questions, all four conditions, capped at 4 hours
 python scripts/run_experiment.py $CFG $PILOT --max-hours 4
-python scripts/verify_archive.py --out-root $R --name pilot12b
+python scripts/verify_archive.py --out-root $R --name pilot12b      # after EVERY session
 python scripts/summarize_run.py  --out-root $R --name pilot12b
 python scripts/pilot_report.py   --out-root $R --name pilot12b --main-n 600 900 1200 \
-       --main-conditions 2 --out $R/pilot12b-report
+       --main-conditions self_reconsider debate --out $R/pilot12b-report
+#    optional, cheap: three fresh independent answers on the same pilot questions (a six-
+#    independent-sample vote to compare with debate), reusing the pilot's round 0
+python scripts/run_experiment.py $CFG --name pilot12b-indep --parent pilot12b --conditions independent
 
-# 3. main run -- only after docs/preregistration.md is dated. N and conditions from the pilot.
+# 3. BEFORE the main run, and before any main-pool question is generated: date
+#    docs/preregistration.md, then freeze the main questions' split from the same deterministic
+#    selection the driver will make
+python scripts/make_split.py --dataset mmlu-pro --pool main --n-questions 900 \
+       --fracs 0.375 0.125 0.5 --seed SEED --out $R/main12b-split.json
+
+# 4. main run, bound to that split (the driver refuses a split that does not cover exactly
+#    these questions and records its hash in the job identity)
 python scripts/run_experiment.py $CFG --name main12b --dataset mmlu-pro --pool main \
-       --n-questions 900 --chunk 25 --conditions self_reconsider debate --max-hours 12
-python scripts/make_split.py --out-root $R --name main12b --seed SEED --out $R/main12b-split.json
+       --n-questions 900 --chunk 25 --conditions self_reconsider debate --max-hours 12 \
+       --split-manifest $R/main12b-split.json
+python scripts/verify_archive.py --out-root $R --name main12b
 
-# 4. optional, reusing main12b's saved round 0 (never regenerated): answer-only peers and fresh
-#    independent answers on the first 450 / 300 main questions; candidate evaluation on 300
+# 5. optional children, reusing main12b's saved round 0 and its split (never regenerated)
 python scripts/run_experiment.py $CFG --name main12b-answeronly --parent main12b --subset-n 450 \
        --conditions debate_answer_only --max-hours 3
 python scripts/run_experiment.py $CFG --name main12b-indep --parent main12b --subset-n 300 \
        --conditions independent --max-hours 2
+#    candidate evaluation: inspect 10 questions first, then the full set (refuses to overwrite)
 python scripts/run_candidates.py --config configs/base.yaml configs/colab_12b.yaml \
-       --out-root $R --parent main12b --n 300 --split-manifest $R/main12b-split.json --splits train validation test
+       --out-root $R --parent main12b --n 10 --split-manifest $R/main12b-split.json --splits train
+python scripts/run_candidates.py --config configs/base.yaml configs/colab_12b.yaml --force \
+       --out-root $R --parent main12b --n 300 --split-manifest $R/main12b-split.json \
+       --splits train validation test
 
-# 5. archive check before deleting anything from the runtime or moving it
+# 6. before deleting anything: verify an independent second copy (a child's copy includes the
+#    parent round-0 files it points into)
 python scripts/verify_archive.py --out-root $R --name main12b --copy-to /path/to/second/copy
+python scripts/verify_archive.py --out-root $R --name main12b-answeronly --copy-to /path/to/second/copy
 ```
 
-A child job (`--parent`) uses the parent's dataset, pool, config, prompts and model, refuses any
-difference, and reads round 0 from the parent's verified caches. Extending a job: rerun with a
-larger `--n-questions`, a multiple of `--chunk` from a full last chunk.
+A child job (`--parent`) takes the parent's dataset, pool, config, prompts, model and split,
+refuses any difference, and reads round 0 from the parent's verified caches. A job with a split
+cannot be extended (the split fixes its questions); a job without one can be extended by
+rerunning with a larger `--n-questions`, a multiple of `--chunk` from a full last chunk.
 
 ## What has and has not been verified
 
-Verified locally on CPU (stub and Gemma-3-270M; see docs/REVIEW_b56c836_CHANGES.md for the list):
-the whole test suite; the driver end to end on the stub, including child jobs, the archive
-verifier and its restored copy; and on the real Hugging Face path with the 270M model, the
-stress pass over a 120-question pool, exact replay of every generated row, all four activation
-positions with their option probabilities, response log-likelihoods equal to full-sequence
-logits, and batched-vs-single agreement (exact in fp32).
+See docs/REVIEW_8bd3b82_CHANGES.md for the current list and which tests cover each change. In
+short: earlier rounds verified on CPU (stub and Gemma-3-270M) the driver, child jobs, archive
+restore, exact replay, the four positions and their option probabilities, and response
+likelihoods. **The changes in the latest round have tests written but not yet run.**
 
 **Not verified until the first 12B run** (each is checked by the smoke test; see
-docs/GPU_MEASUREMENTS.md): hidden states for all 49 layers at every position, finite; the
-letter-in-context check on the 12B tokenizer; bf16 batched-vs-single agreement; exact replay;
-memory at the pool's worst-case lengths at batches 4/6/8; real seconds per question; that
-`transformers==5.17.0` installs against Colab's torch.
+docs/GPU_MEASUREMENTS.md): all 49 layers × 3,840 finite at every position; the letter-in-context
+check on the 12B tokenizer; the fixed own-response transcript's positions and option
+probabilities against the model's own logits in bf16; bf16 batched-vs-single agreement; exact
+replay; memory of the full extraction workload at the pool's worst-case lengths; real seconds per
+question; that `transformers==5.17.0` installs against Colab's torch.
 
 The `vllm` backend is still not implemented. The Hugging Face backend runs on the GPU; it is slower
 at generation than vLLM but returns hidden states directly, which vLLM does not.
@@ -151,11 +180,15 @@ At that length the KV cache during generation is ~0.39 GB per 1,000 tokens per s
 hidden states during readout ~0.38 GB per 1,000 tokens per sequence, so batch 4 needs ~6 GB for
 each (an upper bound for the cache: most Gemma 3 layers use a 1,024-token sliding window), for a
 peak around 33 GB of the 40. Generation and readout have separate batch sizes (`model.batch_size`,
-`model.readout_batch_size`); both default to 4. The smoke test's stress pass measures the real
-peaks at batches 4, 6 and 8, using the longest prompt in the intended question pool (measured with
-the real tokenizer) plus three full responses, and saves them to `<name>-stress.json`; raise a
-batch size in `OVERRIDES` only if it shows room. A job's own stress pass runs once per GPU type
-and is not repeated on resume. Batch sizes may change between
+`model.readout_batch_size`); both default to 4. The stress pass runs the real generation call
+and the real readout -- hidden states for every layer, all four positions with their option
+probabilities, and the response likelihood -- at the configured batch sizes (plus any
+`--stress-batches` extras, for information), at the longest prompt in the intended question pool
+(measured with the real tokenizer) plus three full responses, and records GPU allocated/reserved
+and host resident peaks in `<name>-stress.json`. Start at batch 4; raise a batch size only after
+a stress pass at that size with the full extraction path. A saved stress report is reused only
+if it tested the current batch sizes, lengths at least as long, and the same code, packages, GPU
+and extraction settings; otherwise the job stresses again. Batch sizes may change between
 sessions of a job; nothing else may.
 
 ## Budget

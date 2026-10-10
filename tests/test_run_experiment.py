@@ -438,3 +438,92 @@ def test_pilot_report_runs_on_a_four_condition_pilot(driver, tmp_path):
     assert rep["power"]["table"] and rep["disk"]["projected_gb"] and "runtime" in rep
     assert (out / "transcripts.md").read_text().count("###") >= 12
     assert pr.required_test_questions(0.03, 0.10) > pr.required_test_questions(0.04, 0.10)
+
+
+def _stress_record(batch=4, rb=4, prompt=1000, readout=2000, cap=768, **env):
+    base = {"identity_sha256": "J", "gpu_identity": {"gpu": "A100"}, "packages": {"torch": "2"},
+            "git_sha": "abc", "likelihood_chunk": 256, "positions": ["readout_last"],
+            "coverage": {"worst_round1_prompt_tokens": prompt, "worst_readout_tokens": readout,
+                         "token_cap": cap}}
+    base.update(env)
+    return {**base, "passed": True, "configured": {"batch_size": batch, "readout_batch_size": rb},
+            "generation": [{"batch": batch, "ok": True}],
+            "readout": [{"batch": rb, "ok": True, "finite_all_layers": True, "likelihood_computed": True}]}
+
+
+def test_stress_report_is_reused_only_when_it_covers_the_current_settings(driver):
+    prior = _stress_record()
+    now = {k: v for k, v in _stress_record().items() if k not in ("generation", "readout", "passed")}
+    assert driver.stress_reusable(prior, now, 4, 4)[0]
+    assert not driver.stress_reusable(prior, now, 8, 4)[0], "a larger generation batch was not tested"
+    assert not driver.stress_reusable(prior, now, 4, 8)[0], "a larger readout batch was not tested"
+    longer = {**now, "coverage": {**now["coverage"], "worst_readout_tokens": 2500}}
+    assert not driver.stress_reusable(prior, longer, 4, 4)[0], "longer appended questions"
+    for k, v in (("packages", {"torch": "3"}), ("git_sha", "def"), ("gpu_identity", {"gpu": "L4"}),
+                 ("likelihood_chunk", 512)):
+        assert not driver.stress_reusable(prior, {**now, k: v}, 4, 4)[0], f"{k} changed"
+    assert not driver.stress_reusable({**prior, "passed": False}, now, 4, 4)[0]
+
+
+def test_headroom_headline_is_not_a_per_question_oracle():
+    import pandas as pd
+
+    summ = _load("summarize_run")
+    vote, after, best = pd.Series([1.0, 0.0]), pd.Series([0.0, 1.0]), pd.Series([1.0, 1.0])
+    head = summ.room_above_better(best, vote, after)
+    assert head["mean"] == 0.5, "ceiling minus the better baseline POLICY (both average 0.5)"
+    assert float((best - pd.concat([vote, after], axis=1).max(axis=1)).mean()) == 0.0  # the oracle version
+
+
+def test_pilot_report_projects_from_completed_questions_and_per_condition_timings(driver, tmp_path):
+    assert driver.main(_args(tmp_path, "--pool", "pilot", "--pilot-size", "40", "--conditions",
+                             "self_reconsider", "debate", "debate_answer_only", "misleading_one",
+                             n=40, chunk=20)) == 0
+    (tmp_path / "t-debate-c001" / "completion.json").unlink()  # one chunk now incomplete
+    pr = _load("pilot_report")
+    out = tmp_path / "r2"
+    assert pr.main(["--out-root", str(tmp_path), "--name", "t", "--out", str(out),
+                    "--main-conditions", "debate"]) == 0
+    rep = json.loads((out / "report.json").read_text())
+    assert rep["questions_completed"] == 20
+    parts = rep["runtime"]["seconds_per_question_by_part"]
+    assert set(parts) >= {"round0", "overhead", "debate", "self_reconsider"}
+    assert "upper reference" not in json.dumps(rep)
+    with pytest.raises(SystemExit, match="not in the pilot"):
+        pr.main(["--out-root", str(tmp_path), "--name", "t", "--out", str(out), "--main-conditions", "adversarial"])
+
+
+def test_an_edited_view_table_fails_verification(driver, tmp_path):
+    import pandas as pd
+
+    from mad.job import JobMismatch, verify_archive
+
+    driver.main(_args(tmp_path, n=4))
+    f = tmp_path / "t-debate" / "agent_states.parquet"
+    rows = pd.read_parquet(f)
+    rows.loc[0, "answer"] = (rows.loc[0, "answer"] + 1) % 4  # a derived label, chunks untouched
+    rows.to_parquet(f, index=False)
+    with pytest.raises(JobMismatch, match="differs from a rebuild"):
+        verify_archive(tmp_path, "t")
+
+
+def test_a_child_alone_restores_into_a_clean_location_with_its_parent_dependency(driver, tmp_path):
+    src, dst = tmp_path / "src", tmp_path / "elsewhere" / "clean"
+    driver.main(_args(src, n=4, chunk=2))
+    assert driver.main(["--config", *STUB, "--out-root", str(src), "--name", "kid", "--parent", "t",
+                        "--subset-n", "3", "--conditions", "independent"]) == 0
+    va = _load("verify_archive")
+    assert va.main(["--out-root", str(src), "--name", "kid", "--copy-to", str(dst)]) == 0
+    rep = json.loads((src / "kid-verify.json").read_text())
+    assert rep["copy_loads_identically"]
+    assert any(n.startswith("t-round0-") for n in rep["copied"]), "the parent's round 0 was not copied"
+    assert not any(n.startswith("t-debate") for n in rep["copied"]), "unrelated parent data was copied"
+
+
+def test_a_child_cannot_be_a_parent(driver, tmp_path):
+    driver.main(_args(tmp_path, n=4, chunk=2))
+    driver.main(["--config", *STUB, "--out-root", str(tmp_path), "--name", "kid", "--parent", "t",
+                 "--conditions", "independent"])
+    with pytest.raises(SystemExit, match="itself a child"):
+        driver.main(["--config", *STUB, "--out-root", str(tmp_path), "--name", "grandkid", "--parent", "kid",
+                     "--conditions", "debate_answer_only"])
