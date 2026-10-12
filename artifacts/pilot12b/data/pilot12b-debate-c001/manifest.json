@@ -1,0 +1,161 @@
+{
+  "backend_d_model": 3840,
+  "backend_n_layers": 48,
+  "chunk": "c001",
+  "condition": "debate",
+  "condition_spec": {
+    "kind": "debate",
+    "name": "debate",
+    "peer_confidence": false,
+    "run_id": "pilot12b-debate-c001"
+  },
+  "config": {
+    "activations": {
+      "dtype": "bfloat16",
+      "layers": "all",
+      "likelihood_chunk": 256,
+      "positions": [
+        "readout_last",
+        "generation_last",
+        "stated_answer",
+        "before_stated_answer"
+      ],
+      "shard_size": 256
+    },
+    "data": {
+      "dataset": "TIGER-Lab/MMLU-Pro",
+      "dataset_revision": null,
+      "n_questions": 120,
+      "permutation_seed": 12345,
+      "sample_seed": 7,
+      "split": "test",
+      "split_fracs": [
+        0.5,
+        0.2,
+        0.3
+      ],
+      "split_seed": 20260909,
+      "stratify": true,
+      "subjects": null
+    },
+    "debate": {
+      "ask_verbalized_confidence": true,
+      "canonical_answer": "stated",
+      "condition": "debate",
+      "n_agents": 3,
+      "n_rounds": 1,
+      "peer_shows_confidence": false,
+      "personas": [
+        "You are a careful, methodical reasoner."
+      ],
+      "tie_break": "round0_then_agent0"
+    },
+    "model": {
+      "backend": "hf",
+      "batch_size": 8,
+      "device": "cuda",
+      "dtype": "bfloat16",
+      "max_new_tokens": 768,
+      "readout_batch_size": 4,
+      "repo_id": "google/gemma-3-12b-it",
+      "revision": null,
+      "temperature": 0.7,
+      "top_p": 0.95
+    },
+    "out_dir": "/content/mas_runs",
+    "run_id": "pilot12b-debate-c001",
+    "seed": 20260909,
+    "stub": {
+      "accuracy_spread": 0.3,
+      "base_accuracy": 0.42,
+      "confidence_noise": 1.1,
+      "confidence_signal": 0.55,
+      "conformity": 0.6,
+      "control_revision_scale": 0.5,
+      "d_model": 64,
+      "difficulty_leak": 0.0,
+      "freetext_noise": 0.03,
+      "n_layers": 8,
+      "noise_scale": 1.0,
+      "peer_exposure_commit": 0.6,
+      "probe_signal": 1.2,
+      "revision_rate_correct": 0.14,
+      "revision_rate_incorrect": 0.28,
+      "signal_peak_layer": 0.6,
+      "switch_to_correct": 0.45
+    }
+  },
+  "config_hash": "c331b4646ab843916faf6708212001cbbf8ac1ec56e7e6ed180304babe128c32",
+  "git_dirty": false,
+  "git_dirty_files": [],
+  "git_sha": "5ff52b38e332546106c18463317f07a21b8b0ae1",
+  "job": "pilot12b",
+  "job_identity_sha256": "58148a2fb833c57546748a6aba657bb3f230f6953c598ed9a95f66c7aacf045d",
+  "kind": "debate",
+  "n_questions": 20,
+  "packages": {
+    "datasets": "5.0.1",
+    "numpy": "2.1.3",
+    "pandas": "2.2.3",
+    "python": "3.13.15",
+    "scikit-learn": "1.6.1",
+    "scipy": "1.16.3",
+    "torch": "2.11.0+cu130",
+    "transformers": "5.17.0",
+    "vllm": null
+  },
+  "peer_shows_confidence": false,
+  "platform": {
+    "machine": "x86_64",
+    "release": "6.6.122+",
+    "system": "Linux"
+  },
+  "prompt_template_hashes": {
+    "adversarial_peer": "b428604be34b875d",
+    "brevity": "ab1d02c3aa05d3cd",
+    "candidate_block": "5d9819941923f9a3",
+    "candidate_system": "caa3691bca130cc9",
+    "ending_conf": "a48849121707c4d7",
+    "ending_no_conf": "558b14973471cf5e",
+    "endorsement": "366342ebd3b084e9",
+    "mild_peer": "22963fb9b187cb53",
+    "peer_answer_only": "ba1f0cd92b83ea19",
+    "peer_block": "e8cff792d7c5f195",
+    "peer_entry": "90ec002c5b81d578",
+    "peer_no_answer": "1e009318543bd6e4",
+    "question": "1e3650fb59d929b6",
+    "readout_suffix": "b12a68884c9ecf8b",
+    "self_block": "9d30c3365474ae99",
+    "system": "5d659e0e90d9f7ef",
+    "system_no_conf": "3c240fc3055975c2"
+  },
+  "question_ids": [
+    "6513",
+    "4948",
+    "1270",
+    "8612",
+    "5446",
+    "10784",
+    "9360",
+    "2290",
+    "2865",
+    "770",
+    "3607",
+    "10764",
+    "7354",
+    "12024",
+    "6316",
+    "4694",
+    "930",
+    "7768",
+    "5797",
+    "11158"
+  ],
+  "round0_reloaded": false,
+  "round0_seed": 768091723,
+  "round1_seed": 2129665783,
+  "run_id": "pilot12b-debate-c001",
+  "shared_round0": true,
+  "split_assignment_sha256": null,
+  "timestamp_start": "2026-10-10T06:08:21+0000"
+}

@@ -1,0 +1,17 @@
+{
+  "timestamp_end": "2026-10-12T12:08:04-0400",
+  "merged_from": [
+    "pilot12b-misleading_one-c000",
+    "pilot12b-misleading_one-c001",
+    "pilot12b-misleading_one-c002",
+    "pilot12b-misleading_one-c003",
+    "pilot12b-misleading_one-c004",
+    "pilot12b-misleading_one-c005"
+  ],
+  "row_counts": {
+    "agent_states": 1080,
+    "activation_states": 3564
+  },
+  "shard_sha256": {},
+  "errors": []
+}

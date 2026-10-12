@@ -1,0 +1,40 @@
+{
+  "chunks": [
+    [
+      0,
+      "pilot12b-self_reconsider-c000",
+      "7b5593db6225ae0f6715e0c311438e870744125b5eb64a8ba023c8224b1a5306"
+    ],
+    [
+      1,
+      "pilot12b-self_reconsider-c001",
+      "f63756674970e3fdc941231cfd37f7922eaab730ec5d3a8cc965948e148cd3eb"
+    ],
+    [
+      2,
+      "pilot12b-self_reconsider-c002",
+      "1db4d30b5c0f10e898d9e5820888077a2d9786d285b4571eb63b271e7c4aa8d1"
+    ],
+    [
+      3,
+      "pilot12b-self_reconsider-c003",
+      "fbea7c35d747f6ea1c4c1d1bfdca03913e9047d7b98fe7518ba5e7d32659b24d"
+    ],
+    [
+      4,
+      "pilot12b-self_reconsider-c004",
+      "253155de8173c3da9231f88329391deae2530f2209d743628b7390792df6c497"
+    ],
+    [
+      5,
+      "pilot12b-self_reconsider-c005",
+      "f0bdb6ecc5750c6f38611ec885bc436be1a8312d7007685aa4522f4dd3d04598"
+    ]
+  ],
+  "chunks_complete": 6,
+  "chunks_total": 6,
+  "complete": true,
+  "questions": 120,
+  "questions_in_job": 120,
+  "hashes_verified": true
+}

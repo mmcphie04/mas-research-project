@@ -1,0 +1,40 @@
+{
+  "chunks": [
+    [
+      0,
+      "pilot12b-misleading_one-c000",
+      "d1a4b9f12d82e3beecb267f10166837ea12f8fbe68e8fd8c8f4423287679aa33"
+    ],
+    [
+      1,
+      "pilot12b-misleading_one-c001",
+      "6308f86b1ea5973dbd9253bdf800663277e900c944e8134b43042235be99149e"
+    ],
+    [
+      2,
+      "pilot12b-misleading_one-c002",
+      "5ec3a261621f54ac241ae5b95f25e520940274c9999cc32059b95009577084ac"
+    ],
+    [
+      3,
+      "pilot12b-misleading_one-c003",
+      "bb840a59c0c9c2027485d8fe74ee0ae6ecee25bed0a4cac5a468af24b037746a"
+    ],
+    [
+      4,
+      "pilot12b-misleading_one-c004",
+      "d698f382c28dbb52b204f684833bcbb0506b7164ad2eda1bec4bbb53cb9504af"
+    ],
+    [
+      5,
+      "pilot12b-misleading_one-c005",
+      "16c480fb7c86e513ab1c5e4276fa8e15cd0b840456bd38fab69bb33fd56b2915"
+    ]
+  ],
+  "chunks_complete": 6,
+  "chunks_total": 6,
+  "complete": true,
+  "questions": 120,
+  "questions_in_job": 120,
+  "hashes_verified": true
+}

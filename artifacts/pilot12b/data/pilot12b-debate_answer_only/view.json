@@ -1,0 +1,40 @@
+{
+  "chunks": [
+    [
+      0,
+      "pilot12b-debate_answer_only-c000",
+      "a6245f5ccc2c281f9a36d86897f9d73abd4c1cb8f7de97f8cc96181196506ca6"
+    ],
+    [
+      1,
+      "pilot12b-debate_answer_only-c001",
+      "65544ae56668dfd4cd607af59700186836e0edd03da3add76b2ee1959616bf98"
+    ],
+    [
+      2,
+      "pilot12b-debate_answer_only-c002",
+      "f4329eeb7c9f662929305389e186c5678230dbab19bd532467c6e9dad8889b0b"
+    ],
+    [
+      3,
+      "pilot12b-debate_answer_only-c003",
+      "6dedac7e94277a76e70a03350ed6bd0f62aca2d34f938a34bf4f7525e1130144"
+    ],
+    [
+      4,
+      "pilot12b-debate_answer_only-c004",
+      "43be7edd338425b929ef7ee09f89954b52c494791ba756b3e53d40a79ad53355"
+    ],
+    [
+      5,
+      "pilot12b-debate_answer_only-c005",
+      "fa533b73b09312728a09a37ab4d228f792266c4b793ce78ab5d16c431b04fb30"
+    ]
+  ],
+  "chunks_complete": 6,
+  "chunks_total": 6,
+  "complete": true,
+  "questions": 120,
+  "questions_in_job": 120,
+  "hashes_verified": true
+}

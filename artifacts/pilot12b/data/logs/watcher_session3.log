@@ -1,0 +1,31 @@
+[09:23:56] watcher started
+[09:26:45] [13:25:45]   model loaded in 101s: 48 layers, d=3840
+[09:26:45] [13:25:45]   stress report pilot12b-stress.json covers these settings; not repeating
+[09:34:34] poll failed (1): RuntimeError: Connection was lost.
+[09:51:43] [13:50:58]   c003: 20 questions in 1513s (76 s/question)  {'device': 'NVIDIA A100-SXM4-40GB', 'peak_allocated_gb': 33.02, 'peak_reserved_gb': 38.32, 'total_gb': 42.41}
+[09:53:34] BACKUP ok: packed 22 items, 647.8 MB: ['pilot12b-debate-c000', 'pilot12b-debate-c001', 'pilot12b-debate-c002', 'pilot12b-debate-c003', 'pilot12b-debate_answer_only-c000', 'pilot12b-debate_answer_only-c001', 'pilot12b-debate_answer_only-c002', 'pilot12b-debate_answer_only-c003', 'pilot12b-misleading_one-c000', 'pilot12b-misleading_one-c001', 'pilot12b-misleading_one-c002', 'pilot12b-misleading_one-c003', 'pilot12b-round0-c003', 'pilot12b-self_reconsider-c000', 'pilot12b-self_reconsider-c001', 'pilot12b-self_reconsider-c002', 'pilot12b-self_reconsider-c003'] downloaded 619M in 105s -> /home/mmcph/projects/mas_research_project/runs/colab 
+[10:01:47] poll failed (1): │   741 │   │   │   elif isinstance(e, ReadTimeoutError):                      │
+[10:01:47] SESSION GONE
+[10:02:21] watcher started
+[10:02:24] [13:25:45]   model loaded in 101s: 48 layers, d=3840
+[10:02:24] [13:25:45]   stress report pilot12b-stress.json covers these settings; not repeating
+[10:02:24] [13:50:58]   c003: 20 questions in 1513s (76 s/question)  {'device': 'NVIDIA A100-SXM4-40GB', 'peak_allocated_gb': 33.02, 'peak_reserved_gb': 38.32, 'total_gb': 42.41}
+[10:03:13] BACKUP ok: packed 7 items, 226.4 MB: ['pilot12b-round0-c004', 'pilot12b-self_reconsider-c004'] downloaded 216M in 44s -> /home/mmcph/projects/mas_research_project/runs/colab 
+[10:15:54] poll failed (1): RuntimeError: Connection was lost.
+[10:16:58] [14:13:17]   c004: 20 questions in 1339s (67 s/question)  {'device': 'NVIDIA A100-SXM4-40GB', 'peak_allocated_gb': 35.7, 'peak_reserved_gb': 41.62, 'total_gb': 42.41}
+[10:18:05] BACKUP ok: packed 8 items, 409.4 MB: ['pilot12b-debate-c004', 'pilot12b-debate_answer_only-c004', 'pilot12b-misleading_one-c004'] downloaded 391M in 63s -> /home/mmcph/projects/mas_research_project/runs/colab 
+[10:28:12] poll failed (1): RuntimeError: Connection was lost.
+[10:42:12] [14:42:11]   c005: 20 questions in 1734s (87 s/question)  {'device': 'NVIDIA A100-SXM4-40GB', 'peak_allocated_gb': 34.7, 'peak_reserved_gb': 38.95, 'total_gb': 42.41}
+[10:44:10] BACKUP ok: packed 14 items, 656.5 MB: ['pilot12b-debate', 'pilot12b-debate-c005', 'pilot12b-debate_answer_only', 'pilot12b-debate_answer_only-c005', 'pilot12b-misleading_one', 'pilot12b-misleading_one-c005', 'pilot12b-round0-c005', 'pilot12b-self_reconsider', 'pilot12b-self_reconsider-c005'] downloaded 627M in 108s -> /home/mmcph/projects/mas_research_project/runs/colab 
+[10:46:53] [14:42:11] VIEW self_reconsider: /content/mas_runs/pilot12b-self_reconsider  {'pre': {'stated_answer_parsed': 0.95, 'hit_token_cap': 0.05, 'stated_agrees_readout': 0.95, 'median_tokens': 172.0}, 'post': {'stated_answer_parsed': 0.9917, 'hit_token_cap': 0.0083,
+[10:46:53] [14:42:11] VIEW debate: /content/mas_runs/pilot12b-debate  {'pre': {'stated_answer_parsed': 0.95, 'hit_token_cap': 0.05, 'stated_agrees_readout': 0.95, 'median_tokens': 172.0}, 'post': {'stated_answer_parsed': 1.0, 'hit_token_cap': 0.0, 'stated_agrees_readout'
+[10:46:53] [14:42:11] VIEW debate_answer_only: /content/mas_runs/pilot12b-debate_answer_only  {'pre': {'stated_answer_parsed': 0.95, 'hit_token_cap': 0.05, 'stated_agrees_readout': 0.95, 'median_tokens': 172.0}, 'post': {'stated_answer_parsed': 1.0, 'hit_token_cap': 0.0,
+[10:46:53] [14:42:11] VIEW misleading_one: /content/mas_runs/pilot12b-misleading_one  {'pre': {'stated_answer_parsed': 0.95, 'hit_token_cap': 0.05, 'stated_agrees_readout': 0.95, 'median_tokens': 172.0}, 'post': {'stated_answer_parsed': 1.0, 'hit_token_cap': 0.0, 'stated
+[10:46:53] [14:42:11] finished; failures this job: 0
+[10:46:53] [14:42:11] VIEW debate_answer_only: /content/mas_runs/pilot12b-debate_answer_only  {'pre': {'stated_answer_parsed': 0.95, 'hit_token_cap': 0.05, 'stated_agrees_readout': 0.95, 'median_tokens': 172.0}, 'post': {'stated_answer_parsed': 1.0, 'hit_token_cap': 0.0,
+[10:46:53] [14:42:11] VIEW misleading_one: /content/mas_runs/pilot12b-misleading_one  {'pre': {'stated_answer_parsed': 0.95, 'hit_token_cap': 0.05, 'stated_agrees_readout': 0.95, 'median_tokens': 172.0}, 'post': {'stated_answer_parsed': 1.0, 'hit_token_cap': 0.0, 'stated
+[10:46:53] PILOT PROCESS EXITED
+[10:47:05] FINAL BACKUP ok: packed 5 items, 0.1 MB: [] downloaded 140K in 3s -> /home/mmcph/projects/mas_research_project/runs/colab 
+[colab] Stopping session 'mas'...
+[colab] Session terminated.
+[10:47:07] SESSION STOPPED

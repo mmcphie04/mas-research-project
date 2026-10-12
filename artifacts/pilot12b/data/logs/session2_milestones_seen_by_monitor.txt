@@ -1,0 +1,7 @@
+[05:28:19]   model loaded in 19s: 48 layers, d=3840
+[05:28:20]   stress (no passing stress report): the real generation and readout/extraction workload at the worst-case lengths, generation batches [8], readout batches [4] ...
+[05:29:45]   stress passed in 85.7s: largest safe batch generation 8, readout 4 (report: pilot12b-stress.json)
+[05:56:18]   c000: 20 questions in 1592s (80 s/question)  {'device': 'NVIDIA A100-SXM4-40GB', 'peak_allocated_gb': 35.23, 'peak_reserved_gb': 41.76, 'total_gb': 42.41}
+[06:20:50]   c001: 20 questions in 1472s (74 s/question)  {'device': 'NVIDIA A100-SXM4-40GB', 'peak_allocated_gb': 35.83, 'peak_reserved_gb': 40.05, 'total_gb': 42.41}
+[06:41:42]   c002: 20 questions in 1252s (63 s/question)  {'device': 'NVIDIA A100-SXM4-40GB', 'peak_allocated_gb': 35.64, 'peak_reserved_gb': 40.05, 'total_gb': 42.41}
+[07:06:13]   c003: 20 questions in 1471s (74 s/question)  {'device': 'NVIDIA A100-SXM4-40GB', 'peak_allocated_gb': 33.02, 'peak_reserved_gb': 40.05, 'total_gb': 42.41}

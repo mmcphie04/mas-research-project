@@ -1,0 +1,14 @@
+[13:24:04] === pilot12b: 120 pilot-pool questions x 4 conditions, dataset=mmlu-pro, model=google/gemma-3-12b-it, tokens=768, batch gen/readout=8/4
+[13:24:04]   code at 5ff52b38e332546106c18463317f07a21b8b0ae1
+[13:25:45]   model loaded in 101s: 48 layers, d=3840
+[13:25:45]   job pilot12b: 6 chunks; history: ['created', 'resumed']
+[13:25:45]   token coverage over all 120 intended questions: {'exact_tokens': True, 'n_questions': 120, 'token_cap': 768, 'round0_prompt_tokens': {'p50': 283, 'p95': 506, 'max': 687}, 'round1_template_overhead': 94, 'worst_round1_prompt_tokens': 3085, 'worst_readout_tokens': 3858}
+[13:25:45]   stress report pilot12b-stress.json covers these settings; not repeating
+[13:50:58]   c003: 20 questions in 1513s (76 s/question)  {'device': 'NVIDIA A100-SXM4-40GB', 'peak_allocated_gb': 33.02, 'peak_reserved_gb': 38.32, 'total_gb': 42.41}
+[14:13:17]   c004: 20 questions in 1339s (67 s/question)  {'device': 'NVIDIA A100-SXM4-40GB', 'peak_allocated_gb': 35.7, 'peak_reserved_gb': 41.62, 'total_gb': 42.41}
+[14:42:11]   c005: 20 questions in 1734s (87 s/question)  {'device': 'NVIDIA A100-SXM4-40GB', 'peak_allocated_gb': 34.7, 'peak_reserved_gb': 38.95, 'total_gb': 42.41}
+[14:42:11] VIEW self_reconsider: /content/mas_runs/pilot12b-self_reconsider  {'pre': {'stated_answer_parsed': 0.95, 'hit_token_cap': 0.05, 'stated_agrees_readout': 0.95, 'median_tokens': 172.0}, 'post': {'stated_answer_parsed': 0.9917, 'hit_token_cap': 0.0083, 'stated_agrees_readout': 0.9861, 'median_tokens': 166.0}}
+[14:42:11] VIEW debate: /content/mas_runs/pilot12b-debate  {'pre': {'stated_answer_parsed': 0.95, 'hit_token_cap': 0.05, 'stated_agrees_readout': 0.95, 'median_tokens': 172.0}, 'post': {'stated_answer_parsed': 1.0, 'hit_token_cap': 0.0, 'stated_agrees_readout': 1.0, 'median_tokens': 145.0}}
+[14:42:11] VIEW debate_answer_only: /content/mas_runs/pilot12b-debate_answer_only  {'pre': {'stated_answer_parsed': 0.95, 'hit_token_cap': 0.05, 'stated_agrees_readout': 0.95, 'median_tokens': 172.0}, 'post': {'stated_answer_parsed': 1.0, 'hit_token_cap': 0.0, 'stated_agrees_readout': 0.9972, 'median_tokens': 144.0}}
+[14:42:11] VIEW misleading_one: /content/mas_runs/pilot12b-misleading_one  {'pre': {'stated_answer_parsed': 0.95, 'hit_token_cap': 0.05, 'stated_agrees_readout': 0.95, 'median_tokens': 172.0}, 'post': {'stated_answer_parsed': 1.0, 'hit_token_cap': 0.0, 'stated_agrees_readout': 0.9972, 'median_tokens': 158.0}}
+[14:42:11] finished; failures this job: 0

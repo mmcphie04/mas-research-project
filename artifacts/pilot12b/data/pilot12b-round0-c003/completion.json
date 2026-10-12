@@ -1,0 +1,15 @@
+{
+  "errors": [],
+  "row_counts": {
+    "records": 60
+  },
+  "shard_sha256": {
+    "manifest.json": "a77c87437526fc132819f954c283f32246baa01357cae7d789b79e330bf7f262",
+    "round0.jsonl": "6cc912f685ebd3d437cc62bab6ad5aa8d781f1452372be63cc610e741671fbb4",
+    "round0_hidden_before_stated_answer.npy": "f607d5f0c85d5d8e16ad69feafb16c395b280e58ec6a9c3ae762c37705d5e89d",
+    "round0_hidden_generation_last.npy": "19ff1af6f6a7c542c33ff66acca0c8f1d67e879ef46c9972e6e7ce027a1a500e",
+    "round0_hidden_readout_last.npy": "9817bc8bab38d46c343562c3ecff593c9bfc643c01ee52bf75e071e03cd50623",
+    "round0_hidden_stated_answer.npy": "72be682d992346c7b9f283978927f8073a3a3bf837af8ed2f105890b3b51c91f"
+  },
+  "timestamp_end": "2026-10-10T13:31:47+0000"
+}

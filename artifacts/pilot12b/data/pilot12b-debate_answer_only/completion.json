@@ -1,0 +1,17 @@
+{
+  "timestamp_end": "2026-10-12T12:08:00-0400",
+  "merged_from": [
+    "pilot12b-debate_answer_only-c000",
+    "pilot12b-debate_answer_only-c001",
+    "pilot12b-debate_answer_only-c002",
+    "pilot12b-debate_answer_only-c003",
+    "pilot12b-debate_answer_only-c004",
+    "pilot12b-debate_answer_only-c005"
+  ],
+  "row_counts": {
+    "agent_states": 1080,
+    "activation_states": 3564
+  },
+  "shard_sha256": {},
+  "errors": []
+}

@@ -1,0 +1,17 @@
+{
+  "timestamp_end": "2026-10-12T12:07:52-0400",
+  "merged_from": [
+    "pilot12b-self_reconsider-c000",
+    "pilot12b-self_reconsider-c001",
+    "pilot12b-self_reconsider-c002",
+    "pilot12b-self_reconsider-c003",
+    "pilot12b-self_reconsider-c004",
+    "pilot12b-self_reconsider-c005"
+  ],
+  "row_counts": {
+    "agent_states": 1080,
+    "activation_states": 3558
+  },
+  "shard_sha256": {},
+  "errors": []
+}

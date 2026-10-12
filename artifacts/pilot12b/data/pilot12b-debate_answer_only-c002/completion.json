@@ -1,0 +1,27 @@
+{
+  "errors": [],
+  "row_counts": {
+    "activation_states": 594,
+    "agent_states": 180,
+    "questions": 20
+  },
+  "shard_sha256": {
+    "../pilot12b-round0-c002/round0_hidden_before_stated_answer.npy": "9c254bfa6112228879ee42da8db42ce4081195a2914db92e4e75a29125019410",
+    "../pilot12b-round0-c002/round0_hidden_generation_last.npy": "2f7270f73cdb350ea758c6ee175214b89fb001e38e374ba9dd5414262e826454",
+    "../pilot12b-round0-c002/round0_hidden_readout_last.npy": "2725c82000258bd28433160c8b8a39f6d05d4a55d1997e66e7629a3d490d65fc",
+    "../pilot12b-round0-c002/round0_hidden_stated_answer.npy": "936e65eb311c2ae38375cae3dbf1e527bfe86f45cef1fcac231d42e4b8d2056c",
+    "activation_index.parquet": "a714d3000a229ea594caf82579b3f500ae0cc8cddd83303251ae4089d98ff8de",
+    "activation_meta.parquet": "6dc84341c24cab8bd1a64a35685faa1952004c333d4ab88ff468a0983ce2fd20",
+    "acts_0000.npy": "26239208d46ee1a36ccd7f77af2d7f1853e58b946039fa58ffc4e615ac731e42",
+    "acts_0001.npy": "8ecb6260a0f70dadf8b92548c92859caf9c827b248260b06700adf75fe000b9c",
+    "agent_states.parquet": "bee569a6723aa23dc6b41c416eed225eb555b882bedc048d485577a14ef8fe45",
+    "transcripts.jsonl": "b2d603c7507906431889fdfc4e7bb0e2255b6987035b9fd07074d8179244b8d1"
+  },
+  "timestamp_end": "2026-10-10T06:38:18+0000",
+  "timings": {
+    "exposure_readout_s": 7.25,
+    "generation_s": 184.63,
+    "readout_s": 9.6,
+    "write_s": 0.69
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "job": "pilot12b",
+  "identity_sha256": "58148a2fb833c57546748a6aba657bb3f230f6953c598ed9a95f66c7aacf045d",
+  "chunks": {
+    "pilot12b-self_reconsider-c000": "ok",
+    "pilot12b-debate-c000": "ok",
+    "pilot12b-debate_answer_only-c000": "ok",
+    "pilot12b-misleading_one-c000": "ok",
+    "pilot12b-self_reconsider-c001": "ok",
+    "pilot12b-debate-c001": "ok",
+    "pilot12b-debate_answer_only-c001": "ok",
+    "pilot12b-misleading_one-c001": "ok",
+    "pilot12b-self_reconsider-c002": "ok",
+    "pilot12b-debate-c002": "ok",
+    "pilot12b-debate_answer_only-c002": "ok",
+    "pilot12b-misleading_one-c002": "ok",
+    "pilot12b-self_reconsider-c003": "ok",
+    "pilot12b-debate-c003": "ok",
+    "pilot12b-debate_answer_only-c003": "ok",
+    "pilot12b-misleading_one-c003": "ok",
+    "pilot12b-self_reconsider-c004": "ok",
+    "pilot12b-debate-c004": "ok",
+    "pilot12b-debate_answer_only-c004": "ok",
+    "pilot12b-misleading_one-c004": "ok",
+    "pilot12b-self_reconsider-c005": "ok",
+    "pilot12b-debate-c005": "ok",
+    "pilot12b-debate_answer_only-c005": "ok",
+    "pilot12b-misleading_one-c005": "ok"
+  },
+  "views": {
+    "self_reconsider": {
+      "questions": 120,
+      "states": 3558,
+      "layers": 49,
+      "d_model": 3840,
+      "by_phase_and_position": {
+        "peer_exposure/generation_last": 360,
+        "peer_exposure/readout_last": 360,
+        "post/before_stated_answer": 357,
+        "post/generation_last": 360,
+        "post/readout_last": 360,
+        "post/stated_answer": 357,
+        "pre/before_stated_answer": 342,
+        "pre/generation_last": 360,
+        "pre/readout_last": 360,
+        "pre/stated_answer": 342
+      }
+    },
+    "debate": {
+      "questions": 120,
+      "states": 3564,
+      "layers": 49,
+      "d_model": 3840,
+      "by_phase_and_position": {
+        "peer_exposure/generation_last": 360,
+        "peer_exposure/readout_last": 360,
+        "post/before_stated_answer": 360,
+        "post/generation_last": 360,
+        "post/readout_last": 360,
+        "post/stated_answer": 360,
+        "pre/before_stated_answer": 342,
+        "pre/generation_last": 360,
+        "pre/readout_last": 360,
+        "pre/stated_answer": 342
+      }
+    },
+    "debate_answer_only": {
+      "questions": 120,
+      "states": 3564,
+      "layers": 49,
+      "d_model": 3840,
+      "by_phase_and_position": {
+        "peer_exposure/generation_last": 360,
+        "peer_exposure/readout_last": 360,
+        "post/before_stated_answer": 360,
+        "post/generation_last": 360,
+        "post/readout_last": 360,
+        "post/stated_answer": 360,
+        "pre/before_stated_answer": 342,
+        "pre/generation_last": 360,
+        "pre/readout_last": 360,
+        "pre/stated_answer": 342
+      }
+    },
+    "misleading_one": {
+      "questions": 120,
+      "states": 3564,
+      "layers": 49,
+      "d_model": 3840,
+      "by_phase_and_position": {
+        "peer_exposure/generation_last": 360,
+        "peer_exposure/readout_last": 360,
+        "post/before_stated_answer": 360,
+        "post/generation_last": 360,
+        "post/readout_last": 360,
+        "post/stated_answer": 360,
+        "pre/before_stated_answer": 342,
+        "pre/generation_last": 360,
+        "pre/readout_last": 360,
+        "pre/stated_answer": 342
+      }
+    }
+  },
+  "ok": true
+}

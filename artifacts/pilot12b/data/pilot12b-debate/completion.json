@@ -1,0 +1,17 @@
+{
+  "timestamp_end": "2026-10-12T12:07:56-0400",
+  "merged_from": [
+    "pilot12b-debate-c000",
+    "pilot12b-debate-c001",
+    "pilot12b-debate-c002",
+    "pilot12b-debate-c003",
+    "pilot12b-debate-c004",
+    "pilot12b-debate-c005"
+  ],
+  "row_counts": {
+    "agent_states": 1080,
+    "activation_states": 3564
+  },
+  "shard_sha256": {},
+  "errors": []
+}
