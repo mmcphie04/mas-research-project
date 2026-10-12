@@ -1,0 +1,2621 @@
+{
+  "events_total": 360,
+  "lp_source": "agent_states.readout_logprobs",
+  "time": "exposure",
+  "output_positions": [
+    "before_stated_answer",
+    "generation_last"
+  ],
+  "output_features": [
+    "p_old@pre",
+    "margin@pre",
+    "entropy@pre",
+    "lp0@pre",
+    "lp1@pre",
+    "lp2@pre",
+    "lp3@pre",
+    "lp4@pre",
+    "lp5@pre",
+    "lp6@pre",
+    "lp7@pre",
+    "lp8@pre",
+    "lp9@pre",
+    "verbal_conf_pre",
+    "verbal_conf_pre_missing",
+    "len_pre",
+    "response_logprob_mean_pre",
+    "response_logprob_missing_pre",
+    "response_logprob_min_pre",
+    "fallback_pre",
+    "hit_cap_pre",
+    "stated_vs_readout_disagree_pre",
+    "panel_agree_old",
+    "old_is_0",
+    "old_is_1",
+    "old_is_2",
+    "old_is_3",
+    "old_is_4",
+    "old_is_5",
+    "old_is_6",
+    "old_is_7",
+    "old_is_8",
+    "old_is_9",
+    "n_shown",
+    "shown_agree_old",
+    "p_old@exposure",
+    "margin@exposure",
+    "entropy@exposure",
+    "lp0@exposure",
+    "lp1@exposure",
+    "lp2@exposure",
+    "lp3@exposure",
+    "lp4@exposure",
+    "lp5@exposure",
+    "lp6@exposure",
+    "lp7@exposure",
+    "lp8@exposure",
+    "lp9@exposure",
+    "pos:p_old@pre@before_stated_answer",
+    "pos:margin@pre@before_stated_answer",
+    "pos:entropy@pre@before_stated_answer",
+    "pos:lp0@pre@before_stated_answer",
+    "pos:lp1@pre@before_stated_answer",
+    "pos:lp2@pre@before_stated_answer",
+    "pos:lp3@pre@before_stated_answer",
+    "pos:lp4@pre@before_stated_answer",
+    "pos:lp5@pre@before_stated_answer",
+    "pos:lp6@pre@before_stated_answer",
+    "pos:lp7@pre@before_stated_answer",
+    "pos:lp8@pre@before_stated_answer",
+    "pos:lp9@pre@before_stated_answer",
+    "pos:missing@pre@before_stated_answer",
+    "pos:p_old@pre@generation_last",
+    "pos:margin@pre@generation_last",
+    "pos:entropy@pre@generation_last",
+    "pos:lp0@pre@generation_last",
+    "pos:lp1@pre@generation_last",
+    "pos:lp2@pre@generation_last",
+    "pos:lp3@pre@generation_last",
+    "pos:lp4@pre@generation_last",
+    "pos:lp5@pre@generation_last",
+    "pos:lp6@pre@generation_last",
+    "pos:lp7@pre@generation_last",
+    "pos:lp8@pre@generation_last",
+    "pos:lp9@pre@generation_last",
+    "pos:missing@pre@generation_last",
+    "pos:p_old@exposure@generation_last",
+    "pos:margin@exposure@generation_last",
+    "pos:entropy@exposure@generation_last",
+    "pos:lp0@exposure@generation_last",
+    "pos:lp1@exposure@generation_last",
+    "pos:lp2@exposure@generation_last",
+    "pos:lp3@exposure@generation_last",
+    "pos:lp4@exposure@generation_last",
+    "pos:lp5@exposure@generation_last",
+    "pos:lp6@exposure@generation_last",
+    "pos:lp7@exposure@generation_last",
+    "pos:lp8@exposure@generation_last",
+    "pos:lp9@exposure@generation_last",
+    "pos:missing@exposure@generation_last"
+  ],
+  "output_features_readout_only": [
+    "p_old@pre",
+    "margin@pre",
+    "entropy@pre",
+    "lp0@pre",
+    "lp1@pre",
+    "lp2@pre",
+    "lp3@pre",
+    "lp4@pre",
+    "lp5@pre",
+    "lp6@pre",
+    "lp7@pre",
+    "lp8@pre",
+    "lp9@pre",
+    "verbal_conf_pre",
+    "verbal_conf_pre_missing",
+    "len_pre",
+    "response_logprob_mean_pre",
+    "response_logprob_missing_pre",
+    "response_logprob_min_pre",
+    "fallback_pre",
+    "hit_cap_pre",
+    "stated_vs_readout_disagree_pre",
+    "panel_agree_old",
+    "old_is_0",
+    "old_is_1",
+    "old_is_2",
+    "old_is_3",
+    "old_is_4",
+    "old_is_5",
+    "old_is_6",
+    "old_is_7",
+    "old_is_8",
+    "old_is_9",
+    "n_shown",
+    "shown_agree_old",
+    "p_old@exposure",
+    "margin@exposure",
+    "entropy@exposure",
+    "lp0@exposure",
+    "lp1@exposure",
+    "lp2@exposure",
+    "lp3@exposure",
+    "lp4@exposure",
+    "lp5@exposure",
+    "lp6@exposure",
+    "lp7@exposure",
+    "lp8@exposure",
+    "lp9@exposure"
+  ],
+  "questions_dropped_missing_states": [],
+  "events_used": 360,
+  "questions_used": 120,
+  "revised_used": 110,
+  "position": "readout_last",
+  "exposure_position": "readout_last",
+  "activation_phases": [
+    "pre",
+    "peer_exposure"
+  ],
+  "candidate_layers": [
+    12,
+    24,
+    31,
+    38,
+    44,
+    48
+  ],
+  "run": "runs/colab/pilot12b-debate",
+  "mode": "cv",
+  "tie_break": "round0_then_agent0",
+  "families": [
+    "output_linear",
+    "output_hgb",
+    "activation",
+    "combined"
+  ],
+  "n_boot": 10000,
+  "gates": {
+    "keys": [
+      "difference_panel",
+      "difference_agent",
+      "protect_panel",
+      "protect_agent"
+    ],
+    "primary": "difference_panel",
+    "rules": {
+      "difference": "accept iff P(new) - P(old) > tau",
+      "protect": "accept iff P(old) <= tau (keep confident first answers)"
+    },
+    "objectives": {
+      "panel": "primary",
+      "agent": "secondary"
+    }
+  },
+  "results": [
+    {
+      "families": {
+        "output_linear": {
+          "old_correct": {
+            "auroc_all": 0.7157538538663992,
+            "auroc_all_ci95": [
+              0.635649601859553,
+              0.7902120284836334
+            ],
+            "auroc_revised": 0.6013621794871795,
+            "auroc_revised_ci95": [
+              0.4811519084874348,
+              0.7217075884580915
+            ],
+            "auroc_within_question": 0.6129032258064516,
+            "within_question_pairs": 62,
+            "brier": 0.214573236412046,
+            "logloss": 0.6184471865805549,
+            "ece": 0.03461076958156006,
+            "sd": 0.1776319312414797
+          },
+          "new_correct": {
+            "auroc_all": 0.7464594560721896,
+            "auroc_all_ci95": [
+              0.6687013656610953,
+              0.8171757931865928
+            ],
+            "auroc_revised": 0.6073717948717949,
+            "auroc_revised_ci95": [
+              0.475356120826709,
+              0.72751494545151
+            ],
+            "auroc_within_question": 0.375,
+            "within_question_pairs": 48,
+            "brier": 0.20376695554142618,
+            "logloss": 0.5943236675743238,
+            "ece": 0.06662157477887645,
+            "sd": 0.1894826226369971
+          },
+          "gate_difference_panel": {
+            "agent_accuracy": 0.5583333333333333,
+            "panel_accuracy": 0.55,
+            "beneficial_kept": 16,
+            "beneficial_lost": 16,
+            "harmful_blocked": 15,
+            "harmful_accepted": 17,
+            "unhelpful_accepted": 23,
+            "revisions_accepted": 56,
+            "revisions": 110
+          },
+          "gate_difference_agent": {
+            "agent_accuracy": 0.5388888888888889,
+            "panel_accuracy": 0.525,
+            "beneficial_kept": 15,
+            "beneficial_lost": 17,
+            "harmful_blocked": 9,
+            "harmful_accepted": 23,
+            "unhelpful_accepted": 28,
+            "revisions_accepted": 66,
+            "revisions": 110
+          },
+          "gate_protect_panel": {
+            "agent_accuracy": 0.5527777777777778,
+            "panel_accuracy": 0.525,
+            "beneficial_kept": 12,
+            "beneficial_lost": 20,
+            "harmful_blocked": 17,
+            "harmful_accepted": 15,
+            "unhelpful_accepted": 18,
+            "revisions_accepted": 45,
+            "revisions": 110
+          },
+          "gate_protect_agent": {
+            "agent_accuracy": 0.5527777777777778,
+            "panel_accuracy": 0.525,
+            "beneficial_kept": 12,
+            "beneficial_lost": 20,
+            "harmful_blocked": 17,
+            "harmful_accepted": 15,
+            "unhelpful_accepted": 19,
+            "revisions_accepted": 46,
+            "revisions": 110
+          }
+        },
+        "output_hgb": {
+          "old_correct": {
+            "auroc_all": 0.7403810001253289,
+            "auroc_all_ci95": [
+              0.6662472993827161,
+              0.8104260019924379
+            ],
+            "auroc_revised": 0.6045673076923077,
+            "auroc_revised_ci95": [
+              0.5003661735823863,
+              0.711547252621979
+            ],
+            "auroc_within_question": 0.7096774193548387,
+            "within_question_pairs": 62,
+            "brier": 0.2063891638521202,
+            "logloss": 0.601558345327891,
+            "ece": 0.0437570203992217,
+            "sd": 0.1601770544164419
+          },
+          "new_correct": {
+            "auroc_all": 0.7582090487529766,
+            "auroc_all_ci95": [
+              0.6870845128558726,
+              0.8223423389320281
+            ],
+            "auroc_revised": 0.5961538461538461,
+            "auroc_revised_ci95": [
+              0.46984721242125416,
+              0.7203718637992831
+            ],
+            "auroc_within_question": 0.5416666666666666,
+            "within_question_pairs": 48,
+            "brier": 0.20169403421745397,
+            "logloss": 0.5876750051339927,
+            "ece": 0.06197601670550241,
+            "sd": 0.1755294445402386
+          },
+          "gate_difference_panel": {
+            "agent_accuracy": 0.5583333333333333,
+            "panel_accuracy": 0.5416666666666666,
+            "beneficial_kept": 19,
+            "beneficial_lost": 13,
+            "harmful_blocked": 12,
+            "harmful_accepted": 20,
+            "unhelpful_accepted": 27,
+            "revisions_accepted": 66,
+            "revisions": 110
+          },
+          "gate_difference_agent": {
+            "agent_accuracy": 0.5638888888888889,
+            "panel_accuracy": 0.55,
+            "beneficial_kept": 16,
+            "beneficial_lost": 16,
+            "harmful_blocked": 17,
+            "harmful_accepted": 15,
+            "unhelpful_accepted": 22,
+            "revisions_accepted": 53,
+            "revisions": 110
+          },
+          "gate_protect_panel": {
+            "agent_accuracy": 0.55,
+            "panel_accuracy": 0.5166666666666667,
+            "beneficial_kept": 15,
+            "beneficial_lost": 17,
+            "harmful_blocked": 13,
+            "harmful_accepted": 19,
+            "unhelpful_accepted": 27,
+            "revisions_accepted": 61,
+            "revisions": 110
+          },
+          "gate_protect_agent": {
+            "agent_accuracy": 0.5527777777777778,
+            "panel_accuracy": 0.5166666666666667,
+            "beneficial_kept": 16,
+            "beneficial_lost": 16,
+            "harmful_blocked": 13,
+            "harmful_accepted": 19,
+            "unhelpful_accepted": 25,
+            "revisions_accepted": 60,
+            "revisions": 110
+          }
+        },
+        "activation": {
+          "old_correct": {
+            "auroc_all": 0.7361511467602456,
+            "auroc_all_ci95": [
+              0.6573387390865268,
+              0.8095920671244329
+            ],
+            "auroc_revised": 0.5208333333333333,
+            "auroc_revised_ci95": [
+              0.38339044401544403,
+              0.6671390879664101
+            ],
+            "auroc_within_question": 0.5806451612903226,
+            "within_question_pairs": 62,
+            "brier": 0.20754465233134564,
+            "logloss": 0.6022306434762933,
+            "ece": 0.06549786347293075,
+            "sd": 0.1918592617141552
+          },
+          "new_correct": {
+            "auroc_all": 0.7466161173079333,
+            "auroc_all_ci95": [
+              0.664887521062479,
+              0.8209929113084812
+            ],
+            "auroc_revised": 0.6414262820512822,
+            "auroc_revised_ci95": [
+              0.5058115162365286,
+              0.7744891533197983
+            ],
+            "auroc_within_question": 0.5208333333333334,
+            "within_question_pairs": 48,
+            "brier": 0.2036246183936871,
+            "logloss": 0.5928271412987437,
+            "ece": 0.05620046079597567,
+            "sd": 0.19888428263338043
+          },
+          "gate_difference_panel": {
+            "agent_accuracy": 0.5444444444444444,
+            "panel_accuracy": 0.525,
+            "beneficial_kept": 16,
+            "beneficial_lost": 16,
+            "harmful_blocked": 10,
+            "harmful_accepted": 22,
+            "unhelpful_accepted": 18,
+            "revisions_accepted": 56,
+            "revisions": 110
+          },
+          "gate_difference_agent": {
+            "agent_accuracy": 0.5527777777777778,
+            "panel_accuracy": 0.55,
+            "beneficial_kept": 16,
+            "beneficial_lost": 16,
+            "harmful_blocked": 13,
+            "harmful_accepted": 19,
+            "unhelpful_accepted": 16,
+            "revisions_accepted": 51,
+            "revisions": 110
+          },
+          "gate_protect_panel": {
+            "agent_accuracy": 0.5416666666666666,
+            "panel_accuracy": 0.525,
+            "beneficial_kept": 11,
+            "beneficial_lost": 21,
+            "harmful_blocked": 14,
+            "harmful_accepted": 18,
+            "unhelpful_accepted": 24,
+            "revisions_accepted": 53,
+            "revisions": 110
+          },
+          "gate_protect_agent": {
+            "agent_accuracy": 0.5361111111111111,
+            "panel_accuracy": 0.525,
+            "beneficial_kept": 12,
+            "beneficial_lost": 20,
+            "harmful_blocked": 11,
+            "harmful_accepted": 21,
+            "unhelpful_accepted": 30,
+            "revisions_accepted": 63,
+            "revisions": 110
+          }
+        },
+        "combined": {
+          "old_correct": {
+            "auroc_all": 0.7226156159919789,
+            "auroc_all_ci95": [
+              0.6416777698863637,
+              0.7990737002192833
+            ],
+            "auroc_revised": 0.516426282051282,
+            "auroc_revised_ci95": [
+              0.3747577080142364,
+              0.6684263289656794
+            ],
+            "auroc_within_question": 0.5161290322580645,
+            "within_question_pairs": 62,
+            "brier": 0.2131521702913607,
+            "logloss": 0.6147726419207794,
+            "ece": 0.07983101879054366,
+            "sd": 0.1888706180471956
+          },
+          "new_correct": {
+            "auroc_all": 0.7349291891214438,
+            "auroc_all_ci95": [
+              0.6513289427660552,
+              0.8113961461783358
+            ],
+            "auroc_revised": 0.6642628205128205,
+            "auroc_revised_ci95": [
+              0.5371998006507545,
+              0.7828025260283324
+            ],
+            "auroc_within_question": 0.5416666666666666,
+            "within_question_pairs": 48,
+            "brier": 0.20717690541332803,
+            "logloss": 0.60129813374561,
+            "ece": 0.050654993664440394,
+            "sd": 0.1903698915242161
+          },
+          "gate_difference_panel": {
+            "agent_accuracy": 0.5527777777777778,
+            "panel_accuracy": 0.5333333333333333,
+            "beneficial_kept": 21,
+            "beneficial_lost": 11,
+            "harmful_blocked": 8,
+            "harmful_accepted": 24,
+            "unhelpful_accepted": 22,
+            "revisions_accepted": 67,
+            "revisions": 110
+          },
+          "gate_difference_agent": {
+            "agent_accuracy": 0.55,
+            "panel_accuracy": 0.55,
+            "beneficial_kept": 17,
+            "beneficial_lost": 15,
+            "harmful_blocked": 11,
+            "harmful_accepted": 21,
+            "unhelpful_accepted": 16,
+            "revisions_accepted": 54,
+            "revisions": 110
+          },
+          "gate_protect_panel": {
+            "agent_accuracy": 0.5444444444444444,
+            "panel_accuracy": 0.525,
+            "beneficial_kept": 12,
+            "beneficial_lost": 20,
+            "harmful_blocked": 14,
+            "harmful_accepted": 18,
+            "unhelpful_accepted": 24,
+            "revisions_accepted": 54,
+            "revisions": 110
+          },
+          "gate_protect_agent": {
+            "agent_accuracy": 0.5416666666666666,
+            "panel_accuracy": 0.5333333333333333,
+            "beneficial_kept": 18,
+            "beneficial_lost": 14,
+            "harmful_blocked": 7,
+            "harmful_accepted": 25,
+            "unhelpful_accepted": 34,
+            "revisions_accepted": 77,
+            "revisions": 110
+          }
+        }
+      },
+      "reference": {
+        "accept_all": {
+          "agent_accuracy": 0.5611111111111111,
+          "panel_accuracy": 0.5583333333333333
+        },
+        "reject_all": {
+          "agent_accuracy": 0.5611111111111111,
+          "panel_accuracy": 0.575
+        },
+        "agent_optimal_not_a_panel_bound": {
+          "agent_accuracy": 0.65,
+          "panel_accuracy": 0.65
+        },
+        "panel_optimal": {
+          "agent_accuracy": 0.5861111111111111,
+          "panel_accuracy": 0.65
+        }
+      },
+      "constant_training_rate": {
+        "old_correct": {
+          "brier": 0.2520206404320987,
+          "logloss": 0.697388573457309,
+          "ece": 0.07916666666666666,
+          "auroc_all": 0.5
+        },
+        "new_correct": {
+          "brier": 0.2520206404320987,
+          "logloss": 0.6973840717654309,
+          "ece": 0.07916666666666666,
+          "auroc_all": 0.5
+        }
+      },
+      "paired_panel": {
+        "difference_panel": {
+          "activation - output_linear": {
+            "mean": -0.025,
+            "ci95": [
+              -0.075,
+              0.025
+            ],
+            "n_questions": 120
+          },
+          "activation - output_hgb": {
+            "mean": -0.016666666666666666,
+            "ci95": [
+              -0.058333333333333334,
+              0.025
+            ],
+            "n_questions": 120
+          },
+          "combined - output_linear": {
+            "mean": -0.016666666666666666,
+            "ci95": [
+              -0.075,
+              0.041666666666666664
+            ],
+            "n_questions": 120
+          },
+          "combined - output_hgb": {
+            "mean": -0.008333333333333333,
+            "ci95": [
+              -0.05,
+              0.03333333333333333
+            ],
+            "n_questions": 120
+          },
+          "output_linear - accept_all": {
+            "mean": -0.008333333333333333,
+            "ci95": [
+              -0.058333333333333334,
+              0.041666666666666664
+            ],
+            "n_questions": 120
+          },
+          "output_linear - reject_all": {
+            "mean": -0.025,
+            "ci95": [
+              -0.06666666666666667,
+              0.008333333333333333
+            ],
+            "n_questions": 120
+          },
+          "output_hgb - accept_all": {
+            "mean": -0.016666666666666666,
+            "ci95": [
+              -0.058333333333333334,
+              0.025
+            ],
+            "n_questions": 120
+          },
+          "output_hgb - reject_all": {
+            "mean": -0.03333333333333333,
+            "ci95": [
+              -0.09166666666666666,
+              0.016666666666666666
+            ],
+            "n_questions": 120
+          },
+          "activation - accept_all": {
+            "mean": -0.03333333333333333,
+            "ci95": [
+              -0.075,
+              0.0
+            ],
+            "n_questions": 120
+          },
+          "activation - reject_all": {
+            "mean": -0.05,
+            "ci95": [
+              -0.10833333333333334,
+              0.008333333333333333
+            ],
+            "n_questions": 120
+          },
+          "combined - accept_all": {
+            "mean": -0.025,
+            "ci95": [
+              -0.06666666666666667,
+              0.008333333333333333
+            ],
+            "n_questions": 120
+          },
+          "combined - reject_all": {
+            "mean": -0.041666666666666664,
+            "ci95": [
+              -0.10833333333333334,
+              0.025
+            ],
+            "n_questions": 120
+          }
+        },
+        "difference_agent": {
+          "activation - output_linear": {
+            "mean": 0.025,
+            "ci95": [
+              -0.008333333333333333,
+              0.06666666666666667
+            ],
+            "n_questions": 120
+          },
+          "activation - output_hgb": {
+            "mean": 0.0,
+            "ci95": [
+              -0.05,
+              0.05
+            ],
+            "n_questions": 120
+          },
+          "combined - output_linear": {
+            "mean": 0.025,
+            "ci95": [
+              -0.008333333333333333,
+              0.06666666666666667
+            ],
+            "n_questions": 120
+          },
+          "combined - output_hgb": {
+            "mean": 0.0,
+            "ci95": [
+              -0.05,
+              0.05
+            ],
+            "n_questions": 120
+          },
+          "output_linear - accept_all": {
+            "mean": -0.03333333333333333,
+            "ci95": [
+              -0.075,
+              0.008333333333333333
+            ],
+            "n_questions": 120
+          },
+          "output_linear - reject_all": {
+            "mean": -0.05,
+            "ci95": [
+              -0.1,
+              -0.008333333333333333
+            ],
+            "n_questions": 120
+          },
+          "output_hgb - accept_all": {
+            "mean": -0.008333333333333333,
+            "ci95": [
+              -0.058333333333333334,
+              0.041666666666666664
+            ],
+            "n_questions": 120
+          },
+          "output_hgb - reject_all": {
+            "mean": -0.025,
+            "ci95": [
+              -0.06666666666666667,
+              0.008333333333333333
+            ],
+            "n_questions": 120
+          },
+          "activation - accept_all": {
+            "mean": -0.008333333333333333,
+            "ci95": [
+              -0.041666666666666664,
+              0.025
+            ],
+            "n_questions": 120
+          },
+          "activation - reject_all": {
+            "mean": -0.025,
+            "ci95": [
+              -0.08333333333333333,
+              0.025
+            ],
+            "n_questions": 120
+          },
+          "combined - accept_all": {
+            "mean": -0.008333333333333333,
+            "ci95": [
+              -0.041666666666666664,
+              0.025
+            ],
+            "n_questions": 120
+          },
+          "combined - reject_all": {
+            "mean": -0.025,
+            "ci95": [
+              -0.08333333333333333,
+              0.025
+            ],
+            "n_questions": 120
+          }
+        },
+        "protect_panel": {
+          "activation - output_linear": {
+            "mean": 0.0,
+            "ci95": [
+              -0.03333333333333333,
+              0.03333333333333333
+            ],
+            "n_questions": 120
+          },
+          "activation - output_hgb": {
+            "mean": 0.008333333333333333,
+            "ci95": [
+              -0.025,
+              0.05
+            ],
+            "n_questions": 120
+          },
+          "combined - output_linear": {
+            "mean": 0.0,
+            "ci95": [
+              -0.03333333333333333,
+              0.03333333333333333
+            ],
+            "n_questions": 120
+          },
+          "combined - output_hgb": {
+            "mean": 0.008333333333333333,
+            "ci95": [
+              -0.025,
+              0.05
+            ],
+            "n_questions": 120
+          },
+          "output_linear - accept_all": {
+            "mean": -0.03333333333333333,
+            "ci95": [
+              -0.08333333333333333,
+              0.008333333333333333
+            ],
+            "n_questions": 120
+          },
+          "output_linear - reject_all": {
+            "mean": -0.05,
+            "ci95": [
+              -0.09166666666666666,
+              -0.016666666666666666
+            ],
+            "n_questions": 120
+          },
+          "output_hgb - accept_all": {
+            "mean": -0.041666666666666664,
+            "ci95": [
+              -0.08333333333333333,
+              0.0
+            ],
+            "n_questions": 120
+          },
+          "output_hgb - reject_all": {
+            "mean": -0.058333333333333334,
+            "ci95": [
+              -0.10833333333333334,
+              -0.016666666666666666
+            ],
+            "n_questions": 120
+          },
+          "activation - accept_all": {
+            "mean": -0.03333333333333333,
+            "ci95": [
+              -0.08333333333333333,
+              0.008333333333333333
+            ],
+            "n_questions": 120
+          },
+          "activation - reject_all": {
+            "mean": -0.05,
+            "ci95": [
+              -0.1,
+              -0.008333333333333333
+            ],
+            "n_questions": 120
+          },
+          "combined - accept_all": {
+            "mean": -0.03333333333333333,
+            "ci95": [
+              -0.08333333333333333,
+              0.008333333333333333
+            ],
+            "n_questions": 120
+          },
+          "combined - reject_all": {
+            "mean": -0.05,
+            "ci95": [
+              -0.1,
+              -0.008333333333333333
+            ],
+            "n_questions": 120
+          }
+        },
+        "protect_agent": {
+          "activation - output_linear": {
+            "mean": 0.0,
+            "ci95": [
+              -0.03333333333333333,
+              0.03333333333333333
+            ],
+            "n_questions": 120
+          },
+          "activation - output_hgb": {
+            "mean": 0.008333333333333333,
+            "ci95": [
+              -0.025,
+              0.041666666666666664
+            ],
+            "n_questions": 120
+          },
+          "combined - output_linear": {
+            "mean": 0.008333333333333333,
+            "ci95": [
+              -0.03333333333333333,
+              0.05
+            ],
+            "n_questions": 120
+          },
+          "combined - output_hgb": {
+            "mean": 0.016666666666666666,
+            "ci95": [
+              -0.025,
+              0.058333333333333334
+            ],
+            "n_questions": 120
+          },
+          "output_linear - accept_all": {
+            "mean": -0.03333333333333333,
+            "ci95": [
+              -0.08333333333333333,
+              0.008333333333333333
+            ],
+            "n_questions": 120
+          },
+          "output_linear - reject_all": {
+            "mean": -0.05,
+            "ci95": [
+              -0.09166666666666666,
+              -0.016666666666666666
+            ],
+            "n_questions": 120
+          },
+          "output_hgb - accept_all": {
+            "mean": -0.041666666666666664,
+            "ci95": [
+              -0.08333333333333333,
+              0.0
+            ],
+            "n_questions": 120
+          },
+          "output_hgb - reject_all": {
+            "mean": -0.058333333333333334,
+            "ci95": [
+              -0.10833333333333334,
+              -0.016666666666666666
+            ],
+            "n_questions": 120
+          },
+          "activation - accept_all": {
+            "mean": -0.03333333333333333,
+            "ci95": [
+              -0.075,
+              0.0
+            ],
+            "n_questions": 120
+          },
+          "activation - reject_all": {
+            "mean": -0.05,
+            "ci95": [
+              -0.1,
+              0.0
+            ],
+            "n_questions": 120
+          },
+          "combined - accept_all": {
+            "mean": -0.025,
+            "ci95": [
+              -0.058333333333333334,
+              0.0
+            ],
+            "n_questions": 120
+          },
+          "combined - reject_all": {
+            "mean": -0.041666666666666664,
+            "ci95": [
+              -0.1,
+              0.016666666666666666
+            ],
+            "n_questions": 120
+          }
+        }
+      },
+      "auroc_differences": {
+        "activation - output_linear | new_correct | all": {
+          "point": 0.00015666123574376023,
+          "ci95": [
+            -0.06960665467377576,
+            0.0705267451439284
+          ]
+        },
+        "activation - output_linear | old_correct | all": {
+          "point": 0.020397292893846397,
+          "ci95": [
+            -0.04891331239377837,
+            0.09201974870067384
+          ]
+        },
+        "activation - output_linear | new_correct | revised": {
+          "point": 0.034054487179487225,
+          "ci95": [
+            -0.08564227058669088,
+            0.17131901904026264
+          ]
+        },
+        "activation - output_linear | old_correct | revised": {
+          "point": -0.08052884615384626,
+          "ci95": [
+            -0.2254350490196078,
+            0.05801722326861771
+          ]
+        },
+        "combined - output_linear | new_correct | all": {
+          "point": -0.011530266950745771,
+          "ci95": [
+            -0.07939858697372862,
+            0.05660071305793463
+          ]
+        },
+        "combined - output_linear | old_correct | all": {
+          "point": 0.006861762125579651,
+          "ci95": [
+            -0.06033961720266659,
+            0.07704455268138126
+          ]
+        },
+        "combined - output_linear | new_correct | revised": {
+          "point": 0.05689102564102555,
+          "ci95": [
+            -0.07376958800791195,
+            0.19429740569446452
+          ]
+        },
+        "combined - output_linear | old_correct | revised": {
+          "point": -0.08493589743589747,
+          "ci95": [
+            -0.22538827282317372,
+            0.051287262872628685
+          ]
+        }
+      },
+      "seed": 0,
+      "transfer": {
+        "pilot12b-self_reconsider": {
+          "families": {
+            "output_linear": {
+              "old_correct": {
+                "auroc_all": 0.6678155157287881,
+                "auroc_all_ci95": [
+                  0.5843972995800574,
+                  0.7465089078314253
+                ],
+                "auroc_revised": 0.686150409530901,
+                "auroc_revised_ci95": [
+                  0.5807515412617892,
+                  0.7867997964648105
+                ],
+                "auroc_within_question": 0.5645161290322581,
+                "within_question_pairs": 62,
+                "brier": 0.232690333471682,
+                "logloss": 0.6585396882976321,
+                "ece": 0.11802721718875585,
+                "sd": 0.15070905019887634
+              },
+              "new_correct": {
+                "auroc_all": 0.6232610602832435,
+                "auroc_all_ci95": [
+                  0.5432383576219693,
+                  0.6986178927281869
+                ],
+                "auroc_revised": 0.5602739726027397,
+                "auroc_revised_ci95": [
+                  0.42539919578159324,
+                  0.6921344237095977
+                ],
+                "auroc_within_question": 0.43902439024390244,
+                "within_question_pairs": 82,
+                "brier": 0.2460842481644532,
+                "logloss": 0.6883163284630253,
+                "ece": 0.12820910765356003,
+                "sd": 0.16280701744749798
+              },
+              "gate_difference_panel": {
+                "agent_accuracy": 0.49722222222222223,
+                "panel_accuracy": 0.525,
+                "beneficial_kept": 20,
+                "beneficial_lost": 15,
+                "harmful_blocked": 36,
+                "harmful_accepted": 43,
+                "unhelpful_accepted": 35,
+                "revisions_accepted": 98,
+                "revisions": 181
+              },
+              "gate_difference_agent": {
+                "agent_accuracy": 0.4666666666666667,
+                "panel_accuracy": 0.5,
+                "beneficial_kept": 22,
+                "beneficial_lost": 13,
+                "harmful_blocked": 23,
+                "harmful_accepted": 56,
+                "unhelpful_accepted": 43,
+                "revisions_accepted": 121,
+                "revisions": 181
+              },
+              "gate_protect_panel": {
+                "agent_accuracy": 0.5111111111111111,
+                "panel_accuracy": 0.5166666666666667,
+                "beneficial_kept": 10,
+                "beneficial_lost": 25,
+                "harmful_blocked": 51,
+                "harmful_accepted": 28,
+                "unhelpful_accepted": 29,
+                "revisions_accepted": 67,
+                "revisions": 181
+              },
+              "gate_protect_agent": {
+                "agent_accuracy": 0.5083333333333333,
+                "panel_accuracy": 0.5083333333333333,
+                "beneficial_kept": 10,
+                "beneficial_lost": 25,
+                "harmful_blocked": 50,
+                "harmful_accepted": 29,
+                "unhelpful_accepted": 29,
+                "revisions_accepted": 68,
+                "revisions": 181
+              }
+            },
+            "output_hgb": {
+              "old_correct": {
+                "auroc_all": 0.6634290011279609,
+                "auroc_all_ci95": [
+                  0.5799515588854918,
+                  0.7431484779618934
+                ],
+                "auroc_revised": 0.6760982874162322,
+                "auroc_revised_ci95": [
+                  0.566817921694582,
+                  0.7783072683213805
+                ],
+                "auroc_within_question": 0.6612903225806451,
+                "within_question_pairs": 62,
+                "brier": 0.23221021877193998,
+                "logloss": 0.6574280442820152,
+                "ece": 0.08390669479718042,
+                "sd": 0.14404323760878132
+              },
+              "new_correct": {
+                "auroc_all": 0.5847537285374107,
+                "auroc_all_ci95": [
+                  0.5076521233493397,
+                  0.6597054464433934
+                ],
+                "auroc_revised": 0.45088062622309194,
+                "auroc_revised_ci95": [
+                  0.3327299335504966,
+                  0.5667872520828724
+                ],
+                "auroc_within_question": 0.573170731707317,
+                "within_question_pairs": 82,
+                "brier": 0.2512173374513634,
+                "logloss": 0.6966002395483357,
+                "ece": 0.09691044160303312,
+                "sd": 0.1497025896645288
+              },
+              "gate_difference_panel": {
+                "agent_accuracy": 0.4861111111111111,
+                "panel_accuracy": 0.5,
+                "beneficial_kept": 15,
+                "beneficial_lost": 20,
+                "harmful_blocked": 37,
+                "harmful_accepted": 42,
+                "unhelpful_accepted": 35,
+                "revisions_accepted": 92,
+                "revisions": 181
+              },
+              "gate_difference_agent": {
+                "agent_accuracy": 0.5166666666666667,
+                "panel_accuracy": 0.55,
+                "beneficial_kept": 14,
+                "beneficial_lost": 21,
+                "harmful_blocked": 49,
+                "harmful_accepted": 30,
+                "unhelpful_accepted": 27,
+                "revisions_accepted": 71,
+                "revisions": 181
+              },
+              "gate_protect_panel": {
+                "agent_accuracy": 0.5083333333333333,
+                "panel_accuracy": 0.525,
+                "beneficial_kept": 18,
+                "beneficial_lost": 17,
+                "harmful_blocked": 42,
+                "harmful_accepted": 37,
+                "unhelpful_accepted": 41,
+                "revisions_accepted": 96,
+                "revisions": 181
+              },
+              "gate_protect_agent": {
+                "agent_accuracy": 0.5194444444444445,
+                "panel_accuracy": 0.5333333333333333,
+                "beneficial_kept": 19,
+                "beneficial_lost": 16,
+                "harmful_blocked": 45,
+                "harmful_accepted": 34,
+                "unhelpful_accepted": 42,
+                "revisions_accepted": 95,
+                "revisions": 181
+              }
+            },
+            "activation": {
+              "old_correct": {
+                "auroc_all": 0.6570372227096128,
+                "auroc_all_ci95": [
+                  0.5726996469075599,
+                  0.7378591382177733
+                ],
+                "auroc_revised": 0.5949367088607596,
+                "auroc_revised_ci95": [
+                  0.4849271140508956,
+                  0.7003929213502522
+                ],
+                "auroc_within_question": 0.6451612903225806,
+                "within_question_pairs": 62,
+                "brier": 0.23276134855148645,
+                "logloss": 0.6585290558683031,
+                "ece": 0.07497154859190995,
+                "sd": 0.14518506275893078
+              },
+              "new_correct": {
+                "auroc_all": 0.6950745707482141,
+                "auroc_all_ci95": [
+                  0.6120542547831473,
+                  0.7726881430891125
+                ],
+                "auroc_revised": 0.5592954990215264,
+                "auroc_revised_ci95": [
+                  0.40823020937604276,
+                  0.7068227499904517
+                ],
+                "auroc_within_question": 0.6219512195121951,
+                "within_question_pairs": 82,
+                "brier": 0.21969033800336155,
+                "logloss": 0.6301183744338126,
+                "ece": 0.05086109185532696,
+                "sd": 0.1506231623306694
+              },
+              "gate_difference_panel": {
+                "agent_accuracy": 0.5027777777777778,
+                "panel_accuracy": 0.5166666666666667,
+                "beneficial_kept": 12,
+                "beneficial_lost": 23,
+                "harmful_blocked": 46,
+                "harmful_accepted": 33,
+                "unhelpful_accepted": 20,
+                "revisions_accepted": 65,
+                "revisions": 181
+              },
+              "gate_difference_agent": {
+                "agent_accuracy": 0.5111111111111111,
+                "panel_accuracy": 0.525,
+                "beneficial_kept": 11,
+                "beneficial_lost": 24,
+                "harmful_blocked": 50,
+                "harmful_accepted": 29,
+                "unhelpful_accepted": 14,
+                "revisions_accepted": 54,
+                "revisions": 181
+              },
+              "gate_protect_panel": {
+                "agent_accuracy": 0.5138888888888888,
+                "panel_accuracy": 0.5166666666666667,
+                "beneficial_kept": 12,
+                "beneficial_lost": 23,
+                "harmful_blocked": 50,
+                "harmful_accepted": 29,
+                "unhelpful_accepted": 28,
+                "revisions_accepted": 69,
+                "revisions": 181
+              },
+              "gate_protect_agent": {
+                "agent_accuracy": 0.4777777777777778,
+                "panel_accuracy": 0.48333333333333334,
+                "beneficial_kept": 13,
+                "beneficial_lost": 22,
+                "harmful_blocked": 36,
+                "harmful_accepted": 43,
+                "unhelpful_accepted": 38,
+                "revisions_accepted": 94,
+                "revisions": 181
+              }
+            },
+            "combined": {
+              "old_correct": {
+                "auroc_all": 0.6473555583406441,
+                "auroc_all_ci95": [
+                  0.5605957276478983,
+                  0.7321762666719839
+                ],
+                "auroc_revised": 0.6236038719285182,
+                "auroc_revised_ci95": [
+                  0.5126061551142933,
+                  0.7283442837588608
+                ],
+                "auroc_within_question": 0.6129032258064516,
+                "within_question_pairs": 62,
+                "brier": 0.23717079833161406,
+                "logloss": 0.6679989443363527,
+                "ece": 0.08949042392288856,
+                "sd": 0.1454091935331229
+              },
+              "new_correct": {
+                "auroc_all": 0.6506141120441157,
+                "auroc_all_ci95": [
+                  0.5672091160550445,
+                  0.7316266769865841
+                ],
+                "auroc_revised": 0.6050880626223092,
+                "auroc_revised_ci95": [
+                  0.47372352103234455,
+                  0.7257622368137879
+                ],
+                "auroc_within_question": 0.6463414634146342,
+                "within_question_pairs": 82,
+                "brier": 0.23569556503805772,
+                "logloss": 0.6651251989341679,
+                "ece": 0.07655174448186064,
+                "sd": 0.1616327517965392
+              },
+              "gate_difference_panel": {
+                "agent_accuracy": 0.49166666666666664,
+                "panel_accuracy": 0.49166666666666664,
+                "beneficial_kept": 16,
+                "beneficial_lost": 19,
+                "harmful_blocked": 38,
+                "harmful_accepted": 41,
+                "unhelpful_accepted": 26,
+                "revisions_accepted": 83,
+                "revisions": 181
+              },
+              "gate_difference_agent": {
+                "agent_accuracy": 0.5166666666666667,
+                "panel_accuracy": 0.5333333333333333,
+                "beneficial_kept": 15,
+                "beneficial_lost": 20,
+                "harmful_blocked": 48,
+                "harmful_accepted": 31,
+                "unhelpful_accepted": 17,
+                "revisions_accepted": 63,
+                "revisions": 181
+              },
+              "gate_protect_panel": {
+                "agent_accuracy": 0.5166666666666667,
+                "panel_accuracy": 0.525,
+                "beneficial_kept": 13,
+                "beneficial_lost": 22,
+                "harmful_blocked": 50,
+                "harmful_accepted": 29,
+                "unhelpful_accepted": 28,
+                "revisions_accepted": 70,
+                "revisions": 181
+              },
+              "gate_protect_agent": {
+                "agent_accuracy": 0.4888888888888889,
+                "panel_accuracy": 0.5,
+                "beneficial_kept": 21,
+                "beneficial_lost": 14,
+                "harmful_blocked": 32,
+                "harmful_accepted": 47,
+                "unhelpful_accepted": 53,
+                "revisions_accepted": 121,
+                "revisions": 181
+              }
+            }
+          },
+          "reference": {
+            "accept_all": {
+              "agent_accuracy": 0.4388888888888889,
+              "panel_accuracy": 0.48333333333333334
+            },
+            "reject_all": {
+              "agent_accuracy": 0.5611111111111111,
+              "panel_accuracy": 0.575
+            },
+            "agent_optimal_not_a_panel_bound": {
+              "agent_accuracy": 0.6583333333333333,
+              "panel_accuracy": 0.6666666666666666
+            },
+            "panel_optimal": {
+              "agent_accuracy": 0.6083333333333333,
+              "panel_accuracy": 0.675
+            }
+          },
+          "paired_panel": {
+            "difference_panel": {
+              "activation - output_linear": {
+                "mean": -0.008333333333333333,
+                "ci95": [
+                  -0.075,
+                  0.058333333333333334
+                ],
+                "n_questions": 120
+              },
+              "activation - output_hgb": {
+                "mean": 0.016666666666666666,
+                "ci95": [
+                  -0.03333333333333333,
+                  0.06666666666666667
+                ],
+                "n_questions": 120
+              },
+              "combined - output_linear": {
+                "mean": -0.03333333333333333,
+                "ci95": [
+                  -0.1,
+                  0.03333333333333333
+                ],
+                "n_questions": 120
+              },
+              "combined - output_hgb": {
+                "mean": -0.008333333333333333,
+                "ci95": [
+                  -0.075,
+                  0.058333333333333334
+                ],
+                "n_questions": 120
+              },
+              "output_linear - accept_all": {
+                "mean": 0.041666666666666664,
+                "ci95": [
+                  -0.025,
+                  0.10833333333333334
+                ],
+                "n_questions": 120
+              },
+              "output_linear - reject_all": {
+                "mean": -0.05,
+                "ci95": [
+                  -0.11666666666666667,
+                  0.016666666666666666
+                ],
+                "n_questions": 120
+              },
+              "output_hgb - accept_all": {
+                "mean": 0.016666666666666666,
+                "ci95": [
+                  -0.058333333333333334,
+                  0.09166666666666666
+                ],
+                "n_questions": 120
+              },
+              "output_hgb - reject_all": {
+                "mean": -0.075,
+                "ci95": [
+                  -0.13333333333333333,
+                  -0.016666666666666666
+                ],
+                "n_questions": 120
+              },
+              "activation - accept_all": {
+                "mean": 0.03333333333333333,
+                "ci95": [
+                  -0.041666666666666664,
+                  0.10833333333333334
+                ],
+                "n_questions": 120
+              },
+              "activation - reject_all": {
+                "mean": -0.058333333333333334,
+                "ci95": [
+                  -0.10833333333333334,
+                  -0.008333333333333333
+                ],
+                "n_questions": 120
+              },
+              "combined - accept_all": {
+                "mean": 0.008333333333333333,
+                "ci95": [
+                  -0.058333333333333334,
+                  0.075
+                ],
+                "n_questions": 120
+              },
+              "combined - reject_all": {
+                "mean": -0.08333333333333333,
+                "ci95": [
+                  -0.15,
+                  -0.016666666666666666
+                ],
+                "n_questions": 120
+              }
+            },
+            "difference_agent": {
+              "activation - output_linear": {
+                "mean": 0.025,
+                "ci95": [
+                  -0.041666666666666664,
+                  0.09166666666666666
+                ],
+                "n_questions": 120
+              },
+              "activation - output_hgb": {
+                "mean": -0.025,
+                "ci95": [
+                  -0.075,
+                  0.025
+                ],
+                "n_questions": 120
+              },
+              "combined - output_linear": {
+                "mean": 0.03333333333333333,
+                "ci95": [
+                  -0.03333333333333333,
+                  0.1
+                ],
+                "n_questions": 120
+              },
+              "combined - output_hgb": {
+                "mean": -0.016666666666666666,
+                "ci95": [
+                  -0.075,
+                  0.041666666666666664
+                ],
+                "n_questions": 120
+              },
+              "output_linear - accept_all": {
+                "mean": 0.016666666666666666,
+                "ci95": [
+                  -0.041666666666666664,
+                  0.075
+                ],
+                "n_questions": 120
+              },
+              "output_linear - reject_all": {
+                "mean": -0.075,
+                "ci95": [
+                  -0.15,
+                  0.0
+                ],
+                "n_questions": 120
+              },
+              "output_hgb - accept_all": {
+                "mean": 0.06666666666666667,
+                "ci95": [
+                  -0.008333333333333333,
+                  0.14166666666666666
+                ],
+                "n_questions": 120
+              },
+              "output_hgb - reject_all": {
+                "mean": -0.025,
+                "ci95": [
+                  -0.075,
+                  0.025
+                ],
+                "n_questions": 120
+              },
+              "activation - accept_all": {
+                "mean": 0.041666666666666664,
+                "ci95": [
+                  -0.03333333333333333,
+                  0.11666666666666667
+                ],
+                "n_questions": 120
+              },
+              "activation - reject_all": {
+                "mean": -0.05,
+                "ci95": [
+                  -0.1,
+                  0.0
+                ],
+                "n_questions": 120
+              },
+              "combined - accept_all": {
+                "mean": 0.05,
+                "ci95": [
+                  -0.025,
+                  0.125
+                ],
+                "n_questions": 120
+              },
+              "combined - reject_all": {
+                "mean": -0.041666666666666664,
+                "ci95": [
+                  -0.09166666666666666,
+                  0.008333333333333333
+                ],
+                "n_questions": 120
+              }
+            },
+            "protect_panel": {
+              "activation - output_linear": {
+                "mean": 0.0,
+                "ci95": [
+                  -0.05,
+                  0.04187499999999696
+                ],
+                "n_questions": 120
+              },
+              "activation - output_hgb": {
+                "mean": -0.008333333333333333,
+                "ci95": [
+                  -0.058333333333333334,
+                  0.041666666666666664
+                ],
+                "n_questions": 120
+              },
+              "combined - output_linear": {
+                "mean": 0.008333333333333333,
+                "ci95": [
+                  -0.03333333333333333,
+                  0.05
+                ],
+                "n_questions": 120
+              },
+              "combined - output_hgb": {
+                "mean": 0.0,
+                "ci95": [
+                  -0.05,
+                  0.041666666666666664
+                ],
+                "n_questions": 120
+              },
+              "output_linear - accept_all": {
+                "mean": 0.03333333333333333,
+                "ci95": [
+                  -0.041666666666666664,
+                  0.11666666666666667
+                ],
+                "n_questions": 120
+              },
+              "output_linear - reject_all": {
+                "mean": -0.058333333333333334,
+                "ci95": [
+                  -0.10833333333333334,
+                  -0.016458333333336364
+                ],
+                "n_questions": 120
+              },
+              "output_hgb - accept_all": {
+                "mean": 0.041666666666666664,
+                "ci95": [
+                  -0.025,
+                  0.10833333333333334
+                ],
+                "n_questions": 120
+              },
+              "output_hgb - reject_all": {
+                "mean": -0.05,
+                "ci95": [
+                  -0.11666666666666667,
+                  0.016666666666666666
+                ],
+                "n_questions": 120
+              },
+              "activation - accept_all": {
+                "mean": 0.03333333333333333,
+                "ci95": [
+                  -0.05,
+                  0.10833333333333334
+                ],
+                "n_questions": 120
+              },
+              "activation - reject_all": {
+                "mean": -0.058333333333333334,
+                "ci95": [
+                  -0.11666666666666667,
+                  -0.008333333333333333
+                ],
+                "n_questions": 120
+              },
+              "combined - accept_all": {
+                "mean": 0.041666666666666664,
+                "ci95": [
+                  -0.03333333333333333,
+                  0.11666666666666667
+                ],
+                "n_questions": 120
+              },
+              "combined - reject_all": {
+                "mean": -0.05,
+                "ci95": [
+                  -0.1,
+                  0.0
+                ],
+                "n_questions": 120
+              }
+            },
+            "protect_agent": {
+              "activation - output_linear": {
+                "mean": -0.025,
+                "ci95": [
+                  -0.06666666666666667,
+                  0.016666666666666666
+                ],
+                "n_questions": 120
+              },
+              "activation - output_hgb": {
+                "mean": -0.05,
+                "ci95": [
+                  -0.1,
+                  -0.008333333333333333
+                ],
+                "n_questions": 120
+              },
+              "combined - output_linear": {
+                "mean": -0.008333333333333333,
+                "ci95": [
+                  -0.06666666666666667,
+                  0.05
+                ],
+                "n_questions": 120
+              },
+              "combined - output_hgb": {
+                "mean": -0.03333333333333333,
+                "ci95": [
+                  -0.08333333333333333,
+                  0.008333333333333333
+                ],
+                "n_questions": 120
+              },
+              "output_linear - accept_all": {
+                "mean": 0.025,
+                "ci95": [
+                  -0.05,
+                  0.1
+                ],
+                "n_questions": 120
+              },
+              "output_linear - reject_all": {
+                "mean": -0.06666666666666667,
+                "ci95": [
+                  -0.11666666666666667,
+                  -0.016666666666666666
+                ],
+                "n_questions": 120
+              },
+              "output_hgb - accept_all": {
+                "mean": 0.05,
+                "ci95": [
+                  -0.016666666666666666,
+                  0.11666666666666667
+                ],
+                "n_questions": 120
+              },
+              "output_hgb - reject_all": {
+                "mean": -0.041666666666666664,
+                "ci95": [
+                  -0.10833333333333334,
+                  0.025
+                ],
+                "n_questions": 120
+              },
+              "activation - accept_all": {
+                "mean": 0.0,
+                "ci95": [
+                  -0.075,
+                  0.075
+                ],
+                "n_questions": 120
+              },
+              "activation - reject_all": {
+                "mean": -0.09166666666666666,
+                "ci95": [
+                  -0.15833333333333333,
+                  -0.03333333333333333
+                ],
+                "n_questions": 120
+              },
+              "combined - accept_all": {
+                "mean": 0.016666666666666666,
+                "ci95": [
+                  -0.041666666666666664,
+                  0.075
+                ],
+                "n_questions": 120
+              },
+              "combined - reject_all": {
+                "mean": -0.075,
+                "ci95": [
+                  -0.15,
+                  0.0
+                ],
+                "n_questions": 120
+              }
+            }
+          },
+          "auroc_differences": {
+            "activation - output_linear | new_correct | all": {
+              "point": 0.07181351046497064,
+              "ci95": [
+                -0.022931826106414966,
+                0.16656316754682696
+              ]
+            },
+            "activation - output_linear | old_correct | all": {
+              "point": -0.010778293019175211,
+              "ci95": [
+                -0.1130850032768052,
+                0.09296988022586973
+              ]
+            },
+            "activation - output_linear | new_correct | revised": {
+              "point": -0.0009784735812132794,
+              "ci95": [
+                -0.15271803699135375,
+                0.14919981170488816
+              ]
+            },
+            "activation - output_linear | old_correct | revised": {
+              "point": -0.09121370067014145,
+              "ci95": [
+                -0.22081510295310594,
+                0.03959710860110562
+              ]
+            },
+            "combined - output_linear | new_correct | all": {
+              "point": 0.027353051760872216,
+              "ci95": [
+                -0.06033918676557462,
+                0.11636093547725036
+              ]
+            },
+            "combined - output_linear | old_correct | all": {
+              "point": -0.02045995738814399,
+              "ci95": [
+                -0.12237320400496082,
+                0.08606965046049879
+              ]
+            },
+            "combined - output_linear | new_correct | revised": {
+              "point": 0.044814090019569486,
+              "ci95": [
+                -0.07158613445378144,
+                0.15949305555555549
+              ]
+            },
+            "combined - output_linear | old_correct | revised": {
+              "point": -0.06254653760238282,
+              "ci95": [
+                -0.19281933782640226,
+                0.06558472069748446
+              ]
+            }
+          }
+        },
+        "pilot12b-debate_answer_only": {
+          "families": {
+            "output_linear": {
+              "old_correct": {
+                "auroc_all": 0.6939779420980072,
+                "auroc_all_ci95": [
+                  0.6109857111158562,
+                  0.7721796635570042
+                ],
+                "auroc_revised": 0.6828171828171827,
+                "auroc_revised_ci95": [
+                  0.5263472329721363,
+                  0.8238574604743083
+                ],
+                "auroc_within_question": 0.5967741935483871,
+                "within_question_pairs": 62,
+                "brier": 0.218889570164146,
+                "logloss": 0.6297521717121228,
+                "ece": 0.030840189142706143,
+                "sd": 0.17787046367353895
+              },
+              "new_correct": {
+                "auroc_all": 0.7117598684210527,
+                "auroc_all_ci95": [
+                  0.6278935256804643,
+                  0.7891273113389233
+                ],
+                "auroc_revised": 0.616637323943662,
+                "auroc_revised_ci95": [
+                  0.4791354488868522,
+                  0.7338248866233941
+                ],
+                "auroc_within_question": 0.5,
+                "within_question_pairs": 42,
+                "brier": 0.21050255102370186,
+                "logloss": 0.610303315477399,
+                "ece": 0.03559662899328943,
+                "sd": 0.1766955646800118
+              },
+              "gate_difference_panel": {
+                "agent_accuracy": 0.5722222222222222,
+                "panel_accuracy": 0.5583333333333333,
+                "beneficial_kept": 17,
+                "beneficial_lost": 15,
+                "harmful_blocked": 13,
+                "harmful_accepted": 13,
+                "unhelpful_accepted": 21,
+                "revisions_accepted": 51,
+                "revisions": 103
+              },
+              "gate_difference_agent": {
+                "agent_accuracy": 0.5611111111111111,
+                "panel_accuracy": 0.5416666666666666,
+                "beneficial_kept": 17,
+                "beneficial_lost": 15,
+                "harmful_blocked": 9,
+                "harmful_accepted": 17,
+                "unhelpful_accepted": 26,
+                "revisions_accepted": 60,
+                "revisions": 103
+              },
+              "gate_protect_panel": {
+                "agent_accuracy": 0.5666666666666667,
+                "panel_accuracy": 0.55,
+                "beneficial_kept": 11,
+                "beneficial_lost": 21,
+                "harmful_blocked": 17,
+                "harmful_accepted": 9,
+                "unhelpful_accepted": 21,
+                "revisions_accepted": 41,
+                "revisions": 103
+              },
+              "gate_protect_agent": {
+                "agent_accuracy": 0.5666666666666667,
+                "panel_accuracy": 0.5416666666666666,
+                "beneficial_kept": 12,
+                "beneficial_lost": 20,
+                "harmful_blocked": 16,
+                "harmful_accepted": 10,
+                "unhelpful_accepted": 23,
+                "revisions_accepted": 45,
+                "revisions": 103
+              }
+            },
+            "output_hgb": {
+              "old_correct": {
+                "auroc_all": 0.7223022935204914,
+                "auroc_all_ci95": [
+                  0.6473032253192801,
+                  0.7951942735038617
+                ],
+                "auroc_revised": 0.6233766233766235,
+                "auroc_revised_ci95": [
+                  0.4735845224734113,
+                  0.7624606895997869
+                ],
+                "auroc_within_question": 0.6290322580645161,
+                "within_question_pairs": 62,
+                "brier": 0.2107303710565673,
+                "logloss": 0.6117676987829798,
+                "ece": 0.0644717858084543,
+                "sd": 0.14854203560613
+              },
+              "new_correct": {
+                "auroc_all": 0.7048013663967612,
+                "auroc_all_ci95": [
+                  0.6238609591269639,
+                  0.7803174454613236
+                ],
+                "auroc_revised": 0.5933098591549295,
+                "auroc_revised_ci95": [
+                  0.453200046182266,
+                  0.7278562638135422
+                ],
+                "auroc_within_question": 0.42857142857142855,
+                "within_question_pairs": 42,
+                "brier": 0.2153505479405652,
+                "logloss": 0.6190005705604928,
+                "ece": 0.05289451769644969,
+                "sd": 0.16896992086284077
+              },
+              "gate_difference_panel": {
+                "agent_accuracy": 0.575,
+                "panel_accuracy": 0.5583333333333333,
+                "beneficial_kept": 16,
+                "beneficial_lost": 16,
+                "harmful_blocked": 15,
+                "harmful_accepted": 11,
+                "unhelpful_accepted": 25,
+                "revisions_accepted": 52,
+                "revisions": 103
+              },
+              "gate_difference_agent": {
+                "agent_accuracy": 0.5722222222222222,
+                "panel_accuracy": 0.575,
+                "beneficial_kept": 14,
+                "beneficial_lost": 18,
+                "harmful_blocked": 16,
+                "harmful_accepted": 10,
+                "unhelpful_accepted": 26,
+                "revisions_accepted": 50,
+                "revisions": 103
+              },
+              "gate_protect_panel": {
+                "agent_accuracy": 0.5694444444444444,
+                "panel_accuracy": 0.55,
+                "beneficial_kept": 14,
+                "beneficial_lost": 18,
+                "harmful_blocked": 15,
+                "harmful_accepted": 11,
+                "unhelpful_accepted": 29,
+                "revisions_accepted": 54,
+                "revisions": 103
+              },
+              "gate_protect_agent": {
+                "agent_accuracy": 0.5666666666666667,
+                "panel_accuracy": 0.5416666666666666,
+                "beneficial_kept": 13,
+                "beneficial_lost": 19,
+                "harmful_blocked": 15,
+                "harmful_accepted": 11,
+                "unhelpful_accepted": 27,
+                "revisions_accepted": 51,
+                "revisions": 103
+              }
+            },
+            "activation": {
+              "old_correct": {
+                "auroc_all": 0.7429815766386766,
+                "auroc_all_ci95": [
+                  0.6667311937343592,
+                  0.8133246400579451
+                ],
+                "auroc_revised": 0.6128871128871128,
+                "auroc_revised_ci95": [
+                  0.4611942181843497,
+                  0.7652755083514886
+                ],
+                "auroc_within_question": 0.5967741935483871,
+                "within_question_pairs": 62,
+                "brier": 0.20994306470430718,
+                "logloss": 0.6059755957990686,
+                "ece": 0.0857209816822386,
+                "sd": 0.19063208566617645
+              },
+              "new_correct": {
+                "auroc_all": 0.7491143724696356,
+                "auroc_all_ci95": [
+                  0.6673517857343005,
+                  0.8249611983961123
+                ],
+                "auroc_revised": 0.685299295774648,
+                "auroc_revised_ci95": [
+                  0.552697117093106,
+                  0.8012207987336888
+                ],
+                "auroc_within_question": 0.5714285714285714,
+                "within_question_pairs": 42,
+                "brier": 0.20037433326842952,
+                "logloss": 0.5860652118906016,
+                "ece": 0.040001638550695925,
+                "sd": 0.18678786992818874
+              },
+              "gate_difference_panel": {
+                "agent_accuracy": 0.5805555555555556,
+                "panel_accuracy": 0.575,
+                "beneficial_kept": 17,
+                "beneficial_lost": 15,
+                "harmful_blocked": 16,
+                "harmful_accepted": 10,
+                "unhelpful_accepted": 18,
+                "revisions_accepted": 45,
+                "revisions": 103
+              },
+              "gate_difference_agent": {
+                "agent_accuracy": 0.575,
+                "panel_accuracy": 0.5666666666666667,
+                "beneficial_kept": 17,
+                "beneficial_lost": 15,
+                "harmful_blocked": 14,
+                "harmful_accepted": 12,
+                "unhelpful_accepted": 15,
+                "revisions_accepted": 44,
+                "revisions": 103
+              },
+              "gate_protect_panel": {
+                "agent_accuracy": 0.5722222222222222,
+                "panel_accuracy": 0.55,
+                "beneficial_kept": 12,
+                "beneficial_lost": 20,
+                "harmful_blocked": 18,
+                "harmful_accepted": 8,
+                "unhelpful_accepted": 21,
+                "revisions_accepted": 41,
+                "revisions": 103
+              },
+              "gate_protect_agent": {
+                "agent_accuracy": 0.5694444444444444,
+                "panel_accuracy": 0.55,
+                "beneficial_kept": 14,
+                "beneficial_lost": 18,
+                "harmful_blocked": 15,
+                "harmful_accepted": 11,
+                "unhelpful_accepted": 24,
+                "revisions_accepted": 49,
+                "revisions": 103
+              }
+            },
+            "combined": {
+              "old_correct": {
+                "auroc_all": 0.7323286126080963,
+                "auroc_all_ci95": [
+                  0.6542762933541676,
+                  0.8048904925436567
+                ],
+                "auroc_revised": 0.6108891108891109,
+                "auroc_revised_ci95": [
+                  0.4514922996018331,
+                  0.7633564814814815
+                ],
+                "auroc_within_question": 0.5645161290322581,
+                "within_question_pairs": 62,
+                "brier": 0.21203828354766271,
+                "logloss": 0.6112571421030596,
+                "ece": 0.05515220771185011,
+                "sd": 0.18915856323677605
+              },
+              "new_correct": {
+                "auroc_all": 0.7471849696356276,
+                "auroc_all_ci95": [
+                  0.6664225446428571,
+                  0.8228500646600988
+                ],
+                "auroc_revised": 0.7235915492957746,
+                "auroc_revised_ci95": [
+                  0.6097557848655409,
+                  0.8220055319312795
+                ],
+                "auroc_within_question": 0.5952380952380952,
+                "within_question_pairs": 42,
+                "brier": 0.20111393165173752,
+                "logloss": 0.5899583445413027,
+                "ece": 0.06771957337159117,
+                "sd": 0.1752274937575438
+              },
+              "gate_difference_panel": {
+                "agent_accuracy": 0.5888888888888889,
+                "panel_accuracy": 0.5916666666666667,
+                "beneficial_kept": 23,
+                "beneficial_lost": 9,
+                "harmful_blocked": 13,
+                "harmful_accepted": 13,
+                "unhelpful_accepted": 18,
+                "revisions_accepted": 54,
+                "revisions": 103
+              },
+              "gate_difference_agent": {
+                "agent_accuracy": 0.575,
+                "panel_accuracy": 0.575,
+                "beneficial_kept": 17,
+                "beneficial_lost": 15,
+                "harmful_blocked": 14,
+                "harmful_accepted": 12,
+                "unhelpful_accepted": 13,
+                "revisions_accepted": 42,
+                "revisions": 103
+              },
+              "gate_protect_panel": {
+                "agent_accuracy": 0.5694444444444444,
+                "panel_accuracy": 0.55,
+                "beneficial_kept": 11,
+                "beneficial_lost": 21,
+                "harmful_blocked": 18,
+                "harmful_accepted": 8,
+                "unhelpful_accepted": 20,
+                "revisions_accepted": 39,
+                "revisions": 103
+              },
+              "gate_protect_agent": {
+                "agent_accuracy": 0.5722222222222222,
+                "panel_accuracy": 0.575,
+                "beneficial_kept": 20,
+                "beneficial_lost": 12,
+                "harmful_blocked": 10,
+                "harmful_accepted": 16,
+                "unhelpful_accepted": 35,
+                "revisions_accepted": 71,
+                "revisions": 103
+              }
+            }
+          },
+          "reference": {
+            "accept_all": {
+              "agent_accuracy": 0.5777777777777777,
+              "panel_accuracy": 0.575
+            },
+            "reject_all": {
+              "agent_accuracy": 0.5611111111111111,
+              "panel_accuracy": 0.575
+            },
+            "agent_optimal_not_a_panel_bound": {
+              "agent_accuracy": 0.65,
+              "panel_accuracy": 0.65
+            },
+            "panel_optimal": {
+              "agent_accuracy": 0.5861111111111111,
+              "panel_accuracy": 0.65
+            }
+          },
+          "paired_panel": {
+            "difference_panel": {
+              "activation - output_linear": {
+                "mean": 0.016666666666666666,
+                "ci95": [
+                  -0.03333333333333333,
+                  0.06666666666666667
+                ],
+                "n_questions": 120
+              },
+              "activation - output_hgb": {
+                "mean": 0.016666666666666666,
+                "ci95": [
+                  -0.016666666666666666,
+                  0.05
+                ],
+                "n_questions": 120
+              },
+              "combined - output_linear": {
+                "mean": 0.03333333333333333,
+                "ci95": [
+                  -0.016666666666666666,
+                  0.08333333333333333
+                ],
+                "n_questions": 120
+              },
+              "combined - output_hgb": {
+                "mean": 0.03333333333333333,
+                "ci95": [
+                  0.0,
+                  0.075
+                ],
+                "n_questions": 120
+              },
+              "output_linear - accept_all": {
+                "mean": -0.016666666666666666,
+                "ci95": [
+                  -0.06666666666666667,
+                  0.025
+                ],
+                "n_questions": 120
+              },
+              "output_linear - reject_all": {
+                "mean": -0.016666666666666666,
+                "ci95": [
+                  -0.058333333333333334,
+                  0.025
+                ],
+                "n_questions": 120
+              },
+              "output_hgb - accept_all": {
+                "mean": -0.016666666666666666,
+                "ci95": [
+                  -0.075,
+                  0.041666666666666664
+                ],
+                "n_questions": 120
+              },
+              "output_hgb - reject_all": {
+                "mean": -0.016666666666666666,
+                "ci95": [
+                  -0.05,
+                  0.016666666666666666
+                ],
+                "n_questions": 120
+              },
+              "activation - accept_all": {
+                "mean": 0.0,
+                "ci95": [
+                  -0.05,
+                  0.05
+                ],
+                "n_questions": 120
+              },
+              "activation - reject_all": {
+                "mean": 0.0,
+                "ci95": [
+                  -0.041666666666666664,
+                  0.041666666666666664
+                ],
+                "n_questions": 120
+              },
+              "combined - accept_all": {
+                "mean": 0.016666666666666666,
+                "ci95": [
+                  -0.03333333333333333,
+                  0.06666666666666667
+                ],
+                "n_questions": 120
+              },
+              "combined - reject_all": {
+                "mean": 0.016666666666666666,
+                "ci95": [
+                  -0.025,
+                  0.06666666666666667
+                ],
+                "n_questions": 120
+              }
+            },
+            "difference_agent": {
+              "activation - output_linear": {
+                "mean": 0.025,
+                "ci95": [
+                  -0.016666666666666666,
+                  0.06666666666666667
+                ],
+                "n_questions": 120
+              },
+              "activation - output_hgb": {
+                "mean": -0.008333333333333333,
+                "ci95": [
+                  -0.05,
+                  0.03333333333333333
+                ],
+                "n_questions": 120
+              },
+              "combined - output_linear": {
+                "mean": 0.03333333333333333,
+                "ci95": [
+                  -0.008333333333333333,
+                  0.08333333333333333
+                ],
+                "n_questions": 120
+              },
+              "combined - output_hgb": {
+                "mean": 0.0,
+                "ci95": [
+                  -0.041666666666666664,
+                  0.041666666666666664
+                ],
+                "n_questions": 120
+              },
+              "output_linear - accept_all": {
+                "mean": -0.03333333333333333,
+                "ci95": [
+                  -0.075,
+                  0.0
+                ],
+                "n_questions": 120
+              },
+              "output_linear - reject_all": {
+                "mean": -0.03333333333333333,
+                "ci95": [
+                  -0.08333333333333333,
+                  0.008333333333333333
+                ],
+                "n_questions": 120
+              },
+              "output_hgb - accept_all": {
+                "mean": 0.0,
+                "ci95": [
+                  -0.058333333333333334,
+                  0.058333333333333334
+                ],
+                "n_questions": 120
+              },
+              "output_hgb - reject_all": {
+                "mean": 0.0,
+                "ci95": [
+                  -0.03333333333333333,
+                  0.03333333333333333
+                ],
+                "n_questions": 120
+              },
+              "activation - accept_all": {
+                "mean": -0.008333333333333333,
+                "ci95": [
+                  -0.058333333333333334,
+                  0.041666666666666664
+                ],
+                "n_questions": 120
+              },
+              "activation - reject_all": {
+                "mean": -0.008333333333333333,
+                "ci95": [
+                  -0.041666666666666664,
+                  0.025
+                ],
+                "n_questions": 120
+              },
+              "combined - accept_all": {
+                "mean": 0.0,
+                "ci95": [
+                  -0.05,
+                  0.05
+                ],
+                "n_questions": 120
+              },
+              "combined - reject_all": {
+                "mean": 0.0,
+                "ci95": [
+                  -0.041666666666666664,
+                  0.041666666666666664
+                ],
+                "n_questions": 120
+              }
+            },
+            "protect_panel": {
+              "activation - output_linear": {
+                "mean": 0.0,
+                "ci95": [
+                  -0.025,
+                  0.025
+                ],
+                "n_questions": 120
+              },
+              "activation - output_hgb": {
+                "mean": 0.0,
+                "ci95": [
+                  -0.025,
+                  0.025
+                ],
+                "n_questions": 120
+              },
+              "combined - output_linear": {
+                "mean": 0.0,
+                "ci95": [
+                  0.0,
+                  0.0
+                ],
+                "n_questions": 120
+              },
+              "combined - output_hgb": {
+                "mean": 0.0,
+                "ci95": [
+                  -0.025,
+                  0.025
+                ],
+                "n_questions": 120
+              },
+              "output_linear - accept_all": {
+                "mean": -0.025,
+                "ci95": [
+                  -0.08333333333333333,
+                  0.025
+                ],
+                "n_questions": 120
+              },
+              "output_linear - reject_all": {
+                "mean": -0.025,
+                "ci95": [
+                  -0.058333333333333334,
+                  0.0
+                ],
+                "n_questions": 120
+              },
+              "output_hgb - accept_all": {
+                "mean": -0.025,
+                "ci95": [
+                  -0.075,
+                  0.025
+                ],
+                "n_questions": 120
+              },
+              "output_hgb - reject_all": {
+                "mean": -0.025,
+                "ci95": [
+                  -0.06666666666666667,
+                  0.008333333333333333
+                ],
+                "n_questions": 120
+              },
+              "activation - accept_all": {
+                "mean": -0.025,
+                "ci95": [
+                  -0.075,
+                  0.025
+                ],
+                "n_questions": 120
+              },
+              "activation - reject_all": {
+                "mean": -0.025,
+                "ci95": [
+                  -0.06666666666666667,
+                  0.008333333333333333
+                ],
+                "n_questions": 120
+              },
+              "combined - accept_all": {
+                "mean": -0.025,
+                "ci95": [
+                  -0.08333333333333333,
+                  0.025
+                ],
+                "n_questions": 120
+              },
+              "combined - reject_all": {
+                "mean": -0.025,
+                "ci95": [
+                  -0.058333333333333334,
+                  0.0
+                ],
+                "n_questions": 120
+              }
+            },
+            "protect_agent": {
+              "activation - output_linear": {
+                "mean": 0.008333333333333333,
+                "ci95": [
+                  0.0,
+                  0.025
+                ],
+                "n_questions": 120
+              },
+              "activation - output_hgb": {
+                "mean": 0.008333333333333333,
+                "ci95": [
+                  0.0,
+                  0.025
+                ],
+                "n_questions": 120
+              },
+              "combined - output_linear": {
+                "mean": 0.03333333333333333,
+                "ci95": [
+                  -0.008333333333333333,
+                  0.075
+                ],
+                "n_questions": 120
+              },
+              "combined - output_hgb": {
+                "mean": 0.03333333333333333,
+                "ci95": [
+                  -0.008333333333333333,
+                  0.075
+                ],
+                "n_questions": 120
+              },
+              "output_linear - accept_all": {
+                "mean": -0.03333333333333333,
+                "ci95": [
+                  -0.08333333333333333,
+                  0.016666666666666666
+                ],
+                "n_questions": 120
+              },
+              "output_linear - reject_all": {
+                "mean": -0.03333333333333333,
+                "ci95": [
+                  -0.06666666666666667,
+                  -0.008333333333333333
+                ],
+                "n_questions": 120
+              },
+              "output_hgb - accept_all": {
+                "mean": -0.03333333333333333,
+                "ci95": [
+                  -0.08333333333333333,
+                  0.016666666666666666
+                ],
+                "n_questions": 120
+              },
+              "output_hgb - reject_all": {
+                "mean": -0.03333333333333333,
+                "ci95": [
+                  -0.06666666666666667,
+                  -0.008333333333333333
+                ],
+                "n_questions": 120
+              },
+              "activation - accept_all": {
+                "mean": -0.025,
+                "ci95": [
+                  -0.075,
+                  0.025
+                ],
+                "n_questions": 120
+              },
+              "activation - reject_all": {
+                "mean": -0.025,
+                "ci95": [
+                  -0.06666666666666667,
+                  0.008333333333333333
+                ],
+                "n_questions": 120
+              },
+              "combined - accept_all": {
+                "mean": 0.0,
+                "ci95": [
+                  -0.03333333333333333,
+                  0.03333333333333333
+                ],
+                "n_questions": 120
+              },
+              "combined - reject_all": {
+                "mean": 0.0,
+                "ci95": [
+                  -0.05,
+                  0.05
+                ],
+                "n_questions": 120
+              }
+            }
+          },
+          "auroc_differences": {
+            "activation - output_linear | new_correct | all": {
+              "point": 0.03735450404858298,
+              "ci95": [
+                -0.04311114156920071,
+                0.11940605709876552
+              ]
+            },
+            "activation - output_linear | old_correct | all": {
+              "point": 0.04900363454066936,
+              "ci95": [
+                -0.028708722457317974,
+                0.1291754140258857
+              ]
+            },
+            "activation - output_linear | new_correct | revised": {
+              "point": 0.06866197183098599,
+              "ci95": [
+                -0.0625,
+                0.20322785592525608
+              ]
+            },
+            "activation - output_linear | old_correct | revised": {
+              "point": -0.0699300699300699,
+              "ci95": [
+                -0.2092547298533214,
+                0.0711133966244725
+              ]
+            },
+            "combined - output_linear | new_correct | all": {
+              "point": 0.03542510121457498,
+              "ci95": [
+                -0.041276642776800224,
+                0.1139541478127951
+              ]
+            },
+            "combined - output_linear | old_correct | all": {
+              "point": 0.03835067051008911,
+              "ci95": [
+                -0.034269073509387675,
+                0.11429912052995603
+              ]
+            },
+            "combined - output_linear | new_correct | revised": {
+              "point": 0.10695422535211263,
+              "ci95": [
+                -0.01910759011782714,
+                0.2391990786930225
+              ]
+            },
+            "combined - output_linear | old_correct | revised": {
+              "point": -0.07192807192807182,
+              "ci95": [
+                -0.21670915872102572,
+                0.07068371092327448
+              ]
+            }
+          }
+        }
+      }
+    }
+  ]
+}

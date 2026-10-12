@@ -1,0 +1,652 @@
+[
+ {
+  "seed": 0,
+  "fold": 0,
+  "family": "output_linear",
+  "params": {
+   "old": {
+    "C": 0.01
+   },
+   "new": {
+    "C": 0.01
+   }
+  },
+  "tau": {
+   "difference_panel": 0.025,
+   "difference_agent": 0.025,
+   "protect_panel": 0.15,
+   "protect_agent": 0.225
+  },
+  "calibrators": {
+   "old": {
+    "coef": 4.524005168499335,
+    "intercept": -2.2123107333587653,
+    "constant": null
+   },
+   "new": {
+    "coef": 4.527806403905572,
+    "intercept": -2.212782592505868,
+    "constant": null
+   }
+  }
+ },
+ {
+  "seed": 0,
+  "fold": 0,
+  "family": "output_hgb",
+  "params": {
+   "old": {
+    "max_iter": 100,
+    "max_depth": 3
+   },
+   "new": {
+    "max_iter": 100,
+    "max_depth": 3
+   }
+  },
+  "tau": {
+   "difference_panel": 0.075,
+   "difference_agent": 0.0,
+   "protect_panel": 0.475,
+   "protect_agent": 0.45
+  },
+  "calibrators": {
+   "old": {
+    "coef": 2.4329847197374725,
+    "intercept": -1.0418961565774834,
+    "constant": null
+   },
+   "new": {
+    "coef": 2.795162681845413,
+    "intercept": -1.213627746387822,
+    "constant": null
+   }
+  }
+ },
+ {
+  "seed": 0,
+  "fold": 0,
+  "family": "activation",
+  "params": {
+   "old": {
+    "layer": 24,
+    "C": 0.0001
+   },
+   "new": {
+    "layer": 24,
+    "C": 0.0001
+   }
+  },
+  "tau": {
+   "difference_panel": 0.075,
+   "difference_agent": 0.025,
+   "protect_panel": 0.375,
+   "protect_agent": 0.45
+  },
+  "calibrators": {
+   "old": {
+    "coef": 4.419260115122544,
+    "intercept": -2.2142864717464046,
+    "constant": null
+   },
+   "new": {
+    "coef": 4.770639193633895,
+    "intercept": -2.4238496645373244,
+    "constant": null
+   }
+  }
+ },
+ {
+  "seed": 0,
+  "fold": 0,
+  "family": "combined",
+  "params": {
+   "old": {
+    "layer": 24,
+    "C": 0.0001
+   },
+   "new": {
+    "layer": 24,
+    "C": 0.0001
+   }
+  },
+  "tau": {
+   "difference_panel": 0.075,
+   "difference_agent": 0.025,
+   "protect_panel": 0.35,
+   "protect_agent": 0.6
+  },
+  "calibrators": {
+   "old": {
+    "coef": 4.486158471753514,
+    "intercept": -2.2520251659525634,
+    "constant": null
+   },
+   "new": {
+    "coef": 4.810187211178418,
+    "intercept": -2.445166453526706,
+    "constant": null
+   }
+  }
+ },
+ {
+  "seed": 0,
+  "fold": 1,
+  "family": "output_linear",
+  "params": {
+   "old": {
+    "C": 0.001
+   },
+   "new": {
+    "C": 0.01
+   }
+  },
+  "tau": {
+   "difference_panel": 0.0,
+   "difference_agent": -0.1,
+   "protect_panel": 0.375,
+   "protect_agent": 0.35
+  },
+  "calibrators": {
+   "old": {
+    "coef": 9.212368131769175,
+    "intercept": -4.979840382360039,
+    "constant": null
+   },
+   "new": {
+    "coef": 4.6703773965384965,
+    "intercept": -2.332279320355278,
+    "constant": null
+   }
+  }
+ },
+ {
+  "seed": 0,
+  "fold": 1,
+  "family": "output_hgb",
+  "params": {
+   "old": {
+    "max_iter": 100,
+    "max_depth": 3
+   },
+   "new": {
+    "max_iter": 100,
+    "max_depth": 3
+   }
+  },
+  "tau": {
+   "difference_panel": 0.05,
+   "difference_agent": 0.075,
+   "protect_panel": 0.275,
+   "protect_agent": 0.3
+  },
+  "calibrators": {
+   "old": {
+    "coef": 2.5822250476211708,
+    "intercept": -1.174167289595326,
+    "constant": null
+   },
+   "new": {
+    "coef": 3.669944874899951,
+    "intercept": -1.7126987066116865,
+    "constant": null
+   }
+  }
+ },
+ {
+  "seed": 0,
+  "fold": 1,
+  "family": "activation",
+  "params": {
+   "old": {
+    "layer": 48,
+    "C": 0.0001
+   },
+   "new": {
+    "layer": 38,
+    "C": 0.0001
+   }
+  },
+  "tau": {
+   "difference_panel": 0.05,
+   "difference_agent": 0.025,
+   "protect_panel": 0.275,
+   "protect_agent": 0.275
+  },
+  "calibrators": {
+   "old": {
+    "coef": 3.682635602736613,
+    "intercept": -1.8084218058530945,
+    "constant": null
+   },
+   "new": {
+    "coef": 4.277926368712008,
+    "intercept": -2.119232285731767,
+    "constant": null
+   }
+  }
+ },
+ {
+  "seed": 0,
+  "fold": 1,
+  "family": "combined",
+  "params": {
+   "old": {
+    "layer": 48,
+    "C": 0.0001
+   },
+   "new": {
+    "layer": 24,
+    "C": 0.0001
+   }
+  },
+  "tau": {
+   "difference_panel": 0.075,
+   "difference_agent": 0.0,
+   "protect_panel": 0.275,
+   "protect_agent": 0.275
+  },
+  "calibrators": {
+   "old": {
+    "coef": 3.720402411511886,
+    "intercept": -1.8296969485120302,
+    "constant": null
+   },
+   "new": {
+    "coef": 5.261321550128836,
+    "intercept": -2.657269774496208,
+    "constant": null
+   }
+  }
+ },
+ {
+  "seed": 0,
+  "fold": 2,
+  "family": "output_linear",
+  "params": {
+   "old": {
+    "C": 0.01
+   },
+   "new": {
+    "C": 0.01
+   }
+  },
+  "tau": {
+   "difference_panel": 0.0,
+   "difference_agent": -0.025,
+   "protect_panel": 0.35,
+   "protect_agent": 0.35
+  },
+  "calibrators": {
+   "old": {
+    "coef": 4.226378873557813,
+    "intercept": -2.0662515418490384,
+    "constant": null
+   },
+   "new": {
+    "coef": 4.56825810630181,
+    "intercept": -2.2435796167020197,
+    "constant": null
+   }
+  }
+ },
+ {
+  "seed": 0,
+  "fold": 2,
+  "family": "output_hgb",
+  "params": {
+   "old": {
+    "max_iter": 100,
+    "max_depth": 3
+   },
+   "new": {
+    "max_iter": 100,
+    "max_depth": 3
+   }
+  },
+  "tau": {
+   "difference_panel": 0.075,
+   "difference_agent": 0.075,
+   "protect_panel": 0.35,
+   "protect_agent": 0.35
+  },
+  "calibrators": {
+   "old": {
+    "coef": 2.444507987007839,
+    "intercept": -1.1196648440884078,
+    "constant": null
+   },
+   "new": {
+    "coef": 1.9846982283351393,
+    "intercept": -0.8899571202764452,
+    "constant": null
+   }
+  }
+ },
+ {
+  "seed": 0,
+  "fold": 2,
+  "family": "activation",
+  "params": {
+   "old": {
+    "layer": 24,
+    "C": 0.0001
+   },
+   "new": {
+    "layer": 24,
+    "C": 0.0001
+   }
+  },
+  "tau": {
+   "difference_panel": 0.025,
+   "difference_agent": 0.0,
+   "protect_panel": 0.375,
+   "protect_agent": 0.35
+  },
+  "calibrators": {
+   "old": {
+    "coef": 4.167421102661708,
+    "intercept": -2.0789189131548524,
+    "constant": null
+   },
+   "new": {
+    "coef": 4.615494309316146,
+    "intercept": -2.3171170922915887,
+    "constant": null
+   }
+  }
+ },
+ {
+  "seed": 0,
+  "fold": 2,
+  "family": "combined",
+  "params": {
+   "old": {
+    "layer": 24,
+    "C": 0.0001
+   },
+   "new": {
+    "layer": 24,
+    "C": 0.0001
+   }
+  },
+  "tau": {
+   "difference_panel": 0.025,
+   "difference_agent": 0.0,
+   "protect_panel": 0.375,
+   "protect_agent": 0.35
+  },
+  "calibrators": {
+   "old": {
+    "coef": 4.244048977947487,
+    "intercept": -2.119361508443752,
+    "constant": null
+   },
+   "new": {
+    "coef": 4.707036022322697,
+    "intercept": -2.365305714722301,
+    "constant": null
+   }
+  }
+ },
+ {
+  "seed": 0,
+  "fold": 3,
+  "family": "output_linear",
+  "params": {
+   "old": {
+    "C": 0.01
+   },
+   "new": {
+    "C": 0.01
+   }
+  },
+  "tau": {
+   "difference_panel": 0.0,
+   "difference_agent": -0.075,
+   "protect_panel": 0.75,
+   "protect_agent": 0.75
+  },
+  "calibrators": {
+   "old": {
+    "coef": 4.377521893185562,
+    "intercept": -2.2052145326387724,
+    "constant": null
+   },
+   "new": {
+    "coef": 3.9793016316170116,
+    "intercept": -1.9578204178908112,
+    "constant": null
+   }
+  }
+ },
+ {
+  "seed": 0,
+  "fold": 3,
+  "family": "output_hgb",
+  "params": {
+   "old": {
+    "max_iter": 100,
+    "max_depth": 3
+   },
+   "new": {
+    "max_iter": 100,
+    "max_depth": 3
+   }
+  },
+  "tau": {
+   "difference_panel": -0.175,
+   "difference_agent": 0.075,
+   "protect_panel": 0.75,
+   "protect_agent": 0.75
+  },
+  "calibrators": {
+   "old": {
+    "coef": 2.1048186321745193,
+    "intercept": -0.9426143943395854,
+    "constant": null
+   },
+   "new": {
+    "coef": 3.1940767530367875,
+    "intercept": -1.5091924720511252,
+    "constant": null
+   }
+  }
+ },
+ {
+  "seed": 0,
+  "fold": 3,
+  "family": "activation",
+  "params": {
+   "old": {
+    "layer": 24,
+    "C": 0.0001
+   },
+   "new": {
+    "layer": 24,
+    "C": 0.001
+   }
+  },
+  "tau": {
+   "difference_panel": -0.025,
+   "difference_agent": 0.0,
+   "protect_panel": 0.5,
+   "protect_agent": 0.575
+  },
+  "calibrators": {
+   "old": {
+    "coef": 5.298798809432957,
+    "intercept": -2.646787111109997,
+    "constant": null
+   },
+   "new": {
+    "coef": 3.4794926882824346,
+    "intercept": -1.6224913851029499,
+    "constant": null
+   }
+  }
+ },
+ {
+  "seed": 0,
+  "fold": 3,
+  "family": "combined",
+  "params": {
+   "old": {
+    "layer": 24,
+    "C": 0.0001
+   },
+   "new": {
+    "layer": 24,
+    "C": 0.001
+   }
+  },
+  "tau": {
+   "difference_panel": -0.025,
+   "difference_agent": 0.0,
+   "protect_panel": 0.5,
+   "protect_agent": 0.575
+  },
+  "calibrators": {
+   "old": {
+    "coef": 5.310700409040486,
+    "intercept": -2.653937368536254,
+    "constant": null
+   },
+   "new": {
+    "coef": 3.511883006393333,
+    "intercept": -1.6431972016722491,
+    "constant": null
+   }
+  }
+ },
+ {
+  "seed": 0,
+  "fold": 4,
+  "family": "output_linear",
+  "params": {
+   "old": {
+    "C": 0.01
+   },
+   "new": {
+    "C": 0.01
+   }
+  },
+  "tau": {
+   "difference_panel": 0.0,
+   "difference_agent": -0.05,
+   "protect_panel": 0.35,
+   "protect_agent": 0.4
+  },
+  "calibrators": {
+   "old": {
+    "coef": 3.9878646125453168,
+    "intercept": -1.9874554587002997,
+    "constant": null
+   },
+   "new": {
+    "coef": 4.494710416042633,
+    "intercept": -2.2551872554624954,
+    "constant": null
+   }
+  }
+ },
+ {
+  "seed": 0,
+  "fold": 4,
+  "family": "output_hgb",
+  "params": {
+   "old": {
+    "max_iter": 100,
+    "max_depth": 3
+   },
+   "new": {
+    "max_iter": 100,
+    "max_depth": 3
+   }
+  },
+  "tau": {
+   "difference_panel": -0.125,
+   "difference_agent": -0.1,
+   "protect_panel": 0.5,
+   "protect_agent": 0.425
+  },
+  "calibrators": {
+   "old": {
+    "coef": 2.242568038874186,
+    "intercept": -1.0031212143137471,
+    "constant": null
+   },
+   "new": {
+    "coef": 2.7982881546638976,
+    "intercept": -1.355279518547621,
+    "constant": null
+   }
+  }
+ },
+ {
+  "seed": 0,
+  "fold": 4,
+  "family": "activation",
+  "params": {
+   "old": {
+    "layer": 24,
+    "C": 0.0001
+   },
+   "new": {
+    "layer": 31,
+    "C": 0.0001
+   }
+  },
+  "tau": {
+   "difference_panel": 0.0,
+   "difference_agent": 0.0,
+   "protect_panel": 0.45,
+   "protect_agent": 0.5
+  },
+  "calibrators": {
+   "old": {
+    "coef": 5.406742304954007,
+    "intercept": -2.7104707892502367,
+    "constant": null
+   },
+   "new": {
+    "coef": 4.600833970563708,
+    "intercept": -2.281057530515204,
+    "constant": null
+   }
+  }
+ },
+ {
+  "seed": 0,
+  "fold": 4,
+  "family": "combined",
+  "params": {
+   "old": {
+    "layer": 24,
+    "C": 0.0001
+   },
+   "new": {
+    "layer": 31,
+    "C": 0.0001
+   }
+  },
+  "tau": {
+   "difference_panel": 0.05,
+   "difference_agent": 0.0,
+   "protect_panel": 0.45,
+   "protect_agent": 0.5
+  },
+  "calibrators": {
+   "old": {
+    "coef": 5.435258667668807,
+    "intercept": -2.724142238249605,
+    "constant": null
+   },
+   "new": {
+    "coef": 4.647177527878477,
+    "intercept": -2.3049773131464186,
+    "constant": null
+   }
+  }
+ }
+]

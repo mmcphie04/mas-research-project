@@ -1,0 +1,170 @@
+runs/colab/pilot12b-debate: 360 events, 120 questions, 110 revised; time=pre; families=['output_linear', 'output_hgb', 'activation', 'combined']; tie-break=round0_then_agent0
+  seed 0 fold 0 done
+  seed 0 fold 1 done
+  seed 0 fold 2 done
+  seed 0 fold 3 done
+  seed 0 fold 4 done
+{
+ "reference": {
+  "accept_all": {
+   "agent_accuracy": 0.5611111111111111,
+   "panel_accuracy": 0.5583333333333333
+  },
+  "reject_all": {
+   "agent_accuracy": 0.5611111111111111,
+   "panel_accuracy": 0.575
+  },
+  "agent_optimal_not_a_panel_bound": {
+   "agent_accuracy": 0.65,
+   "panel_accuracy": 0.65
+  },
+  "panel_optimal": {
+   "agent_accuracy": 0.5861111111111111,
+   "panel_accuracy": 0.65
+  }
+ },
+ "primary_gates": {
+  "output_linear": {
+   "agent_accuracy": 0.5638888888888889,
+   "panel_accuracy": 0.5666666666666667,
+   "beneficial_kept": 15,
+   "beneficial_lost": 17,
+   "harmful_blocked": 18,
+   "harmful_accepted": 14,
+   "unhelpful_accepted": 21,
+   "revisions_accepted": 50,
+   "revisions": 110
+  },
+  "output_hgb": {
+   "agent_accuracy": 0.5555555555555556,
+   "panel_accuracy": 0.5416666666666666,
+   "beneficial_kept": 18,
+   "beneficial_lost": 14,
+   "harmful_blocked": 12,
+   "harmful_accepted": 20,
+   "unhelpful_accepted": 20,
+   "revisions_accepted": 58,
+   "revisions": 110
+  },
+  "activation": {
+   "agent_accuracy": 0.5555555555555556,
+   "panel_accuracy": 0.5333333333333333,
+   "beneficial_kept": 20,
+   "beneficial_lost": 12,
+   "harmful_blocked": 10,
+   "harmful_accepted": 22,
+   "unhelpful_accepted": 17,
+   "revisions_accepted": 59,
+   "revisions": 110
+  },
+  "combined": {
+   "agent_accuracy": 0.5555555555555556,
+   "panel_accuracy": 0.5333333333333333,
+   "beneficial_kept": 20,
+   "beneficial_lost": 12,
+   "harmful_blocked": 10,
+   "harmful_accepted": 22,
+   "unhelpful_accepted": 16,
+   "revisions_accepted": 58,
+   "revisions": 110
+  }
+ },
+ "paired_panel_primary": {
+  "activation - output_linear": {
+   "mean": -0.03333333333333333,
+   "ci95": [
+    -0.075,
+    0.0
+   ],
+   "n_questions": 120
+  },
+  "activation - output_hgb": {
+   "mean": -0.008333333333333333,
+   "ci95": [
+    -0.041666666666666664,
+    0.016666666666666666
+   ],
+   "n_questions": 120
+  },
+  "combined - output_linear": {
+   "mean": -0.03333333333333333,
+   "ci95": [
+    -0.075,
+    0.0
+   ],
+   "n_questions": 120
+  },
+  "combined - output_hgb": {
+   "mean": -0.008333333333333333,
+   "ci95": [
+    -0.041666666666666664,
+    0.016666666666666666
+   ],
+   "n_questions": 120
+  },
+  "output_linear - accept_all": {
+   "mean": 0.008333333333333333,
+   "ci95": [
+    -0.041666666666666664,
+    0.058333333333333334
+   ],
+   "n_questions": 120
+  },
+  "output_linear - reject_all": {
+   "mean": -0.008333333333333333,
+   "ci95": [
+    -0.05,
+    0.03333333333333333
+   ],
+   "n_questions": 120
+  },
+  "output_hgb - accept_all": {
+   "mean": -0.016666666666666666,
+   "ci95": [
+    -0.058333333333333334,
+    0.025
+   ],
+   "n_questions": 120
+  },
+  "output_hgb - reject_all": {
+   "mean": -0.03333333333333333,
+   "ci95": [
+    -0.08333333333333333,
+    0.008333333333333333
+   ],
+   "n_questions": 120
+  },
+  "activation - accept_all": {
+   "mean": -0.025,
+   "ci95": [
+    -0.075,
+    0.025
+   ],
+   "n_questions": 120
+  },
+  "activation - reject_all": {
+   "mean": -0.041666666666666664,
+   "ci95": [
+    -0.09166666666666666,
+    0.008333333333333333
+   ],
+   "n_questions": 120
+  },
+  "combined - accept_all": {
+   "mean": -0.025,
+   "ci95": [
+    -0.075,
+    0.025
+   ],
+   "n_questions": 120
+  },
+  "combined - reject_all": {
+   "mean": -0.041666666666666664,
+   "ci95": [
+    -0.09166666666666666,
+    0.008333333333333333
+   ],
+   "n_questions": 120
+  }
+ }
+}

@@ -1,0 +1,1125 @@
+{
+  "primary_all_questions": {
+    "n_questions": 120,
+    "conditions": {
+      "self_reconsider": {
+        "final_vote_correct": 58,
+        "pooled6_correct": 72,
+        "oracle_correct": 81,
+        "gains": 11,
+        "losses": 22,
+        "new_correct_discoveries": 9,
+        "final_minus_original": {
+          "mean": -0.09166666666666666,
+          "ci95": [
+            -0.18333333333333332,
+            0.0
+          ]
+        },
+        "pooled6_minus_original": {
+          "mean": 0.025,
+          "ci95": [
+            -0.016666666666666666,
+            0.06666666666666667
+          ]
+        }
+      },
+      "debate": {
+        "final_vote_correct": 67,
+        "pooled6_correct": 71,
+        "oracle_correct": 78,
+        "gains": 6,
+        "losses": 8,
+        "new_correct_discoveries": 1,
+        "final_minus_original": {
+          "mean": -0.016666666666666666,
+          "ci95": [
+            -0.075,
+            0.041666666666666664
+          ]
+        },
+        "pooled6_minus_original": {
+          "mean": 0.016666666666666666,
+          "ci95": [
+            -0.016666666666666666,
+            0.05
+          ]
+        }
+      },
+      "debate_answer_only": {
+        "final_vote_correct": 69,
+        "pooled6_correct": 70,
+        "oracle_correct": 78,
+        "gains": 7,
+        "losses": 7,
+        "new_correct_discoveries": 2,
+        "final_minus_original": {
+          "mean": 0.0,
+          "ci95": [
+            -0.058333333333333334,
+            0.058333333333333334
+          ]
+        },
+        "pooled6_minus_original": {
+          "mean": 0.008333333333333333,
+          "ci95": [
+            -0.025,
+            0.041666666666666664
+          ]
+        }
+      },
+      "misleading_one": {
+        "final_vote_correct": 66,
+        "pooled6_correct": 72,
+        "oracle_correct": 78,
+        "gains": 4,
+        "losses": 7,
+        "new_correct_discoveries": 2,
+        "final_minus_original": {
+          "mean": -0.025,
+          "ci95": [
+            -0.08333333333333333,
+            0.025
+          ]
+        },
+        "pooled6_minus_original": {
+          "mean": 0.025,
+          "ci95": [
+            0.0,
+            0.058333333333333334
+          ]
+        }
+      }
+    },
+    "paired": {
+      "final: debate - debate_answer_only": {
+        "mean": -0.016666666666666666,
+        "ci95": [
+          -0.075,
+          0.041666666666666664
+        ],
+        "debate_only_correct": 5,
+        "debate_answer_only_only_correct": 7
+      },
+      "final: debate - self_reconsider": {
+        "mean": 0.075,
+        "ci95": [
+          -0.016666666666666666,
+          0.16666666666666666
+        ],
+        "debate_only_correct": 22,
+        "self_reconsider_only_correct": 13
+      },
+      "final: debate_answer_only - self_reconsider": {
+        "mean": 0.09166666666666666,
+        "ci95": [
+          -0.008333333333333333,
+          0.19166666666666668
+        ],
+        "debate_answer_only_only_correct": 24,
+        "self_reconsider_only_correct": 13
+      },
+      "final: debate - misleading_one": {
+        "mean": 0.008333333333333333,
+        "ci95": [
+          -0.058333333333333334,
+          0.075
+        ],
+        "debate_only_correct": 9,
+        "misleading_one_only_correct": 8
+      }
+    },
+    "original_vote_correct": 69,
+    "any_first_answer_correct": 82
+  },
+  "sensitivity_excluding_truncated_or_fallback_first_answers": {
+    "n_questions": 109,
+    "conditions": {
+      "self_reconsider": {
+        "final_vote_correct": 53,
+        "pooled6_correct": 67,
+        "oracle_correct": 76,
+        "gains": 10,
+        "losses": 22,
+        "new_correct_discoveries": 9,
+        "final_minus_original": {
+          "mean": -0.11009174311926606,
+          "ci95": [
+            -0.21100917431192662,
+            -0.009174311926605505
+          ]
+        },
+        "pooled6_minus_original": {
+          "mean": 0.01834862385321101,
+          "ci95": [
+            -0.027522935779816515,
+            0.06422018348623854
+          ]
+        }
+      },
+      "debate": {
+        "final_vote_correct": 62,
+        "pooled6_correct": 66,
+        "oracle_correct": 72,
+        "gains": 4,
+        "losses": 7,
+        "new_correct_discoveries": 1,
+        "final_minus_original": {
+          "mean": -0.027522935779816515,
+          "ci95": [
+            -0.09174311926605505,
+            0.027522935779816515
+          ]
+        },
+        "pooled6_minus_original": {
+          "mean": 0.009174311926605505,
+          "ci95": [
+            0.0,
+            0.027522935779816515
+          ]
+        }
+      },
+      "debate_answer_only": {
+        "final_vote_correct": 64,
+        "pooled6_correct": 65,
+        "oracle_correct": 72,
+        "gains": 5,
+        "losses": 6,
+        "new_correct_discoveries": 2,
+        "final_minus_original": {
+          "mean": -0.009174311926605505,
+          "ci95": [
+            -0.07339449541284404,
+            0.045871559633027525
+          ]
+        },
+        "pooled6_minus_original": {
+          "mean": 0.0,
+          "ci95": [
+            -0.027522935779816515,
+            0.027522935779816515
+          ]
+        }
+      },
+      "misleading_one": {
+        "final_vote_correct": 61,
+        "pooled6_correct": 66,
+        "oracle_correct": 72,
+        "gains": 2,
+        "losses": 6,
+        "new_correct_discoveries": 2,
+        "final_minus_original": {
+          "mean": -0.03669724770642202,
+          "ci95": [
+            -0.09174311926605505,
+            0.009174311926605505
+          ]
+        },
+        "pooled6_minus_original": {
+          "mean": 0.009174311926605505,
+          "ci95": [
+            0.0,
+            0.027522935779816515
+          ]
+        }
+      }
+    },
+    "paired": {
+      "final: debate - debate_answer_only": {
+        "mean": -0.01834862385321101,
+        "ci95": [
+          -0.08256880733944955,
+          0.045871559633027525
+        ],
+        "debate_only_correct": 5,
+        "debate_answer_only_only_correct": 7
+      },
+      "final: debate - self_reconsider": {
+        "mean": 0.08256880733944955,
+        "ci95": [
+          -0.01834862385321101,
+          0.1834862385321101
+        ],
+        "debate_only_correct": 20,
+        "self_reconsider_only_correct": 11
+      },
+      "final: debate_answer_only - self_reconsider": {
+        "mean": 0.10091743119266056,
+        "ci95": [
+          0.0,
+          0.2018348623853211
+        ],
+        "debate_answer_only_only_correct": 22,
+        "self_reconsider_only_correct": 11
+      },
+      "final: debate - misleading_one": {
+        "mean": 0.009174311926605505,
+        "ci95": [
+          -0.06422018348623854,
+          0.08256880733944955
+        ],
+        "debate_only_correct": 9,
+        "misleading_one_only_correct": 8
+      }
+    },
+    "original_vote_correct": 65,
+    "any_first_answer_correct": 75
+  },
+  "exclusion": {
+    "first_answers_capped_or_fallback": 18,
+    "questions_excluded": 11,
+    "question_ids": [
+      "11291",
+      "11397",
+      "11936",
+      "12024",
+      "12111",
+      "12198",
+      "161",
+      "715",
+      "770",
+      "8205",
+      "9837"
+    ],
+    "revised_answers_capped_by_condition": {
+      "self_reconsider": {
+        "n_questions": 3,
+        "within_excluded_set": true,
+        "question_ids": [
+          "11291",
+          "11936",
+          "12111"
+        ]
+      },
+      "debate": {
+        "n_questions": 0,
+        "within_excluded_set": true,
+        "question_ids": []
+      },
+      "debate_answer_only": {
+        "n_questions": 0,
+        "within_excluded_set": true,
+        "question_ids": []
+      },
+      "misleading_one": {
+        "n_questions": 0,
+        "within_excluded_set": true,
+        "question_ids": []
+      }
+    }
+  },
+  "revision_decomposition": {
+    "first_answers": {
+      "debate|1-1-1 split": {
+        "beneficial": 3,
+        "harmful": 3,
+        "unhelpful": 15
+      },
+      "debate|2-1 split": {
+        "beneficial": 28,
+        "harmful": 27,
+        "unhelpful": 30
+      },
+      "debate|unanimous": {
+        "beneficial": 1,
+        "harmful": 2,
+        "unhelpful": 1
+      },
+      "debate_answer_only|1-1-1 split": {
+        "beneficial": 2,
+        "harmful": 2,
+        "unhelpful": 13
+      },
+      "debate_answer_only|2-1 split": {
+        "beneficial": 29,
+        "harmful": 21,
+        "unhelpful": 29
+      },
+      "debate_answer_only|unanimous": {
+        "beneficial": 1,
+        "harmful": 3,
+        "unhelpful": 3
+      },
+      "misleading_one|1-1-1 split": {
+        "beneficial": 5,
+        "harmful": 4,
+        "unhelpful": 15
+      },
+      "misleading_one|2-1 split": {
+        "beneficial": 24,
+        "harmful": 22,
+        "unhelpful": 37
+      },
+      "misleading_one|unanimous": {
+        "beneficial": 1,
+        "harmful": 33,
+        "unhelpful": 23
+      },
+      "self_reconsider|1-1-1 split": {
+        "beneficial": 4,
+        "harmful": 2,
+        "unhelpful": 10
+      },
+      "self_reconsider|2-1 split": {
+        "beneficial": 19,
+        "harmful": 22,
+        "unhelpful": 30
+      },
+      "self_reconsider|unanimous": {
+        "beneficial": 12,
+        "harmful": 55,
+        "unhelpful": 27
+      }
+    },
+    "correct_minority": {
+      "debate|0": {
+        "beneficial": 32,
+        "harmful": 23,
+        "unhelpful": 46
+      },
+      "debate|1": {
+        "beneficial": 0,
+        "harmful": 9,
+        "unhelpful": 0
+      },
+      "debate_answer_only|0": {
+        "beneficial": 32,
+        "harmful": 18,
+        "unhelpful": 45
+      },
+      "debate_answer_only|1": {
+        "beneficial": 0,
+        "harmful": 8,
+        "unhelpful": 0
+      },
+      "misleading_one|0": {
+        "beneficial": 30,
+        "harmful": 49,
+        "unhelpful": 75
+      },
+      "misleading_one|1": {
+        "beneficial": 0,
+        "harmful": 10,
+        "unhelpful": 0
+      },
+      "self_reconsider|0": {
+        "beneficial": 35,
+        "harmful": 74,
+        "unhelpful": 67
+      },
+      "self_reconsider|1": {
+        "beneficial": 0,
+        "harmful": 5,
+        "unhelpful": 0
+      }
+    },
+    "any_first_correct": {
+      "debate|0": {
+        "beneficial": 1,
+        "harmful": 0,
+        "unhelpful": 40
+      },
+      "debate|1": {
+        "beneficial": 31,
+        "harmful": 32,
+        "unhelpful": 6
+      },
+      "debate_answer_only|0": {
+        "beneficial": 2,
+        "harmful": 0,
+        "unhelpful": 40
+      },
+      "debate_answer_only|1": {
+        "beneficial": 30,
+        "harmful": 26,
+        "unhelpful": 5
+      },
+      "misleading_one|0": {
+        "beneficial": 2,
+        "harmful": 0,
+        "unhelpful": 64
+      },
+      "misleading_one|1": {
+        "beneficial": 28,
+        "harmful": 59,
+        "unhelpful": 11
+      },
+      "self_reconsider|0": {
+        "beneficial": 16,
+        "harmful": 0,
+        "unhelpful": 56
+      },
+      "self_reconsider|1": {
+        "beneficial": 19,
+        "harmful": 79,
+        "unhelpful": 11
+      }
+    },
+    "shown_majority_wrong": {
+      "debate|0": {
+        "beneficial": 31,
+        "harmful": 23,
+        "unhelpful": 31
+      },
+      "debate|1": {
+        "beneficial": 1,
+        "harmful": 9,
+        "unhelpful": 15
+      },
+      "debate_answer_only|0": {
+        "beneficial": 30,
+        "harmful": 17,
+        "unhelpful": 29
+      },
+      "debate_answer_only|1": {
+        "beneficial": 2,
+        "harmful": 9,
+        "unhelpful": 16
+      },
+      "misleading_one|0": {
+        "beneficial": 29,
+        "harmful": 56,
+        "unhelpful": 56
+      },
+      "misleading_one|1": {
+        "beneficial": 1,
+        "harmful": 3,
+        "unhelpful": 19
+      },
+      "self_reconsider|0": {
+        "beneficial": 35,
+        "harmful": 79,
+        "unhelpful": 67
+      }
+    },
+    "adopted_shown_answer": {
+      "debate|0": {
+        "beneficial": 1,
+        "harmful": 3,
+        "unhelpful": 5
+      },
+      "debate|1": {
+        "beneficial": 31,
+        "harmful": 29,
+        "unhelpful": 41
+      },
+      "debate_answer_only|0": {
+        "beneficial": 2,
+        "harmful": 3,
+        "unhelpful": 7
+      },
+      "debate_answer_only|1": {
+        "beneficial": 30,
+        "harmful": 23,
+        "unhelpful": 38
+      },
+      "misleading_one|0": {
+        "beneficial": 4,
+        "harmful": 5,
+        "unhelpful": 5
+      },
+      "misleading_one|1": {
+        "beneficial": 26,
+        "harmful": 54,
+        "unhelpful": 70
+      },
+      "self_reconsider|0": {
+        "beneficial": 35,
+        "harmful": 79,
+        "unhelpful": 67
+      }
+    },
+    "subject": {
+      "debate|biology": {
+        "beneficial": 2,
+        "harmful": 6,
+        "unhelpful": 5
+      },
+      "debate|business": {
+        "beneficial": 2,
+        "harmful": 1,
+        "unhelpful": 3
+      },
+      "debate|chemistry": {
+        "beneficial": 2,
+        "harmful": 0,
+        "unhelpful": 1
+      },
+      "debate|computer science": {
+        "beneficial": 0,
+        "harmful": 0,
+        "unhelpful": 4
+      },
+      "debate|economics": {
+        "beneficial": 4,
+        "harmful": 4,
+        "unhelpful": 2
+      },
+      "debate|engineering": {
+        "beneficial": 0,
+        "harmful": 2,
+        "unhelpful": 7
+      },
+      "debate|health": {
+        "beneficial": 0,
+        "harmful": 0,
+        "unhelpful": 4
+      },
+      "debate|history": {
+        "beneficial": 0,
+        "harmful": 0,
+        "unhelpful": 3
+      },
+      "debate|law": {
+        "beneficial": 3,
+        "harmful": 3,
+        "unhelpful": 3
+      },
+      "debate|math": {
+        "beneficial": 3,
+        "harmful": 4,
+        "unhelpful": 4
+      },
+      "debate|other": {
+        "beneficial": 5,
+        "harmful": 3,
+        "unhelpful": 3
+      },
+      "debate|philosophy": {
+        "beneficial": 3,
+        "harmful": 1,
+        "unhelpful": 2
+      },
+      "debate|physics": {
+        "beneficial": 5,
+        "harmful": 3,
+        "unhelpful": 2
+      },
+      "debate|psychology": {
+        "beneficial": 3,
+        "harmful": 5,
+        "unhelpful": 3
+      },
+      "debate_answer_only|biology": {
+        "beneficial": 1,
+        "harmful": 2,
+        "unhelpful": 5
+      },
+      "debate_answer_only|business": {
+        "beneficial": 2,
+        "harmful": 1,
+        "unhelpful": 4
+      },
+      "debate_answer_only|chemistry": {
+        "beneficial": 4,
+        "harmful": 1,
+        "unhelpful": 1
+      },
+      "debate_answer_only|computer science": {
+        "beneficial": 0,
+        "harmful": 2,
+        "unhelpful": 3
+      },
+      "debate_answer_only|economics": {
+        "beneficial": 4,
+        "harmful": 1,
+        "unhelpful": 3
+      },
+      "debate_answer_only|engineering": {
+        "beneficial": 0,
+        "harmful": 2,
+        "unhelpful": 8
+      },
+      "debate_answer_only|health": {
+        "beneficial": 0,
+        "harmful": 0,
+        "unhelpful": 6
+      },
+      "debate_answer_only|history": {
+        "beneficial": 0,
+        "harmful": 0,
+        "unhelpful": 3
+      },
+      "debate_answer_only|law": {
+        "beneficial": 4,
+        "harmful": 4,
+        "unhelpful": 1
+      },
+      "debate_answer_only|math": {
+        "beneficial": 4,
+        "harmful": 1,
+        "unhelpful": 1
+      },
+      "debate_answer_only|other": {
+        "beneficial": 4,
+        "harmful": 3,
+        "unhelpful": 4
+      },
+      "debate_answer_only|philosophy": {
+        "beneficial": 1,
+        "harmful": 1,
+        "unhelpful": 1
+      },
+      "debate_answer_only|physics": {
+        "beneficial": 5,
+        "harmful": 4,
+        "unhelpful": 2
+      },
+      "debate_answer_only|psychology": {
+        "beneficial": 3,
+        "harmful": 4,
+        "unhelpful": 3
+      },
+      "misleading_one|biology": {
+        "beneficial": 3,
+        "harmful": 7,
+        "unhelpful": 5
+      },
+      "misleading_one|business": {
+        "beneficial": 2,
+        "harmful": 3,
+        "unhelpful": 3
+      },
+      "misleading_one|chemistry": {
+        "beneficial": 4,
+        "harmful": 5,
+        "unhelpful": 3
+      },
+      "misleading_one|computer science": {
+        "beneficial": 0,
+        "harmful": 2,
+        "unhelpful": 4
+      },
+      "misleading_one|economics": {
+        "beneficial": 4,
+        "harmful": 7,
+        "unhelpful": 4
+      },
+      "misleading_one|engineering": {
+        "beneficial": 0,
+        "harmful": 5,
+        "unhelpful": 14
+      },
+      "misleading_one|health": {
+        "beneficial": 0,
+        "harmful": 3,
+        "unhelpful": 3
+      },
+      "misleading_one|history": {
+        "beneficial": 0,
+        "harmful": 2,
+        "unhelpful": 9
+      },
+      "misleading_one|law": {
+        "beneficial": 3,
+        "harmful": 8,
+        "unhelpful": 5
+      },
+      "misleading_one|math": {
+        "beneficial": 3,
+        "harmful": 3,
+        "unhelpful": 5
+      },
+      "misleading_one|other": {
+        "beneficial": 2,
+        "harmful": 5,
+        "unhelpful": 7
+      },
+      "misleading_one|philosophy": {
+        "beneficial": 2,
+        "harmful": 3,
+        "unhelpful": 4
+      },
+      "misleading_one|physics": {
+        "beneficial": 4,
+        "harmful": 2,
+        "unhelpful": 4
+      },
+      "misleading_one|psychology": {
+        "beneficial": 3,
+        "harmful": 4,
+        "unhelpful": 5
+      },
+      "self_reconsider|biology": {
+        "beneficial": 2,
+        "harmful": 11,
+        "unhelpful": 4
+      },
+      "self_reconsider|business": {
+        "beneficial": 1,
+        "harmful": 5,
+        "unhelpful": 2
+      },
+      "self_reconsider|chemistry": {
+        "beneficial": 6,
+        "harmful": 4,
+        "unhelpful": 0
+      },
+      "self_reconsider|computer science": {
+        "beneficial": 0,
+        "harmful": 4,
+        "unhelpful": 2
+      },
+      "self_reconsider|economics": {
+        "beneficial": 4,
+        "harmful": 4,
+        "unhelpful": 4
+      },
+      "self_reconsider|engineering": {
+        "beneficial": 2,
+        "harmful": 2,
+        "unhelpful": 7
+      },
+      "self_reconsider|health": {
+        "beneficial": 0,
+        "harmful": 13,
+        "unhelpful": 3
+      },
+      "self_reconsider|history": {
+        "beneficial": 6,
+        "harmful": 1,
+        "unhelpful": 12
+      },
+      "self_reconsider|law": {
+        "beneficial": 1,
+        "harmful": 12,
+        "unhelpful": 3
+      },
+      "self_reconsider|math": {
+        "beneficial": 2,
+        "harmful": 2,
+        "unhelpful": 6
+      },
+      "self_reconsider|other": {
+        "beneficial": 2,
+        "harmful": 2,
+        "unhelpful": 8
+      },
+      "self_reconsider|philosophy": {
+        "beneficial": 7,
+        "harmful": 4,
+        "unhelpful": 5
+      },
+      "self_reconsider|physics": {
+        "beneficial": 0,
+        "harmful": 6,
+        "unhelpful": 6
+      },
+      "self_reconsider|psychology": {
+        "beneficial": 2,
+        "harmful": 9,
+        "unhelpful": 5
+      }
+    },
+    "chunk": {
+      "debate|c000": {
+        "beneficial": 6,
+        "harmful": 7,
+        "unhelpful": 0
+      },
+      "debate|c001": {
+        "beneficial": 3,
+        "harmful": 3,
+        "unhelpful": 7
+      },
+      "debate|c002": {
+        "beneficial": 7,
+        "harmful": 8,
+        "unhelpful": 7
+      },
+      "debate|c003": {
+        "beneficial": 8,
+        "harmful": 5,
+        "unhelpful": 10
+      },
+      "debate|c004": {
+        "beneficial": 6,
+        "harmful": 6,
+        "unhelpful": 14
+      },
+      "debate|c005": {
+        "beneficial": 2,
+        "harmful": 3,
+        "unhelpful": 8
+      },
+      "debate_answer_only|c000": {
+        "beneficial": 6,
+        "harmful": 7,
+        "unhelpful": 1
+      },
+      "debate_answer_only|c001": {
+        "beneficial": 4,
+        "harmful": 2,
+        "unhelpful": 7
+      },
+      "debate_answer_only|c002": {
+        "beneficial": 7,
+        "harmful": 5,
+        "unhelpful": 8
+      },
+      "debate_answer_only|c003": {
+        "beneficial": 8,
+        "harmful": 4,
+        "unhelpful": 10
+      },
+      "debate_answer_only|c004": {
+        "beneficial": 2,
+        "harmful": 5,
+        "unhelpful": 12
+      },
+      "debate_answer_only|c005": {
+        "beneficial": 5,
+        "harmful": 3,
+        "unhelpful": 7
+      },
+      "misleading_one|c000": {
+        "beneficial": 5,
+        "harmful": 16,
+        "unhelpful": 2
+      },
+      "misleading_one|c001": {
+        "beneficial": 5,
+        "harmful": 8,
+        "unhelpful": 8
+      },
+      "misleading_one|c002": {
+        "beneficial": 7,
+        "harmful": 5,
+        "unhelpful": 13
+      },
+      "misleading_one|c003": {
+        "beneficial": 5,
+        "harmful": 11,
+        "unhelpful": 20
+      },
+      "misleading_one|c004": {
+        "beneficial": 5,
+        "harmful": 8,
+        "unhelpful": 19
+      },
+      "misleading_one|c005": {
+        "beneficial": 3,
+        "harmful": 11,
+        "unhelpful": 13
+      },
+      "self_reconsider|c000": {
+        "beneficial": 3,
+        "harmful": 26,
+        "unhelpful": 4
+      },
+      "self_reconsider|c001": {
+        "beneficial": 7,
+        "harmful": 8,
+        "unhelpful": 10
+      },
+      "self_reconsider|c002": {
+        "beneficial": 7,
+        "harmful": 12,
+        "unhelpful": 11
+      },
+      "self_reconsider|c003": {
+        "beneficial": 6,
+        "harmful": 8,
+        "unhelpful": 21
+      },
+      "self_reconsider|c004": {
+        "beneficial": 3,
+        "harmful": 12,
+        "unhelpful": 14
+      },
+      "self_reconsider|c005": {
+        "beneficial": 9,
+        "harmful": 13,
+        "unhelpful": 7
+      }
+    }
+  },
+  "sessions": [
+    {
+      "condition": "self_reconsider",
+      "session": "session 2 (c000-c002)",
+      "agent_first_acc": 0.656,
+      "agent_revised_acc": 0.494,
+      "revision_rate": 0.489,
+      "beneficial": 17,
+      "harmful": 46,
+      "unhelpful": 25
+    },
+    {
+      "condition": "self_reconsider",
+      "session": "session 3 (c003-c005)",
+      "agent_first_acc": 0.467,
+      "agent_revised_acc": 0.383,
+      "revision_rate": 0.517,
+      "beneficial": 18,
+      "harmful": 33,
+      "unhelpful": 42
+    },
+    {
+      "condition": "debate",
+      "session": "session 2 (c000-c002)",
+      "agent_first_acc": 0.656,
+      "agent_revised_acc": 0.644,
+      "revision_rate": 0.267,
+      "beneficial": 16,
+      "harmful": 18,
+      "unhelpful": 14
+    },
+    {
+      "condition": "debate",
+      "session": "session 3 (c003-c005)",
+      "agent_first_acc": 0.467,
+      "agent_revised_acc": 0.478,
+      "revision_rate": 0.344,
+      "beneficial": 16,
+      "harmful": 14,
+      "unhelpful": 32
+    },
+    {
+      "condition": "debate_answer_only",
+      "session": "session 2 (c000-c002)",
+      "agent_first_acc": 0.656,
+      "agent_revised_acc": 0.672,
+      "revision_rate": 0.261,
+      "beneficial": 17,
+      "harmful": 14,
+      "unhelpful": 16
+    },
+    {
+      "condition": "debate_answer_only",
+      "session": "session 3 (c003-c005)",
+      "agent_first_acc": 0.467,
+      "agent_revised_acc": 0.483,
+      "revision_rate": 0.311,
+      "beneficial": 15,
+      "harmful": 12,
+      "unhelpful": 29
+    },
+    {
+      "condition": "misleading_one",
+      "session": "session 2 (c000-c002)",
+      "agent_first_acc": 0.656,
+      "agent_revised_acc": 0.589,
+      "revision_rate": 0.383,
+      "beneficial": 17,
+      "harmful": 29,
+      "unhelpful": 23
+    },
+    {
+      "condition": "misleading_one",
+      "session": "session 3 (c003-c005)",
+      "agent_first_acc": 0.467,
+      "agent_revised_acc": 0.372,
+      "revision_rate": 0.528,
+      "beneficial": 13,
+      "harmful": 30,
+      "unhelpful": 52
+    }
+  ],
+  "pivotal_question_ids": {
+    "self_reconsider": {
+      "gains": [
+        "10828",
+        "10866",
+        "11030",
+        "11936",
+        "3607",
+        "3768",
+        "4694",
+        "4711",
+        "4948",
+        "6969",
+        "8909"
+      ],
+      "losses": [
+        "10099",
+        "10559",
+        "10736",
+        "11011",
+        "1176",
+        "1197",
+        "1270",
+        "203",
+        "2106",
+        "2757",
+        "2824",
+        "2827",
+        "3219",
+        "3248",
+        "4454",
+        "6181",
+        "6249",
+        "6498",
+        "6800",
+        "930",
+        "9360",
+        "9422"
+      ]
+    },
+    "debate": {
+      "gains": [
+        "11030",
+        "5364",
+        "5953",
+        "6969",
+        "8205",
+        "9837"
+      ],
+      "losses": [
+        "12198",
+        "2106",
+        "2478",
+        "2827",
+        "3219",
+        "3482",
+        "7497",
+        "930"
+      ]
+    },
+    "debate_answer_only": {
+      "gains": [
+        "1832",
+        "3607",
+        "5364",
+        "5589",
+        "6969",
+        "8205",
+        "9837"
+      ],
+      "losses": [
+        "10099",
+        "10623",
+        "12198",
+        "2034",
+        "2478",
+        "3219",
+        "930"
+      ]
+    },
+    "misleading_one": {
+      "gains": [
+        "3607",
+        "6969",
+        "8205",
+        "9837"
+      ],
+      "losses": [
+        "11359",
+        "1197",
+        "12198",
+        "2824",
+        "4454",
+        "6813",
+        "7354"
+      ]
+    }
+  },
+  "case_study_question_ids": [
+    "8205",
+    "5364",
+    "9837",
+    "12198",
+    "3219",
+    "930"
+  ]
+}

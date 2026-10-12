@@ -1,0 +1,1441 @@
+question_id,agent_id,subject,label,chunk,first_answers,correct_minority,any_first_correct,shown_majority_wrong,adopted_shown_answer,condition
+3248,0,biology,none,c000,unanimous,0,1,0,0,self_reconsider
+3248,1,biology,harmful,c000,unanimous,0,1,0,0,self_reconsider
+3248,2,biology,harmful,c000,unanimous,0,1,0,0,self_reconsider
+203,0,business,harmful,c000,unanimous,0,1,0,0,self_reconsider
+203,1,business,harmful,c000,unanimous,0,1,0,0,self_reconsider
+203,2,business,harmful,c000,unanimous,0,1,0,0,self_reconsider
+4020,0,chemistry,beneficial,c000,2-1 split,0,1,0,0,self_reconsider
+4020,1,chemistry,none,c000,2-1 split,0,1,0,0,self_reconsider
+4020,2,chemistry,none,c000,2-1 split,0,1,0,0,self_reconsider
+10736,0,computer science,none,c000,unanimous,0,1,0,0,self_reconsider
+10736,1,computer science,harmful,c000,unanimous,0,1,0,0,self_reconsider
+10736,2,computer science,harmful,c000,unanimous,0,1,0,0,self_reconsider
+7123,0,economics,harmful,c000,unanimous,0,1,0,0,self_reconsider
+7123,1,economics,none,c000,unanimous,0,1,0,0,self_reconsider
+7123,2,economics,none,c000,unanimous,0,1,0,0,self_reconsider
+12198,0,engineering,beneficial,c000,2-1 split,0,1,0,0,self_reconsider
+12198,1,engineering,harmful,c000,2-1 split,0,1,0,0,self_reconsider
+12198,2,engineering,harmful,c000,2-1 split,0,1,0,0,self_reconsider
+6800,0,health,harmful,c000,unanimous,0,1,0,0,self_reconsider
+6800,1,health,harmful,c000,unanimous,0,1,0,0,self_reconsider
+6800,2,health,harmful,c000,unanimous,0,1,0,0,self_reconsider
+4950,0,history,unhelpful,c000,unanimous,0,0,0,0,self_reconsider
+4950,1,history,unhelpful,c000,unanimous,0,0,0,0,self_reconsider
+4950,2,history,unhelpful,c000,unanimous,0,0,0,0,self_reconsider
+1197,0,law,harmful,c000,2-1 split,0,1,0,0,self_reconsider
+1197,1,law,beneficial,c000,2-1 split,0,1,0,0,self_reconsider
+1197,2,law,harmful,c000,2-1 split,0,1,0,0,self_reconsider
+7937,0,math,harmful,c000,2-1 split,0,1,0,0,self_reconsider
+7937,1,math,unhelpful,c000,2-1 split,0,1,0,0,self_reconsider
+7937,2,math,none,c000,2-1 split,0,1,0,0,self_reconsider
+5589,0,other,none,c000,2-1 split,1,1,0,0,self_reconsider
+5589,1,other,none,c000,2-1 split,0,1,0,0,self_reconsider
+5589,2,other,none,c000,2-1 split,0,1,0,0,self_reconsider
+10779,0,philosophy,none,c000,unanimous,0,1,0,0,self_reconsider
+10779,1,philosophy,none,c000,unanimous,0,1,0,0,self_reconsider
+10779,2,philosophy,none,c000,unanimous,0,1,0,0,self_reconsider
+9588,0,physics,none,c000,2-1 split,0,1,0,0,self_reconsider
+9588,1,physics,none,c000,2-1 split,0,1,0,0,self_reconsider
+9588,2,physics,harmful,c000,2-1 split,0,1,0,0,self_reconsider
+2021,0,psychology,harmful,c000,unanimous,0,1,0,0,self_reconsider
+2021,1,psychology,harmful,c000,unanimous,0,1,0,0,self_reconsider
+2021,2,psychology,none,c000,unanimous,0,1,0,0,self_reconsider
+3219,0,biology,harmful,c000,2-1 split,0,1,0,0,self_reconsider
+3219,1,biology,harmful,c000,2-1 split,0,1,0,0,self_reconsider
+3219,2,biology,none,c000,2-1 split,0,1,0,0,self_reconsider
+430,0,business,harmful,c000,unanimous,0,1,0,0,self_reconsider
+430,1,business,none,c000,unanimous,0,1,0,0,self_reconsider
+430,2,business,harmful,c000,unanimous,0,1,0,0,self_reconsider
+4454,0,chemistry,harmful,c000,unanimous,0,1,0,0,self_reconsider
+4454,1,chemistry,harmful,c000,unanimous,0,1,0,0,self_reconsider
+4454,2,chemistry,harmful,c000,unanimous,0,1,0,0,self_reconsider
+10539,0,computer science,none,c000,unanimous,0,1,0,0,self_reconsider
+10539,1,computer science,none,c000,unanimous,0,1,0,0,self_reconsider
+10539,2,computer science,none,c000,unanimous,0,1,0,0,self_reconsider
+7307,0,economics,none,c000,unanimous,0,1,0,0,self_reconsider
+7307,1,economics,none,c000,unanimous,0,1,0,0,self_reconsider
+7307,2,economics,none,c000,unanimous,0,1,0,0,self_reconsider
+11359,0,engineering,none,c000,unanimous,0,1,0,0,self_reconsider
+11359,1,engineering,none,c000,unanimous,0,1,0,0,self_reconsider
+11359,2,engineering,none,c000,unanimous,0,1,0,0,self_reconsider
+6513,0,health,none,c001,unanimous,0,1,0,0,self_reconsider
+6513,1,health,harmful,c001,unanimous,0,1,0,0,self_reconsider
+6513,2,health,none,c001,unanimous,0,1,0,0,self_reconsider
+4948,0,history,beneficial,c001,unanimous,0,0,0,0,self_reconsider
+4948,1,history,unhelpful,c001,unanimous,0,0,0,0,self_reconsider
+4948,2,history,beneficial,c001,unanimous,0,0,0,0,self_reconsider
+1270,0,law,harmful,c001,unanimous,0,1,0,0,self_reconsider
+1270,1,law,harmful,c001,unanimous,0,1,0,0,self_reconsider
+1270,2,law,harmful,c001,unanimous,0,1,0,0,self_reconsider
+8612,0,math,none,c001,unanimous,0,1,0,0,self_reconsider
+8612,1,math,none,c001,unanimous,0,1,0,0,self_reconsider
+8612,2,math,none,c001,unanimous,0,1,0,0,self_reconsider
+5446,0,other,none,c001,unanimous,0,1,0,0,self_reconsider
+5446,1,other,none,c001,unanimous,0,1,0,0,self_reconsider
+5446,2,other,none,c001,unanimous,0,1,0,0,self_reconsider
+10784,0,philosophy,unhelpful,c001,unanimous,0,0,0,0,self_reconsider
+10784,1,philosophy,none,c001,unanimous,0,0,0,0,self_reconsider
+10784,2,philosophy,none,c001,unanimous,0,0,0,0,self_reconsider
+9360,0,physics,harmful,c001,unanimous,0,1,0,0,self_reconsider
+9360,1,physics,harmful,c001,unanimous,0,1,0,0,self_reconsider
+9360,2,physics,none,c001,unanimous,0,1,0,0,self_reconsider
+2290,0,psychology,none,c001,unanimous,0,0,0,0,self_reconsider
+2290,1,psychology,none,c001,unanimous,0,0,0,0,self_reconsider
+2290,2,psychology,none,c001,unanimous,0,0,0,0,self_reconsider
+2865,0,biology,none,c001,unanimous,0,1,0,0,self_reconsider
+2865,1,biology,none,c001,unanimous,0,1,0,0,self_reconsider
+2865,2,biology,none,c001,unanimous,0,1,0,0,self_reconsider
+770,0,business,none,c001,2-1 split,0,1,0,0,self_reconsider
+770,1,business,none,c001,2-1 split,0,1,0,0,self_reconsider
+770,2,business,none,c001,2-1 split,0,1,0,0,self_reconsider
+3607,0,chemistry,none,c001,1-1-1 split,0,1,0,0,self_reconsider
+3607,1,chemistry,beneficial,c001,1-1-1 split,0,1,0,0,self_reconsider
+3607,2,chemistry,none,c001,1-1-1 split,1,1,0,0,self_reconsider
+10764,0,computer science,none,c001,unanimous,0,1,0,0,self_reconsider
+10764,1,computer science,none,c001,unanimous,0,1,0,0,self_reconsider
+10764,2,computer science,none,c001,unanimous,0,1,0,0,self_reconsider
+7354,0,economics,none,c001,2-1 split,0,1,0,0,self_reconsider
+7354,1,economics,beneficial,c001,2-1 split,0,1,0,0,self_reconsider
+7354,2,economics,harmful,c001,2-1 split,0,1,0,0,self_reconsider
+12024,0,engineering,unhelpful,c001,1-1-1 split,0,0,0,0,self_reconsider
+12024,1,engineering,unhelpful,c001,1-1-1 split,0,0,0,0,self_reconsider
+12024,2,engineering,unhelpful,c001,1-1-1 split,0,0,0,0,self_reconsider
+6316,0,health,unhelpful,c001,1-1-1 split,0,0,0,0,self_reconsider
+6316,1,health,none,c001,1-1-1 split,0,0,0,0,self_reconsider
+6316,2,health,none,c001,1-1-1 split,0,0,0,0,self_reconsider
+4694,0,history,beneficial,c001,unanimous,0,0,0,0,self_reconsider
+4694,1,history,beneficial,c001,unanimous,0,0,0,0,self_reconsider
+4694,2,history,beneficial,c001,unanimous,0,0,0,0,self_reconsider
+930,0,law,unhelpful,c001,2-1 split,0,1,0,0,self_reconsider
+930,1,law,none,c001,2-1 split,0,1,0,0,self_reconsider
+930,2,law,harmful,c001,2-1 split,0,1,0,0,self_reconsider
+7768,0,math,none,c001,unanimous,0,1,0,0,self_reconsider
+7768,1,math,none,c001,unanimous,0,1,0,0,self_reconsider
+7768,2,math,none,c001,unanimous,0,1,0,0,self_reconsider
+5797,0,other,none,c001,unanimous,0,1,0,0,self_reconsider
+5797,1,other,none,c001,unanimous,0,1,0,0,self_reconsider
+5797,2,other,none,c001,unanimous,0,1,0,0,self_reconsider
+11158,0,philosophy,unhelpful,c001,2-1 split,0,0,0,0,self_reconsider
+11158,1,philosophy,unhelpful,c001,2-1 split,0,0,0,0,self_reconsider
+11158,2,philosophy,unhelpful,c001,2-1 split,0,0,0,0,self_reconsider
+10099,0,physics,harmful,c002,2-1 split,0,1,0,0,self_reconsider
+10099,1,physics,none,c002,2-1 split,0,1,0,0,self_reconsider
+10099,2,physics,none,c002,2-1 split,0,1,0,0,self_reconsider
+2106,0,psychology,harmful,c002,2-1 split,0,1,0,0,self_reconsider
+2106,1,psychology,none,c002,2-1 split,0,1,0,0,self_reconsider
+2106,2,psychology,harmful,c002,2-1 split,0,1,0,0,self_reconsider
+2927,0,biology,harmful,c002,unanimous,0,1,0,0,self_reconsider
+2927,1,biology,none,c002,unanimous,0,1,0,0,self_reconsider
+2927,2,biology,none,c002,unanimous,0,1,0,0,self_reconsider
+232,0,business,none,c002,unanimous,0,1,0,0,self_reconsider
+232,1,business,none,c002,unanimous,0,1,0,0,self_reconsider
+232,2,business,none,c002,unanimous,0,1,0,0,self_reconsider
+4442,0,chemistry,none,c002,unanimous,0,1,0,0,self_reconsider
+4442,1,chemistry,none,c002,unanimous,0,1,0,0,self_reconsider
+4442,2,chemistry,none,c002,unanimous,0,1,0,0,self_reconsider
+10451,0,computer science,unhelpful,c002,2-1 split,0,0,0,0,self_reconsider
+10451,1,computer science,none,c002,2-1 split,0,0,0,0,self_reconsider
+10451,2,computer science,unhelpful,c002,2-1 split,0,0,0,0,self_reconsider
+7568,0,economics,unhelpful,c002,unanimous,0,0,0,0,self_reconsider
+7568,1,economics,none,c002,unanimous,0,0,0,0,self_reconsider
+7568,2,economics,unhelpful,c002,unanimous,0,0,0,0,self_reconsider
+11373,0,engineering,none,c002,unanimous,0,0,0,0,self_reconsider
+11373,1,engineering,none,c002,unanimous,0,0,0,0,self_reconsider
+11373,2,engineering,unhelpful,c002,unanimous,0,0,0,0,self_reconsider
+6181,0,health,harmful,c002,unanimous,0,1,0,0,self_reconsider
+6181,1,health,harmful,c002,unanimous,0,1,0,0,self_reconsider
+6181,2,health,harmful,c002,unanimous,0,1,0,0,self_reconsider
+4677,0,history,harmful,c002,unanimous,0,1,0,0,self_reconsider
+4677,1,history,none,c002,unanimous,0,1,0,0,self_reconsider
+4677,2,history,none,c002,unanimous,0,1,0,0,self_reconsider
+1516,0,law,none,c002,unanimous,0,1,0,0,self_reconsider
+1516,1,law,harmful,c002,unanimous,0,1,0,0,self_reconsider
+1516,2,law,harmful,c002,unanimous,0,1,0,0,self_reconsider
+8205,0,math,unhelpful,c002,2-1 split,0,1,0,0,self_reconsider
+8205,1,math,none,c002,2-1 split,1,1,0,0,self_reconsider
+8205,2,math,unhelpful,c002,2-1 split,0,1,0,0,self_reconsider
+5310,0,other,none,c002,2-1 split,0,0,0,0,self_reconsider
+5310,1,other,beneficial,c002,2-1 split,0,0,0,0,self_reconsider
+5310,2,other,unhelpful,c002,2-1 split,0,0,0,0,self_reconsider
+10866,0,philosophy,beneficial,c002,unanimous,0,0,0,0,self_reconsider
+10866,1,philosophy,beneficial,c002,unanimous,0,0,0,0,self_reconsider
+10866,2,philosophy,beneficial,c002,unanimous,0,0,0,0,self_reconsider
+9169,0,physics,unhelpful,c002,2-1 split,0,0,0,0,self_reconsider
+9169,1,physics,unhelpful,c002,2-1 split,0,0,0,0,self_reconsider
+9169,2,physics,unhelpful,c002,2-1 split,0,0,0,0,self_reconsider
+2478,0,psychology,harmful,c002,2-1 split,0,1,0,0,self_reconsider
+2478,1,psychology,none,c002,2-1 split,0,1,0,0,self_reconsider
+2478,2,psychology,beneficial,c002,2-1 split,0,1,0,0,self_reconsider
+3482,0,biology,beneficial,c002,2-1 split,0,1,0,0,self_reconsider
+3482,1,biology,harmful,c002,2-1 split,0,1,0,0,self_reconsider
+3482,2,biology,none,c002,2-1 split,0,1,0,0,self_reconsider
+161,0,business,none,c002,2-1 split,0,1,0,0,self_reconsider
+161,1,business,none,c002,2-1 split,0,1,0,0,self_reconsider
+161,2,business,beneficial,c002,2-1 split,0,1,0,0,self_reconsider
+3869,0,chemistry,none,c002,unanimous,0,1,0,0,self_reconsider
+3869,1,chemistry,none,c002,unanimous,0,1,0,0,self_reconsider
+3869,2,chemistry,none,c002,unanimous,0,1,0,0,self_reconsider
+10404,0,computer science,none,c002,unanimous,0,1,0,0,self_reconsider
+10404,1,computer science,none,c002,unanimous,0,1,0,0,self_reconsider
+10404,2,computer science,none,c002,unanimous,0,1,0,0,self_reconsider
+7497,0,economics,beneficial,c003,2-1 split,0,1,0,0,self_reconsider
+7497,1,economics,none,c003,2-1 split,0,1,0,0,self_reconsider
+7497,2,economics,harmful,c003,2-1 split,0,1,0,0,self_reconsider
+11826,0,engineering,unhelpful,c003,unanimous,0,0,0,0,self_reconsider
+11826,1,engineering,none,c003,unanimous,0,0,0,0,self_reconsider
+11826,2,engineering,none,c003,unanimous,0,0,0,0,self_reconsider
+6813,0,health,none,c003,unanimous,0,1,0,0,self_reconsider
+6813,1,health,none,c003,unanimous,0,1,0,0,self_reconsider
+6813,2,health,none,c003,unanimous,0,1,0,0,self_reconsider
+4712,0,history,unhelpful,c003,unanimous,0,0,0,0,self_reconsider
+4712,1,history,unhelpful,c003,unanimous,0,0,0,0,self_reconsider
+4712,2,history,unhelpful,c003,unanimous,0,0,0,0,self_reconsider
+1832,0,law,harmful,c003,2-1 split,1,1,0,0,self_reconsider
+1832,1,law,none,c003,2-1 split,0,1,0,0,self_reconsider
+1832,2,law,none,c003,2-1 split,0,1,0,0,self_reconsider
+8837,0,math,unhelpful,c003,unanimous,0,0,0,0,self_reconsider
+8837,1,math,none,c003,unanimous,0,0,0,0,self_reconsider
+8837,2,math,none,c003,unanimous,0,0,0,0,self_reconsider
+5364,0,other,none,c003,2-1 split,0,1,0,0,self_reconsider
+5364,1,other,beneficial,c003,2-1 split,0,1,0,0,self_reconsider
+5364,2,other,harmful,c003,2-1 split,1,1,0,0,self_reconsider
+10828,0,philosophy,unhelpful,c003,unanimous,0,0,0,0,self_reconsider
+10828,1,philosophy,beneficial,c003,unanimous,0,0,0,0,self_reconsider
+10828,2,philosophy,beneficial,c003,unanimous,0,0,0,0,self_reconsider
+9837,0,physics,unhelpful,c003,2-1 split,0,1,0,0,self_reconsider
+9837,1,physics,unhelpful,c003,2-1 split,0,1,0,0,self_reconsider
+9837,2,physics,none,c003,2-1 split,1,1,0,0,self_reconsider
+2262,0,psychology,unhelpful,c003,unanimous,0,0,0,0,self_reconsider
+2262,1,psychology,none,c003,unanimous,0,0,0,0,self_reconsider
+2262,2,psychology,unhelpful,c003,unanimous,0,0,0,0,self_reconsider
+2977,0,biology,beneficial,c003,2-1 split,0,0,0,0,self_reconsider
+2977,1,biology,unhelpful,c003,2-1 split,0,0,0,0,self_reconsider
+2977,2,biology,unhelpful,c003,2-1 split,0,0,0,0,self_reconsider
+126,0,business,none,c003,2-1 split,0,0,0,0,self_reconsider
+126,1,business,unhelpful,c003,2-1 split,0,0,0,0,self_reconsider
+126,2,business,none,c003,2-1 split,0,0,0,0,self_reconsider
+3586,0,chemistry,beneficial,c003,2-1 split,0,1,0,0,self_reconsider
+3586,1,chemistry,none,c003,2-1 split,0,1,0,0,self_reconsider
+3586,2,chemistry,none,c003,2-1 split,0,1,0,0,self_reconsider
+10623,0,computer science,none,c003,unanimous,0,1,0,0,self_reconsider
+10623,1,computer science,none,c003,unanimous,0,1,0,0,self_reconsider
+10623,2,computer science,none,c003,unanimous,0,1,0,0,self_reconsider
+7626,0,economics,none,c003,unanimous,0,1,0,0,self_reconsider
+7626,1,economics,none,c003,unanimous,0,1,0,0,self_reconsider
+7626,2,economics,harmful,c003,unanimous,0,1,0,0,self_reconsider
+11397,0,engineering,none,c003,2-1 split,0,0,0,0,self_reconsider
+11397,1,engineering,none,c003,2-1 split,0,0,0,0,self_reconsider
+11397,2,engineering,unhelpful,c003,2-1 split,0,0,0,0,self_reconsider
+6017,0,health,unhelpful,c003,2-1 split,0,0,0,0,self_reconsider
+6017,1,health,none,c003,2-1 split,0,0,0,0,self_reconsider
+6017,2,health,unhelpful,c003,2-1 split,0,0,0,0,self_reconsider
+4695,0,history,unhelpful,c003,unanimous,0,0,0,0,self_reconsider
+4695,1,history,unhelpful,c003,unanimous,0,0,0,0,self_reconsider
+4695,2,history,unhelpful,c003,unanimous,0,0,0,0,self_reconsider
+1176,0,law,harmful,c003,unanimous,0,1,0,0,self_reconsider
+1176,1,law,harmful,c003,unanimous,0,1,0,0,self_reconsider
+1176,2,law,harmful,c003,unanimous,0,1,0,0,self_reconsider
+8403,0,math,unhelpful,c003,1-1-1 split,0,1,0,0,self_reconsider
+8403,1,math,unhelpful,c003,1-1-1 split,0,1,0,0,self_reconsider
+8403,2,math,harmful,c003,1-1-1 split,1,1,0,0,self_reconsider
+5953,0,other,unhelpful,c004,1-1-1 split,0,1,0,0,self_reconsider
+5953,1,other,unhelpful,c004,1-1-1 split,0,1,0,0,self_reconsider
+5953,2,other,harmful,c004,1-1-1 split,1,1,0,0,self_reconsider
+10901,0,philosophy,none,c004,unanimous,0,1,0,0,self_reconsider
+10901,1,philosophy,none,c004,unanimous,0,1,0,0,self_reconsider
+10901,2,philosophy,none,c004,unanimous,0,1,0,0,self_reconsider
+9422,0,physics,none,c004,2-1 split,0,1,0,0,self_reconsider
+9422,1,physics,harmful,c004,2-1 split,0,1,0,0,self_reconsider
+9422,2,physics,harmful,c004,2-1 split,0,1,0,0,self_reconsider
+2026,0,psychology,unhelpful,c004,2-1 split,0,0,0,0,self_reconsider
+2026,1,psychology,unhelpful,c004,2-1 split,0,0,0,0,self_reconsider
+2026,2,psychology,unhelpful,c004,2-1 split,0,0,0,0,self_reconsider
+2827,0,biology,harmful,c004,unanimous,0,1,0,0,self_reconsider
+2827,1,biology,harmful,c004,unanimous,0,1,0,0,self_reconsider
+2827,2,biology,harmful,c004,unanimous,0,1,0,0,self_reconsider
+700,0,business,none,c004,unanimous,0,1,0,0,self_reconsider
+700,1,business,none,c004,unanimous,0,1,0,0,self_reconsider
+700,2,business,none,c004,unanimous,0,1,0,0,self_reconsider
+3886,0,chemistry,harmful,c004,unanimous,0,1,0,0,self_reconsider
+3886,1,chemistry,none,c004,unanimous,0,1,0,0,self_reconsider
+3886,2,chemistry,none,c004,unanimous,0,1,0,0,self_reconsider
+10724,0,computer science,none,c004,1-1-1 split,0,0,0,0,self_reconsider
+10724,1,computer science,none,c004,1-1-1 split,0,0,0,0,self_reconsider
+10724,2,computer science,none,c004,1-1-1 split,0,0,0,0,self_reconsider
+7616,0,economics,none,c004,2-1 split,0,0,0,0,self_reconsider
+7616,1,economics,unhelpful,c004,2-1 split,0,0,0,0,self_reconsider
+7616,2,economics,unhelpful,c004,2-1 split,0,0,0,0,self_reconsider
+12111,0,engineering,unhelpful,c004,unanimous,0,0,0,0,self_reconsider
+12111,1,engineering,none,c004,unanimous,0,0,0,0,self_reconsider
+12111,2,engineering,none,c004,unanimous,0,0,0,0,self_reconsider
+6249,0,health,harmful,c004,unanimous,0,1,0,0,self_reconsider
+6249,1,health,harmful,c004,unanimous,0,1,0,0,self_reconsider
+6249,2,health,harmful,c004,unanimous,0,1,0,0,self_reconsider
+4856,0,history,none,c004,unanimous,0,1,0,0,self_reconsider
+4856,1,history,none,c004,unanimous,0,1,0,0,self_reconsider
+4856,2,history,none,c004,unanimous,0,1,0,0,self_reconsider
+1499,0,law,none,c004,2-1 split,0,0,0,0,self_reconsider
+1499,1,law,none,c004,2-1 split,0,0,0,0,self_reconsider
+1499,2,law,unhelpful,c004,2-1 split,0,0,0,0,self_reconsider
+9029,0,math,none,c004,unanimous,0,1,0,0,self_reconsider
+9029,1,math,none,c004,unanimous,0,1,0,0,self_reconsider
+9029,2,math,none,c004,unanimous,0,1,0,0,self_reconsider
+5880,0,other,unhelpful,c004,unanimous,0,0,0,0,self_reconsider
+5880,1,other,unhelpful,c004,unanimous,0,0,0,0,self_reconsider
+5880,2,other,unhelpful,c004,unanimous,0,0,0,0,self_reconsider
+11030,0,philosophy,harmful,c004,2-1 split,1,1,0,0,self_reconsider
+11030,1,philosophy,beneficial,c004,2-1 split,0,1,0,0,self_reconsider
+11030,2,philosophy,beneficial,c004,2-1 split,0,1,0,0,self_reconsider
+9427,0,physics,none,c004,unanimous,0,1,0,0,self_reconsider
+9427,1,physics,none,c004,unanimous,0,1,0,0,self_reconsider
+9427,2,physics,none,c004,unanimous,0,1,0,0,self_reconsider
+2034,0,psychology,none,c004,2-1 split,0,1,0,0,self_reconsider
+2034,1,psychology,beneficial,c004,2-1 split,0,1,0,0,self_reconsider
+2034,2,psychology,harmful,c004,2-1 split,0,1,0,0,self_reconsider
+2828,0,biology,unhelpful,c004,1-1-1 split,0,0,0,0,self_reconsider
+2828,1,biology,none,c004,1-1-1 split,0,0,0,0,self_reconsider
+2828,2,biology,unhelpful,c004,1-1-1 split,0,0,0,0,self_reconsider
+395,0,business,none,c004,unanimous,0,1,0,0,self_reconsider
+395,1,business,none,c004,unanimous,0,1,0,0,self_reconsider
+395,2,business,none,c004,unanimous,0,1,0,0,self_reconsider
+3768,0,chemistry,beneficial,c005,unanimous,0,0,0,0,self_reconsider
+3768,1,chemistry,beneficial,c005,unanimous,0,0,0,0,self_reconsider
+3768,2,chemistry,none,c005,unanimous,0,0,0,0,self_reconsider
+10559,0,computer science,none,c005,unanimous,0,1,0,0,self_reconsider
+10559,1,computer science,harmful,c005,unanimous,0,1,0,0,self_reconsider
+10559,2,computer science,harmful,c005,unanimous,0,1,0,0,self_reconsider
+6904,0,economics,none,c005,unanimous,0,0,0,0,self_reconsider
+6904,1,economics,none,c005,unanimous,0,0,0,0,self_reconsider
+6904,2,economics,none,c005,unanimous,0,0,0,0,self_reconsider
+11291,0,engineering,none,c005,unanimous,0,1,0,0,self_reconsider
+11291,1,engineering,none,c005,unanimous,0,1,0,0,self_reconsider
+11291,2,engineering,none,c005,unanimous,0,1,0,0,self_reconsider
+6719,0,health,none,c005,unanimous,0,1,0,0,self_reconsider
+6719,1,health,none,c005,unanimous,0,1,0,0,self_reconsider
+6719,2,health,none,c005,unanimous,0,1,0,0,self_reconsider
+4711,0,history,beneficial,c005,2-1 split,0,0,0,0,self_reconsider
+4711,1,history,unhelpful,c005,2-1 split,0,0,0,0,self_reconsider
+4711,2,history,unhelpful,c005,2-1 split,0,0,0,0,self_reconsider
+1748,0,law,none,c005,unanimous,0,0,0,0,self_reconsider
+1748,1,law,unhelpful,c005,unanimous,0,0,0,0,self_reconsider
+1748,2,law,none,c005,unanimous,0,0,0,0,self_reconsider
+8909,0,math,beneficial,c005,1-1-1 split,0,1,0,0,self_reconsider
+8909,1,math,none,c005,1-1-1 split,1,1,0,0,self_reconsider
+8909,2,math,beneficial,c005,1-1-1 split,0,1,0,0,self_reconsider
+5905,0,other,unhelpful,c005,unanimous,0,0,0,0,self_reconsider
+5905,1,other,none,c005,unanimous,0,0,0,0,self_reconsider
+5905,2,other,unhelpful,c005,unanimous,0,0,0,0,self_reconsider
+11011,0,philosophy,harmful,c005,unanimous,0,1,0,0,self_reconsider
+11011,1,philosophy,harmful,c005,unanimous,0,1,0,0,self_reconsider
+11011,2,philosophy,harmful,c005,unanimous,0,1,0,0,self_reconsider
+9906,0,physics,none,c005,2-1 split,1,1,0,0,self_reconsider
+9906,1,physics,unhelpful,c005,2-1 split,0,1,0,0,self_reconsider
+9906,2,physics,none,c005,2-1 split,0,1,0,0,self_reconsider
+2757,0,psychology,harmful,c005,unanimous,0,1,0,0,self_reconsider
+2757,1,psychology,harmful,c005,unanimous,0,1,0,0,self_reconsider
+2757,2,psychology,harmful,c005,unanimous,0,1,0,0,self_reconsider
+2824,0,biology,harmful,c005,unanimous,0,1,0,0,self_reconsider
+2824,1,biology,none,c005,unanimous,0,1,0,0,self_reconsider
+2824,2,biology,harmful,c005,unanimous,0,1,0,0,self_reconsider
+715,0,business,none,c005,unanimous,0,0,0,0,self_reconsider
+715,1,business,none,c005,unanimous,0,0,0,0,self_reconsider
+715,2,business,unhelpful,c005,unanimous,0,0,0,0,self_reconsider
+4620,0,chemistry,none,c005,2-1 split,0,0,0,0,self_reconsider
+4620,1,chemistry,none,c005,2-1 split,0,0,0,0,self_reconsider
+4620,2,chemistry,beneficial,c005,2-1 split,0,0,0,0,self_reconsider
+10594,0,computer science,none,c005,unanimous,0,1,0,0,self_reconsider
+10594,1,computer science,none,c005,unanimous,0,1,0,0,self_reconsider
+10594,2,computer science,none,c005,unanimous,0,1,0,0,self_reconsider
+6969,0,economics,beneficial,c005,2-1 split,0,1,0,0,self_reconsider
+6969,1,economics,beneficial,c005,2-1 split,0,1,0,0,self_reconsider
+6969,2,economics,none,c005,2-1 split,1,1,0,0,self_reconsider
+11936,0,engineering,beneficial,c005,1-1-1 split,0,1,0,0,self_reconsider
+11936,1,engineering,none,c005,1-1-1 split,0,1,0,0,self_reconsider
+11936,2,engineering,none,c005,1-1-1 split,1,1,0,0,self_reconsider
+6498,0,health,harmful,c005,unanimous,0,1,0,0,self_reconsider
+6498,1,health,harmful,c005,unanimous,0,1,0,0,self_reconsider
+6498,2,health,harmful,c005,unanimous,0,1,0,0,self_reconsider
+4959,0,history,none,c005,unanimous,0,1,0,0,self_reconsider
+4959,1,history,none,c005,unanimous,0,1,0,0,self_reconsider
+4959,2,history,none,c005,unanimous,0,1,0,0,self_reconsider
+3248,0,biology,none,c000,unanimous,0,1,0,0,debate
+3248,1,biology,none,c000,unanimous,0,1,0,0,debate
+3248,2,biology,none,c000,unanimous,0,1,0,0,debate
+203,0,business,none,c000,unanimous,0,1,0,0,debate
+203,1,business,none,c000,unanimous,0,1,0,0,debate
+203,2,business,none,c000,unanimous,0,1,0,0,debate
+4020,0,chemistry,beneficial,c000,2-1 split,0,1,0,1,debate
+4020,1,chemistry,none,c000,2-1 split,0,1,0,0,debate
+4020,2,chemistry,none,c000,2-1 split,0,1,0,0,debate
+10736,0,computer science,none,c000,unanimous,0,1,0,0,debate
+10736,1,computer science,none,c000,unanimous,0,1,0,0,debate
+10736,2,computer science,none,c000,unanimous,0,1,0,0,debate
+7123,0,economics,none,c000,unanimous,0,1,0,0,debate
+7123,1,economics,none,c000,unanimous,0,1,0,0,debate
+7123,2,economics,none,c000,unanimous,0,1,0,0,debate
+12198,0,engineering,none,c000,2-1 split,0,1,0,0,debate
+12198,1,engineering,harmful,c000,2-1 split,0,1,1,1,debate
+12198,2,engineering,harmful,c000,2-1 split,0,1,1,1,debate
+6800,0,health,none,c000,unanimous,0,1,0,0,debate
+6800,1,health,none,c000,unanimous,0,1,0,0,debate
+6800,2,health,none,c000,unanimous,0,1,0,0,debate
+4950,0,history,none,c000,unanimous,0,0,1,0,debate
+4950,1,history,none,c000,unanimous,0,0,1,0,debate
+4950,2,history,none,c000,unanimous,0,0,1,0,debate
+1197,0,law,none,c000,2-1 split,0,1,0,0,debate
+1197,1,law,beneficial,c000,2-1 split,0,1,0,1,debate
+1197,2,law,none,c000,2-1 split,0,1,0,0,debate
+7937,0,math,harmful,c000,2-1 split,0,1,0,1,debate
+7937,1,math,beneficial,c000,2-1 split,0,1,0,1,debate
+7937,2,math,harmful,c000,2-1 split,0,1,0,0,debate
+5589,0,other,harmful,c000,2-1 split,1,1,1,1,debate
+5589,1,other,beneficial,c000,2-1 split,0,1,0,1,debate
+5589,2,other,none,c000,2-1 split,0,1,0,0,debate
+10779,0,philosophy,none,c000,unanimous,0,1,0,0,debate
+10779,1,philosophy,none,c000,unanimous,0,1,0,0,debate
+10779,2,philosophy,none,c000,unanimous,0,1,0,0,debate
+9588,0,physics,none,c000,2-1 split,0,1,0,0,debate
+9588,1,physics,beneficial,c000,2-1 split,0,1,0,1,debate
+9588,2,physics,none,c000,2-1 split,0,1,0,0,debate
+2021,0,psychology,none,c000,unanimous,0,1,0,0,debate
+2021,1,psychology,none,c000,unanimous,0,1,0,0,debate
+2021,2,psychology,none,c000,unanimous,0,1,0,0,debate
+3219,0,biology,harmful,c000,2-1 split,0,1,0,1,debate
+3219,1,biology,harmful,c000,2-1 split,0,1,0,1,debate
+3219,2,biology,beneficial,c000,2-1 split,0,1,0,1,debate
+430,0,business,none,c000,unanimous,0,1,0,0,debate
+430,1,business,none,c000,unanimous,0,1,0,0,debate
+430,2,business,none,c000,unanimous,0,1,0,0,debate
+4454,0,chemistry,none,c000,unanimous,0,1,0,0,debate
+4454,1,chemistry,none,c000,unanimous,0,1,0,0,debate
+4454,2,chemistry,none,c000,unanimous,0,1,0,0,debate
+10539,0,computer science,none,c000,unanimous,0,1,0,0,debate
+10539,1,computer science,none,c000,unanimous,0,1,0,0,debate
+10539,2,computer science,none,c000,unanimous,0,1,0,0,debate
+7307,0,economics,none,c000,unanimous,0,1,0,0,debate
+7307,1,economics,none,c000,unanimous,0,1,0,0,debate
+7307,2,economics,none,c000,unanimous,0,1,0,0,debate
+11359,0,engineering,none,c000,unanimous,0,1,0,0,debate
+11359,1,engineering,none,c000,unanimous,0,1,0,0,debate
+11359,2,engineering,none,c000,unanimous,0,1,0,0,debate
+6513,0,health,none,c001,unanimous,0,1,0,0,debate
+6513,1,health,none,c001,unanimous,0,1,0,0,debate
+6513,2,health,none,c001,unanimous,0,1,0,0,debate
+4948,0,history,none,c001,unanimous,0,0,1,0,debate
+4948,1,history,none,c001,unanimous,0,0,1,0,debate
+4948,2,history,none,c001,unanimous,0,0,1,0,debate
+1270,0,law,none,c001,unanimous,0,1,0,0,debate
+1270,1,law,none,c001,unanimous,0,1,0,0,debate
+1270,2,law,none,c001,unanimous,0,1,0,0,debate
+8612,0,math,none,c001,unanimous,0,1,0,0,debate
+8612,1,math,none,c001,unanimous,0,1,0,0,debate
+8612,2,math,none,c001,unanimous,0,1,0,0,debate
+5446,0,other,none,c001,unanimous,0,1,0,0,debate
+5446,1,other,none,c001,unanimous,0,1,0,0,debate
+5446,2,other,none,c001,unanimous,0,1,0,0,debate
+10784,0,philosophy,none,c001,unanimous,0,0,1,0,debate
+10784,1,philosophy,none,c001,unanimous,0,0,1,0,debate
+10784,2,philosophy,none,c001,unanimous,0,0,1,0,debate
+9360,0,physics,none,c001,unanimous,0,1,0,0,debate
+9360,1,physics,none,c001,unanimous,0,1,0,0,debate
+9360,2,physics,none,c001,unanimous,0,1,0,0,debate
+2290,0,psychology,none,c001,unanimous,0,0,1,0,debate
+2290,1,psychology,none,c001,unanimous,0,0,1,0,debate
+2290,2,psychology,none,c001,unanimous,0,0,1,0,debate
+2865,0,biology,none,c001,unanimous,0,1,0,0,debate
+2865,1,biology,none,c001,unanimous,0,1,0,0,debate
+2865,2,biology,none,c001,unanimous,0,1,0,0,debate
+770,0,business,none,c001,2-1 split,0,1,0,0,debate
+770,1,business,none,c001,2-1 split,0,1,0,0,debate
+770,2,business,beneficial,c001,2-1 split,0,1,0,1,debate
+3607,0,chemistry,none,c001,1-1-1 split,0,1,0,0,debate
+3607,1,chemistry,none,c001,1-1-1 split,0,1,0,0,debate
+3607,2,chemistry,none,c001,1-1-1 split,1,1,0,0,debate
+10764,0,computer science,none,c001,unanimous,0,1,0,0,debate
+10764,1,computer science,none,c001,unanimous,0,1,0,0,debate
+10764,2,computer science,none,c001,unanimous,0,1,0,0,debate
+7354,0,economics,none,c001,2-1 split,0,1,0,0,debate
+7354,1,economics,beneficial,c001,2-1 split,0,1,0,1,debate
+7354,2,economics,harmful,c001,2-1 split,0,1,0,1,debate
+12024,0,engineering,unhelpful,c001,1-1-1 split,0,0,0,0,debate
+12024,1,engineering,unhelpful,c001,1-1-1 split,0,0,0,0,debate
+12024,2,engineering,unhelpful,c001,1-1-1 split,0,0,0,0,debate
+6316,0,health,unhelpful,c001,1-1-1 split,0,0,0,1,debate
+6316,1,health,unhelpful,c001,1-1-1 split,0,0,0,1,debate
+6316,2,health,none,c001,1-1-1 split,0,0,0,0,debate
+4694,0,history,none,c001,unanimous,0,0,1,0,debate
+4694,1,history,none,c001,unanimous,0,0,1,0,debate
+4694,2,history,none,c001,unanimous,0,0,1,0,debate
+930,0,law,beneficial,c001,2-1 split,0,1,0,1,debate
+930,1,law,harmful,c001,2-1 split,0,1,0,1,debate
+930,2,law,harmful,c001,2-1 split,0,1,0,1,debate
+7768,0,math,none,c001,unanimous,0,1,0,0,debate
+7768,1,math,none,c001,unanimous,0,1,0,0,debate
+7768,2,math,none,c001,unanimous,0,1,0,0,debate
+5797,0,other,none,c001,unanimous,0,1,0,0,debate
+5797,1,other,none,c001,unanimous,0,1,0,0,debate
+5797,2,other,none,c001,unanimous,0,1,0,0,debate
+11158,0,philosophy,unhelpful,c001,2-1 split,0,0,1,1,debate
+11158,1,philosophy,unhelpful,c001,2-1 split,0,0,0,1,debate
+11158,2,philosophy,none,c001,2-1 split,0,0,0,0,debate
+10099,0,physics,none,c002,2-1 split,0,1,0,0,debate
+10099,1,physics,harmful,c002,2-1 split,0,1,0,1,debate
+10099,2,physics,beneficial,c002,2-1 split,0,1,0,1,debate
+2106,0,psychology,harmful,c002,2-1 split,0,1,0,1,debate
+2106,1,psychology,beneficial,c002,2-1 split,0,1,0,1,debate
+2106,2,psychology,harmful,c002,2-1 split,0,1,0,1,debate
+2927,0,biology,none,c002,unanimous,0,1,0,0,debate
+2927,1,biology,none,c002,unanimous,0,1,0,0,debate
+2927,2,biology,none,c002,unanimous,0,1,0,0,debate
+232,0,business,none,c002,unanimous,0,1,0,0,debate
+232,1,business,none,c002,unanimous,0,1,0,0,debate
+232,2,business,none,c002,unanimous,0,1,0,0,debate
+4442,0,chemistry,none,c002,unanimous,0,1,0,0,debate
+4442,1,chemistry,none,c002,unanimous,0,1,0,0,debate
+4442,2,chemistry,none,c002,unanimous,0,1,0,0,debate
+10451,0,computer science,none,c002,2-1 split,0,0,0,0,debate
+10451,1,computer science,unhelpful,c002,2-1 split,0,0,1,1,debate
+10451,2,computer science,none,c002,2-1 split,0,0,0,0,debate
+7568,0,economics,none,c002,unanimous,0,0,1,0,debate
+7568,1,economics,none,c002,unanimous,0,0,1,0,debate
+7568,2,economics,none,c002,unanimous,0,0,1,0,debate
+11373,0,engineering,none,c002,unanimous,0,0,1,0,debate
+11373,1,engineering,none,c002,unanimous,0,0,1,0,debate
+11373,2,engineering,none,c002,unanimous,0,0,1,0,debate
+6181,0,health,none,c002,unanimous,0,1,0,0,debate
+6181,1,health,none,c002,unanimous,0,1,0,0,debate
+6181,2,health,none,c002,unanimous,0,1,0,0,debate
+4677,0,history,none,c002,unanimous,0,1,0,0,debate
+4677,1,history,none,c002,unanimous,0,1,0,0,debate
+4677,2,history,none,c002,unanimous,0,1,0,0,debate
+1516,0,law,none,c002,unanimous,0,1,0,0,debate
+1516,1,law,none,c002,unanimous,0,1,0,0,debate
+1516,2,law,none,c002,unanimous,0,1,0,0,debate
+8205,0,math,unhelpful,c002,2-1 split,0,1,0,0,debate
+8205,1,math,none,c002,2-1 split,1,1,0,0,debate
+8205,2,math,beneficial,c002,2-1 split,0,1,0,1,debate
+5310,0,other,unhelpful,c002,2-1 split,0,0,1,1,debate
+5310,1,other,unhelpful,c002,2-1 split,0,0,0,1,debate
+5310,2,other,unhelpful,c002,2-1 split,0,0,0,1,debate
+10866,0,philosophy,beneficial,c002,unanimous,0,0,1,0,debate
+10866,1,philosophy,none,c002,unanimous,0,0,1,0,debate
+10866,2,philosophy,none,c002,unanimous,0,0,1,0,debate
+9169,0,physics,unhelpful,c002,2-1 split,0,0,1,1,debate
+9169,1,physics,unhelpful,c002,2-1 split,0,0,0,1,debate
+9169,2,physics,none,c002,2-1 split,0,0,0,0,debate
+2478,0,psychology,harmful,c002,2-1 split,0,1,0,1,debate
+2478,1,psychology,harmful,c002,2-1 split,0,1,0,1,debate
+2478,2,psychology,beneficial,c002,2-1 split,0,1,0,1,debate
+3482,0,biology,beneficial,c002,2-1 split,0,1,0,1,debate
+3482,1,biology,harmful,c002,2-1 split,0,1,0,1,debate
+3482,2,biology,harmful,c002,2-1 split,0,1,0,1,debate
+161,0,business,none,c002,2-1 split,0,1,0,0,debate
+161,1,business,harmful,c002,2-1 split,0,1,1,1,debate
+161,2,business,beneficial,c002,2-1 split,0,1,0,1,debate
+3869,0,chemistry,none,c002,unanimous,0,1,0,0,debate
+3869,1,chemistry,none,c002,unanimous,0,1,0,0,debate
+3869,2,chemistry,none,c002,unanimous,0,1,0,0,debate
+10404,0,computer science,none,c002,unanimous,0,1,0,0,debate
+10404,1,computer science,none,c002,unanimous,0,1,0,0,debate
+10404,2,computer science,none,c002,unanimous,0,1,0,0,debate
+7497,0,economics,beneficial,c003,2-1 split,0,1,0,1,debate
+7497,1,economics,harmful,c003,2-1 split,0,1,0,1,debate
+7497,2,economics,harmful,c003,2-1 split,0,1,0,1,debate
+11826,0,engineering,none,c003,unanimous,0,0,1,0,debate
+11826,1,engineering,none,c003,unanimous,0,0,1,0,debate
+11826,2,engineering,none,c003,unanimous,0,0,1,0,debate
+6813,0,health,none,c003,unanimous,0,1,0,0,debate
+6813,1,health,none,c003,unanimous,0,1,0,0,debate
+6813,2,health,none,c003,unanimous,0,1,0,0,debate
+4712,0,history,none,c003,unanimous,0,0,1,0,debate
+4712,1,history,none,c003,unanimous,0,0,1,0,debate
+4712,2,history,none,c003,unanimous,0,0,1,0,debate
+1832,0,law,harmful,c003,2-1 split,1,1,1,1,debate
+1832,1,law,none,c003,2-1 split,0,1,0,0,debate
+1832,2,law,beneficial,c003,2-1 split,0,1,0,1,debate
+8837,0,math,none,c003,unanimous,0,0,1,0,debate
+8837,1,math,none,c003,unanimous,0,0,1,0,debate
+8837,2,math,none,c003,unanimous,0,0,1,0,debate
+5364,0,other,beneficial,c003,2-1 split,0,1,0,1,debate
+5364,1,other,beneficial,c003,2-1 split,0,1,0,1,debate
+5364,2,other,harmful,c003,2-1 split,1,1,1,1,debate
+10828,0,philosophy,none,c003,unanimous,0,0,1,0,debate
+10828,1,philosophy,none,c003,unanimous,0,0,1,0,debate
+10828,2,philosophy,none,c003,unanimous,0,0,1,0,debate
+9837,0,physics,beneficial,c003,2-1 split,0,1,0,1,debate
+9837,1,physics,beneficial,c003,2-1 split,0,1,0,1,debate
+9837,2,physics,none,c003,2-1 split,1,1,1,0,debate
+2262,0,psychology,none,c003,unanimous,0,0,1,0,debate
+2262,1,psychology,none,c003,unanimous,0,0,1,0,debate
+2262,2,psychology,none,c003,unanimous,0,0,1,0,debate
+2977,0,biology,unhelpful,c003,2-1 split,0,0,0,1,debate
+2977,1,biology,unhelpful,c003,2-1 split,0,0,1,1,debate
+2977,2,biology,unhelpful,c003,2-1 split,0,0,0,1,debate
+126,0,business,unhelpful,c003,2-1 split,0,0,0,1,debate
+126,1,business,unhelpful,c003,2-1 split,0,0,1,1,debate
+126,2,business,unhelpful,c003,2-1 split,0,0,0,1,debate
+3586,0,chemistry,beneficial,c003,2-1 split,0,1,0,1,debate
+3586,1,chemistry,none,c003,2-1 split,0,1,0,0,debate
+3586,2,chemistry,none,c003,2-1 split,0,1,0,0,debate
+10623,0,computer science,none,c003,unanimous,0,1,0,0,debate
+10623,1,computer science,none,c003,unanimous,0,1,0,0,debate
+10623,2,computer science,none,c003,unanimous,0,1,0,0,debate
+7626,0,economics,none,c003,unanimous,0,1,0,0,debate
+7626,1,economics,none,c003,unanimous,0,1,0,0,debate
+7626,2,economics,none,c003,unanimous,0,1,0,0,debate
+11397,0,engineering,none,c003,2-1 split,0,0,1,0,debate
+11397,1,engineering,none,c003,2-1 split,0,0,1,0,debate
+11397,2,engineering,unhelpful,c003,2-1 split,0,0,1,1,debate
+6017,0,health,unhelpful,c003,2-1 split,0,0,0,1,debate
+6017,1,health,unhelpful,c003,2-1 split,0,0,1,1,debate
+6017,2,health,none,c003,2-1 split,0,0,0,0,debate
+4695,0,history,none,c003,unanimous,0,0,1,0,debate
+4695,1,history,none,c003,unanimous,0,0,1,0,debate
+4695,2,history,none,c003,unanimous,0,0,1,0,debate
+1176,0,law,none,c003,unanimous,0,1,0,0,debate
+1176,1,law,none,c003,unanimous,0,1,0,0,debate
+1176,2,law,none,c003,unanimous,0,1,0,0,debate
+8403,0,math,unhelpful,c003,1-1-1 split,0,1,0,1,debate
+8403,1,math,beneficial,c003,1-1-1 split,0,1,0,1,debate
+8403,2,math,harmful,c003,1-1-1 split,1,1,0,1,debate
+5953,0,other,beneficial,c004,1-1-1 split,0,1,0,1,debate
+5953,1,other,beneficial,c004,1-1-1 split,0,1,0,1,debate
+5953,2,other,harmful,c004,1-1-1 split,1,1,0,1,debate
+10901,0,philosophy,none,c004,unanimous,0,1,0,0,debate
+10901,1,philosophy,none,c004,unanimous,0,1,0,0,debate
+10901,2,philosophy,none,c004,unanimous,0,1,0,0,debate
+9422,0,physics,beneficial,c004,2-1 split,0,1,0,1,debate
+9422,1,physics,none,c004,2-1 split,0,1,0,0,debate
+9422,2,physics,harmful,c004,2-1 split,0,1,0,1,debate
+2026,0,psychology,unhelpful,c004,2-1 split,0,0,0,1,debate
+2026,1,psychology,unhelpful,c004,2-1 split,0,0,0,1,debate
+2026,2,psychology,unhelpful,c004,2-1 split,0,0,1,1,debate
+2827,0,biology,harmful,c004,unanimous,0,1,0,0,debate
+2827,1,biology,harmful,c004,unanimous,0,1,0,0,debate
+2827,2,biology,none,c004,unanimous,0,1,0,0,debate
+700,0,business,none,c004,unanimous,0,1,0,0,debate
+700,1,business,none,c004,unanimous,0,1,0,0,debate
+700,2,business,none,c004,unanimous,0,1,0,0,debate
+3886,0,chemistry,none,c004,unanimous,0,1,0,0,debate
+3886,1,chemistry,none,c004,unanimous,0,1,0,0,debate
+3886,2,chemistry,none,c004,unanimous,0,1,0,0,debate
+10724,0,computer science,unhelpful,c004,1-1-1 split,0,0,0,1,debate
+10724,1,computer science,unhelpful,c004,1-1-1 split,0,0,0,1,debate
+10724,2,computer science,unhelpful,c004,1-1-1 split,0,0,0,1,debate
+7616,0,economics,none,c004,2-1 split,0,0,0,0,debate
+7616,1,economics,unhelpful,c004,2-1 split,0,0,0,1,debate
+7616,2,economics,unhelpful,c004,2-1 split,0,0,1,1,debate
+12111,0,engineering,none,c004,unanimous,0,0,0,0,debate
+12111,1,engineering,unhelpful,c004,unanimous,0,0,0,0,debate
+12111,2,engineering,none,c004,unanimous,0,0,0,0,debate
+6249,0,health,none,c004,unanimous,0,1,0,0,debate
+6249,1,health,none,c004,unanimous,0,1,0,0,debate
+6249,2,health,none,c004,unanimous,0,1,0,0,debate
+4856,0,history,none,c004,unanimous,0,1,0,0,debate
+4856,1,history,none,c004,unanimous,0,1,0,0,debate
+4856,2,history,none,c004,unanimous,0,1,0,0,debate
+1499,0,law,unhelpful,c004,2-1 split,0,0,0,1,debate
+1499,1,law,unhelpful,c004,2-1 split,0,0,0,1,debate
+1499,2,law,unhelpful,c004,2-1 split,0,0,1,1,debate
+9029,0,math,none,c004,unanimous,0,1,0,0,debate
+9029,1,math,none,c004,unanimous,0,1,0,0,debate
+9029,2,math,none,c004,unanimous,0,1,0,0,debate
+5880,0,other,none,c004,unanimous,0,0,1,0,debate
+5880,1,other,none,c004,unanimous,0,0,1,0,debate
+5880,2,other,none,c004,unanimous,0,0,1,0,debate
+11030,0,philosophy,harmful,c004,2-1 split,1,1,1,1,debate
+11030,1,philosophy,beneficial,c004,2-1 split,0,1,0,1,debate
+11030,2,philosophy,beneficial,c004,2-1 split,0,1,0,1,debate
+9427,0,physics,none,c004,unanimous,0,1,0,0,debate
+9427,1,physics,none,c004,unanimous,0,1,0,0,debate
+9427,2,physics,none,c004,unanimous,0,1,0,0,debate
+2034,0,psychology,harmful,c004,2-1 split,0,1,0,1,debate
+2034,1,psychology,beneficial,c004,2-1 split,0,1,0,1,debate
+2034,2,psychology,none,c004,2-1 split,0,1,0,0,debate
+2828,0,biology,unhelpful,c004,1-1-1 split,0,0,0,1,debate
+2828,1,biology,none,c004,1-1-1 split,0,0,0,0,debate
+2828,2,biology,unhelpful,c004,1-1-1 split,0,0,0,1,debate
+395,0,business,none,c004,unanimous,0,1,0,0,debate
+395,1,business,none,c004,unanimous,0,1,0,0,debate
+395,2,business,none,c004,unanimous,0,1,0,0,debate
+3768,0,chemistry,none,c005,unanimous,0,0,1,0,debate
+3768,1,chemistry,none,c005,unanimous,0,0,1,0,debate
+3768,2,chemistry,none,c005,unanimous,0,0,1,0,debate
+10559,0,computer science,none,c005,unanimous,0,1,0,0,debate
+10559,1,computer science,none,c005,unanimous,0,1,0,0,debate
+10559,2,computer science,none,c005,unanimous,0,1,0,0,debate
+6904,0,economics,none,c005,unanimous,0,0,1,0,debate
+6904,1,economics,none,c005,unanimous,0,0,1,0,debate
+6904,2,economics,none,c005,unanimous,0,0,1,0,debate
+11291,0,engineering,none,c005,unanimous,0,1,0,0,debate
+11291,1,engineering,none,c005,unanimous,0,1,0,0,debate
+11291,2,engineering,none,c005,unanimous,0,1,0,0,debate
+6719,0,health,none,c005,unanimous,0,1,0,0,debate
+6719,1,health,none,c005,unanimous,0,1,0,0,debate
+6719,2,health,none,c005,unanimous,0,1,0,0,debate
+4711,0,history,unhelpful,c005,2-1 split,0,0,1,1,debate
+4711,1,history,unhelpful,c005,2-1 split,0,0,0,1,debate
+4711,2,history,unhelpful,c005,2-1 split,0,0,0,1,debate
+1748,0,law,none,c005,unanimous,0,0,1,0,debate
+1748,1,law,none,c005,unanimous,0,0,1,0,debate
+1748,2,law,none,c005,unanimous,0,0,1,0,debate
+8909,0,math,unhelpful,c005,1-1-1 split,0,1,0,1,debate
+8909,1,math,harmful,c005,1-1-1 split,1,1,0,1,debate
+8909,2,math,unhelpful,c005,1-1-1 split,0,1,0,1,debate
+5905,0,other,none,c005,unanimous,0,0,1,0,debate
+5905,1,other,none,c005,unanimous,0,0,1,0,debate
+5905,2,other,none,c005,unanimous,0,0,1,0,debate
+11011,0,philosophy,none,c005,unanimous,0,1,0,0,debate
+11011,1,philosophy,none,c005,unanimous,0,1,0,0,debate
+11011,2,philosophy,none,c005,unanimous,0,1,0,0,debate
+9906,0,physics,harmful,c005,2-1 split,1,1,1,1,debate
+9906,1,physics,none,c005,2-1 split,0,1,0,0,debate
+9906,2,physics,none,c005,2-1 split,0,1,0,0,debate
+2757,0,psychology,none,c005,unanimous,0,1,0,0,debate
+2757,1,psychology,none,c005,unanimous,0,1,0,0,debate
+2757,2,psychology,none,c005,unanimous,0,1,0,0,debate
+2824,0,biology,none,c005,unanimous,0,1,0,0,debate
+2824,1,biology,none,c005,unanimous,0,1,0,0,debate
+2824,2,biology,none,c005,unanimous,0,1,0,0,debate
+715,0,business,none,c005,unanimous,0,0,1,0,debate
+715,1,business,none,c005,unanimous,0,0,1,0,debate
+715,2,business,none,c005,unanimous,0,0,1,0,debate
+4620,0,chemistry,none,c005,2-1 split,0,0,0,0,debate
+4620,1,chemistry,none,c005,2-1 split,0,0,0,0,debate
+4620,2,chemistry,unhelpful,c005,2-1 split,0,0,1,1,debate
+10594,0,computer science,none,c005,unanimous,0,1,0,0,debate
+10594,1,computer science,none,c005,unanimous,0,1,0,0,debate
+10594,2,computer science,none,c005,unanimous,0,1,0,0,debate
+6969,0,economics,beneficial,c005,2-1 split,0,1,0,1,debate
+6969,1,economics,beneficial,c005,2-1 split,0,1,0,1,debate
+6969,2,economics,harmful,c005,2-1 split,1,1,1,1,debate
+11936,0,engineering,unhelpful,c005,1-1-1 split,0,1,1,1,debate
+11936,1,engineering,unhelpful,c005,1-1-1 split,0,1,1,1,debate
+11936,2,engineering,none,c005,1-1-1 split,1,1,0,0,debate
+6498,0,health,none,c005,unanimous,0,1,0,0,debate
+6498,1,health,none,c005,unanimous,0,1,0,0,debate
+6498,2,health,none,c005,unanimous,0,1,0,0,debate
+4959,0,history,none,c005,unanimous,0,1,0,0,debate
+4959,1,history,none,c005,unanimous,0,1,0,0,debate
+4959,2,history,none,c005,unanimous,0,1,0,0,debate
+3248,0,biology,none,c000,unanimous,0,1,0,0,debate_answer_only
+3248,1,biology,none,c000,unanimous,0,1,0,0,debate_answer_only
+3248,2,biology,none,c000,unanimous,0,1,0,0,debate_answer_only
+203,0,business,none,c000,unanimous,0,1,0,0,debate_answer_only
+203,1,business,none,c000,unanimous,0,1,0,0,debate_answer_only
+203,2,business,none,c000,unanimous,0,1,0,0,debate_answer_only
+4020,0,chemistry,beneficial,c000,2-1 split,0,1,0,1,debate_answer_only
+4020,1,chemistry,none,c000,2-1 split,0,1,0,0,debate_answer_only
+4020,2,chemistry,none,c000,2-1 split,0,1,0,0,debate_answer_only
+10736,0,computer science,none,c000,unanimous,0,1,0,0,debate_answer_only
+10736,1,computer science,none,c000,unanimous,0,1,0,0,debate_answer_only
+10736,2,computer science,none,c000,unanimous,0,1,0,0,debate_answer_only
+7123,0,economics,none,c000,unanimous,0,1,0,0,debate_answer_only
+7123,1,economics,none,c000,unanimous,0,1,0,0,debate_answer_only
+7123,2,economics,none,c000,unanimous,0,1,0,0,debate_answer_only
+12198,0,engineering,unhelpful,c000,2-1 split,0,1,0,0,debate_answer_only
+12198,1,engineering,harmful,c000,2-1 split,0,1,1,1,debate_answer_only
+12198,2,engineering,harmful,c000,2-1 split,0,1,1,1,debate_answer_only
+6800,0,health,none,c000,unanimous,0,1,0,0,debate_answer_only
+6800,1,health,none,c000,unanimous,0,1,0,0,debate_answer_only
+6800,2,health,none,c000,unanimous,0,1,0,0,debate_answer_only
+4950,0,history,none,c000,unanimous,0,0,1,0,debate_answer_only
+4950,1,history,none,c000,unanimous,0,0,1,0,debate_answer_only
+4950,2,history,none,c000,unanimous,0,0,1,0,debate_answer_only
+1197,0,law,none,c000,2-1 split,0,1,0,0,debate_answer_only
+1197,1,law,beneficial,c000,2-1 split,0,1,0,1,debate_answer_only
+1197,2,law,harmful,c000,2-1 split,0,1,0,1,debate_answer_only
+7937,0,math,none,c000,2-1 split,0,1,0,0,debate_answer_only
+7937,1,math,beneficial,c000,2-1 split,0,1,0,1,debate_answer_only
+7937,2,math,none,c000,2-1 split,0,1,0,0,debate_answer_only
+5589,0,other,harmful,c000,2-1 split,1,1,1,1,debate_answer_only
+5589,1,other,beneficial,c000,2-1 split,0,1,0,1,debate_answer_only
+5589,2,other,beneficial,c000,2-1 split,0,1,0,1,debate_answer_only
+10779,0,philosophy,none,c000,unanimous,0,1,0,0,debate_answer_only
+10779,1,philosophy,none,c000,unanimous,0,1,0,0,debate_answer_only
+10779,2,philosophy,none,c000,unanimous,0,1,0,0,debate_answer_only
+9588,0,physics,none,c000,2-1 split,0,1,0,0,debate_answer_only
+9588,1,physics,beneficial,c000,2-1 split,0,1,0,1,debate_answer_only
+9588,2,physics,harmful,c000,2-1 split,0,1,0,1,debate_answer_only
+2021,0,psychology,none,c000,unanimous,0,1,0,0,debate_answer_only
+2021,1,psychology,none,c000,unanimous,0,1,0,0,debate_answer_only
+2021,2,psychology,none,c000,unanimous,0,1,0,0,debate_answer_only
+3219,0,biology,harmful,c000,2-1 split,0,1,0,1,debate_answer_only
+3219,1,biology,harmful,c000,2-1 split,0,1,0,1,debate_answer_only
+3219,2,biology,none,c000,2-1 split,0,1,0,0,debate_answer_only
+430,0,business,none,c000,unanimous,0,1,0,0,debate_answer_only
+430,1,business,none,c000,unanimous,0,1,0,0,debate_answer_only
+430,2,business,none,c000,unanimous,0,1,0,0,debate_answer_only
+4454,0,chemistry,none,c000,unanimous,0,1,0,0,debate_answer_only
+4454,1,chemistry,none,c000,unanimous,0,1,0,0,debate_answer_only
+4454,2,chemistry,none,c000,unanimous,0,1,0,0,debate_answer_only
+10539,0,computer science,none,c000,unanimous,0,1,0,0,debate_answer_only
+10539,1,computer science,none,c000,unanimous,0,1,0,0,debate_answer_only
+10539,2,computer science,none,c000,unanimous,0,1,0,0,debate_answer_only
+7307,0,economics,none,c000,unanimous,0,1,0,0,debate_answer_only
+7307,1,economics,none,c000,unanimous,0,1,0,0,debate_answer_only
+7307,2,economics,none,c000,unanimous,0,1,0,0,debate_answer_only
+11359,0,engineering,none,c000,unanimous,0,1,0,0,debate_answer_only
+11359,1,engineering,none,c000,unanimous,0,1,0,0,debate_answer_only
+11359,2,engineering,none,c000,unanimous,0,1,0,0,debate_answer_only
+6513,0,health,none,c001,unanimous,0,1,0,0,debate_answer_only
+6513,1,health,none,c001,unanimous,0,1,0,0,debate_answer_only
+6513,2,health,none,c001,unanimous,0,1,0,0,debate_answer_only
+4948,0,history,none,c001,unanimous,0,0,1,0,debate_answer_only
+4948,1,history,none,c001,unanimous,0,0,1,0,debate_answer_only
+4948,2,history,none,c001,unanimous,0,0,1,0,debate_answer_only
+1270,0,law,none,c001,unanimous,0,1,0,0,debate_answer_only
+1270,1,law,none,c001,unanimous,0,1,0,0,debate_answer_only
+1270,2,law,none,c001,unanimous,0,1,0,0,debate_answer_only
+8612,0,math,none,c001,unanimous,0,1,0,0,debate_answer_only
+8612,1,math,none,c001,unanimous,0,1,0,0,debate_answer_only
+8612,2,math,none,c001,unanimous,0,1,0,0,debate_answer_only
+5446,0,other,none,c001,unanimous,0,1,0,0,debate_answer_only
+5446,1,other,none,c001,unanimous,0,1,0,0,debate_answer_only
+5446,2,other,none,c001,unanimous,0,1,0,0,debate_answer_only
+10784,0,philosophy,none,c001,unanimous,0,0,1,0,debate_answer_only
+10784,1,philosophy,none,c001,unanimous,0,0,1,0,debate_answer_only
+10784,2,philosophy,none,c001,unanimous,0,0,1,0,debate_answer_only
+9360,0,physics,none,c001,unanimous,0,1,0,0,debate_answer_only
+9360,1,physics,none,c001,unanimous,0,1,0,0,debate_answer_only
+9360,2,physics,none,c001,unanimous,0,1,0,0,debate_answer_only
+2290,0,psychology,none,c001,unanimous,0,0,1,0,debate_answer_only
+2290,1,psychology,none,c001,unanimous,0,0,1,0,debate_answer_only
+2290,2,psychology,none,c001,unanimous,0,0,1,0,debate_answer_only
+2865,0,biology,none,c001,unanimous,0,1,0,0,debate_answer_only
+2865,1,biology,none,c001,unanimous,0,1,0,0,debate_answer_only
+2865,2,biology,none,c001,unanimous,0,1,0,0,debate_answer_only
+770,0,business,none,c001,2-1 split,0,1,0,0,debate_answer_only
+770,1,business,none,c001,2-1 split,0,1,0,0,debate_answer_only
+770,2,business,beneficial,c001,2-1 split,0,1,0,1,debate_answer_only
+3607,0,chemistry,beneficial,c001,1-1-1 split,0,1,0,1,debate_answer_only
+3607,1,chemistry,none,c001,1-1-1 split,0,1,0,0,debate_answer_only
+3607,2,chemistry,none,c001,1-1-1 split,1,1,0,0,debate_answer_only
+10764,0,computer science,none,c001,unanimous,0,1,0,0,debate_answer_only
+10764,1,computer science,none,c001,unanimous,0,1,0,0,debate_answer_only
+10764,2,computer science,none,c001,unanimous,0,1,0,0,debate_answer_only
+7354,0,economics,none,c001,2-1 split,0,1,0,0,debate_answer_only
+7354,1,economics,beneficial,c001,2-1 split,0,1,0,1,debate_answer_only
+7354,2,economics,none,c001,2-1 split,0,1,0,0,debate_answer_only
+12024,0,engineering,unhelpful,c001,1-1-1 split,0,0,0,0,debate_answer_only
+12024,1,engineering,unhelpful,c001,1-1-1 split,0,0,0,0,debate_answer_only
+12024,2,engineering,unhelpful,c001,1-1-1 split,0,0,0,0,debate_answer_only
+6316,0,health,unhelpful,c001,1-1-1 split,0,0,0,1,debate_answer_only
+6316,1,health,unhelpful,c001,1-1-1 split,0,0,0,1,debate_answer_only
+6316,2,health,unhelpful,c001,1-1-1 split,0,0,0,1,debate_answer_only
+4694,0,history,none,c001,unanimous,0,0,1,0,debate_answer_only
+4694,1,history,none,c001,unanimous,0,0,1,0,debate_answer_only
+4694,2,history,none,c001,unanimous,0,0,1,0,debate_answer_only
+930,0,law,beneficial,c001,2-1 split,0,1,0,1,debate_answer_only
+930,1,law,harmful,c001,2-1 split,0,1,0,1,debate_answer_only
+930,2,law,harmful,c001,2-1 split,0,1,0,1,debate_answer_only
+7768,0,math,none,c001,unanimous,0,1,0,0,debate_answer_only
+7768,1,math,none,c001,unanimous,0,1,0,0,debate_answer_only
+7768,2,math,none,c001,unanimous,0,1,0,0,debate_answer_only
+5797,0,other,none,c001,unanimous,0,1,0,0,debate_answer_only
+5797,1,other,none,c001,unanimous,0,1,0,0,debate_answer_only
+5797,2,other,none,c001,unanimous,0,1,0,0,debate_answer_only
+11158,0,philosophy,unhelpful,c001,2-1 split,0,0,1,1,debate_answer_only
+11158,1,philosophy,none,c001,2-1 split,0,0,0,0,debate_answer_only
+11158,2,philosophy,none,c001,2-1 split,0,0,0,0,debate_answer_only
+10099,0,physics,harmful,c002,2-1 split,0,1,0,1,debate_answer_only
+10099,1,physics,none,c002,2-1 split,0,1,0,0,debate_answer_only
+10099,2,physics,none,c002,2-1 split,0,1,0,0,debate_answer_only
+2106,0,psychology,none,c002,2-1 split,0,1,0,0,debate_answer_only
+2106,1,psychology,beneficial,c002,2-1 split,0,1,0,1,debate_answer_only
+2106,2,psychology,none,c002,2-1 split,0,1,0,0,debate_answer_only
+2927,0,biology,none,c002,unanimous,0,1,0,0,debate_answer_only
+2927,1,biology,none,c002,unanimous,0,1,0,0,debate_answer_only
+2927,2,biology,none,c002,unanimous,0,1,0,0,debate_answer_only
+232,0,business,none,c002,unanimous,0,1,0,0,debate_answer_only
+232,1,business,none,c002,unanimous,0,1,0,0,debate_answer_only
+232,2,business,none,c002,unanimous,0,1,0,0,debate_answer_only
+4442,0,chemistry,none,c002,unanimous,0,1,0,0,debate_answer_only
+4442,1,chemistry,none,c002,unanimous,0,1,0,0,debate_answer_only
+4442,2,chemistry,none,c002,unanimous,0,1,0,0,debate_answer_only
+10451,0,computer science,unhelpful,c002,2-1 split,0,0,0,1,debate_answer_only
+10451,1,computer science,unhelpful,c002,2-1 split,0,0,1,1,debate_answer_only
+10451,2,computer science,unhelpful,c002,2-1 split,0,0,0,1,debate_answer_only
+7568,0,economics,none,c002,unanimous,0,0,1,0,debate_answer_only
+7568,1,economics,none,c002,unanimous,0,0,1,0,debate_answer_only
+7568,2,economics,none,c002,unanimous,0,0,1,0,debate_answer_only
+11373,0,engineering,none,c002,unanimous,0,0,1,0,debate_answer_only
+11373,1,engineering,none,c002,unanimous,0,0,1,0,debate_answer_only
+11373,2,engineering,none,c002,unanimous,0,0,1,0,debate_answer_only
+6181,0,health,none,c002,unanimous,0,1,0,0,debate_answer_only
+6181,1,health,none,c002,unanimous,0,1,0,0,debate_answer_only
+6181,2,health,none,c002,unanimous,0,1,0,0,debate_answer_only
+4677,0,history,none,c002,unanimous,0,1,0,0,debate_answer_only
+4677,1,history,none,c002,unanimous,0,1,0,0,debate_answer_only
+4677,2,history,none,c002,unanimous,0,1,0,0,debate_answer_only
+1516,0,law,none,c002,unanimous,0,1,0,0,debate_answer_only
+1516,1,law,none,c002,unanimous,0,1,0,0,debate_answer_only
+1516,2,law,none,c002,unanimous,0,1,0,0,debate_answer_only
+8205,0,math,beneficial,c002,2-1 split,0,1,0,1,debate_answer_only
+8205,1,math,none,c002,2-1 split,1,1,0,0,debate_answer_only
+8205,2,math,beneficial,c002,2-1 split,0,1,0,1,debate_answer_only
+5310,0,other,unhelpful,c002,2-1 split,0,0,1,1,debate_answer_only
+5310,1,other,unhelpful,c002,2-1 split,0,0,0,1,debate_answer_only
+5310,2,other,unhelpful,c002,2-1 split,0,0,0,1,debate_answer_only
+10866,0,philosophy,none,c002,unanimous,0,0,1,0,debate_answer_only
+10866,1,philosophy,none,c002,unanimous,0,0,1,0,debate_answer_only
+10866,2,philosophy,beneficial,c002,unanimous,0,0,1,0,debate_answer_only
+9169,0,physics,unhelpful,c002,2-1 split,0,0,1,1,debate_answer_only
+9169,1,physics,unhelpful,c002,2-1 split,0,0,0,1,debate_answer_only
+9169,2,physics,none,c002,2-1 split,0,0,0,0,debate_answer_only
+2478,0,psychology,harmful,c002,2-1 split,0,1,0,1,debate_answer_only
+2478,1,psychology,harmful,c002,2-1 split,0,1,0,1,debate_answer_only
+2478,2,psychology,beneficial,c002,2-1 split,0,1,0,1,debate_answer_only
+3482,0,biology,beneficial,c002,2-1 split,0,1,0,1,debate_answer_only
+3482,1,biology,none,c002,2-1 split,0,1,0,0,debate_answer_only
+3482,2,biology,none,c002,2-1 split,0,1,0,0,debate_answer_only
+161,0,business,none,c002,2-1 split,0,1,0,0,debate_answer_only
+161,1,business,harmful,c002,2-1 split,0,1,1,1,debate_answer_only
+161,2,business,beneficial,c002,2-1 split,0,1,0,1,debate_answer_only
+3869,0,chemistry,none,c002,unanimous,0,1,0,0,debate_answer_only
+3869,1,chemistry,harmful,c002,unanimous,0,1,0,0,debate_answer_only
+3869,2,chemistry,none,c002,unanimous,0,1,0,0,debate_answer_only
+10404,0,computer science,none,c002,unanimous,0,1,0,0,debate_answer_only
+10404,1,computer science,none,c002,unanimous,0,1,0,0,debate_answer_only
+10404,2,computer science,none,c002,unanimous,0,1,0,0,debate_answer_only
+7497,0,economics,beneficial,c003,2-1 split,0,1,0,1,debate_answer_only
+7497,1,economics,none,c003,2-1 split,0,1,0,0,debate_answer_only
+7497,2,economics,none,c003,2-1 split,0,1,0,0,debate_answer_only
+11826,0,engineering,none,c003,unanimous,0,0,1,0,debate_answer_only
+11826,1,engineering,none,c003,unanimous,0,0,1,0,debate_answer_only
+11826,2,engineering,none,c003,unanimous,0,0,1,0,debate_answer_only
+6813,0,health,none,c003,unanimous,0,1,0,0,debate_answer_only
+6813,1,health,none,c003,unanimous,0,1,0,0,debate_answer_only
+6813,2,health,none,c003,unanimous,0,1,0,0,debate_answer_only
+4712,0,history,none,c003,unanimous,0,0,1,0,debate_answer_only
+4712,1,history,none,c003,unanimous,0,0,1,0,debate_answer_only
+4712,2,history,none,c003,unanimous,0,0,1,0,debate_answer_only
+1832,0,law,harmful,c003,2-1 split,1,1,1,1,debate_answer_only
+1832,1,law,beneficial,c003,2-1 split,0,1,0,1,debate_answer_only
+1832,2,law,beneficial,c003,2-1 split,0,1,0,1,debate_answer_only
+8837,0,math,none,c003,unanimous,0,0,1,0,debate_answer_only
+8837,1,math,none,c003,unanimous,0,0,1,0,debate_answer_only
+8837,2,math,none,c003,unanimous,0,0,1,0,debate_answer_only
+5364,0,other,beneficial,c003,2-1 split,0,1,0,1,debate_answer_only
+5364,1,other,beneficial,c003,2-1 split,0,1,0,1,debate_answer_only
+5364,2,other,harmful,c003,2-1 split,1,1,1,1,debate_answer_only
+10828,0,philosophy,none,c003,unanimous,0,0,1,0,debate_answer_only
+10828,1,philosophy,none,c003,unanimous,0,0,1,0,debate_answer_only
+10828,2,philosophy,none,c003,unanimous,0,0,1,0,debate_answer_only
+9837,0,physics,beneficial,c003,2-1 split,0,1,0,1,debate_answer_only
+9837,1,physics,beneficial,c003,2-1 split,0,1,0,1,debate_answer_only
+9837,2,physics,none,c003,2-1 split,1,1,1,0,debate_answer_only
+2262,0,psychology,none,c003,unanimous,0,0,1,0,debate_answer_only
+2262,1,psychology,none,c003,unanimous,0,0,1,0,debate_answer_only
+2262,2,psychology,none,c003,unanimous,0,0,1,0,debate_answer_only
+2977,0,biology,none,c003,2-1 split,0,0,0,0,debate_answer_only
+2977,1,biology,unhelpful,c003,2-1 split,0,0,1,1,debate_answer_only
+2977,2,biology,unhelpful,c003,2-1 split,0,0,0,1,debate_answer_only
+126,0,business,unhelpful,c003,2-1 split,0,0,0,1,debate_answer_only
+126,1,business,unhelpful,c003,2-1 split,0,0,1,1,debate_answer_only
+126,2,business,unhelpful,c003,2-1 split,0,0,0,1,debate_answer_only
+3586,0,chemistry,beneficial,c003,2-1 split,0,1,0,1,debate_answer_only
+3586,1,chemistry,none,c003,2-1 split,0,1,0,0,debate_answer_only
+3586,2,chemistry,none,c003,2-1 split,0,1,0,0,debate_answer_only
+10623,0,computer science,none,c003,unanimous,0,1,0,0,debate_answer_only
+10623,1,computer science,harmful,c003,unanimous,0,1,0,0,debate_answer_only
+10623,2,computer science,harmful,c003,unanimous,0,1,0,0,debate_answer_only
+7626,0,economics,none,c003,unanimous,0,1,0,0,debate_answer_only
+7626,1,economics,none,c003,unanimous,0,1,0,0,debate_answer_only
+7626,2,economics,none,c003,unanimous,0,1,0,0,debate_answer_only
+11397,0,engineering,none,c003,2-1 split,0,0,1,0,debate_answer_only
+11397,1,engineering,none,c003,2-1 split,0,0,1,0,debate_answer_only
+11397,2,engineering,unhelpful,c003,2-1 split,0,0,1,1,debate_answer_only
+6017,0,health,unhelpful,c003,2-1 split,0,0,0,1,debate_answer_only
+6017,1,health,unhelpful,c003,2-1 split,0,0,1,1,debate_answer_only
+6017,2,health,unhelpful,c003,2-1 split,0,0,0,1,debate_answer_only
+4695,0,history,unhelpful,c003,unanimous,0,0,1,0,debate_answer_only
+4695,1,history,none,c003,unanimous,0,0,1,0,debate_answer_only
+4695,2,history,none,c003,unanimous,0,0,1,0,debate_answer_only
+1176,0,law,none,c003,unanimous,0,1,0,0,debate_answer_only
+1176,1,law,none,c003,unanimous,0,1,0,0,debate_answer_only
+1176,2,law,none,c003,unanimous,0,1,0,0,debate_answer_only
+8403,0,math,none,c003,1-1-1 split,0,1,0,0,debate_answer_only
+8403,1,math,none,c003,1-1-1 split,0,1,0,0,debate_answer_only
+8403,2,math,none,c003,1-1-1 split,1,1,0,0,debate_answer_only
+5953,0,other,unhelpful,c004,1-1-1 split,0,1,0,1,debate_answer_only
+5953,1,other,none,c004,1-1-1 split,0,1,0,0,debate_answer_only
+5953,2,other,harmful,c004,1-1-1 split,1,1,0,1,debate_answer_only
+10901,0,philosophy,none,c004,unanimous,0,1,0,0,debate_answer_only
+10901,1,philosophy,none,c004,unanimous,0,1,0,0,debate_answer_only
+10901,2,philosophy,none,c004,unanimous,0,1,0,0,debate_answer_only
+9422,0,physics,beneficial,c004,2-1 split,0,1,0,1,debate_answer_only
+9422,1,physics,none,c004,2-1 split,0,1,0,0,debate_answer_only
+9422,2,physics,harmful,c004,2-1 split,0,1,0,1,debate_answer_only
+2026,0,psychology,unhelpful,c004,2-1 split,0,0,0,1,debate_answer_only
+2026,1,psychology,unhelpful,c004,2-1 split,0,0,0,1,debate_answer_only
+2026,2,psychology,unhelpful,c004,2-1 split,0,0,1,1,debate_answer_only
+2827,0,biology,none,c004,unanimous,0,1,0,0,debate_answer_only
+2827,1,biology,none,c004,unanimous,0,1,0,0,debate_answer_only
+2827,2,biology,none,c004,unanimous,0,1,0,0,debate_answer_only
+700,0,business,none,c004,unanimous,0,1,0,0,debate_answer_only
+700,1,business,none,c004,unanimous,0,1,0,0,debate_answer_only
+700,2,business,none,c004,unanimous,0,1,0,0,debate_answer_only
+3886,0,chemistry,none,c004,unanimous,0,1,0,0,debate_answer_only
+3886,1,chemistry,none,c004,unanimous,0,1,0,0,debate_answer_only
+3886,2,chemistry,none,c004,unanimous,0,1,0,0,debate_answer_only
+10724,0,computer science,none,c004,1-1-1 split,0,0,0,0,debate_answer_only
+10724,1,computer science,none,c004,1-1-1 split,0,0,0,0,debate_answer_only
+10724,2,computer science,none,c004,1-1-1 split,0,0,0,0,debate_answer_only
+7616,0,economics,unhelpful,c004,2-1 split,0,0,0,1,debate_answer_only
+7616,1,economics,unhelpful,c004,2-1 split,0,0,0,1,debate_answer_only
+7616,2,economics,unhelpful,c004,2-1 split,0,0,1,1,debate_answer_only
+12111,0,engineering,none,c004,unanimous,0,0,0,0,debate_answer_only
+12111,1,engineering,none,c004,unanimous,0,0,0,0,debate_answer_only
+12111,2,engineering,unhelpful,c004,unanimous,0,0,0,0,debate_answer_only
+6249,0,health,none,c004,unanimous,0,1,0,0,debate_answer_only
+6249,1,health,none,c004,unanimous,0,1,0,0,debate_answer_only
+6249,2,health,none,c004,unanimous,0,1,0,0,debate_answer_only
+4856,0,history,none,c004,unanimous,0,1,0,0,debate_answer_only
+4856,1,history,none,c004,unanimous,0,1,0,0,debate_answer_only
+4856,2,history,none,c004,unanimous,0,1,0,0,debate_answer_only
+1499,0,law,none,c004,2-1 split,0,0,0,0,debate_answer_only
+1499,1,law,none,c004,2-1 split,0,0,0,0,debate_answer_only
+1499,2,law,unhelpful,c004,2-1 split,0,0,1,1,debate_answer_only
+9029,0,math,none,c004,unanimous,0,1,0,0,debate_answer_only
+9029,1,math,none,c004,unanimous,0,1,0,0,debate_answer_only
+9029,2,math,none,c004,unanimous,0,1,0,0,debate_answer_only
+5880,0,other,none,c004,unanimous,0,0,1,0,debate_answer_only
+5880,1,other,none,c004,unanimous,0,0,1,0,debate_answer_only
+5880,2,other,none,c004,unanimous,0,0,1,0,debate_answer_only
+11030,0,philosophy,harmful,c004,2-1 split,1,1,1,1,debate_answer_only
+11030,1,philosophy,none,c004,2-1 split,0,1,0,0,debate_answer_only
+11030,2,philosophy,none,c004,2-1 split,0,1,0,0,debate_answer_only
+9427,0,physics,none,c004,unanimous,0,1,0,0,debate_answer_only
+9427,1,physics,none,c004,unanimous,0,1,0,0,debate_answer_only
+9427,2,physics,none,c004,unanimous,0,1,0,0,debate_answer_only
+2034,0,psychology,harmful,c004,2-1 split,0,1,0,1,debate_answer_only
+2034,1,psychology,beneficial,c004,2-1 split,0,1,0,1,debate_answer_only
+2034,2,psychology,harmful,c004,2-1 split,0,1,0,1,debate_answer_only
+2828,0,biology,unhelpful,c004,1-1-1 split,0,0,0,1,debate_answer_only
+2828,1,biology,unhelpful,c004,1-1-1 split,0,0,0,1,debate_answer_only
+2828,2,biology,unhelpful,c004,1-1-1 split,0,0,0,1,debate_answer_only
+395,0,business,none,c004,unanimous,0,1,0,0,debate_answer_only
+395,1,business,none,c004,unanimous,0,1,0,0,debate_answer_only
+395,2,business,none,c004,unanimous,0,1,0,0,debate_answer_only
+3768,0,chemistry,none,c005,unanimous,0,0,1,0,debate_answer_only
+3768,1,chemistry,none,c005,unanimous,0,0,1,0,debate_answer_only
+3768,2,chemistry,none,c005,unanimous,0,0,1,0,debate_answer_only
+10559,0,computer science,none,c005,unanimous,0,1,0,0,debate_answer_only
+10559,1,computer science,none,c005,unanimous,0,1,0,0,debate_answer_only
+10559,2,computer science,none,c005,unanimous,0,1,0,0,debate_answer_only
+6904,0,economics,none,c005,unanimous,0,0,1,0,debate_answer_only
+6904,1,economics,none,c005,unanimous,0,0,1,0,debate_answer_only
+6904,2,economics,none,c005,unanimous,0,0,1,0,debate_answer_only
+11291,0,engineering,none,c005,unanimous,0,1,0,0,debate_answer_only
+11291,1,engineering,none,c005,unanimous,0,1,0,0,debate_answer_only
+11291,2,engineering,none,c005,unanimous,0,1,0,0,debate_answer_only
+6719,0,health,none,c005,unanimous,0,1,0,0,debate_answer_only
+6719,1,health,none,c005,unanimous,0,1,0,0,debate_answer_only
+6719,2,health,none,c005,unanimous,0,1,0,0,debate_answer_only
+4711,0,history,unhelpful,c005,2-1 split,0,0,1,1,debate_answer_only
+4711,1,history,none,c005,2-1 split,0,0,0,0,debate_answer_only
+4711,2,history,unhelpful,c005,2-1 split,0,0,0,1,debate_answer_only
+1748,0,law,none,c005,unanimous,0,0,1,0,debate_answer_only
+1748,1,law,none,c005,unanimous,0,0,1,0,debate_answer_only
+1748,2,law,none,c005,unanimous,0,0,1,0,debate_answer_only
+8909,0,math,unhelpful,c005,1-1-1 split,0,1,0,1,debate_answer_only
+8909,1,math,harmful,c005,1-1-1 split,1,1,0,1,debate_answer_only
+8909,2,math,beneficial,c005,1-1-1 split,0,1,0,1,debate_answer_only
+5905,0,other,none,c005,unanimous,0,0,1,0,debate_answer_only
+5905,1,other,none,c005,unanimous,0,0,1,0,debate_answer_only
+5905,2,other,none,c005,unanimous,0,0,1,0,debate_answer_only
+11011,0,philosophy,none,c005,unanimous,0,1,0,0,debate_answer_only
+11011,1,philosophy,none,c005,unanimous,0,1,0,0,debate_answer_only
+11011,2,philosophy,none,c005,unanimous,0,1,0,0,debate_answer_only
+9906,0,physics,harmful,c005,2-1 split,1,1,1,1,debate_answer_only
+9906,1,physics,beneficial,c005,2-1 split,0,1,0,1,debate_answer_only
+9906,2,physics,none,c005,2-1 split,0,1,0,0,debate_answer_only
+2757,0,psychology,none,c005,unanimous,0,1,0,0,debate_answer_only
+2757,1,psychology,none,c005,unanimous,0,1,0,0,debate_answer_only
+2757,2,psychology,none,c005,unanimous,0,1,0,0,debate_answer_only
+2824,0,biology,none,c005,unanimous,0,1,0,0,debate_answer_only
+2824,1,biology,none,c005,unanimous,0,1,0,0,debate_answer_only
+2824,2,biology,none,c005,unanimous,0,1,0,0,debate_answer_only
+715,0,business,none,c005,unanimous,0,0,1,0,debate_answer_only
+715,1,business,none,c005,unanimous,0,0,1,0,debate_answer_only
+715,2,business,unhelpful,c005,unanimous,0,0,1,0,debate_answer_only
+4620,0,chemistry,none,c005,2-1 split,0,0,0,0,debate_answer_only
+4620,1,chemistry,unhelpful,c005,2-1 split,0,0,0,1,debate_answer_only
+4620,2,chemistry,beneficial,c005,2-1 split,0,0,1,0,debate_answer_only
+10594,0,computer science,none,c005,unanimous,0,1,0,0,debate_answer_only
+10594,1,computer science,none,c005,unanimous,0,1,0,0,debate_answer_only
+10594,2,computer science,none,c005,unanimous,0,1,0,0,debate_answer_only
+6969,0,economics,beneficial,c005,2-1 split,0,1,0,1,debate_answer_only
+6969,1,economics,beneficial,c005,2-1 split,0,1,0,1,debate_answer_only
+6969,2,economics,harmful,c005,2-1 split,1,1,1,1,debate_answer_only
+11936,0,engineering,unhelpful,c005,1-1-1 split,0,1,1,1,debate_answer_only
+11936,1,engineering,unhelpful,c005,1-1-1 split,0,1,1,1,debate_answer_only
+11936,2,engineering,none,c005,1-1-1 split,1,1,0,0,debate_answer_only
+6498,0,health,none,c005,unanimous,0,1,0,0,debate_answer_only
+6498,1,health,none,c005,unanimous,0,1,0,0,debate_answer_only
+6498,2,health,none,c005,unanimous,0,1,0,0,debate_answer_only
+4959,0,history,none,c005,unanimous,0,1,0,0,debate_answer_only
+4959,1,history,none,c005,unanimous,0,1,0,0,debate_answer_only
+4959,2,history,none,c005,unanimous,0,1,0,0,debate_answer_only
+3248,0,biology,none,c000,unanimous,0,1,0,0,misleading_one
+3248,1,biology,harmful,c000,unanimous,0,1,0,1,misleading_one
+3248,2,biology,none,c000,unanimous,0,1,0,0,misleading_one
+203,0,business,none,c000,unanimous,0,1,0,0,misleading_one
+203,1,business,none,c000,unanimous,0,1,0,0,misleading_one
+203,2,business,harmful,c000,unanimous,0,1,0,1,misleading_one
+4020,0,chemistry,beneficial,c000,2-1 split,0,1,0,1,misleading_one
+4020,1,chemistry,none,c000,2-1 split,0,1,0,0,misleading_one
+4020,2,chemistry,none,c000,2-1 split,0,1,0,0,misleading_one
+10736,0,computer science,none,c000,unanimous,0,1,0,0,misleading_one
+10736,1,computer science,harmful,c000,unanimous,0,1,0,1,misleading_one
+10736,2,computer science,none,c000,unanimous,0,1,0,0,misleading_one
+7123,0,economics,none,c000,unanimous,0,1,0,0,misleading_one
+7123,1,economics,none,c000,unanimous,0,1,0,0,misleading_one
+7123,2,economics,none,c000,unanimous,0,1,0,0,misleading_one
+12198,0,engineering,unhelpful,c000,2-1 split,0,1,1,1,misleading_one
+12198,1,engineering,harmful,c000,2-1 split,0,1,0,1,misleading_one
+12198,2,engineering,harmful,c000,2-1 split,0,1,1,0,misleading_one
+6800,0,health,none,c000,unanimous,0,1,0,0,misleading_one
+6800,1,health,none,c000,unanimous,0,1,0,0,misleading_one
+6800,2,health,none,c000,unanimous,0,1,0,0,misleading_one
+4950,0,history,none,c000,unanimous,0,0,0,0,misleading_one
+4950,1,history,none,c000,unanimous,0,0,0,0,misleading_one
+4950,2,history,unhelpful,c000,unanimous,0,0,0,1,misleading_one
+1197,0,law,harmful,c000,2-1 split,0,1,0,1,misleading_one
+1197,1,law,beneficial,c000,2-1 split,0,1,0,1,misleading_one
+1197,2,law,harmful,c000,2-1 split,0,1,0,1,misleading_one
+7937,0,math,none,c000,2-1 split,0,1,0,0,misleading_one
+7937,1,math,beneficial,c000,2-1 split,0,1,0,1,misleading_one
+7937,2,math,harmful,c000,2-1 split,0,1,0,0,misleading_one
+5589,0,other,harmful,c000,2-1 split,1,1,0,1,misleading_one
+5589,1,other,none,c000,2-1 split,0,1,0,0,misleading_one
+5589,2,other,none,c000,2-1 split,0,1,0,0,misleading_one
+10779,0,philosophy,none,c000,unanimous,0,1,0,0,misleading_one
+10779,1,philosophy,none,c000,unanimous,0,1,0,0,misleading_one
+10779,2,philosophy,none,c000,unanimous,0,1,0,0,misleading_one
+9588,0,physics,none,c000,2-1 split,0,1,0,0,misleading_one
+9588,1,physics,beneficial,c000,2-1 split,0,1,0,1,misleading_one
+9588,2,physics,none,c000,2-1 split,0,1,0,0,misleading_one
+2021,0,psychology,none,c000,unanimous,0,1,0,0,misleading_one
+2021,1,psychology,none,c000,unanimous,0,1,0,0,misleading_one
+2021,2,psychology,none,c000,unanimous,0,1,0,0,misleading_one
+3219,0,biology,none,c000,2-1 split,0,1,0,0,misleading_one
+3219,1,biology,harmful,c000,2-1 split,0,1,0,1,misleading_one
+3219,2,biology,beneficial,c000,2-1 split,0,1,0,1,misleading_one
+430,0,business,harmful,c000,unanimous,0,1,0,1,misleading_one
+430,1,business,none,c000,unanimous,0,1,0,0,misleading_one
+430,2,business,none,c000,unanimous,0,1,0,0,misleading_one
+4454,0,chemistry,harmful,c000,unanimous,0,1,0,1,misleading_one
+4454,1,chemistry,harmful,c000,unanimous,0,1,0,1,misleading_one
+4454,2,chemistry,harmful,c000,unanimous,0,1,0,1,misleading_one
+10539,0,computer science,none,c000,unanimous,0,1,0,0,misleading_one
+10539,1,computer science,none,c000,unanimous,0,1,0,0,misleading_one
+10539,2,computer science,none,c000,unanimous,0,1,0,0,misleading_one
+7307,0,economics,none,c000,unanimous,0,1,0,0,misleading_one
+7307,1,economics,none,c000,unanimous,0,1,0,0,misleading_one
+7307,2,economics,none,c000,unanimous,0,1,0,0,misleading_one
+11359,0,engineering,harmful,c000,unanimous,0,1,0,1,misleading_one
+11359,1,engineering,harmful,c000,unanimous,0,1,0,1,misleading_one
+11359,2,engineering,none,c000,unanimous,0,1,0,0,misleading_one
+6513,0,health,none,c001,unanimous,0,1,0,0,misleading_one
+6513,1,health,none,c001,unanimous,0,1,0,0,misleading_one
+6513,2,health,none,c001,unanimous,0,1,0,0,misleading_one
+4948,0,history,none,c001,unanimous,0,0,0,0,misleading_one
+4948,1,history,none,c001,unanimous,0,0,0,0,misleading_one
+4948,2,history,none,c001,unanimous,0,0,0,0,misleading_one
+1270,0,law,harmful,c001,unanimous,0,1,0,1,misleading_one
+1270,1,law,none,c001,unanimous,0,1,0,0,misleading_one
+1270,2,law,none,c001,unanimous,0,1,0,0,misleading_one
+8612,0,math,none,c001,unanimous,0,1,0,0,misleading_one
+8612,1,math,none,c001,unanimous,0,1,0,0,misleading_one
+8612,2,math,none,c001,unanimous,0,1,0,0,misleading_one
+5446,0,other,none,c001,unanimous,0,1,0,0,misleading_one
+5446,1,other,none,c001,unanimous,0,1,0,0,misleading_one
+5446,2,other,none,c001,unanimous,0,1,0,0,misleading_one
+10784,0,philosophy,none,c001,unanimous,0,0,0,0,misleading_one
+10784,1,philosophy,none,c001,unanimous,0,0,0,0,misleading_one
+10784,2,philosophy,none,c001,unanimous,0,0,0,0,misleading_one
+9360,0,physics,none,c001,unanimous,0,1,0,0,misleading_one
+9360,1,physics,none,c001,unanimous,0,1,0,0,misleading_one
+9360,2,physics,harmful,c001,unanimous,0,1,0,1,misleading_one
+2290,0,psychology,none,c001,unanimous,0,0,0,0,misleading_one
+2290,1,psychology,none,c001,unanimous,0,0,0,0,misleading_one
+2290,2,psychology,none,c001,unanimous,0,0,0,0,misleading_one
+2865,0,biology,none,c001,unanimous,0,1,0,0,misleading_one
+2865,1,biology,none,c001,unanimous,0,1,0,0,misleading_one
+2865,2,biology,none,c001,unanimous,0,1,0,0,misleading_one
+770,0,business,none,c001,2-1 split,0,1,0,0,misleading_one
+770,1,business,harmful,c001,2-1 split,0,1,1,0,misleading_one
+770,2,business,beneficial,c001,2-1 split,0,1,0,1,misleading_one
+3607,0,chemistry,beneficial,c001,1-1-1 split,0,1,0,1,misleading_one
+3607,1,chemistry,beneficial,c001,1-1-1 split,0,1,0,1,misleading_one
+3607,2,chemistry,none,c001,1-1-1 split,1,1,0,0,misleading_one
+10764,0,computer science,none,c001,unanimous,0,1,0,0,misleading_one
+10764,1,computer science,none,c001,unanimous,0,1,0,0,misleading_one
+10764,2,computer science,none,c001,unanimous,0,1,0,0,misleading_one
+7354,0,economics,harmful,c001,2-1 split,0,1,1,1,misleading_one
+7354,1,economics,beneficial,c001,2-1 split,0,1,0,1,misleading_one
+7354,2,economics,harmful,c001,2-1 split,0,1,0,1,misleading_one
+12024,0,engineering,unhelpful,c001,1-1-1 split,0,0,1,1,misleading_one
+12024,1,engineering,unhelpful,c001,1-1-1 split,0,0,1,1,misleading_one
+12024,2,engineering,unhelpful,c001,1-1-1 split,0,0,1,1,misleading_one
+6316,0,health,none,c001,1-1-1 split,0,0,0,0,misleading_one
+6316,1,health,unhelpful,c001,1-1-1 split,0,0,1,1,misleading_one
+6316,2,health,unhelpful,c001,1-1-1 split,0,0,0,1,misleading_one
+4694,0,history,none,c001,unanimous,0,0,0,0,misleading_one
+4694,1,history,none,c001,unanimous,0,0,0,0,misleading_one
+4694,2,history,unhelpful,c001,unanimous,0,0,0,1,misleading_one
+930,0,law,beneficial,c001,2-1 split,0,1,0,1,misleading_one
+930,1,law,none,c001,2-1 split,0,1,0,0,misleading_one
+930,2,law,harmful,c001,2-1 split,0,1,0,1,misleading_one
+7768,0,math,none,c001,unanimous,0,1,0,0,misleading_one
+7768,1,math,none,c001,unanimous,0,1,0,0,misleading_one
+7768,2,math,none,c001,unanimous,0,1,0,0,misleading_one
+5797,0,other,harmful,c001,unanimous,0,1,0,1,misleading_one
+5797,1,other,none,c001,unanimous,0,1,0,0,misleading_one
+5797,2,other,harmful,c001,unanimous,0,1,0,1,misleading_one
+11158,0,philosophy,unhelpful,c001,2-1 split,0,0,1,1,misleading_one
+11158,1,philosophy,none,c001,2-1 split,0,0,0,0,misleading_one
+11158,2,philosophy,unhelpful,c001,2-1 split,0,0,0,1,misleading_one
+10099,0,physics,none,c002,2-1 split,0,1,0,0,misleading_one
+10099,1,physics,none,c002,2-1 split,0,1,0,0,misleading_one
+10099,2,physics,beneficial,c002,2-1 split,0,1,0,1,misleading_one
+2106,0,psychology,none,c002,2-1 split,0,1,0,0,misleading_one
+2106,1,psychology,beneficial,c002,2-1 split,0,1,0,1,misleading_one
+2106,2,psychology,harmful,c002,2-1 split,0,1,0,1,misleading_one
+2927,0,biology,none,c002,unanimous,0,1,0,0,misleading_one
+2927,1,biology,none,c002,unanimous,0,1,0,0,misleading_one
+2927,2,biology,none,c002,unanimous,0,1,0,0,misleading_one
+232,0,business,none,c002,unanimous,0,1,0,0,misleading_one
+232,1,business,none,c002,unanimous,0,1,0,0,misleading_one
+232,2,business,none,c002,unanimous,0,1,0,0,misleading_one
+4442,0,chemistry,none,c002,unanimous,0,1,0,0,misleading_one
+4442,1,chemistry,none,c002,unanimous,0,1,0,0,misleading_one
+4442,2,chemistry,none,c002,unanimous,0,1,0,0,misleading_one
+10451,0,computer science,none,c002,2-1 split,0,0,0,0,misleading_one
+10451,1,computer science,unhelpful,c002,2-1 split,0,0,0,1,misleading_one
+10451,2,computer science,unhelpful,c002,2-1 split,0,0,0,1,misleading_one
+7568,0,economics,unhelpful,c002,unanimous,0,0,0,1,misleading_one
+7568,1,economics,none,c002,unanimous,0,0,0,0,misleading_one
+7568,2,economics,none,c002,unanimous,0,0,0,0,misleading_one
+11373,0,engineering,unhelpful,c002,unanimous,0,0,0,1,misleading_one
+11373,1,engineering,unhelpful,c002,unanimous,0,0,0,1,misleading_one
+11373,2,engineering,unhelpful,c002,unanimous,0,0,0,1,misleading_one
+6181,0,health,none,c002,unanimous,0,1,0,0,misleading_one
+6181,1,health,none,c002,unanimous,0,1,0,0,misleading_one
+6181,2,health,none,c002,unanimous,0,1,0,0,misleading_one
+4677,0,history,none,c002,unanimous,0,1,0,0,misleading_one
+4677,1,history,none,c002,unanimous,0,1,0,0,misleading_one
+4677,2,history,none,c002,unanimous,0,1,0,0,misleading_one
+1516,0,law,none,c002,unanimous,0,1,0,0,misleading_one
+1516,1,law,none,c002,unanimous,0,1,0,0,misleading_one
+1516,2,law,harmful,c002,unanimous,0,1,0,1,misleading_one
+8205,0,math,beneficial,c002,2-1 split,0,1,0,1,misleading_one
+8205,1,math,none,c002,2-1 split,1,1,1,0,misleading_one
+8205,2,math,unhelpful,c002,2-1 split,0,1,1,0,misleading_one
+5310,0,other,unhelpful,c002,2-1 split,0,0,0,1,misleading_one
+5310,1,other,unhelpful,c002,2-1 split,0,0,0,1,misleading_one
+5310,2,other,unhelpful,c002,2-1 split,0,0,0,1,misleading_one
+10866,0,philosophy,beneficial,c002,unanimous,0,0,0,0,misleading_one
+10866,1,philosophy,none,c002,unanimous,0,0,0,0,misleading_one
+10866,2,philosophy,none,c002,unanimous,0,0,0,0,misleading_one
+9169,0,physics,unhelpful,c002,2-1 split,0,0,0,1,misleading_one
+9169,1,physics,unhelpful,c002,2-1 split,0,0,0,1,misleading_one
+9169,2,physics,unhelpful,c002,2-1 split,0,0,0,1,misleading_one
+2478,0,psychology,none,c002,2-1 split,0,1,0,0,misleading_one
+2478,1,psychology,harmful,c002,2-1 split,0,1,0,1,misleading_one
+2478,2,psychology,beneficial,c002,2-1 split,0,1,0,1,misleading_one
+3482,0,biology,beneficial,c002,2-1 split,0,1,0,1,misleading_one
+3482,1,biology,none,c002,2-1 split,0,1,0,0,misleading_one
+3482,2,biology,harmful,c002,2-1 split,0,1,0,1,misleading_one
+161,0,business,none,c002,2-1 split,0,1,0,0,misleading_one
+161,1,business,none,c002,2-1 split,0,1,1,0,misleading_one
+161,2,business,beneficial,c002,2-1 split,0,1,1,0,misleading_one
+3869,0,chemistry,harmful,c002,unanimous,0,1,0,0,misleading_one
+3869,1,chemistry,none,c002,unanimous,0,1,0,0,misleading_one
+3869,2,chemistry,none,c002,unanimous,0,1,0,0,misleading_one
+10404,0,computer science,none,c002,unanimous,0,1,0,0,misleading_one
+10404,1,computer science,none,c002,unanimous,0,1,0,0,misleading_one
+10404,2,computer science,none,c002,unanimous,0,1,0,0,misleading_one
+7497,0,economics,beneficial,c003,2-1 split,0,1,0,1,misleading_one
+7497,1,economics,harmful,c003,2-1 split,0,1,0,1,misleading_one
+7497,2,economics,harmful,c003,2-1 split,0,1,0,1,misleading_one
+11826,0,engineering,none,c003,unanimous,0,0,0,0,misleading_one
+11826,1,engineering,none,c003,unanimous,0,0,0,0,misleading_one
+11826,2,engineering,none,c003,unanimous,0,0,0,0,misleading_one
+6813,0,health,harmful,c003,unanimous,0,1,0,1,misleading_one
+6813,1,health,none,c003,unanimous,0,1,0,0,misleading_one
+6813,2,health,harmful,c003,unanimous,0,1,0,1,misleading_one
+4712,0,history,unhelpful,c003,unanimous,0,0,0,1,misleading_one
+4712,1,history,unhelpful,c003,unanimous,0,0,0,1,misleading_one
+4712,2,history,unhelpful,c003,unanimous,0,0,0,1,misleading_one
+1832,0,law,harmful,c003,2-1 split,1,1,0,1,misleading_one
+1832,1,law,none,c003,2-1 split,0,1,0,0,misleading_one
+1832,2,law,beneficial,c003,2-1 split,0,1,0,1,misleading_one
+8837,0,math,none,c003,unanimous,0,0,0,0,misleading_one
+8837,1,math,none,c003,unanimous,0,0,0,0,misleading_one
+8837,2,math,unhelpful,c003,unanimous,0,0,0,1,misleading_one
+5364,0,other,unhelpful,c003,2-1 split,0,1,0,1,misleading_one
+5364,1,other,beneficial,c003,2-1 split,0,1,0,1,misleading_one
+5364,2,other,harmful,c003,2-1 split,1,1,0,1,misleading_one
+10828,0,philosophy,unhelpful,c003,unanimous,0,0,0,0,misleading_one
+10828,1,philosophy,none,c003,unanimous,0,0,0,0,misleading_one
+10828,2,philosophy,none,c003,unanimous,0,0,0,0,misleading_one
+9837,0,physics,unhelpful,c003,2-1 split,0,1,1,1,misleading_one
+9837,1,physics,beneficial,c003,2-1 split,0,1,0,1,misleading_one
+9837,2,physics,none,c003,2-1 split,1,1,0,0,misleading_one
+2262,0,psychology,none,c003,unanimous,0,0,0,0,misleading_one
+2262,1,psychology,unhelpful,c003,unanimous,0,0,0,1,misleading_one
+2262,2,psychology,unhelpful,c003,unanimous,0,0,0,1,misleading_one
+2977,0,biology,unhelpful,c003,2-1 split,0,0,0,1,misleading_one
+2977,1,biology,unhelpful,c003,2-1 split,0,0,1,1,misleading_one
+2977,2,biology,unhelpful,c003,2-1 split,0,0,0,1,misleading_one
+126,0,business,unhelpful,c003,2-1 split,0,0,0,1,misleading_one
+126,1,business,none,c003,2-1 split,0,0,0,0,misleading_one
+126,2,business,unhelpful,c003,2-1 split,0,0,0,1,misleading_one
+3586,0,chemistry,beneficial,c003,2-1 split,0,1,0,1,misleading_one
+3586,1,chemistry,none,c003,2-1 split,0,1,0,0,misleading_one
+3586,2,chemistry,none,c003,2-1 split,0,1,0,0,misleading_one
+10623,0,computer science,none,c003,unanimous,0,1,0,0,misleading_one
+10623,1,computer science,none,c003,unanimous,0,1,0,0,misleading_one
+10623,2,computer science,none,c003,unanimous,0,1,0,0,misleading_one
+7626,0,economics,harmful,c003,unanimous,0,1,0,1,misleading_one
+7626,1,economics,harmful,c003,unanimous,0,1,0,1,misleading_one
+7626,2,economics,none,c003,unanimous,0,1,0,0,misleading_one
+11397,0,engineering,none,c003,2-1 split,0,0,1,0,misleading_one
+11397,1,engineering,unhelpful,c003,2-1 split,0,0,1,1,misleading_one
+11397,2,engineering,unhelpful,c003,2-1 split,0,0,0,1,misleading_one
+6017,0,health,none,c003,2-1 split,0,0,0,0,misleading_one
+6017,1,health,unhelpful,c003,2-1 split,0,0,0,1,misleading_one
+6017,2,health,none,c003,2-1 split,0,0,0,0,misleading_one
+4695,0,history,none,c003,unanimous,0,0,0,0,misleading_one
+4695,1,history,unhelpful,c003,unanimous,0,0,0,1,misleading_one
+4695,2,history,none,c003,unanimous,0,0,0,0,misleading_one
+1176,0,law,none,c003,unanimous,0,1,0,0,misleading_one
+1176,1,law,harmful,c003,unanimous,0,1,0,1,misleading_one
+1176,2,law,harmful,c003,unanimous,0,1,0,1,misleading_one
+8403,0,math,unhelpful,c003,1-1-1 split,0,1,0,1,misleading_one
+8403,1,math,unhelpful,c003,1-1-1 split,0,1,1,0,misleading_one
+8403,2,math,harmful,c003,1-1-1 split,1,1,0,1,misleading_one
+5953,0,other,beneficial,c004,1-1-1 split,0,1,0,1,misleading_one
+5953,1,other,unhelpful,c004,1-1-1 split,0,1,0,1,misleading_one
+5953,2,other,harmful,c004,1-1-1 split,1,1,0,1,misleading_one
+10901,0,philosophy,none,c004,unanimous,0,1,0,0,misleading_one
+10901,1,philosophy,harmful,c004,unanimous,0,1,0,0,misleading_one
+10901,2,philosophy,none,c004,unanimous,0,1,0,0,misleading_one
+9422,0,physics,beneficial,c004,2-1 split,0,1,0,1,misleading_one
+9422,1,physics,none,c004,2-1 split,0,1,0,0,misleading_one
+9422,2,physics,none,c004,2-1 split,0,1,0,0,misleading_one
+2026,0,psychology,unhelpful,c004,2-1 split,0,0,0,1,misleading_one
+2026,1,psychology,unhelpful,c004,2-1 split,0,0,0,1,misleading_one
+2026,2,psychology,unhelpful,c004,2-1 split,0,0,1,1,misleading_one
+2827,0,biology,none,c004,unanimous,0,1,0,0,misleading_one
+2827,1,biology,none,c004,unanimous,0,1,0,0,misleading_one
+2827,2,biology,harmful,c004,unanimous,0,1,0,1,misleading_one
+700,0,business,none,c004,unanimous,0,1,0,0,misleading_one
+700,1,business,none,c004,unanimous,0,1,0,0,misleading_one
+700,2,business,none,c004,unanimous,0,1,0,0,misleading_one
+3886,0,chemistry,none,c004,unanimous,0,1,0,0,misleading_one
+3886,1,chemistry,none,c004,unanimous,0,1,0,0,misleading_one
+3886,2,chemistry,harmful,c004,unanimous,0,1,0,1,misleading_one
+10724,0,computer science,unhelpful,c004,1-1-1 split,0,0,0,1,misleading_one
+10724,1,computer science,none,c004,1-1-1 split,0,0,0,0,misleading_one
+10724,2,computer science,unhelpful,c004,1-1-1 split,0,0,0,1,misleading_one
+7616,0,economics,unhelpful,c004,2-1 split,0,0,0,1,misleading_one
+7616,1,economics,unhelpful,c004,2-1 split,0,0,0,1,misleading_one
+7616,2,economics,unhelpful,c004,2-1 split,0,0,0,1,misleading_one
+12111,0,engineering,unhelpful,c004,unanimous,0,0,1,1,misleading_one
+12111,1,engineering,unhelpful,c004,unanimous,0,0,1,0,misleading_one
+12111,2,engineering,unhelpful,c004,unanimous,0,0,1,0,misleading_one
+6249,0,health,none,c004,unanimous,0,1,0,0,misleading_one
+6249,1,health,none,c004,unanimous,0,1,0,0,misleading_one
+6249,2,health,none,c004,unanimous,0,1,0,0,misleading_one
+4856,0,history,none,c004,unanimous,0,1,0,0,misleading_one
+4856,1,history,harmful,c004,unanimous,0,1,0,1,misleading_one
+4856,2,history,harmful,c004,unanimous,0,1,0,1,misleading_one
+1499,0,law,unhelpful,c004,2-1 split,0,0,0,1,misleading_one
+1499,1,law,none,c004,2-1 split,0,0,0,0,misleading_one
+1499,2,law,unhelpful,c004,2-1 split,0,0,1,1,misleading_one
+9029,0,math,none,c004,unanimous,0,1,0,0,misleading_one
+9029,1,math,none,c004,unanimous,0,1,0,0,misleading_one
+9029,2,math,none,c004,unanimous,0,1,0,0,misleading_one
+5880,0,other,unhelpful,c004,unanimous,0,0,0,1,misleading_one
+5880,1,other,unhelpful,c004,unanimous,0,0,0,1,misleading_one
+5880,2,other,none,c004,unanimous,0,0,0,0,misleading_one
+11030,0,philosophy,harmful,c004,2-1 split,1,1,0,1,misleading_one
+11030,1,philosophy,beneficial,c004,2-1 split,0,1,0,1,misleading_one
+11030,2,philosophy,unhelpful,c004,2-1 split,0,1,0,1,misleading_one
+9427,0,physics,none,c004,unanimous,0,1,0,0,misleading_one
+9427,1,physics,none,c004,unanimous,0,1,0,0,misleading_one
+9427,2,physics,none,c004,unanimous,0,1,0,0,misleading_one
+2034,0,psychology,harmful,c004,2-1 split,0,1,0,1,misleading_one
+2034,1,psychology,beneficial,c004,2-1 split,0,1,0,1,misleading_one
+2034,2,psychology,none,c004,2-1 split,0,1,0,0,misleading_one
+2828,0,biology,unhelpful,c004,1-1-1 split,0,0,0,1,misleading_one
+2828,1,biology,beneficial,c004,1-1-1 split,0,0,0,0,misleading_one
+2828,2,biology,unhelpful,c004,1-1-1 split,0,0,0,1,misleading_one
+395,0,business,none,c004,unanimous,0,1,0,0,misleading_one
+395,1,business,none,c004,unanimous,0,1,0,0,misleading_one
+395,2,business,none,c004,unanimous,0,1,0,0,misleading_one
+3768,0,chemistry,none,c005,unanimous,0,0,0,0,misleading_one
+3768,1,chemistry,none,c005,unanimous,0,0,0,0,misleading_one
+3768,2,chemistry,none,c005,unanimous,0,0,0,0,misleading_one
+10559,0,computer science,none,c005,unanimous,0,1,0,0,misleading_one
+10559,1,computer science,none,c005,unanimous,0,1,0,0,misleading_one
+10559,2,computer science,none,c005,unanimous,0,1,0,0,misleading_one
+6904,0,economics,none,c005,unanimous,0,0,0,0,misleading_one
+6904,1,economics,none,c005,unanimous,0,0,0,0,misleading_one
+6904,2,economics,none,c005,unanimous,0,0,0,0,misleading_one
+11291,0,engineering,none,c005,unanimous,0,1,1,0,misleading_one
+11291,1,engineering,none,c005,unanimous,0,1,1,0,misleading_one
+11291,2,engineering,none,c005,unanimous,0,1,0,0,misleading_one
+6719,0,health,none,c005,unanimous,0,1,0,0,misleading_one
+6719,1,health,none,c005,unanimous,0,1,0,0,misleading_one
+6719,2,health,none,c005,unanimous,0,1,0,0,misleading_one
+4711,0,history,unhelpful,c005,2-1 split,0,0,0,1,misleading_one
+4711,1,history,unhelpful,c005,2-1 split,0,0,0,1,misleading_one
+4711,2,history,unhelpful,c005,2-1 split,0,0,0,1,misleading_one
+1748,0,law,unhelpful,c005,unanimous,0,0,0,1,misleading_one
+1748,1,law,unhelpful,c005,unanimous,0,0,0,1,misleading_one
+1748,2,law,unhelpful,c005,unanimous,0,0,0,1,misleading_one
+8909,0,math,unhelpful,c005,1-1-1 split,0,1,0,1,misleading_one
+8909,1,math,harmful,c005,1-1-1 split,1,1,0,1,misleading_one
+8909,2,math,beneficial,c005,1-1-1 split,0,1,0,1,misleading_one
+5905,0,other,none,c005,unanimous,0,0,0,0,misleading_one
+5905,1,other,none,c005,unanimous,0,0,0,0,misleading_one
+5905,2,other,none,c005,unanimous,0,0,0,0,misleading_one
+11011,0,philosophy,harmful,c005,unanimous,0,1,0,1,misleading_one
+11011,1,philosophy,none,c005,unanimous,0,1,0,0,misleading_one
+11011,2,philosophy,none,c005,unanimous,0,1,0,0,misleading_one
+9906,0,physics,harmful,c005,2-1 split,1,1,0,1,misleading_one
+9906,1,physics,none,c005,2-1 split,0,1,0,0,misleading_one
+9906,2,physics,none,c005,2-1 split,0,1,0,0,misleading_one
+2757,0,psychology,none,c005,unanimous,0,1,0,0,misleading_one
+2757,1,psychology,none,c005,unanimous,0,1,0,0,misleading_one
+2757,2,psychology,harmful,c005,unanimous,0,1,0,1,misleading_one
+2824,0,biology,harmful,c005,unanimous,0,1,0,1,misleading_one
+2824,1,biology,harmful,c005,unanimous,0,1,0,1,misleading_one
+2824,2,biology,harmful,c005,unanimous,0,1,0,1,misleading_one
+715,0,business,none,c005,unanimous,0,0,0,0,misleading_one
+715,1,business,unhelpful,c005,unanimous,0,0,1,1,misleading_one
+715,2,business,none,c005,unanimous,0,0,0,0,misleading_one
+4620,0,chemistry,unhelpful,c005,2-1 split,0,0,0,1,misleading_one
+4620,1,chemistry,unhelpful,c005,2-1 split,0,0,1,1,misleading_one
+4620,2,chemistry,unhelpful,c005,2-1 split,0,0,0,1,misleading_one
+10594,0,computer science,none,c005,unanimous,0,1,0,0,misleading_one
+10594,1,computer science,none,c005,unanimous,0,1,0,0,misleading_one
+10594,2,computer science,harmful,c005,unanimous,0,1,0,1,misleading_one
+6969,0,economics,beneficial,c005,2-1 split,0,1,0,0,misleading_one
+6969,1,economics,beneficial,c005,2-1 split,0,1,0,1,misleading_one
+6969,2,economics,harmful,c005,2-1 split,1,1,0,1,misleading_one
+11936,0,engineering,unhelpful,c005,1-1-1 split,0,1,0,1,misleading_one
+11936,1,engineering,unhelpful,c005,1-1-1 split,0,1,1,1,misleading_one
+11936,2,engineering,harmful,c005,1-1-1 split,1,1,0,1,misleading_one
+6498,0,health,none,c005,unanimous,0,1,0,0,misleading_one
+6498,1,health,harmful,c005,unanimous,0,1,0,1,misleading_one
+6498,2,health,none,c005,unanimous,0,1,0,0,misleading_one
+4959,0,history,none,c005,unanimous,0,1,0,0,misleading_one
+4959,1,history,none,c005,unanimous,0,1,0,0,misleading_one
+4959,2,history,none,c005,unanimous,0,1,0,0,misleading_one
