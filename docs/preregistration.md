@@ -83,9 +83,12 @@ probabilities and the observable debate already tell us, well enough to change p
   keeps the assignment itself as `<job>-split.json`; children inherit it. The analysis refuses a
   manifest whose hash, split names, partitions or membership are wrong, or which the run did not
   record (`load_split`).
-- **Fitting:** probe layer, regularisation and tree settings by grouped cross-validated AUROC
-  within train; models refit on all of train. No choice uses test questions.
-- **Calibration and threshold:** Platt calibrators fitted on validation; the gate accepts a
+- **Fitting:** probe layer, regularisation and tree settings by grouped cross-validated
+  **log-loss** within train (a proper scoring rule; mean per-fold AUROC is blind to scale and,
+  on the pilot, chose near-constant models whose pooled predictions ranked below chance);
+  models refit on all of train. No choice uses test questions.
+- **Calibration and threshold:** monotone Platt calibrators fitted on validation (a calibrator
+  whose fitted slope is not positive outputs the base rate instead of reversing the ranking); the gate accepts a
   revision iff calibrated P(new) − calibrated P(old) > τ ("difference" rule); τ chosen on
   validation over a grid that includes −∞ (accept every revision) and +∞ (reject every
   revision), maximising **panel accuracy** under the **`round0_then_agent0`** tie-break. The test
@@ -129,7 +132,11 @@ probabilities and the observable debate already tell us, well enough to change p
   5. beneficial revisions lost vs harmful revisions blocked, per gate; the panel-optimal ceiling
      (best of ≤ 8 accept patterns per question) and the agent-optimal policy, labelled as such;
   6. transfer of gates fixed on `debate` to `self_reconsider` and `debate_answer_only` on the same
-     held-out questions (observational, not causal); `misleading_one` (pilot only).
+     held-out questions (observational, not causal); `misleading_one` (pilot only);
+  7. optional candidate-evaluation diagnostic (`scripts/run_candidates.py`): any prompt check uses
+     pilot or training questions only (`--check`); the diagnostic sample is drawn explicitly per
+     split from the registered split (`--n-per-split`); probes and the fitted output comparator
+     train on train + validation and are scored once on test.
 - **Intervals:** every agent-level interval resamples questions (agents of one question are
   correlated); no row-wise DeLong. Repeated CV seeds (exploratory route,
   `scripts/reanalysis.py --mode cv`) are sensitivity checks, not replications.
@@ -189,10 +196,15 @@ retained activation positions.
 | split fractions and seed | 37.5 / 12.5 / 50; seed 20261010 | `[ ]` |
 | decision rule tolerance δ | 2 panel points | `[ ]` |
 | N and conditions | set by the rule in §9 from the pilot report; conditions `debate`, `self_reconsider` | `[ ]` |
+| cumulative main time cap (`MAIN_MAX_HOURS`) | §9 projection × 1.15 | `[ ]` |
+| bootstrap resamples | 10,000 (`scripts/reanalysis.py --n-boot`, default) | `[ ]` |
 | stopping rule | below | `[ ]` |
 
 **Stopping rule:** collect exactly the N questions in the split manifest; no outcome on any
-main-pool question is examined until collection ends. Collection stops early only for a
+main-pool question is examined until collection ends (the notebook's main stage shows only the
+archive verification; status files show progress, parse and cap rates, never accuracy). The
+cumulative compute cap for the main job is `MAIN_MAX_HOURS` = the §9 projection × 1.15, fixed in
+§8 before generation. Collection stops early only for a
 technical failure that cannot be fixed without changing the protocol, or when the compute budget
 is exhausted; in either case the completed chunks are analysed as they stand and the shortfall
 is reported. Collection is never stopped or extended because of results.
@@ -201,7 +213,8 @@ is reported. Collection is never stopped or extended because of results.
 
 N is the largest multiple of the chunk size such that the pilot report's projected A100-hours for
 the main conditions (measured seconds per question, per condition), plus the planned child jobs,
-plus 15% contingency, fit within the remaining budget of `[... A100-hours]`, capped at 1,200. It
+plus 15% contingency, fit within the remaining budget of `[... A100-hours]`, capped at 1,200 (a
+larger N requires amending this cap here before any main data is generated). It
 is computed from the pilot report, written into §8, and frozen -- together with the split made
 for exactly those N questions -- before any main-pool question is generated.
 
@@ -209,3 +222,4 @@ for exactly those N questions -- before any main-pool question is generated.
 
 | date | change | reason | made before or after seeing main-pool results |
 |---|---|---|---|
+| 2026-10-12 (draft, pre-dating) | model selection by grouped CV log-loss instead of AUROC; monotone calibration | found on the pilot's exploratory analysis: AUROC selection chose near-constant models and Platt slopes reversed rankings (docs/PILOT_ANALYSIS.md) | before any main-pool data exists |

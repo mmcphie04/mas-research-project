@@ -9,9 +9,9 @@ _pilot data choose instrument settings and scope; they do not test the activatio
 | debate_answer_only | 0.561 [0.48, 0.64] | 0.575 [0.49, 0.66] | 0.575 [0.48, 0.66] | 0.650 [0.57, 0.73] | 0.075 [0.03, 0.10] | 0.950 / 1.000 | 0.050 / 0.000 | 32 (26) / 26 (20) / 45 (23) |
 | misleading_one | 0.561 [0.48, 0.64] | 0.575 [0.49, 0.66] | 0.550 [0.47, 0.63] | 0.650 [0.57, 0.73] | 0.075 [0.03, 0.12] | 0.950 / 1.000 | 0.050 / 0.000 | 30 (28) / 59 (45) / 75 (39) |
 
-**Runtime:** 74.2 s/question measured over 120 completed questions ({'round0': 19.3, 'overhead': 0.1, 'self_reconsider': 17.6, 'debate': 11.8, 'debate_answer_only': 13.2, 'misleading_one': 12.3}); projected 48.7 s/question for self_reconsider, debate; GPU-hours {600: 8.1, 900: 12.2, 1200: 16.2}.
+**Runtime:** 74.2 s/question measured over 120 completed questions ({'round0': 19.3, 'overhead': 0.1, 'self_reconsider': 17.6, 'debate': 11.8, 'debate_answer_only': 13.2, 'misleading_one': 12.3}); projected 48.7 s/question for self_reconsider, debate; GPU-hours {600: 8.1, 900: 12.2, 1200: 16.2, 1500: 20.3}.
 
-**Disk:** projected GB {600: 10.9, 900: 16.3, 1200: 21.8}.
+**Disk:** projected GB {600: 10.9, 900: 16.3, 1200: 21.8, 1500: 27.2}.
 
 **Power** (test questions needed, 80% power, two-sided 5%):
 

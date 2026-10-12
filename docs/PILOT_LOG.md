@@ -45,14 +45,32 @@ The scripts are in `artifacts/pilot12b/ops/`.
   restored chunks 1–3 had no arrays there). On the laptop, `verify_archive.py` then checked every
   checksum of all 24 chunk directories, rebuilt and compared all four views, and loaded every layer:
   all 120 questions per condition, 49 layers × 3,840, finite (`pilot12b-verify.json`).
-- Compute used: 18.66 units in total (300 → 281.34), including the lost attempt.
+- **Compute accounting** (three different quantities; use the account balance for budgeting):
+  - successful chunk compute (sum of the six completed chunks' timings): **2.47 h**;
+  - job status `elapsed_hours_total`: **2.53 h** (adds model loading and the stress pass for the
+    two recorded sessions; excludes the lost first attempt at chunks 4–6);
+  - the ledger records only one `session_end` (session 2's ended unrecorded when its runtime was
+    reclaimed), so ledger-derived session hours (~1.3 h) are a lower bound only;
+  - **actual account usage: 18.66 units (300 → 281.34), ≈ 3.52 A100-hours at the 5.30/h rate**,
+    including both smoke attempts, setup, the lost attempt and idle time before reclamation.
+- **Truncation does not drive the outcomes.** 18 first answers on 11 questions hit the 768-token
+  cap (verified from rows); excluding those 11 questions (109 left) gives the same pattern:
+  original vote 65, self-reconsideration 53, debate 62, answer-only 64, misleading 61
+  (`artifacts/pilot12b/outcomes/`). All three capped self-reconsideration revisions are on those
+  same 11 questions.
+- **Views rebuilt with checksum verification** on the complete laptop archive (2026-10-12): the
+  runtime-built views had `hashes_verified: false` because the resumed session lacked chunks
+  1–3's arrays; the rebuilt views are identical in content and record `hashes_verified: true`.
 
 ## What changes because of this
 
 - Activations are stored as bfloat16 (the float16 overflow would have corrupted every 12B run).
-- For CLI runs: the watcher runs as a background process with no expiry, backs up after every
-  chunk, does a final backup with retries, and stops the session itself; it confirms a lost
-  session with `colab status` before believing it. For notebook runs, writing straight to Drive
-  remains the recommended route.
+- For CLI runs: the pilot's backup scripts marked a chunk as packed BEFORE downloading it, so a
+  failed download followed by a repack could drop that chunk (reproduced in review). Replaced by
+  `mad.cli_backup` / `scripts/colab_backup.py`: prepare -> transfer -> local checksum
+  verification -> acknowledgment, the same batch resent until acknowledged, and the runtime
+  stopped only after the COMPLETE local archive verifies (tests: `tests/test_cli_backup.py`). Not
+  yet exercised against a live runtime. For main collection, mounted Drive through the notebook,
+  plus an independent verified copy, remains the recommended route.
 - MMLU-Pro question ids look numeric; transcript readers now read them as text (the pilot report
   would otherwise have matched no transcripts to rows).

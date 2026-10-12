@@ -43,7 +43,8 @@ def main(argv=None) -> int:
                     help="explicit sample: the first K questions of each split, in the parent's order")
     ap.add_argument("--split-manifest", help="default: the parent's archived <parent>-split.json")
     ap.add_argument("--check", action="store_true",
-                    help="a prompt check: written to <parent>-candidates-check, never the final output")
+                    help="a prompt check on the first --n TRAINING questions (or a pilot job's questions): "
+                         "written to <parent>-candidates-check, never the final output")
     ap.add_argument("--set", nargs="*")
     ap.add_argument("--force", action="store_true", help="overwrite a completed candidate run")
     args = ap.parse_args(argv)
@@ -75,6 +76,8 @@ def main(argv=None) -> int:
     elif args.n:
         if registered and not args.check:
             raise SystemExit(f"{args.parent} has a registered split: sample with --n-per-split")
+        if args.check and assign:
+            qs = [q for q in qs if assign[q.question_id] == "train"]  # prompt checks never touch test
         qs = qs[: args.n]
     else:
         raise SystemExit("give --n-per-split (or --n for a prompt check / a parent without a split)")

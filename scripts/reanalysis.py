@@ -223,7 +223,7 @@ def panel_table(ev, accept, tie_break):
     return apply_policy(ev, accept, tie_break).set_index("question_id")
 
 
-def paired_panel(ev, a, b, tie_break, n_boot=2000, seed=0):
+def paired_panel(ev, a, b, tie_break, n_boot=10000, seed=0):
     pa = panel_table(ev, a, tie_break).panel_correct
     pb = panel_table(ev, b, tie_break).panel_correct.reindex(pa.index)
     d = (pa - pb).to_numpy(float)
@@ -233,7 +233,7 @@ def paired_panel(ev, a, b, tie_break, n_boot=2000, seed=0):
             "n_questions": int(len(d))}
 
 
-def evaluate(ev, P, tie_break, families, seed, const=None):
+def evaluate(ev, P, tie_break, families, seed, const=None, n_boot=10000):
     """Metrics on held-out rows. ``P[fam]`` holds old/new raw/cal and accept_<gate key>.
     ``const`` = {"old": array, "new": array}: the training base rate for each held-out row.
     Agent-level intervals resample QUESTIONS (agents of one question are correlated)."""
@@ -248,8 +248,8 @@ def evaluate(ev, P, tie_break, families, seed, const=None):
         for t, y in (("old", y_old), ("new", y_new)):
             s = p[f"{t}_cal"]
             c, npair, _ = conditional_auroc(y, s, g)
-            ci_all = bootstrap_auroc(y, s, g, seed=seed)
-            ci_rev = bootstrap_auroc(y[rev], s[rev], g[rev], seed=seed)
+            ci_all = bootstrap_auroc(y, s, g, seed=seed, n_boot=n_boot)
+            ci_rev = bootstrap_auroc(y[rev], s[rev], g[rev], seed=seed, n_boot=n_boot)
             fr[f"{t}_correct"] = {
                 "auroc_all": ci_all.point, "auroc_all_ci95": [ci_all.lo, ci_all.hi],
                 "auroc_revised": ci_rev.point, "auroc_revised_ci95": [ci_rev.lo, ci_rev.hi],
@@ -290,7 +290,7 @@ def evaluate(ev, P, tie_break, families, seed, const=None):
         pairs = [(a, b) for a in ("activation", "combined", "stacked")
                  for b in ("output_linear", "output_hgb", "output_readout_only")]
         pairs += [(f, r) for f in families for r in ("accept_all", "reject_all")]
-        res["paired_panel"][key] = {f"{a} - {b}": paired_panel(ev, gates[a], gates[b], tie_break, seed=seed)
+        res["paired_panel"][key] = {f"{a} - {b}": paired_panel(ev, gates[a], gates[b], tie_break, n_boot, seed)
                                     for a, b in pairs if a in gates and b in gates}
     res["auroc_differences"] = {}
     for a in ("activation", "combined", "stacked"):
@@ -298,7 +298,7 @@ def evaluate(ev, P, tie_break, families, seed, const=None):
             for subset, m in (("all", np.ones(len(ev), bool)), ("revised", rev)):
                 for t, y in (("new", y_new), ("old", y_old)):
                     d = bootstrap_delta_auroc(y[m], P[a][f"{t}_cal"][m], P["output_linear"][f"{t}_cal"][m],
-                                              g[m], seed=seed)
+                                              g[m], seed=seed, n_boot=n_boot)
                     res["auroc_differences"][f"{a} - output_linear | {t}_correct | {subset}"] = {
                         "point": d.point, "ci95": [d.lo, d.hi]}
     return res, ref
@@ -365,7 +365,7 @@ def _train_rate(f):
     return f.train_rate if isinstance(f, Stacked) else f["train_rate"]
 
 
-def run_cv(ev, feats, families, tie_break, seeds, k_outer=5, transfer=None):
+def run_cv(ev, feats, families, tie_break, seeds, k_outer=5, transfer=None, n_boot=10000):
     """``transfer``: {name: (events, feats)} of other conditions on the same questions. Gates
     fitted on this run's training questions are applied, frozen, to their held-out questions."""
     transfer = transfer or {}
@@ -392,14 +392,14 @@ def run_cv(ev, feats, families, tie_break, seeds, k_outer=5, transfer=None):
             for fam in families:
                 choices.append({"seed": seed, "fold": k, "family": fam, **choices_of(fitted[fam])})
             print(f"  seed {seed} fold {k} done", flush=True)
-        res, ref = evaluate(ev, P, tie_break, families, seed, const)
+        res, ref = evaluate(ev, P, tie_break, families, seed, const, n_boot)
         res["seed"] = seed
         res["transfer"] = {}
         for n, (e, _) in transfer.items():
             covered = ~np.isnan(PT[n][families[0]]["new_cal"])
             e2 = e[covered].reset_index(drop=True)
             P2 = {f: {k: v[covered] for k, v in PT[n][f].items()} for f in families}
-            res["transfer"][n], ref2 = evaluate(e2, P2, tie_break, families, seed)
+            res["transfer"][n], ref2 = evaluate(e2, P2, tie_break, families, seed, None, n_boot)
             t_rows.append(export_rows(e2, P2, families, seed, e2.question_id.map(fold_of)).assign(transfer_run=n))
             t_panels.append(export_panel(e2, P2, ref2, families, tie_break, seed).assign(transfer_run=n))
         results.append(res)
@@ -409,7 +409,7 @@ def run_cv(ev, feats, families, tie_break, seeds, k_outer=5, transfer=None):
     return results, pd.concat(rows), pd.concat(panels), choices, transfer_out
 
 
-def run_split(ev, feats, families, tie_break, manifest, transfer=None):
+def run_split(ev, feats, families, tie_break, manifest, transfer=None, n_boot=10000):
     split = ev.question_id.map(manifest)
     if split.isna().any():
         raise SystemExit(f"{int(split.isna().sum())} events have no split in the manifest")
@@ -432,7 +432,7 @@ def run_split(ev, feats, families, tie_break, manifest, transfer=None):
     P = frozen(sc, rev[te], int(te.sum()))
     rate = _train_rate(fitted[families[0]])
     const = {t: np.full(int(te.sum()), rate[t]) for t in rate}
-    res, ref = evaluate(ev_te, P, tie_break, families, 0, const)
+    res, ref = evaluate(ev_te, P, tie_break, families, 0, const, n_boot)
     res["split_sizes"] = {s: int(ev[split == s].question_id.nunique()) for s in ("train", "validation", "test")}
     res["transfer"] = {}
     t_rows, t_panels = [], []
@@ -440,7 +440,7 @@ def run_split(ev, feats, families, tie_break, manifest, transfer=None):
         m = (e.question_id.map(manifest) == "test").to_numpy()
         e2 = e[m].reset_index(drop=True)
         P2 = frozen(score_all(fitted, f_t, m), (e2.revised == 1).to_numpy(), int(m.sum()))
-        res["transfer"][n], ref2 = evaluate(e2, P2, tie_break, families, 0)
+        res["transfer"][n], ref2 = evaluate(e2, P2, tie_break, families, 0, None, n_boot)
         t_rows.append(export_rows(e2, P2, families, "split", "test").assign(transfer_run=n))
         t_panels.append(export_panel(e2, P2, ref2, families, tie_break, "split").assign(transfer_run=n))
     choices = [{"split": "train/validation", "family": f, **choices_of(fitted[f])} for f in families]
@@ -466,6 +466,8 @@ def main(argv=None) -> int:
     ap.add_argument("--exposure-position", default="readout_last")
     ap.add_argument("--families", nargs="+", default=list(ALL), choices=list(ALL))
     ap.add_argument("--tie-break", help="default: the run manifest's debate.tie_break")
+    ap.add_argument("--n-boot", type=int, default=10000,
+                    help="bootstrap resamples of questions for every interval (preregistered: 10,000)")
     ap.add_argument("--allow-unregistered-split", action="store_true",
                     help="exploration only: accept a split manifest the run did not record")
     ap.add_argument("--transfer-runs", nargs="*", default=[],
@@ -514,12 +516,13 @@ def main(argv=None) -> int:
             print("WARNING: split manifest not registered with this run; results are exploratory")
         report["split"] = {"assignment_sha256": smeta["assignment_sha256"], "registered_with_run": registered,
                            "counts_in_manifest": smeta["counts"]}
-        results, rows, panels, choices, t_out = run_split(ev, feats, fams, tie, manifest, transfer)
+        results, rows, panels, choices, t_out = run_split(ev, feats, fams, tie, manifest, transfer, args.n_boot)
     else:
-        results, rows, panels, choices, t_out = run_cv(ev, feats, fams, tie, args.seeds, transfer=transfer)
+        results, rows, panels, choices, t_out = run_cv(ev, feats, fams, tie, args.seeds, transfer=transfer,
+                                                       n_boot=args.n_boot)
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
-    report.update({"run": str(run), "mode": args.mode, "tie_break": tie, "families": fams,
+    report.update({"run": str(run), "mode": args.mode, "tie_break": tie, "families": fams, "n_boot": args.n_boot,
                    "gates": {"keys": list(G.GATE_KEYS), "primary": G.PRIMARY_GATE,
                              "rules": {"difference": "accept iff P(new) - P(old) > tau",
                                        "protect": "accept iff P(old) <= tau (keep confident first answers)"},

@@ -31,7 +31,7 @@ import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 from sklearn.model_selection import GroupKFold  # noqa: E402
 
-from mad.analysis.gates import C_GRID, cv_auroc, linear  # noqa: E402
+from mad.analysis.gates import C_GRID, cv_logloss, linear  # noqa: E402
 from mad.analysis.states import StateBank  # noqa: E402
 from mad.analysis.stats import bootstrap_auroc, cluster_bootstrap, conditional_auroc  # noqa: E402
 from mad.candidates import ROWS  # noqa: E402
@@ -135,11 +135,11 @@ def main(argv=None) -> int:
     p_probe, p_comb, p_outm = (np.full(len(r), np.nan) for _ in range(3))
     chosen = []
     for tr, te in folds:
-        L = max(layers, key=lambda L: cv_auroc(lambda: linear(1e-2), states(L)[tr], y[tr], g[tr]))
+        L = min(layers, key=lambda L: cv_logloss(lambda: linear(1e-2), states(L)[tr], y[tr], g[tr]))
         X = states(L)
-        C = max(C_GRID, key=lambda C: cv_auroc(lambda C=C: linear(C), X[tr], y[tr], g[tr]))
+        C = min(C_GRID, key=lambda C: cv_logloss(lambda C=C: linear(C), X[tr], y[tr], g[tr]))
         p_probe[te] = linear(C).fit(X[tr], y[tr]).predict_proba(X[te])[:, 1]
-        Co = max(C_GRID, key=lambda C: cv_auroc(lambda C=C: linear(C), X_out[tr], y[tr], g[tr]))
+        Co = min(C_GRID, key=lambda C: cv_logloss(lambda C=C: linear(C), X_out[tr], y[tr], g[tr]))
         p_outm[te] = linear(Co).fit(X_out[tr], y[tr]).predict_proba(X_out[te])[:, 1]
         Xc = np.hstack([X, X_out])
         p_comb[te] = linear(C).fit(Xc[tr], y[tr]).predict_proba(Xc[te])[:, 1]

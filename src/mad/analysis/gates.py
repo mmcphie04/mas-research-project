@@ -62,6 +62,26 @@ def hgb(params):
     return HistGradientBoostingClassifier(learning_rate=0.05, random_state=0, **params)
 
 
+def cv_logloss(make, X, y, g, k=3) -> float:
+    """Mean per-fold log-loss under grouped k-fold CV (lower is better).
+
+    The selection criterion. Mean per-fold AUROC was used before and is blind to a model's
+    scale: on the 12B pilot it preferred C=1e-4, whose near-constant predictions rank well WITHIN
+    a fold (AUROC 0.71) but, pooled across folds -- as calibration, thresholds and evaluation all
+    pool them -- rank at 0.44, because each fold's offset tracks its training base rate. A proper
+    scoring rule penalises near-constant predictions directly.
+    """
+    from sklearn.metrics import log_loss
+
+    s = []
+    for a, b in GroupKFold(n_splits=k).split(X, y, g):
+        if len(np.unique(y[a])) < 2:
+            continue
+        p = np.clip(make().fit(X[a], y[a]).predict_proba(X[b])[:, 1], 1e-6, 1 - 1e-6)
+        s.append(log_loss(y[b], p, labels=[0, 1]))
+    return float(np.mean(s)) if s else np.inf
+
+
 def cv_auroc(make, X, y, g, k=3) -> float:
     s = []
     for a, b in GroupKFold(n_splits=k).split(X, y, g):
@@ -148,19 +168,19 @@ class Features:
 
 
 def select(F: Features, X_rows, y, g):
-    """Hyperparameters by grouped CV AUROC on the given (training) rows only.
-    Returns (factory, params)."""
+    """Hyperparameters by grouped CV LOG-LOSS on the given (training) rows only (see
+    ``cv_logloss`` for why not AUROC). Returns (factory, params)."""
     if F.kind == "output_hgb":
         X = F.matrix()[X_rows]
-        bp = max(HGB_GRID, key=lambda p: cv_auroc(lambda p=p: hgb(p), X, y, g))
+        bp = min(HGB_GRID, key=lambda p: cv_logloss(lambda p=p: hgb(p), X, y, g))
         return (lambda p=bp: hgb(p)), dict(bp)
     if F.kind == "output_linear":
         X = F.matrix()[X_rows]
-        bc = max(C_GRID, key=lambda C: cv_auroc(lambda C=C: linear(C), X, y, g))
+        bc = min(C_GRID, key=lambda C: cv_logloss(lambda C=C: linear(C), X, y, g))
         return (lambda C=bc: linear(C)), {"C": bc}
-    best_l = max(F.layers, key=lambda L: cv_auroc(lambda: linear(1e-2), F.matrix(L)[X_rows], y, g))
+    best_l = min(F.layers, key=lambda L: cv_logloss(lambda: linear(1e-2), F.matrix(L)[X_rows], y, g))
     X = F.matrix(best_l)[X_rows]
-    bc = max(C_GRID, key=lambda C: cv_auroc(lambda C=C: linear(C), X, y, g))
+    bc = min(C_GRID, key=lambda C: cv_logloss(lambda C=C: linear(C), X, y, g))
     return (lambda C=bc: linear(C)), {"layer": int(best_l), "C": bc}
 
 
@@ -220,4 +240,5 @@ def score(fitted: dict, F: Features, rows) -> dict:
 
 def calibrator_params(cal: PlattScaler) -> dict:
     lr = cal._lr
-    return {"coef": float(lr.coef_[0][0]), "intercept": float(lr.intercept_[0])}
+    return {"coef": float(lr.coef_[0][0]), "intercept": float(lr.intercept_[0]),
+            "constant": cal.constant}

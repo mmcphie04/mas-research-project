@@ -123,7 +123,7 @@ def test_features_respect_information_time(stub_view):
 
 def test_cv_route_end_to_end_exports_everything(stub_view, tmp_path):
     R = _load("reanalysis")
-    assert R.main(["--run", str(stub_view / "s-debate"), "--out", str(tmp_path), "--seeds", "0",
+    assert R.main(["--n-boot", "200", "--run", str(stub_view / "s-debate"), "--out", str(tmp_path), "--seeds", "0",
                    "--time", "exposure", "--families", "output_linear", "activation", "stacked"]) == 0
     res = json.loads((tmp_path / "results.json").read_text())
     assert res["activation_phases"] == ["pre", "peer_exposure"]
@@ -141,7 +141,7 @@ def test_cv_route_end_to_end_exports_everything(stub_view, tmp_path):
 
 def test_position_is_respected_and_missing_states_drop_whole_questions(stub_view, tmp_path):
     R = _load("reanalysis")
-    assert R.main(["--run", str(stub_view / "s-debate"), "--out", str(tmp_path), "--seeds", "0",
+    assert R.main(["--n-boot", "200", "--run", str(stub_view / "s-debate"), "--out", str(tmp_path), "--seeds", "0",
                    "--position", "stated_answer", "--families", "activation"]) == 0
     res = json.loads((tmp_path / "results.json").read_text())
     assert res["position"] == "stated_answer" and res["questions_used"] + len(
@@ -160,7 +160,7 @@ def test_split_route_scores_only_test_questions(stub_view, tmp_path):
             "--split-manifest", str(split), "--families", "output_linear", "activation"]
     with pytest.raises(SystemExit, match="collected with split"):
         R.main(args)  # made AFTER collection: not the preregistered route
-    assert R.main([*args, "--allow-unregistered-split"]) == 0
+    assert R.main(["--n-boot", "200", *args, "--allow-unregistered-split"]) == 0
     pred = pd.read_csv(out / "predictions.csv")
     assert set(pred.question_id.map(assign)) == {"test"}
 
@@ -178,7 +178,7 @@ def test_registered_split_route_end_to_end(tmp_path):
     assert json.loads((tmp_path / "m-job.json").read_text())["identity"]["split"]["assignment_sha256"] == sha
     assert json.loads((tmp_path / "m-debate" / "manifest.json").read_text())["split_assignment_sha256"] == sha
     out = tmp_path / "o"
-    assert R.main(["--run", str(tmp_path / "m-debate"), "--out", str(out), "--mode", "split",
+    assert R.main(["--n-boot", "200", "--run", str(tmp_path / "m-debate"), "--out", str(out), "--mode", "split",
                    "--split-manifest", str(split), "--families", "output_linear"]) == 0
     assert json.loads((out / "results.json").read_text())["split"]["registered_with_run"] == sha
 
@@ -239,7 +239,7 @@ def test_candidate_analysis_rejects_unmapped_questions(tmp_path):
 
 def test_transfer_applies_frozen_gates_to_another_condition(stub_view, tmp_path):
     R = _load("reanalysis")
-    assert R.main(["--run", str(stub_view / "s-debate"), "--out", str(tmp_path), "--seeds", "0",
+    assert R.main(["--n-boot", "200", "--run", str(stub_view / "s-debate"), "--out", str(tmp_path), "--seeds", "0",
                    "--families", "output_linear", "--transfer-runs", str(stub_view / "s-self_reconsider")]) == 0
     res = json.loads((tmp_path / "results.json").read_text())
     tr = res["results"][0]["transfer"]["s-self_reconsider"]
@@ -286,7 +286,7 @@ def test_position_matched_output_features_have_explicit_missingness(stub_view):
 
 def test_readout_only_ablation_and_constant_baseline_are_exported(stub_view, tmp_path):
     R = _load("reanalysis")
-    assert R.main(["--run", str(stub_view / "s-debate"), "--out", str(tmp_path), "--seeds", "0",
+    assert R.main(["--n-boot", "200", "--run", str(stub_view / "s-debate"), "--out", str(tmp_path), "--seeds", "0",
                    "--position", "stated_answer", "--families", "output_linear", "output_readout_only",
                    "activation", "--transfer-runs", str(stub_view / "s-self_reconsider")]) == 0
     res = json.loads((tmp_path / "results.json").read_text())
@@ -306,3 +306,29 @@ def test_strong_output_baseline_is_the_default_where_saved():
                                                                  "stated_answer"]
     assert R.resolve_output_positions([], "readout_last") == [], "old runs fall back to the readout"
     assert R.resolve_output_positions(all4, "readout_last", []) == [], "explicit empty means none"
+
+
+def test_selection_by_logloss_rejects_near_constant_models():
+    """Regression (12B pilot): mean per-fold AUROC preferred C=1e-4, whose near-constant
+    predictions rank at chance or worse once folds are pooled. Log-loss does not."""
+    ev, X = _events(n_q=120, seed=11)
+    y, g = ev.pre_correct.to_numpy(), ev.question_id.to_numpy()
+    tiny = G.cv_logloss(lambda: G.linear(1e-4), X, y, g)
+    fair = G.cv_logloss(lambda: G.linear(1e-1), X, y, g)
+    assert fair < tiny
+    F = G.Features("output_linear", output=X)
+    _, prm = G.select(F, np.ones(len(y), bool), y, g)
+    assert prm["C"] != 1e-4
+
+
+def test_calibration_never_reverses_a_ranking():
+    from mad.analysis.calibrate import PlattScaler
+
+    s = np.linspace(0, 1, 200)
+    y = (s < 0.5).astype(int)  # scores anti-correlated with the outcome
+    cal = PlattScaler().fit(s, y)
+    out = cal.transform(np.array([0.1, 0.9]))
+    assert cal.constant is not None and out[0] == out[1] == y.mean()
+    good = PlattScaler().fit(s, 1 - y)
+    a, b = good.transform(np.array([0.1, 0.9]))
+    assert good.constant is None and b > a

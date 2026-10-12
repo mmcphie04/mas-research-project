@@ -605,3 +605,13 @@ def test_pilot_report_handles_numeric_looking_question_ids(driver, tmp_path):
     assert pr.main(["--out-root", str(tmp_path), "--name", "t", "--out", str(out),
                     "--main-conditions", "debate"]) == 0
     assert "### 000" in (out / "transcripts.md").read_text(), "transcripts did not match rows"
+
+
+def test_notebook_main_stage_shows_no_outcomes_and_needs_a_cumulative_cap():
+    _, cells = _code_cells()
+    settings = next(c for c in cells if c.startswith("STAGE"))
+    assert "MAIN_MAX_HOURS = None" in settings and "MAX_HOURS = MAIN_MAX_HOURS" in settings
+    summary = next(c for c in cells if "scripts/summarize_run.py" in c)
+    main_branch = summary.split('elif STAGE == "main":')[1].split("else:")[0]
+    assert "summarize_run" not in main_branch and "pilot_report" not in main_branch
+    assert "verify_archive" in main_branch

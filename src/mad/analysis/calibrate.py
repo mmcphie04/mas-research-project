@@ -14,14 +14,26 @@ from sklearn.linear_model import LogisticRegression
 
 
 class PlattScaler:
+    """Monotone calibration: never reverses a model's ranking.
+
+    If the fitted slope is not positive -- the scores carry no usable ranking on the calibration
+    data, as happened with near-constant scores on the 12B pilot -- the calibrator outputs the
+    calibration data's base rate for every score (``constant``), instead of a flipped ranking.
+    """
+
     def __init__(self):
         self._lr = LogisticRegression(C=1e6, solver="lbfgs", max_iter=1000)
+        self.constant: float | None = None
 
     def fit(self, scores: np.ndarray, y: np.ndarray) -> PlattScaler:
-        self._lr.fit(np.asarray(scores).reshape(-1, 1), np.asarray(y).astype(int))
+        y = np.asarray(y).astype(int)
+        self._lr.fit(np.asarray(scores).reshape(-1, 1), y)
+        self.constant = float(y.mean()) if self._lr.coef_[0][0] <= 0 else None
         return self
 
     def transform(self, scores: np.ndarray) -> np.ndarray:
+        if self.constant is not None:
+            return np.full(len(np.asarray(scores)), self.constant)
         return self._lr.predict_proba(np.asarray(scores).reshape(-1, 1))[:, 1]
 
 

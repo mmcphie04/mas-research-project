@@ -115,7 +115,13 @@ def main(argv=None) -> int:
     if ledger.exists():
         ev_l = [json.loads(x) for x in ledger.read_text().splitlines()]
         ends = [e["session_seconds"] for e in ev_l if e["event"] == "session_end"]
-        rep["runtime"]["session_wall_hours_total"] = round(sum(ends) / 3600, 2)
+        starts = sum(e["event"] == "session_start" for e in ev_l)
+        rep["runtime"]["ledger_recorded_session_hours"] = round(sum(ends) / 3600, 2)
+        rep["runtime"]["ledger_note"] = (
+            f"{len(ends)} of {starts} recorded sessions wrote a session_end; this is a LOWER bound. "
+            "Actual usage is the Colab compute-unit balance (setup, failed or lost work, idle time).")
+    rep["runtime"]["successful_chunk_hours"] = round(float(t.seconds.sum()) / 3600, 3) if n_t else 0.0
+    rep["runtime"]["status_elapsed_hours"] = status.get("elapsed_hours_total")
 
     # ---- disk, per COMPLETED question, each condition from its own bytes
     r0 = sum(dir_bytes(root / f"{args.name}-round0-{chunk_tag(i)}") for i in done_chunks)

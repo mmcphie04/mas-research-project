@@ -59,6 +59,8 @@ def test_candidates_follow_the_parents_registered_split(tmp_path):
         rc.main([*base, "--n", "10"])  # a registered split: no unstratified sampling
     assert rc.main([*base, "--n", "4", "--check"]) == 0
     assert (tmp_path / "p-candidates-check" / "completion.json").exists()
+    chk = pd.read_parquet(tmp_path / "p-candidates-check" / "candidate_states.parquet")
+    assert set(chk.split) == {"train"}, "a prompt check touched non-training questions"
     assert not (tmp_path / "p-candidates").exists(), "a prompt check must not become the final output"
     assert rc.main([*base, "--n-per-split", "10", "4", "8"]) == 0
     r = pd.read_parquet(tmp_path / "p-candidates" / "candidate_states.parquet")
