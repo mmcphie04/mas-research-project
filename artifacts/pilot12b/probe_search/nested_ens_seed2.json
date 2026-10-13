@@ -1,0 +1,3325 @@
+{
+ "seed": 2,
+ "recipes": [
+  "readout_last:raw:meandiff:12-24",
+  "readout_last:raw:meandiff:21-33",
+  "readout_last:raw:meandiff:15-39",
+  "readout_last:raw:pca16:12-24",
+  "readout_last:raw:pca16:21-33",
+  "readout_last:raw:pca16:15-39",
+  "readout_last:letter:meandiff:12-24",
+  "readout_last:letter:meandiff:21-33",
+  "readout_last:letter:meandiff:15-39",
+  "readout_last:letter:pca16:12-24",
+  "readout_last:letter:pca16:21-33",
+  "readout_last:letter:pca16:15-39",
+  "before_stated_answer:raw:meandiff:12-24",
+  "before_stated_answer:raw:meandiff:21-33",
+  "before_stated_answer:raw:meandiff:15-39",
+  "before_stated_answer:raw:pca16:12-24",
+  "before_stated_answer:raw:pca16:21-33",
+  "before_stated_answer:raw:pca16:15-39",
+  "before_stated_answer:letter:meandiff:12-24",
+  "before_stated_answer:letter:meandiff:21-33",
+  "before_stated_answer:letter:meandiff:15-39",
+  "before_stated_answer:letter:pca16:12-24",
+  "before_stated_answer:letter:pca16:21-33",
+  "before_stated_answer:letter:pca16:15-39",
+  "generation_last:raw:meandiff:12-24",
+  "generation_last:raw:meandiff:21-33",
+  "generation_last:raw:meandiff:15-39",
+  "generation_last:raw:pca16:12-24",
+  "generation_last:raw:pca16:21-33",
+  "generation_last:raw:pca16:15-39",
+  "generation_last:letter:meandiff:12-24",
+  "generation_last:letter:meandiff:21-33",
+  "generation_last:letter:meandiff:15-39",
+  "generation_last:letter:pca16:12-24",
+  "generation_last:letter:pca16:21-33",
+  "generation_last:letter:pca16:15-39",
+  "stated_answer:raw:meandiff:12-24",
+  "stated_answer:raw:meandiff:21-33",
+  "stated_answer:raw:meandiff:15-39",
+  "stated_answer:raw:pca16:12-24",
+  "stated_answer:raw:pca16:21-33",
+  "stated_answer:raw:pca16:15-39",
+  "stated_answer:letter:meandiff:12-24",
+  "stated_answer:letter:meandiff:21-33",
+  "stated_answer:letter:meandiff:15-39",
+  "stated_answer:letter:pca16:12-24",
+  "stated_answer:letter:pca16:21-33",
+  "stated_answer:letter:pca16:15-39"
+ ],
+ "fixed": "readout_last:letter:meandiff:15-39",
+ "chosen": {
+  "auroc_all": [
+   {
+    "fold": 0,
+    "recipe": "before_stated_answer:letter:meandiff:21-33",
+    "auroc_all": 0.7689151931923074
+   },
+   {
+    "fold": 1,
+    "recipe": "before_stated_answer:letter:pca16:21-33",
+    "auroc_all": 0.7558957748588495
+   },
+   {
+    "fold": 2,
+    "recipe": "before_stated_answer:letter:pca16:21-33",
+    "auroc_all": 0.7678813392156831
+   },
+   {
+    "fold": 3,
+    "recipe": "before_stated_answer:letter:pca16:21-33",
+    "auroc_all": 0.7662975812364679
+   },
+   {
+    "fold": 4,
+    "recipe": "readout_last:raw:pca16:21-33",
+    "auroc_all": 0.7853530153908268
+   }
+  ],
+  "within_panel": [
+   {
+    "fold": 0,
+    "recipe": "readout_last:letter:meandiff:21-33",
+    "within_panel": 0.7857142857142857
+   },
+   {
+    "fold": 1,
+    "recipe": "before_stated_answer:letter:pca16:12-24",
+    "within_panel": 0.7782426778242678
+   },
+   {
+    "fold": 2,
+    "recipe": "before_stated_answer:letter:pca16:12-24",
+    "within_panel": 0.7715355805243446
+   },
+   {
+    "fold": 3,
+    "recipe": "before_stated_answer:letter:pca16:21-33",
+    "within_panel": 0.7575757575757576
+   },
+   {
+    "fold": 4,
+    "recipe": "before_stated_answer:letter:pca16:21-33",
+    "within_panel": 0.7916666666666666
+   }
+  ],
+  "rev_auc": [
+   {
+    "fold": 0,
+    "recipe": "before_stated_answer:letter:meandiff:21-33",
+    "rev_auc": 0.8074513478052499
+   },
+   {
+    "fold": 1,
+    "recipe": "before_stated_answer:letter:meandiff:21-33",
+    "rev_auc": 0.788467551745752
+   },
+   {
+    "fold": 2,
+    "recipe": "before_stated_answer:letter:meandiff:21-33",
+    "rev_auc": 0.7666282930713774
+   },
+   {
+    "fold": 3,
+    "recipe": "before_stated_answer:letter:pca16:21-33",
+    "rev_auc": 0.7862847837646225
+   },
+   {
+    "fold": 4,
+    "recipe": "before_stated_answer:letter:pca16:21-33",
+    "rev_auc": 0.7643252842907221
+   }
+  ]
+ },
+ "per_recipe_unselected": {
+  "readout_last:raw:meandiff:12-24": {
+   "auroc_all": 0.7312653713156474,
+   "auroc_pre": 0.6132348058544868,
+   "within_q": 0.729136690647482,
+   "within_q_pairs": 2780,
+   "within_panel": 0.7075471698113207,
+   "within_panel_pairs": 318,
+   "within_panel_pre": 0.5806451612903226,
+   "within_panel_pre_pairs": 62,
+   "rev_auc": 0.6637436934833005,
+   "rev_auc_debate": 0.658203125,
+   "rev_auc_pooled": 0.6724410694510362,
+   "rev_n": 325
+  },
+  "readout_last:raw:meandiff:21-33": {
+   "auroc_all": 0.7464258133132319,
+   "auroc_pre": 0.6684500340639526,
+   "within_q": 0.7316546762589928,
+   "within_q_pairs": 2780,
+   "within_panel": 0.7327044025157232,
+   "within_panel_pairs": 318,
+   "within_panel_pre": 0.6774193548387096,
+   "within_panel_pre_pairs": 62,
+   "rev_auc": 0.7160197926008245,
+   "rev_auc_debate": 0.6865234375,
+   "rev_auc_pooled": 0.7284053156146179,
+   "rev_n": 325
+  },
+  "readout_last:raw:meandiff:15-39": {
+   "auroc_all": 0.7489112495565575,
+   "auroc_pre": 0.6531611217980899,
+   "within_q": 0.7309352517985611,
+   "within_q_pairs": 2780,
+   "within_panel": 0.7169811320754716,
+   "within_panel_pairs": 318,
+   "within_panel_pre": 0.6129032258064516,
+   "within_panel_pre_pairs": 62,
+   "rev_auc": 0.702772492160258,
+   "rev_auc_debate": 0.6708984375,
+   "rev_auc_pooled": 0.7148789748457522,
+   "rev_n": 325
+  },
+  "readout_last:raw:pca16:12-24": {
+   "auroc_all": 0.7339995029873985,
+   "auroc_pre": 0.5647940521575273,
+   "within_q": 0.7269784172661871,
+   "within_q_pairs": 2780,
+   "within_panel": 0.7012578616352201,
+   "within_panel_pairs": 318,
+   "within_panel_pre": 0.532258064516129,
+   "within_panel_pre_pairs": 62,
+   "rev_auc": 0.6616371451548086,
+   "rev_auc_debate": 0.6318359375,
+   "rev_auc_pooled": 0.6804698623635501,
+   "rev_n": 325
+  },
+  "readout_last:raw:pca16:21-33": {
+   "auroc_all": 0.7643495987651454,
+   "auroc_pre": 0.6428141588270134,
+   "within_q": 0.7359712230215827,
+   "within_q_pairs": 2780,
+   "within_panel": 0.7138364779874213,
+   "within_panel_pairs": 318,
+   "within_panel_pre": 0.5645161290322581,
+   "within_panel_pre_pairs": 62,
+   "rev_auc": 0.6978374777997081,
+   "rev_auc_debate": 0.6630859375,
+   "rev_auc_pooled": 0.7156304382218004,
+   "rev_n": 325
+  },
+  "readout_last:raw:pca16:15-39": {
+   "auroc_all": 0.7586488381759189,
+   "auroc_pre": 0.6188104624381221,
+   "within_q": 0.7305755395683453,
+   "within_q_pairs": 2780,
+   "within_panel": 0.7044025157232704,
+   "within_panel_pairs": 318,
+   "within_panel_pre": 0.532258064516129,
+   "within_panel_pre_pairs": 62,
+   "rev_auc": 0.6937533316401224,
+   "rev_auc_debate": 0.662109375,
+   "rev_auc_pooled": 0.7124663819015978,
+   "rev_n": 325
+  },
+  "readout_last:letter:meandiff:12-24": {
+   "auroc_all": 0.7366040157588768,
+   "auroc_pre": 0.624892873940303,
+   "within_q": 0.7366906474820144,
+   "within_q_pairs": 2780,
+   "within_panel": 0.7075471698113207,
+   "within_panel_pairs": 318,
+   "within_panel_pre": 0.5483870967741935,
+   "within_panel_pre_pairs": 62,
+   "rev_auc": 0.6954442051960859,
+   "rev_auc_debate": 0.7265625,
+   "rev_auc_pooled": 0.711517165005537,
+   "rev_n": 325
+  },
+  "readout_last:letter:meandiff:21-33": {
+   "auroc_all": 0.7460750798046574,
+   "auroc_pre": 0.6651245455815491,
+   "within_q": 0.7345323741007195,
+   "within_q_pairs": 2780,
+   "within_panel": 0.720125786163522,
+   "within_panel_pairs": 318,
+   "within_panel_pre": 0.5806451612903226,
+   "within_panel_pre_pairs": 62,
+   "rev_auc": 0.7143833705357142,
+   "rev_auc_debate": 0.697265625,
+   "rev_auc_pooled": 0.7293149818066763,
+   "rev_n": 325
+  },
+  "readout_last:letter:meandiff:15-39": {
+   "auroc_all": 0.7471711533451765,
+   "auroc_pre": 0.6507427457852989,
+   "within_q": 0.7341726618705036,
+   "within_q_pairs": 2780,
+   "within_panel": 0.7169811320754716,
+   "within_panel_pairs": 318,
+   "within_panel_pre": 0.5806451612903226,
+   "within_panel_pre_pairs": 62,
+   "rev_auc": 0.7121375627429855,
+   "rev_auc_debate": 0.703125,
+   "rev_auc_pooled": 0.7264277804144914,
+   "rev_n": 325
+  },
+  "readout_last:letter:pca16:12-24": {
+   "auroc_all": 0.7394841612359981,
+   "auroc_pre": 0.5937588168208736,
+   "within_q": 0.7399280575539569,
+   "within_q_pairs": 2780,
+   "within_panel": 0.7232704402515723,
+   "within_panel_pairs": 318,
+   "within_panel_pre": 0.5645161290322581,
+   "within_panel_pre_pairs": 62,
+   "rev_auc": 0.7204027496420176,
+   "rev_auc_debate": 0.7607421875,
+   "rev_auc_pooled": 0.7287612719506408,
+   "rev_n": 325
+  },
+  "readout_last:letter:pca16:21-33": {
+   "auroc_all": 0.7547238869678707,
+   "auroc_pre": 0.6254771251748201,
+   "within_q": 0.7482014388489209,
+   "within_q_pairs": 2780,
+   "within_panel": 0.7389937106918238,
+   "within_panel_pairs": 318,
+   "within_panel_pre": 0.5967741935483871,
+   "within_panel_pre_pairs": 62,
+   "rev_auc": 0.7098764699354931,
+   "rev_auc_debate": 0.7275390625,
+   "rev_auc_pooled": 0.7233032747982914,
+   "rev_n": 325
+  },
+  "readout_last:letter:pca16:15-39": {
+   "auroc_all": 0.7541957444394441,
+   "auroc_pre": 0.6152486576622216,
+   "within_q": 0.7521582733812949,
+   "within_q_pairs": 2780,
+   "within_panel": 0.7547169811320755,
+   "within_panel_pairs": 318,
+   "within_panel_pre": 0.6129032258064516,
+   "within_panel_pre_pairs": 62,
+   "rev_auc": 0.7248812610014501,
+   "rev_auc_debate": 0.7431640625,
+   "rev_auc_pooled": 0.7428017718715394,
+   "rev_n": 325
+  },
+  "before_stated_answer:raw:meandiff:12-24": {
+   "auroc_all": 0.6996107792350574,
+   "auroc_pre": 0.6159810100803095,
+   "within_q": 0.7122168585220943,
+   "within_q_pairs": 2693,
+   "within_panel": 0.6319218241042345,
+   "within_panel_pairs": 307,
+   "within_panel_pre": 0.5192307692307693,
+   "within_panel_pre_pairs": 52,
+   "rev_auc": 0.6039683850725941,
+   "rev_auc_debate": 0.6252873563218391,
+   "rev_auc_pooled": 0.6280703344511919,
+   "rev_n": 305
+  },
+  "before_stated_answer:raw:meandiff:21-33": {
+   "auroc_all": 0.7504909352678066,
+   "auroc_pre": 0.6486091824999864,
+   "within_q": 0.7478648347567768,
+   "within_q_pairs": 2693,
+   "within_panel": 0.6905537459283387,
+   "within_panel_pairs": 307,
+   "within_panel_pre": 0.6153846153846154,
+   "within_panel_pre_pairs": 52,
+   "rev_auc": 0.7373623297716857,
+   "rev_auc_debate": 0.6919540229885057,
+   "rev_auc_pooled": 0.7545545182633917,
+   "rev_n": 305
+  },
+  "before_stated_answer:raw:meandiff:15-39": {
+   "auroc_all": 0.7449934420850644,
+   "auroc_pre": 0.6309965522008222,
+   "within_q": 0.7389528406981062,
+   "within_q_pairs": 2693,
+   "within_panel": 0.6807817589576547,
+   "within_panel_pairs": 307,
+   "within_panel_pre": 0.6153846153846154,
+   "within_panel_pre_pairs": 52,
+   "rev_auc": 0.7033391406458089,
+   "rev_auc_debate": 0.6770114942528735,
+   "rev_auc_pooled": 0.7258225324027916,
+   "rev_n": 305
+  },
+  "before_stated_answer:raw:pca16:12-24": {
+   "auroc_all": 0.7228386734506487,
+   "auroc_pre": 0.5916690644484484,
+   "within_q": 0.7363535090976606,
+   "within_q_pairs": 2693,
+   "within_panel": 0.6677524429967426,
+   "within_panel_pairs": 307,
+   "within_panel_pre": 0.4807692307692308,
+   "within_panel_pre_pairs": 52,
+   "rev_auc": 0.6316485145085551,
+   "rev_auc_debate": 0.6149425287356322,
+   "rev_auc_pooled": 0.6612435421009699,
+   "rev_n": 305
+  },
+  "before_stated_answer:raw:pca16:21-33": {
+   "auroc_all": 0.7595961397574633,
+   "auroc_pre": 0.6352196241248839,
+   "within_q": 0.753434831043446,
+   "within_q_pairs": 2693,
+   "within_panel": 0.7133550488599348,
+   "within_panel_pairs": 307,
+   "within_panel_pre": 0.6153846153846154,
+   "within_panel_pre_pairs": 52,
+   "rev_auc": 0.6919603739266518,
+   "rev_auc_debate": 0.6540229885057471,
+   "rev_auc_pooled": 0.7068340433245717,
+   "rev_n": 305
+  },
+  "before_stated_answer:raw:pca16:15-39": {
+   "auroc_all": 0.7517253726654733,
+   "auroc_pre": 0.6251568764462127,
+   "within_q": 0.746379502413665,
+   "within_q_pairs": 2693,
+   "within_panel": 0.6905537459283387,
+   "within_panel_pairs": 307,
+   "within_panel_pre": 0.5769230769230769,
+   "within_panel_pre_pairs": 52,
+   "rev_auc": 0.6603210702602184,
+   "rev_auc_debate": 0.6195402298850574,
+   "rev_auc_pooled": 0.6777395087464878,
+   "rev_n": 305
+  },
+  "before_stated_answer:letter:meandiff:12-24": {
+   "auroc_all": 0.7124565238573214,
+   "auroc_pre": 0.6325152759512818,
+   "within_q": 0.7237281841812105,
+   "within_q_pairs": 2693,
+   "within_panel": 0.7068403908794788,
+   "within_panel_pairs": 307,
+   "within_panel_pre": 0.5769230769230769,
+   "within_panel_pre_pairs": 52,
+   "rev_auc": 0.6758576602009665,
+   "rev_auc_debate": 0.7011494252873564,
+   "rev_auc_pooled": 0.6941448382126347,
+   "rev_n": 305
+  },
+  "before_stated_answer:letter:meandiff:21-33": {
+   "auroc_all": 0.7569586629731866,
+   "auroc_pre": 0.6858629811582106,
+   "within_q": 0.7526921648718901,
+   "within_q_pairs": 2693,
+   "within_panel": 0.7198697068403909,
+   "within_panel_pairs": 307,
+   "within_panel_pre": 0.6538461538461539,
+   "within_panel_pre_pairs": 52,
+   "rev_auc": 0.7601970943375609,
+   "rev_auc_debate": 0.7218390804597701,
+   "rev_auc_pooled": 0.7716849451645066,
+   "rev_n": 305
+  },
+  "before_stated_answer:letter:meandiff:15-39": {
+   "auroc_all": 0.7535773650932556,
+   "auroc_pre": 0.6686431870458336,
+   "within_q": 0.7575194949870033,
+   "within_q_pairs": 2693,
+   "within_panel": 0.7068403908794788,
+   "within_panel_pairs": 307,
+   "within_panel_pre": 0.6346153846153846,
+   "within_panel_pre_pairs": 52,
+   "rev_auc": 0.7440128672506969,
+   "rev_auc_debate": 0.7172413793103448,
+   "rev_auc_pooled": 0.7561406689023836,
+   "rev_n": 305
+  },
+  "before_stated_answer:letter:pca16:12-24": {
+   "auroc_all": 0.7373674773369304,
+   "auroc_pre": 0.6526393619282533,
+   "within_q": 0.7560341626438916,
+   "within_q_pairs": 2693,
+   "within_panel": 0.7328990228013029,
+   "within_panel_pairs": 307,
+   "within_panel_pre": 0.6538461538461539,
+   "within_panel_pre_pairs": 52,
+   "rev_auc": 0.7226151068665014,
+   "rev_auc_debate": 0.7344827586206896,
+   "rev_auc_pooled": 0.7433155080213903,
+   "rev_n": 305
+  },
+  "before_stated_answer:letter:pca16:21-33": {
+   "auroc_all": 0.75735396173099,
+   "auroc_pre": 0.669254913296946,
+   "within_q": 0.7526921648718901,
+   "within_q_pairs": 2693,
+   "within_panel": 0.745928338762215,
+   "within_panel_pairs": 307,
+   "within_panel_pre": 0.6538461538461539,
+   "within_panel_pre_pairs": 52,
+   "rev_auc": 0.7308939190880114,
+   "rev_auc_debate": 0.7114942528735632,
+   "rev_auc_pooled": 0.7532855977521979,
+   "rev_n": 305
+  },
+  "before_stated_answer:letter:pca16:15-39": {
+   "auroc_all": 0.7537304892592733,
+   "auroc_pre": 0.6635864598129694,
+   "within_q": 0.7556628295581136,
+   "within_q_pairs": 2693,
+   "within_panel": 0.739413680781759,
+   "within_panel_pairs": 307,
+   "within_panel_pre": 0.6153846153846154,
+   "within_panel_pre_pairs": 52,
+   "rev_auc": 0.7342375782601441,
+   "rev_auc_debate": 0.7367816091954024,
+   "rev_auc_pooled": 0.756729810568295,
+   "rev_n": 305
+  },
+  "generation_last:raw:meandiff:12-24": {
+   "auroc_all": 0.7389057308584208,
+   "auroc_pre": 0.5688195300797252,
+   "within_q": 0.7510791366906475,
+   "within_q_pairs": 2780,
+   "within_panel": 0.7484276729559748,
+   "within_panel_pairs": 318,
+   "within_panel_pre": 0.6612903225806451,
+   "within_panel_pre_pairs": 62,
+   "rev_auc": 0.67791254299551,
+   "rev_auc_debate": 0.5986328125,
+   "rev_auc_pooled": 0.7000079101408005,
+   "rev_n": 325
+  },
+  "generation_last:raw:meandiff:21-33": {
+   "auroc_all": 0.7462666325609371,
+   "auroc_pre": 0.5825817248986574,
+   "within_q": 0.7510791366906475,
+   "within_q_pairs": 2780,
+   "within_panel": 0.7232704402515723,
+   "within_panel_pairs": 318,
+   "within_panel_pre": 0.6129032258064516,
+   "within_panel_pre_pairs": 62,
+   "rev_auc": 0.6986383078144021,
+   "rev_auc_debate": 0.6123046875,
+   "rev_auc_pooled": 0.7168960607498813,
+   "rev_n": 325
+  },
+  "generation_last:raw:meandiff:15-39": {
+   "auroc_all": 0.7454244090200209,
+   "auroc_pre": 0.5899421374261798,
+   "within_q": 0.7485611510791367,
+   "within_q_pairs": 2780,
+   "within_panel": 0.7327044025157232,
+   "within_panel_pairs": 318,
+   "within_panel_pre": 0.6290322580645161,
+   "within_panel_pre_pairs": 62,
+   "rev_auc": 0.6982784434053629,
+   "rev_auc_debate": 0.6044921875,
+   "rev_auc_pooled": 0.7160654959658281,
+   "rev_n": 325
+  },
+  "generation_last:raw:pca16:12-24": {
+   "auroc_all": 0.7422172832507116,
+   "auroc_pre": 0.5606856081638882,
+   "within_q": 0.7402877697841727,
+   "within_q_pairs": 2780,
+   "within_panel": 0.6792452830188679,
+   "within_panel_pairs": 318,
+   "within_panel_pre": 0.5,
+   "within_panel_pre_pairs": 62,
+   "rev_auc": 0.6906219013237253,
+   "rev_auc_debate": 0.6494140625,
+   "rev_auc_pooled": 0.7080367030533143,
+   "rev_n": 325
+  },
+  "generation_last:raw:pca16:21-33": {
+   "auroc_all": 0.7525179985476205,
+   "auroc_pre": 0.6177020337840373,
+   "within_q": 0.7341726618705036,
+   "within_q_pairs": 2780,
+   "within_panel": 0.7012578616352201,
+   "within_panel_pairs": 318,
+   "within_panel_pre": 0.5645161290322581,
+   "within_panel_pre_pairs": 62,
+   "rev_auc": 0.6969965858313505,
+   "rev_auc_debate": 0.6435546875,
+   "rev_auc_pooled": 0.7159468438538206,
+   "rev_n": 325
+  },
+  "generation_last:raw:pca16:15-39": {
+   "auroc_all": 0.7446835556732941,
+   "auroc_pre": 0.6000431267767261,
+   "within_q": 0.7359712230215827,
+   "within_q_pairs": 2780,
+   "within_panel": 0.6823899371069182,
+   "within_panel_pairs": 318,
+   "within_panel_pre": 0.532258064516129,
+   "within_panel_pre_pairs": 62,
+   "rev_auc": 0.6952924441956918,
+   "rev_auc_debate": 0.6376953125,
+   "rev_auc_pooled": 0.715828191741813,
+   "rev_n": 325
+  },
+  "generation_last:letter:meandiff:12-24": {
+   "auroc_all": 0.730288049248216,
+   "auroc_pre": 0.5970873271320967,
+   "within_q": 0.7348920863309353,
+   "within_q_pairs": 2780,
+   "within_panel": 0.7295597484276729,
+   "within_panel_pairs": 318,
+   "within_panel_pre": 0.6451612903225806,
+   "within_panel_pre_pairs": 62,
+   "rev_auc": 0.6983021109743346,
+   "rev_auc_debate": 0.6484375,
+   "rev_auc_pooled": 0.7165401044138585,
+   "rev_n": 325
+  },
+  "generation_last:letter:meandiff:21-33": {
+   "auroc_all": 0.738943690684215,
+   "auroc_pre": 0.5940383166220932,
+   "within_q": 0.7446043165467626,
+   "within_q_pairs": 2780,
+   "within_panel": 0.7421383647798742,
+   "within_panel_pairs": 318,
+   "within_panel_pre": 0.6774193548387096,
+   "within_panel_pre_pairs": 62,
+   "rev_auc": 0.7168244613578065,
+   "rev_auc_debate": 0.6640625,
+   "rev_auc_pooled": 0.7327954437588988,
+   "rev_n": 325
+  },
+  "generation_last:letter:meandiff:15-39": {
+   "auroc_all": 0.7378095716519814,
+   "auroc_pre": 0.6060318695088199,
+   "within_q": 0.7410071942446043,
+   "within_q_pairs": 2780,
+   "within_panel": 0.7389937106918238,
+   "within_panel_pairs": 318,
+   "within_panel_pre": 0.6774193548387096,
+   "within_panel_pre_pairs": 62,
+   "rev_auc": 0.7096172888866648,
+   "rev_auc_debate": 0.6572265625,
+   "rev_auc_pooled": 0.728405315614618,
+   "rev_n": 325
+  },
+  "generation_last:letter:pca16:12-24": {
+   "auroc_all": 0.7333400470347097,
+   "auroc_pre": 0.5763092653824036,
+   "within_q": 0.739568345323741,
+   "within_q_pairs": 2780,
+   "within_panel": 0.7264150943396226,
+   "within_panel_pairs": 318,
+   "within_panel_pre": 0.5483870967741935,
+   "within_panel_pre_pairs": 62,
+   "rev_auc": 0.6967003998318111,
+   "rev_auc_debate": 0.68359375,
+   "rev_auc_pooled": 0.7121499762695775,
+   "rev_n": 325
+  },
+  "generation_last:letter:pca16:21-33": {
+   "auroc_all": 0.7459938899213411,
+   "auroc_pre": 0.6126910040739828,
+   "within_q": 0.741726618705036,
+   "within_q_pairs": 2780,
+   "within_panel": 0.7389937106918238,
+   "within_panel_pairs": 318,
+   "within_panel_pre": 0.5806451612903226,
+   "within_panel_pre_pairs": 62,
+   "rev_auc": 0.7038039247646205,
+   "rev_auc_debate": 0.6923828125,
+   "rev_auc_pooled": 0.7220376522702103,
+   "rev_n": 325
+  },
+  "generation_last:letter:pca16:15-39": {
+   "auroc_all": 0.738717281327577,
+   "auroc_pre": 0.6003144170005872,
+   "within_q": 0.741726618705036,
+   "within_q_pairs": 2780,
+   "within_panel": 0.7295597484276729,
+   "within_panel_pairs": 318,
+   "within_panel_pre": 0.5645161290322581,
+   "within_panel_pre_pairs": 62,
+   "rev_auc": 0.70266004395306,
+   "rev_auc_debate": 0.6884765625,
+   "rev_auc_pooled": 0.7210884353741496,
+   "rev_n": 325
+  },
+  "stated_answer:raw:meandiff:12-24": {
+   "auroc_all": 0.7047910361968371,
+   "auroc_pre": 0.5429039726537781,
+   "within_q": 0.727070181953212,
+   "within_q_pairs": 2693,
+   "within_panel": 0.7035830618892508,
+   "within_panel_pairs": 307,
+   "within_panel_pre": 0.6346153846153846,
+   "within_panel_pre_pairs": 52,
+   "rev_auc": 0.6969453039401061,
+   "rev_auc_debate": 0.7229885057471265,
+   "rev_auc_pooled": 0.7021662285869663,
+   "rev_n": 305
+  },
+  "stated_answer:raw:meandiff:21-33": {
+   "auroc_all": 0.7286334679581166,
+   "auroc_pre": 0.5856731880806161,
+   "within_q": 0.7322688451541032,
+   "within_q_pairs": 2693,
+   "within_panel": 0.7003257328990228,
+   "within_panel_pairs": 307,
+   "within_panel_pre": 0.6153846153846154,
+   "within_panel_pre_pairs": 52,
+   "rev_auc": 0.6690387695046671,
+   "rev_auc_debate": 0.6597701149425287,
+   "rev_auc_pooled": 0.6701713042690112,
+   "rev_n": 305
+  },
+  "stated_answer:raw:meandiff:15-39": {
+   "auroc_all": 0.7226456530018092,
+   "auroc_pre": 0.5588035786345583,
+   "within_q": 0.7307835128109914,
+   "within_q_pairs": 2693,
+   "within_panel": 0.7003257328990228,
+   "within_panel_pairs": 307,
+   "within_panel_pre": 0.5576923076923077,
+   "within_panel_pre_pairs": 52,
+   "rev_auc": 0.673566704851568,
+   "rev_auc_debate": 0.6620689655172414,
+   "rev_auc_pooled": 0.6805945798966736,
+   "rev_n": 305
+  },
+  "stated_answer:raw:pca16:12-24": {
+   "auroc_all": 0.7408311971826435,
+   "auroc_pre": 0.5756336249775591,
+   "within_q": 0.7356108429261047,
+   "within_q_pairs": 2693,
+   "within_panel": 0.7068403908794788,
+   "within_panel_pairs": 307,
+   "within_panel_pre": 0.5576923076923077,
+   "within_panel_pre_pairs": 52,
+   "rev_auc": 0.6726259382192445,
+   "rev_auc_debate": 0.7011494252873564,
+   "rev_auc_pooled": 0.6808664914347866,
+   "rev_n": 305
+  },
+  "stated_answer:raw:pca16:21-33": {
+   "auroc_all": 0.7486589170959684,
+   "auroc_pre": 0.6014880111872217,
+   "within_q": 0.720386186409209,
+   "within_q_pairs": 2693,
+   "within_panel": 0.6775244299674267,
+   "within_panel_pairs": 307,
+   "within_panel_pre": 0.5192307692307693,
+   "within_panel_pre_pairs": 52,
+   "rev_auc": 0.6353824148955994,
+   "rev_auc_debate": 0.6229885057471264,
+   "rev_auc_pooled": 0.6421644158433788,
+   "rev_n": 305
+  },
+  "stated_answer:raw:pca16:15-39": {
+   "auroc_all": 0.7519564760101002,
+   "auroc_pre": 0.5934812179641492,
+   "within_q": 0.7151875232083179,
+   "within_q_pairs": 2693,
+   "within_panel": 0.6742671009771987,
+   "within_panel_pairs": 307,
+   "within_panel_pre": 0.5192307692307693,
+   "within_panel_pre_pairs": 52,
+   "rev_auc": 0.6336912009230721,
+   "rev_auc_debate": 0.6183908045977011,
+   "rev_auc_pooled": 0.638085742771685,
+   "rev_n": 305
+  },
+  "stated_answer:letter:meandiff:12-24": {
+   "auroc_all": 0.7073842199027867,
+   "auroc_pre": 0.5444177760229134,
+   "within_q": 0.7359821760118826,
+   "within_q_pairs": 2693,
+   "within_panel": 0.7068403908794788,
+   "within_panel_pairs": 307,
+   "within_panel_pre": 0.5961538461538461,
+   "within_panel_pre_pairs": 52,
+   "rev_auc": 0.7237027134085958,
+   "rev_auc_debate": 0.7666666666666667,
+   "rev_auc_pooled": 0.7134505574186532,
+   "rev_n": 305
+  },
+  "stated_answer:letter:meandiff:21-33": {
+   "auroc_all": 0.7326804200988433,
+   "auroc_pre": 0.611399011461838,
+   "within_q": 0.7348681767545489,
+   "within_q_pairs": 2693,
+   "within_panel": 0.7166123778501629,
+   "within_panel_pairs": 307,
+   "within_panel_pre": 0.5961538461538461,
+   "within_panel_pre_pairs": 52,
+   "rev_auc": 0.6873914974384041,
+   "rev_auc_debate": 0.7022988505747126,
+   "rev_auc_pooled": 0.6845372971993111,
+   "rev_n": 305
+  },
+  "stated_answer:letter:meandiff:15-39": {
+   "auroc_all": 0.726258454924493,
+   "auroc_pre": 0.5988846584348642,
+   "within_q": 0.7378388414407724,
+   "within_q_pairs": 2693,
+   "within_panel": 0.7068403908794788,
+   "within_panel_pairs": 307,
+   "within_panel_pre": 0.5576923076923077,
+   "within_panel_pre_pairs": 52,
+   "rev_auc": 0.7074108466096296,
+   "rev_auc_debate": 0.7183908045977012,
+   "rev_auc_pooled": 0.6971358651318771,
+   "rev_n": 305
+  },
+  "stated_answer:letter:pca16:12-24": {
+   "auroc_all": 0.7461993366097636,
+   "auroc_pre": 0.5998876272761515,
+   "within_q": 0.7441515038989974,
+   "within_q_pairs": 2693,
+   "within_panel": 0.7263843648208469,
+   "within_panel_pairs": 307,
+   "within_panel_pre": 0.6923076923076923,
+   "within_panel_pre_pairs": 52,
+   "rev_auc": 0.7434161931055947,
+   "rev_auc_debate": 0.771264367816092,
+   "rev_auc_pooled": 0.7481645971177376,
+   "rev_n": 305
+  },
+  "stated_answer:letter:pca16:21-33": {
+   "auroc_all": 0.7510947120129577,
+   "auroc_pre": 0.6409123578905631,
+   "within_q": 0.7389528406981062,
+   "within_q_pairs": 2693,
+   "within_panel": 0.7296416938110749,
+   "within_panel_pairs": 307,
+   "within_panel_pre": 0.6153846153846154,
+   "within_panel_pre_pairs": 52,
+   "rev_auc": 0.7079563245099502,
+   "rev_auc_debate": 0.689655172413793,
+   "rev_auc_pooled": 0.7129973715217983,
+   "rev_n": 305
+  },
+  "stated_answer:letter:pca16:15-39": {
+   "auroc_all": 0.7535045839965574,
+   "auroc_pre": 0.6354628021613455,
+   "within_q": 0.7408095061269959,
+   "within_q_pairs": 2693,
+   "within_panel": 0.7166123778501629,
+   "within_panel_pairs": 307,
+   "within_panel_pre": 0.5576923076923077,
+   "within_panel_pre_pairs": 52,
+   "rev_auc": 0.7267647421647168,
+   "rev_auc_debate": 0.7114942528735633,
+   "rev_auc_pooled": 0.7308528958578809,
+   "rev_n": 305
+  }
+ },
+ "comparison": {
+  "n_states": 1779,
+  "scorers": {
+   "out+text_lr": {
+    "auroc_all": {
+     "value": 0.7866095493394856,
+     "ci95": [
+      0.7320392309168086,
+      0.8389767647997142
+     ]
+    },
+    "auroc_pre": {
+     "value": 0.7293239242410821,
+     "ci95": [
+      0.6492610087644042,
+      0.8116285224257831
+     ]
+    },
+    "within_panel": {
+     "value": 0.6840390879478827,
+     "ci95": [
+      0.5924624719583791,
+      0.7798837279173176
+     ]
+    },
+    "within_panel_pre": {
+     "value": 0.5769230769230769,
+     "ci95": [
+      0.3999137931034483,
+      0.7608695652173914
+     ]
+    },
+    "rev_auc": {
+     "value": 0.6672751584960003,
+     "ci95": [
+      0.511764562900722,
+      0.8260333525367749
+     ]
+    },
+    "rev_auc_debate": {
+     "value": 0.5517241379310345,
+     "ci95": [
+      0.33921415441176467,
+      0.7762977207977207
+     ]
+    },
+    "minus_out+text_hgb": {
+     "auroc_all": {
+      "value": 0.02845116100928502,
+      "ci95": [
+       -0.015774595016457584,
+       0.07376651504008415
+      ]
+     },
+     "auroc_pre": {
+      "value": 0.06803498202308389,
+      "ci95": [
+       -0.00973451643028228,
+       0.14867596098841548
+      ]
+     },
+     "within_panel": {
+      "value": -0.009771986970684043,
+      "ci95": [
+       -0.07902379475004727,
+       0.0582289000953383
+      ]
+     },
+     "within_panel_pre": {
+      "value": 0.0576923076923076,
+      "ci95": [
+       -0.07322825586746434,
+       0.19354838709677413
+      ]
+     },
+     "rev_auc": {
+      "value": -0.007061822464966561,
+      "ci95": [
+       -0.1116168331636717,
+       0.0968312363231917
+      ]
+     },
+     "rev_auc_debate": {
+      "value": -0.04137931034482756,
+      "ci95": [
+       -0.16557006335158103,
+       0.09723875661375662
+      ]
+     }
+    },
+    "minus_out+text_pair": {
+     "auroc_all": {
+      "value": 0.11194222453117486,
+      "ci95": [
+       0.04991112803980997,
+       0.16742674320722617
+      ]
+     },
+     "auroc_pre": {
+      "value": 0.15571404702895864,
+      "ci95": [
+       0.04831394714345547,
+       0.2531389872937377
+      ]
+     },
+     "within_panel": {
+      "value": -0.009771986970684043,
+      "ci95": [
+       -0.08418530873888012,
+       0.07097417516772359
+      ]
+     },
+     "within_panel_pre": {
+      "value": -0.07692307692307698,
+      "ci95": [
+       -0.27275840597758416,
+       0.13045260156806834
+      ]
+     },
+     "rev_auc": {
+      "value": -0.006761197164341204,
+      "ci95": [
+       -0.12130453082122652,
+       0.11141040171933554
+      ]
+     },
+     "rev_auc_debate": {
+      "value": -0.04137931034482767,
+      "ci95": [
+       -0.20900846702317294,
+       0.14287423103212574
+      ]
+     }
+    }
+   },
+   "out+text_hgb": {
+    "auroc_all": {
+     "value": 0.7581583883302005,
+     "ci95": [
+      0.6984067145014523,
+      0.8154391942378075
+     ]
+    },
+    "auroc_pre": {
+     "value": 0.6612889422179982,
+     "ci95": [
+      0.5702406819798546,
+      0.7468799686137304
+     ]
+    },
+    "within_panel": {
+     "value": 0.6938110749185668,
+     "ci95": [
+      0.5964133275261324,
+      0.7912457912457912
+     ]
+    },
+    "within_panel_pre": {
+     "value": 0.5192307692307693,
+     "ci95": [
+      0.3333333333333333,
+      0.7
+     ]
+    },
+    "rev_auc": {
+     "value": 0.6743369809609668,
+     "ci95": [
+      0.5324873267071182,
+      0.8109736909394296
+     ]
+    },
+    "rev_auc_debate": {
+     "value": 0.593103448275862,
+     "ci95": [
+      0.38723402323892525,
+      0.7862936222860789
+     ]
+    },
+    "minus_out+text_lr": {
+     "auroc_all": {
+      "value": -0.02845116100928502,
+      "ci95": [
+       -0.0737665150400842,
+       0.01577459501645758
+      ]
+     },
+     "auroc_pre": {
+      "value": -0.06803498202308389,
+      "ci95": [
+       -0.14867596098841548,
+       0.009734516430282268
+      ]
+     },
+     "within_panel": {
+      "value": 0.009771986970684043,
+      "ci95": [
+       -0.058228900095338355,
+       0.07902379475004724
+      ]
+     },
+     "within_panel_pre": {
+      "value": -0.0576923076923076,
+      "ci95": [
+       -0.19354838709677413,
+       0.07322825586746402
+      ]
+     },
+     "rev_auc": {
+      "value": 0.007061822464966561,
+      "ci95": [
+       -0.09683123632319181,
+       0.11161683316367166
+      ]
+     },
+     "rev_auc_debate": {
+      "value": 0.04137931034482756,
+      "ci95": [
+       -0.09723875661375671,
+       0.16557006335158098
+      ]
+     }
+    },
+    "minus_out+text_pair": {
+     "auroc_all": {
+      "value": 0.08349106352188984,
+      "ci95": [
+       0.012977636774936808,
+       0.1518738740271131
+      ]
+     },
+     "auroc_pre": {
+      "value": 0.08767906500587475,
+      "ci95": [
+       -0.02609307393286358,
+       0.1890540048893174
+      ]
+     },
+     "within_panel": {
+      "value": 0.0,
+      "ci95": [
+       -0.08068768368279369,
+       0.08572374645222314
+      ]
+     },
+     "within_panel_pre": {
+      "value": -0.13461538461538458,
+      "ci95": [
+       -0.3061616954474098,
+       0.019230769230769218
+      ]
+     },
+     "rev_auc": {
+      "value": 0.00030062530062535675,
+      "ci95": [
+       -0.11950619784172326,
+       0.11685095530645317
+      ]
+     },
+     "rev_auc_debate": {
+      "value": -1.1102230246251565e-16,
+      "ci95": [
+       -0.1622635582010583,
+       0.16706982626198413
+      ]
+     }
+    }
+   },
+   "out+text_pair": {
+    "auroc_all": {
+     "value": 0.6746673248083107,
+     "ci95": [
+      0.6142241133270894,
+      0.7382087744397756
+     ]
+    },
+    "auroc_pre": {
+     "value": 0.5736098772121234,
+     "ci95": [
+      0.4986012947730529,
+      0.6586014453883057
+     ]
+    },
+    "within_panel": {
+     "value": 0.6938110749185668,
+     "ci95": [
+      0.6005819179452707,
+      0.7788234063328218
+     ]
+    },
+    "within_panel_pre": {
+     "value": 0.6538461538461539,
+     "ci95": [
+      0.46150793650793653,
+      0.8214484126984125
+     ]
+    },
+    "rev_auc": {
+     "value": 0.6740363556603415,
+     "ci95": [
+      0.5285130760555473,
+      0.8164140393826617
+     ]
+    },
+    "rev_auc_debate": {
+     "value": 0.5931034482758621,
+     "ci95": [
+      0.3723600770637408,
+      0.7941101774042948
+     ]
+    },
+    "minus_out+text_lr": {
+     "auroc_all": {
+      "value": -0.11194222453117486,
+      "ci95": [
+       -0.1674267432072262,
+       -0.049911128039809974
+      ]
+     },
+     "auroc_pre": {
+      "value": -0.15571404702895864,
+      "ci95": [
+       -0.2531389872937377,
+       -0.04831394714345548
+      ]
+     },
+     "within_panel": {
+      "value": 0.009771986970684043,
+      "ci95": [
+       -0.07097417516772363,
+       0.08418530873888011
+      ]
+     },
+     "within_panel_pre": {
+      "value": 0.07692307692307698,
+      "ci95": [
+       -0.13045260156806845,
+       0.272758405977584
+      ]
+     },
+     "rev_auc": {
+      "value": 0.006761197164341204,
+      "ci95": [
+       -0.11141040171933561,
+       0.12130453082122641
+      ]
+     },
+     "rev_auc_debate": {
+      "value": 0.04137931034482767,
+      "ci95": [
+       -0.14287423103212582,
+       0.20900846702317274
+      ]
+     }
+    },
+    "minus_out+text_hgb": {
+     "auroc_all": {
+      "value": -0.08349106352188984,
+      "ci95": [
+       -0.15187387402711314,
+       -0.012977636774936852
+      ]
+     },
+     "auroc_pre": {
+      "value": -0.08767906500587475,
+      "ci95": [
+       -0.18905400488931742,
+       0.026093073932863576
+      ]
+     },
+     "within_panel": {
+      "value": 0.0,
+      "ci95": [
+       -0.08572374645222319,
+       0.08068768368279368
+      ]
+     },
+     "within_panel_pre": {
+      "value": 0.13461538461538458,
+      "ci95": [
+       -0.019230769230769218,
+       0.30616169544740957
+      ]
+     },
+     "rev_auc": {
+      "value": -0.00030062530062535675,
+      "ci95": [
+       -0.11685095530645324,
+       0.11950619784172317
+      ]
+     },
+     "rev_auc_debate": {
+      "value": 1.1102230246251565e-16,
+      "ci95": [
+       -0.16706982626198424,
+       0.16226355820105826
+      ]
+     }
+    }
+   },
+   "act[fixed]": {
+    "auroc_all": {
+     "value": 0.7494402729311436,
+     "ci95": [
+      0.6944793063304715,
+      0.8039702472775411
+     ]
+    },
+    "auroc_pre": {
+     "value": 0.6408711507477214,
+     "ci95": [
+      0.5556805080441611,
+      0.724436278943019
+     ]
+    },
+    "within_panel": {
+     "value": 0.7263843648208469,
+     "ci95": [
+      0.6344163593553451,
+      0.8135160397816495
+     ]
+    },
+    "within_panel_pre": {
+     "value": 0.5961538461538461,
+     "ci95": [
+      0.4126082251082251,
+      0.7736001217285453
+     ]
+    },
+    "rev_auc": {
+     "value": 0.7343484330775152,
+     "ci95": [
+      0.6359985396301384,
+      0.8237299542814277
+     ]
+    },
+    "rev_auc_debate": {
+     "value": 0.7160919540229885,
+     "ci95": [
+      0.5639137516495208,
+      0.8556855753258368
+     ]
+    },
+    "minus_out+text_lr": {
+     "auroc_all": {
+      "value": -0.037169276408342,
+      "ci95": [
+       -0.08617358983125244,
+       0.013886590037339344
+      ]
+     },
+     "auroc_pre": {
+      "value": -0.08845277349336067,
+      "ci95": [
+       -0.19134454026159173,
+       0.011882013866891108
+      ]
+     },
+     "within_panel": {
+      "value": 0.04234527687296419,
+      "ci95": [
+       -0.06819548578569191,
+       0.15357829670329656
+      ]
+     },
+     "within_panel_pre": {
+      "value": 0.019230769230769273,
+      "ci95": [
+       -0.23083333333333333,
+       0.2653401360544215
+      ]
+     },
+     "rev_auc": {
+      "value": 0.06707327458151491,
+      "ci95": [
+       -0.08711492026412643,
+       0.21530645087742978
+      ]
+     },
+     "rev_auc_debate": {
+      "value": 0.16436781609195406,
+      "ci95": [
+       -0.05801677489177495,
+       0.3716682867703532
+      ]
+     }
+    },
+    "minus_out+text_hgb": {
+     "auroc_all": {
+      "value": -0.00871811539905698,
+      "ci95": [
+       -0.07029851661723072,
+       0.0498456277625792
+      ]
+     },
+     "auroc_pre": {
+      "value": -0.02041779147027678,
+      "ci95": [
+       -0.12795967559805432,
+       0.08918940565990495
+      ]
+     },
+     "within_panel": {
+      "value": 0.032573289902280145,
+      "ci95": [
+       -0.08367130488559059,
+       0.14672250943437376
+      ]
+     },
+     "within_panel_pre": {
+      "value": 0.07692307692307687,
+      "ci95": [
+       -0.17022573949143743,
+       0.3333333333333333
+      ]
+     },
+     "rev_auc": {
+      "value": 0.06001145211654835,
+      "ci95": [
+       -0.08055046898842555,
+       0.19890265957739908
+      ]
+     },
+     "rev_auc_debate": {
+      "value": 0.1229885057471265,
+      "ci95": [
+       -0.07274191651969433,
+       0.3179495614035089
+      ]
+     }
+    },
+    "minus_out+text_pair": {
+     "auroc_all": {
+      "value": 0.07477294812283286,
+      "ci95": [
+       0.01591442919489757,
+       0.13175223293583752
+      ]
+     },
+     "auroc_pre": {
+      "value": 0.06726127353559797,
+      "ci95": [
+       -0.0514555681797889,
+       0.17664540534798
+      ]
+     },
+     "within_panel": {
+      "value": 0.032573289902280145,
+      "ci95": [
+       -0.07880843471596895,
+       0.14029739511143374
+      ]
+     },
+     "within_panel_pre": {
+      "value": -0.05769230769230771,
+      "ci95": [
+       -0.30191538021726705,
+       0.19999999999999996
+      ]
+     },
+     "rev_auc": {
+      "value": 0.060312077417173704,
+      "ci95": [
+       -0.08509840540790604,
+       0.20423774502677886
+      ]
+     },
+     "rev_auc_debate": {
+      "value": 0.12298850574712639,
+      "ci95": [
+       -0.09048003072196611,
+       0.3399499654934438
+      ]
+     }
+    }
+   },
+   "stacked[fixed]": {
+    "auroc_all": {
+     "value": 0.7908160827247473,
+     "ci95": [
+      0.7362123221044449,
+      0.8423829457534859
+     ]
+    },
+    "auroc_pre": {
+     "value": 0.7266218355660143,
+     "ci95": [
+      0.6464210337439034,
+      0.8104744181913373
+     ]
+    },
+    "within_panel": {
+     "value": 0.7100977198697068,
+     "ci95": [
+      0.6207840953118946,
+      0.8000564971751409
+     ]
+    },
+    "within_panel_pre": {
+     "value": 0.5961538461538461,
+     "ci95": [
+      0.4166666666666667,
+      0.7735849056603774
+     ]
+    },
+    "rev_auc": {
+     "value": 0.6795220112600944,
+     "ci95": [
+      0.5267244025875475,
+      0.8354863496107867
+     ]
+    },
+    "rev_auc_debate": {
+     "value": 0.5689655172413793,
+     "ci95": [
+      0.35477744783810955,
+      0.7947379862700228
+     ]
+    },
+    "minus_out+text_lr": {
+     "auroc_all": {
+      "value": 0.004206533385261779,
+      "ci95": [
+       -0.0018290591763753554,
+       0.01004230640702296
+      ]
+     },
+     "auroc_pre": {
+      "value": -0.0027020886750677153,
+      "ci95": [
+       -0.015855956702948905,
+       0.009718294942630656
+      ]
+     },
+     "within_panel": {
+      "value": 0.026058631921824116,
+      "ci95": [
+       0.003743597157964318,
+       0.050508247027234346
+      ]
+     },
+     "within_panel_pre": {
+      "value": 0.019230769230769273,
+      "ci95": [
+       0.0,
+       0.0625
+      ]
+     },
+     "rev_auc": {
+      "value": 0.012246852764094096,
+      "ci95": [
+       0.0002835011437177987,
+       0.026218258068468236
+      ]
+     },
+     "rev_auc_debate": {
+      "value": 0.017241379310344862,
+      "ci95": [
+       -0.0012830687830688871,
+       0.04266837606837603
+      ]
+     }
+    },
+    "minus_out+text_hgb": {
+     "auroc_all": {
+      "value": 0.0326576943945468,
+      "ci95": [
+       -0.012022287223431656,
+       0.07689092402774617
+      ]
+     },
+     "auroc_pre": {
+      "value": 0.06533289334801617,
+      "ci95": [
+       -0.012291191827487474,
+       0.1471411251468788
+      ]
+     },
+     "within_panel": {
+      "value": 0.016286644951140072,
+      "ci95": [
+       -0.0555685358255452,
+       0.08536693863379911
+      ]
+     },
+     "within_panel_pre": {
+      "value": 0.07692307692307687,
+      "ci95": [
+       -0.06125637755102047,
+       0.2143207282913164
+      ]
+     },
+     "rev_auc": {
+      "value": 0.0051850302991275354,
+      "ci95": [
+       -0.0988273274042419,
+       0.10727551046341118
+      ]
+     },
+     "rev_auc_debate": {
+      "value": -0.024137931034482696,
+      "ci95": [
+       -0.14822548769603466,
+       0.11532394293924467
+      ]
+     }
+    },
+    "minus_out+text_pair": {
+     "auroc_all": {
+      "value": 0.11614875791643664,
+      "ci95": [
+       0.053578690912728294,
+       0.17147628799453393
+      ]
+     },
+     "auroc_pre": {
+      "value": 0.15301195835389092,
+      "ci95": [
+       0.043423782391539885,
+       0.2521518280515418
+      ]
+     },
+     "within_panel": {
+      "value": 0.016286644951140072,
+      "ci95": [
+       -0.05860837438423647,
+       0.09690589398361739
+      ]
+     },
+     "within_panel_pre": {
+      "value": -0.05769230769230771,
+      "ci95": [
+       -0.24561403508771928,
+       0.13731190150478773
+      ]
+     },
+     "rev_auc": {
+      "value": 0.005485655599752892,
+      "ci95": [
+       -0.10413100000456545,
+       0.11997975820166064
+      ]
+     },
+     "rev_auc_debate": {
+      "value": -0.024137931034482807,
+      "ci95": [
+       -0.18002441077441073,
+       0.15550477560988893
+      ]
+     }
+    }
+   },
+   "pair[fixed]": {
+    "auroc_all": {
+     "value": 0.6861930989249041,
+     "ci95": [
+      0.6260743628078098,
+      0.7470616198792537
+     ]
+    },
+    "auroc_pre": {
+     "value": 0.5861257930522914,
+     "ci95": [
+      0.5113953645306717,
+      0.6677772603817506
+     ]
+    },
+    "within_panel": {
+     "value": 0.7035830618892508,
+     "ci95": [
+      0.6058949010105176,
+      0.7902730598379932
+     ]
+    },
+    "within_panel_pre": {
+     "value": 0.6730769230769231,
+     "ci95": [
+      0.48075,
+      0.8421052631578947
+     ]
+    },
+    "rev_auc": {
+     "value": 0.6811420736877127,
+     "ci95": [
+      0.5374670321018874,
+      0.821903865775366
+     ]
+    },
+    "rev_auc_debate": {
+     "value": 0.6103448275862069,
+     "ci95": [
+      0.3911231983214742,
+      0.809033764367816
+     ]
+    },
+    "minus_out+text_lr": {
+     "auroc_all": {
+      "value": -0.10041645041458147,
+      "ci95": [
+       -0.15474557089431068,
+       -0.04198683145104144
+      ]
+     },
+     "auroc_pre": {
+      "value": -0.14319813118879066,
+      "ci95": [
+       -0.2357562434334527,
+       -0.03944055077441895
+      ]
+     },
+     "within_panel": {
+      "value": 0.019543973941368087,
+      "ci95": [
+       -0.06792854275391408,
+       0.1010840465663408
+      ]
+     },
+     "within_panel_pre": {
+      "value": 0.09615384615384626,
+      "ci95": [
+       -0.10869565217391308,
+       0.29634502923976586
+      ]
+     },
+     "rev_auc": {
+      "value": 0.013866915191712459,
+      "ci95": [
+       -0.10124341097059829,
+       0.1273786946547361
+      ]
+     },
+     "rev_auc_debate": {
+      "value": 0.05862068965517242,
+      "ci95": [
+       -0.12171347171347176,
+       0.22213824884792602
+      ]
+     }
+    },
+    "minus_out+text_hgb": {
+     "auroc_all": {
+      "value": -0.07196528940529645,
+      "ci95": [
+       -0.139019711920423,
+       -0.003988013302589628
+      ]
+     },
+     "auroc_pre": {
+      "value": -0.07516314916570677,
+      "ci95": [
+       -0.17693437819697885,
+       0.03566699138145091
+      ]
+     },
+     "within_panel": {
+      "value": 0.009771986970684043,
+      "ci95": [
+       -0.07937775749277341,
+       0.09821794496487116
+      ]
+     },
+     "within_panel_pre": {
+      "value": 0.15384615384615385,
+      "ci95": [
+       0.017528991971454112,
+       0.3181818181818182
+      ]
+     },
+     "rev_auc": {
+      "value": 0.006805092726745898,
+      "ci95": [
+       -0.10922845514299095,
+       0.12738364513560918
+      ]
+     },
+     "rev_auc_debate": {
+      "value": 0.017241379310344862,
+      "ci95": [
+       -0.15134379426827943,
+       0.18025250857434155
+      ]
+     }
+    },
+    "minus_out+text_pair": {
+     "auroc_all": {
+      "value": 0.01152577411659339,
+      "ci95": [
+       0.0035670899489087804,
+       0.019331285914587406
+      ]
+     },
+     "auroc_pre": {
+      "value": 0.01251591584016798,
+      "ci95": [
+       -0.005449178883379019,
+       0.032186764580087505
+      ]
+     },
+     "within_panel": {
+      "value": 0.009771986970684043,
+      "ci95": [
+       -0.009677419354838679,
+       0.027874564459930307
+      ]
+     },
+     "within_panel_pre": {
+      "value": 0.019230769230769273,
+      "ci95": [
+       0.0,
+       0.06451612903225801
+      ]
+     },
+     "rev_auc": {
+      "value": 0.007105718027371255,
+      "ci95": [
+       -0.006814937174563301,
+       0.020366780704002153
+      ]
+     },
+     "rev_auc_debate": {
+      "value": 0.01724137931034475,
+      "ci95": [
+       -0.0073381696428572235,
+       0.03896147535260439
+      ]
+     }
+    }
+   },
+   "act[auroc_all]": {
+    "auroc_all": {
+     "value": 0.7402992280434927,
+     "ci95": [
+      0.6851161515443972,
+      0.7956957794263491
+     ]
+    },
+    "auroc_pre": {
+     "value": 0.6353274028988474,
+     "ci95": [
+      0.552034244018932,
+      0.7185948287560034
+     ]
+    },
+    "within_panel": {
+     "value": 0.758957654723127,
+     "ci95": [
+      0.6793417423750812,
+      0.8354553995253164
+     ]
+    },
+    "within_panel_pre": {
+     "value": 0.6538461538461539,
+     "ci95": [
+      0.49090051457975986,
+      0.803921568627451
+     ]
+    },
+    "rev_auc": {
+     "value": 0.6954063966234352,
+     "ci95": [
+      0.6025144314859001,
+      0.7927233581680729
+     ]
+    },
+    "rev_auc_debate": {
+     "value": 0.6758620689655173,
+     "ci95": [
+      0.5200381231671554,
+      0.8156378141534392
+     ]
+    },
+    "minus_out+text_lr": {
+     "auroc_all": {
+      "value": -0.046310321295992884,
+      "ci95": [
+       -0.09904918109317733,
+       0.008420251333555482
+      ]
+     },
+     "auroc_pre": {
+      "value": -0.09399652134223468,
+      "ci95": [
+       -0.2105362479561157,
+       0.019813400458132964
+      ]
+     },
+     "within_panel": {
+      "value": 0.07491856677524433,
+      "ci95": [
+       -0.03372454353932581,
+       0.18518518518518512
+      ]
+     },
+     "within_panel_pre": {
+      "value": 0.07692307692307698,
+      "ci95": [
+       -0.14816784869976357,
+       0.3035908385093166
+      ]
+     },
+     "rev_auc": {
+      "value": 0.0281312381274349,
+      "ci95": [
+       -0.15081740802645607,
+       0.20563301208103965
+      ]
+     },
+     "rev_auc_debate": {
+      "value": 0.12413793103448278,
+      "ci95": [
+       -0.12441686602870812,
+       0.3542640710403867
+      ]
+     }
+    },
+    "minus_out+text_hgb": {
+     "auroc_all": {
+      "value": -0.017859160286707865,
+      "ci95": [
+       -0.07207943595408713,
+       0.03613533352860887
+      ]
+     },
+     "auroc_pre": {
+      "value": -0.025961539319150795,
+      "ci95": [
+       -0.12835900247065166,
+       0.07895700789260003
+      ]
+     },
+     "within_panel": {
+      "value": 0.06514657980456029,
+      "ci95": [
+       -0.03873531296731466,
+       0.16667933130699078
+      ]
+     },
+     "within_panel_pre": {
+      "value": 0.13461538461538458,
+      "ci95": [
+       -0.06,
+       0.34486074270557016
+      ]
+     },
+     "rev_auc": {
+      "value": 0.021069415662468338,
+      "ci95": [
+       -0.11350554751392838,
+       0.1568132159051851
+      ]
+     },
+     "rev_auc_debate": {
+      "value": 0.08275862068965523,
+      "ci95": [
+       -0.11201019290863914,
+       0.2778808358373235
+      ]
+     }
+    },
+    "minus_out+text_pair": {
+     "auroc_all": {
+      "value": 0.06563190323518198,
+      "ci95": [
+       0.007224334267129359,
+       0.12182891378558015
+      ]
+     },
+     "auroc_pre": {
+      "value": 0.06171752568672395,
+      "ci95": [
+       -0.043285192395010184,
+       0.15995173856902076
+      ]
+     },
+     "within_panel": {
+      "value": 0.06514657980456029,
+      "ci95": [
+       -0.040270390499584106,
+       0.17823046134400672
+      ]
+     },
+     "within_panel_pre": {
+      "value": 0.0,
+      "ci95": [
+       -0.23636363636363633,
+       0.25
+      ]
+     },
+     "rev_auc": {
+      "value": 0.021370040963093695,
+      "ci95": [
+       -0.13838073006426532,
+       0.17152021168835416
+      ]
+     },
+     "rev_auc_debate": {
+      "value": 0.08275862068965512,
+      "ci95": [
+       -0.13903340517241364,
+       0.29271311020710056
+      ]
+     }
+    }
+   },
+   "stacked[auroc_all]": {
+    "auroc_all": {
+     "value": 0.7879935461857295,
+     "ci95": [
+      0.7341451614653278,
+      0.8390548929487587
+     ]
+    },
+    "auroc_pre": {
+     "value": 0.7373368096247003,
+     "ci95": [
+      0.6605482828928877,
+      0.815858891675981
+     ]
+    },
+    "within_panel": {
+     "value": 0.7003257328990228,
+     "ci95": [
+      0.6090900765323802,
+      0.7922714604236343
+     ]
+    },
+    "within_panel_pre": {
+     "value": 0.6153846153846154,
+     "ci95": [
+      0.43588709677419357,
+      0.788486842105263
+     ]
+    },
+    "rev_auc": {
+     "value": 0.6785363825519759,
+     "ci95": [
+      0.5279035859767379,
+      0.8320793110583249
+     ]
+    },
+    "rev_auc_debate": {
+     "value": 0.5643678160919541,
+     "ci95": [
+      0.3437432065217391,
+      0.7869577708475732
+     ]
+    },
+    "minus_out+text_lr": {
+     "auroc_all": {
+      "value": 0.0013839968462439067,
+      "ci95": [
+       -0.009045444782613429,
+       0.012191443307283925
+      ]
+     },
+     "auroc_pre": {
+      "value": 0.008012885383618218,
+      "ci95": [
+       -0.015161910944629162,
+       0.03375451407482079
+      ]
+     },
+     "within_panel": {
+      "value": 0.016286644951140072,
+      "ci95": [
+       -0.010832294059730815,
+       0.04471544715447151
+      ]
+     },
+     "within_panel_pre": {
+      "value": 0.03846153846153855,
+      "ci95": [
+       0.0,
+       0.09999999999999998
+      ]
+     },
+     "rev_auc": {
+      "value": 0.011261224055975627,
+      "ci95": [
+       -0.0045919848477530886,
+       0.02707922721281856
+      ]
+     },
+     "rev_auc_debate": {
+      "value": 0.012643678160919603,
+      "ci95": [
+       -0.016721815859746945,
+       0.03819478754940708
+      ]
+     }
+    },
+    "minus_out+text_hgb": {
+     "auroc_all": {
+      "value": 0.029835157855528927,
+      "ci95": [
+       -0.013706501530256373,
+       0.07152871723989243
+      ]
+     },
+     "auroc_pre": {
+      "value": 0.07604786740670211,
+      "ci95": [
+       0.005521314512928891,
+       0.1498927729748893
+      ]
+     },
+     "within_panel": {
+      "value": 0.006514657980456029,
+      "ci95": [
+       -0.05863671201379566,
+       0.0714285714285714
+      ]
+     },
+     "within_panel_pre": {
+      "value": 0.09615384615384615,
+      "ci95": [
+       0.0,
+       0.2096986417657044
+      ]
+     },
+     "rev_auc": {
+      "value": 0.0041994015910090665,
+      "ci95": [
+       -0.09261474934209839,
+       0.09878856358947592
+      ]
+     },
+     "rev_auc_debate": {
+      "value": -0.028735632183907955,
+      "ci95": [
+       -0.14225677339901466,
+       0.09764520202020201
+      ]
+     }
+    },
+    "minus_out+text_pair": {
+     "auroc_all": {
+      "value": 0.11332622137741877,
+      "ci95": [
+       0.052717061779563014,
+       0.1681805072070185
+      ]
+     },
+     "auroc_pre": {
+      "value": 0.16372693241257685,
+      "ci95": [
+       0.06298413609523715,
+       0.25608206659770005
+      ]
+     },
+     "within_panel": {
+      "value": 0.006514657980456029,
+      "ci95": [
+       -0.0696034663865546,
+       0.08808049941294856
+      ]
+     },
+     "within_panel_pre": {
+      "value": -0.038461538461538436,
+      "ci95": [
+       -0.23290585835033523,
+       0.1578947368421053
+      ]
+     },
+     "rev_auc": {
+      "value": 0.004500026891634423,
+      "ci95": [
+       -0.10832598459944792,
+       0.1169136013252112
+      ]
+     },
+     "rev_auc_debate": {
+      "value": -0.028735632183908066,
+      "ci95": [
+       -0.18618646800825597,
+       0.13337543554006953
+      ]
+     }
+    }
+   },
+   "pair[auroc_all]": {
+    "auroc_all": {
+     "value": 0.7162288898338172,
+     "ci95": [
+      0.6593604438282955,
+      0.7744596287172254
+     ]
+    },
+    "auroc_pre": {
+     "value": 0.6187030128078722,
+     "ci95": [
+      0.5415718598835192,
+      0.6960990543224322
+     ]
+    },
+    "within_panel": {
+     "value": 0.7035830618892508,
+     "ci95": [
+      0.6078204692281537,
+      0.7916666666666666
+     ]
+    },
+    "within_panel_pre": {
+     "value": 0.6346153846153846,
+     "ci95": [
+      0.44997448979591836,
+      0.803921568627451
+     ]
+    },
+    "rev_auc": {
+     "value": 0.6982973586073231,
+     "ci95": [
+      0.5498506301665037,
+      0.8340984191800127
+     ]
+    },
+    "rev_auc_debate": {
+     "value": 0.6160919540229886,
+     "ci95": [
+      0.3981860330339032,
+      0.8115344968616452
+     ]
+    },
+    "minus_out+text_lr": {
+     "auroc_all": {
+      "value": -0.07038065950566841,
+      "ci95": [
+       -0.12132402157726102,
+       -0.014721009978561815
+      ]
+     },
+     "auroc_pre": {
+      "value": -0.11062091143320985,
+      "ci95": [
+       -0.20913532006721552,
+       -0.006736648836166669
+      ]
+     },
+     "within_panel": {
+      "value": 0.019543973941368087,
+      "ci95": [
+       -0.06647116972056334,
+       0.10033444816053505
+      ]
+     },
+     "within_panel_pre": {
+      "value": 0.05769230769230771,
+      "ci95": [
+       -0.14927238805970147,
+       0.2600476190476188
+      ]
+     },
+     "rev_auc": {
+      "value": 0.03102220011132284,
+      "ci95": [
+       -0.0896915522459702,
+       0.14573803901957005
+      ]
+     },
+     "rev_auc_debate": {
+      "value": 0.06436781609195408,
+      "ci95": [
+       -0.11397474747474759,
+       0.22728588978588984
+      ]
+     }
+    },
+    "minus_out+text_hgb": {
+     "auroc_all": {
+      "value": -0.04192949849638339,
+      "ci95": [
+       -0.10401912422266485,
+       0.0199652438433203
+      ]
+     },
+     "auroc_pre": {
+      "value": -0.042585929410125956,
+      "ci95": [
+       -0.14618305526017975,
+       0.06378708816916845
+      ]
+     },
+     "within_panel": {
+      "value": 0.009771986970684043,
+      "ci95": [
+       -0.08130965909090913,
+       0.09191660216718264
+      ]
+     },
+     "within_panel_pre": {
+      "value": 0.11538461538461531,
+      "ci95": [
+       -0.06453366058906031,
+       0.30000000000000004
+      ]
+     },
+     "rev_auc": {
+      "value": 0.02396037764635628,
+      "ci95": [
+       -0.09386021755971616,
+       0.1408389286709634
+      ]
+     },
+     "rev_auc_debate": {
+      "value": 0.02298850574712652,
+      "ci95": [
+       -0.14420342113246506,
+       0.19347118513814116
+      ]
+     }
+    },
+    "minus_out+text_pair": {
+     "auroc_all": {
+      "value": 0.04156156502550645,
+      "ci95": [
+       0.016685039892469306,
+       0.06532826340667762
+      ]
+     },
+     "auroc_pre": {
+      "value": 0.04509313559574879,
+      "ci95": [
+       0.0023631255681883546,
+       0.08517466838353614
+      ]
+     },
+     "within_panel": {
+      "value": 0.009771986970684043,
+      "ci95": [
+       -0.0263177187837629,
+       0.045020193313446685
+      ]
+     },
+     "within_panel_pre": {
+      "value": -0.019230769230769273,
+      "ci95": [
+       -0.14583333333333331,
+       0.1034662356321838
+      ]
+     },
+     "rev_auc": {
+      "value": 0.024261002946981636,
+      "ci95": [
+       -0.010983600031593559,
+       0.0615791800065294
+      ]
+     },
+     "rev_auc_debate": {
+      "value": 0.02298850574712641,
+      "ci95": [
+       -0.022448021885521894,
+       0.07407407407407407
+      ]
+     }
+    }
+   },
+   "act[within_panel]": {
+    "auroc_all": {
+     "value": 0.7488689814159237,
+     "ci95": [
+      0.6950982262797282,
+      0.8024223268158446
+     ]
+    },
+    "auroc_pre": {
+     "value": 0.7001284265617637,
+     "ci95": [
+      0.6229987262896652,
+      0.7783264708416427
+     ]
+    },
+    "within_panel": {
+     "value": 0.7003257328990228,
+     "ci95": [
+      0.6094054423235918,
+      0.7906158173117287
+     ]
+    },
+    "within_panel_pre": {
+     "value": 0.6538461538461539,
+     "ci95": [
+      0.47267379679144383,
+      0.8181818181818182
+     ]
+    },
+    "rev_auc": {
+     "value": 0.7088852368707845,
+     "ci95": [
+      0.5908763779805842,
+      0.8084980452727588
+     ]
+    },
+    "rev_auc_debate": {
+     "value": 0.718390804597701,
+     "ci95": [
+      0.5448012167515563,
+      0.8532853812788945
+     ]
+    },
+    "minus_out+text_lr": {
+     "auroc_all": {
+      "value": -0.03774056792356184,
+      "ci95": [
+       -0.09050378890186661,
+       0.01635595976719931
+      ]
+     },
+     "auroc_pre": {
+      "value": -0.029195497679318394,
+      "ci95": [
+       -0.1356733186691475,
+       0.08086008400352664
+      ]
+     },
+     "within_panel": {
+      "value": 0.016286644951140072,
+      "ci95": [
+       -0.09339752243309775,
+       0.12050726269564219
+      ]
+     },
+     "within_panel_pre": {
+      "value": 0.07692307692307698,
+      "ci95": [
+       -0.17501096491228074,
+       0.3191489361702128
+      ]
+     },
+     "rev_auc": {
+      "value": 0.041610078374784254,
+      "ci95": [
+       -0.11295782905576954,
+       0.1943499170332108
+      ]
+     },
+     "rev_auc_debate": {
+      "value": 0.16666666666666652,
+      "ci95": [
+       -0.08774857954545462,
+       0.38746481570555646
+      ]
+     }
+    },
+    "minus_out+text_hgb": {
+     "auroc_all": {
+      "value": -0.009289406914276821,
+      "ci95": [
+       -0.07626294445700484,
+       0.05472290004473147
+      ]
+     },
+     "auroc_pre": {
+      "value": 0.038839484343765496,
+      "ci95": [
+       -0.07275094373108959,
+       0.15547630864941522
+      ]
+     },
+     "within_panel": {
+      "value": 0.006514657980456029,
+      "ci95": [
+       -0.10921642971769542,
+       0.11799506745974175
+      ]
+     },
+     "within_panel_pre": {
+      "value": 0.13461538461538458,
+      "ci95": [
+       -0.10204081632653061,
+       0.3695652173913043
+      ]
+     },
+     "rev_auc": {
+      "value": 0.03454825590981769,
+      "ci95": [
+       -0.1340432816326782,
+       0.1910986539755908
+      ]
+     },
+     "rev_auc_debate": {
+      "value": 0.12528735632183896,
+      "ci95": [
+       -0.1135574490746904,
+       0.3416578219098383
+      ]
+     }
+    },
+    "minus_out+text_pair": {
+     "auroc_all": {
+      "value": 0.07420165660761302,
+      "ci95": [
+       0.019562177143010454,
+       0.1252663031260161
+      ]
+     },
+     "auroc_pre": {
+      "value": 0.12651854934964024,
+      "ci95": [
+       0.03161313079990439,
+       0.21556439539672398
+      ]
+     },
+     "within_panel": {
+      "value": 0.006514657980456029,
+      "ci95": [
+       -0.10646798742069452,
+       0.10927411009933774
+      ]
+     },
+     "within_panel_pre": {
+      "value": 0.0,
+      "ci95": [
+       -0.23076923076923073,
+       0.2400344827586205
+      ]
+     },
+     "rev_auc": {
+      "value": 0.03484888121044305,
+      "ci95": [
+       -0.12589682781004835,
+       0.1935297807850658
+      ]
+     },
+     "rev_auc_debate": {
+      "value": 0.12528735632183885,
+      "ci95": [
+       -0.13838377192982465,
+       0.35984374999999985
+      ]
+     }
+    }
+   },
+   "stacked[within_panel]": {
+    "auroc_all": {
+     "value": 0.789223852866376,
+     "ci95": [
+      0.7357819406581411,
+      0.8402817755700281
+     ]
+    },
+    "auroc_pre": {
+     "value": 0.7392514665009939,
+     "ci95": [
+      0.6629054365195813,
+      0.8171482594162953
+     ]
+    },
+    "within_panel": {
+     "value": 0.6807817589576547,
+     "ci95": [
+      0.5884423076923078,
+      0.7758722969023962
+     ]
+    },
+    "within_panel_pre": {
+     "value": 0.6153846153846154,
+     "ci95": [
+      0.43588709677419357,
+      0.788486842105263
+     ]
+    },
+    "rev_auc": {
+     "value": 0.6757091235571205,
+     "ci95": [
+      0.5195247628595654,
+      0.8357174259477576
+     ]
+    },
+    "rev_auc_debate": {
+     "value": 0.5747126436781609,
+     "ci95": [
+      0.3589439655172414,
+      0.7976463653094087
+     ]
+    },
+    "minus_out+text_lr": {
+     "auroc_all": {
+      "value": 0.0026143035268904047,
+      "ci95": [
+       -0.006622129825630599,
+       0.0120163876530151
+      ]
+     },
+     "auroc_pre": {
+      "value": 0.009927542259911881,
+      "ci95": [
+       -0.013190564438578665,
+       0.03524235010021443
+      ]
+     },
+     "within_panel": {
+      "value": -0.0032573289902280145,
+      "ci95": [
+       -0.034605079777008815,
+       0.024098814613291938
+      ]
+     },
+     "within_panel_pre": {
+      "value": 0.03846153846153855,
+      "ci95": [
+       0.0,
+       0.09999999999999998
+      ]
+     },
+     "rev_auc": {
+      "value": 0.008433965061120263,
+      "ci95": [
+       -0.004799837471103091,
+       0.02336115323311952
+      ]
+     },
+     "rev_auc_debate": {
+      "value": 0.02298850574712641,
+      "ci95": [
+       0.0,
+       0.053760073460884836
+      ]
+     }
+    },
+    "minus_out+text_hgb": {
+     "auroc_all": {
+      "value": 0.031065464536175424,
+      "ci95": [
+       -0.013943888246103075,
+       0.07708372964094548
+      ]
+     },
+     "auroc_pre": {
+      "value": 0.07796252428299577,
+      "ci95": [
+       0.003516912951910278,
+       0.15598166941013386
+      ]
+     },
+     "within_panel": {
+      "value": -0.013029315960912058,
+      "ci95": [
+       -0.08646714103598103,
+       0.055067751086431554
+      ]
+     },
+     "within_panel_pre": {
+      "value": 0.09615384615384615,
+      "ci95": [
+       0.0,
+       0.2096986417657044
+      ]
+     },
+     "rev_auc": {
+      "value": 0.0013721425961537026,
+      "ci95": [
+       -0.10506660248531301,
+       0.10655236981582254
+      ]
+     },
+     "rev_auc_debate": {
+      "value": -0.01839080459770115,
+      "ci95": [
+       -0.14465112433862423,
+       0.12308641975308637
+      ]
+     }
+    },
+    "minus_out+text_pair": {
+     "auroc_all": {
+      "value": 0.11455652805806527,
+      "ci95": [
+       0.055591684981697205,
+       0.1686290616179442
+      ]
+     },
+     "auroc_pre": {
+      "value": 0.16564158928887052,
+      "ci95": [
+       0.06518998190846521,
+       0.2590383188888213
+      ]
+     },
+     "within_panel": {
+      "value": -0.013029315960912058,
+      "ci95": [
+       -0.0935534274193548,
+       0.07237372665534808
+      ]
+     },
+     "within_panel_pre": {
+      "value": -0.038461538461538436,
+      "ci95": [
+       -0.23290585835033523,
+       0.1578947368421053
+      ]
+     },
+     "rev_auc": {
+      "value": 0.0016727678967790593,
+      "ci95": [
+       -0.10914639060172447,
+       0.11937430770257951
+      ]
+     },
+     "rev_auc_debate": {
+      "value": -0.01839080459770126,
+      "ci95": [
+       -0.16761456272259603,
+       0.16118494671877318
+      ]
+     }
+    }
+   },
+   "pair[within_panel]": {
+    "auroc_all": {
+     "value": 0.7038121881904684,
+     "ci95": [
+      0.6483540798667075,
+      0.76071720201359
+     ]
+    },
+    "auroc_pre": {
+     "value": 0.6091549833621445,
+     "ci95": [
+      0.5320477043009448,
+      0.6867924416588422
+     ]
+    },
+    "within_panel": {
+     "value": 0.6938110749185668,
+     "ci95": [
+      0.5987044192616164,
+      0.7838755224520415
+     ]
+    },
+    "within_panel_pre": {
+     "value": 0.6153846153846154,
+     "ci95": [
+      0.4259160756501182,
+      0.7879186602870811
+     ]
+    },
+    "rev_auc": {
+     "value": 0.667496644033789,
+     "ci95": [
+      0.5199395445857038,
+      0.8119220594107885
+     ]
+    },
+    "rev_auc_debate": {
+     "value": 0.5942528735632183,
+     "ci95": [
+      0.3825625483933411,
+      0.7941765648567115
+     ]
+    },
+    "minus_out+text_lr": {
+     "auroc_all": {
+      "value": -0.08279736114901715,
+      "ci95": [
+       -0.13292221722554529,
+       -0.0275325859363455
+      ]
+     },
+     "auroc_pre": {
+      "value": -0.12016894087893759,
+      "ci95": [
+       -0.2141302060465916,
+       -0.017654420896522
+      ]
+     },
+     "within_panel": {
+      "value": 0.009771986970684043,
+      "ci95": [
+       -0.06987389422172029,
+       0.08257293247970424
+      ]
+     },
+     "within_panel_pre": {
+      "value": 0.03846153846153855,
+      "ci95": [
+       -0.18181818181818182,
+       0.2363636363636364
+      ]
+     },
+     "rev_auc": {
+      "value": 0.00022148553778877922,
+      "ci95": [
+       -0.11658574616103602,
+       0.11470272390165968
+      ]
+     },
+     "rev_auc_debate": {
+      "value": 0.042528735632183845,
+      "ci95": [
+       -0.12205122180451128,
+       0.1987199699699699
+      ]
+     }
+    },
+    "minus_out+text_hgb": {
+     "auroc_all": {
+      "value": -0.054346200139732126,
+      "ci95": [
+       -0.1163767677390968,
+       0.008576372445659093
+      ]
+     },
+     "auroc_pre": {
+      "value": -0.0521339588558537,
+      "ci95": [
+       -0.1564726965058828,
+       0.053550930113848254
+      ]
+     },
+     "within_panel": {
+      "value": 0.0,
+      "ci95": [
+       -0.08312926204230554,
+       0.0757097791798107
+      ]
+     },
+     "within_panel_pre": {
+      "value": 0.09615384615384615,
+      "ci95": [
+       -0.06001515151515156,
+       0.2553464266230222
+      ]
+     },
+     "rev_auc": {
+      "value": -0.006840336927177781,
+      "ci95": [
+       -0.13306398533626015,
+       0.11536187047314325
+      ]
+     },
+     "rev_auc_debate": {
+      "value": 0.0011494252873562871,
+      "ci95": [
+       -0.16556688963210703,
+       0.1586591748768473
+      ]
+     }
+    },
+    "minus_out+text_pair": {
+     "auroc_all": {
+      "value": 0.029144863382157715,
+      "ci95": [
+       0.005513379326957413,
+       0.05296263664368688
+      ]
+     },
+     "auroc_pre": {
+      "value": 0.035545106150021044,
+      "ci95": [
+       -0.005324697973383265,
+       0.0744809097767888
+      ]
+     },
+     "within_panel": {
+      "value": 0.0,
+      "ci95": [
+       -0.03530173234342279,
+       0.033333333333333326
+      ]
+     },
+     "within_panel_pre": {
+      "value": -0.038461538461538436,
+      "ci95": [
+       -0.139546511627907,
+       0.04166666666666663
+      ]
+     },
+     "rev_auc": {
+      "value": -0.006539711626552425,
+      "ci95": [
+       -0.04306620433500567,
+       0.028345619820169685
+      ]
+     },
+     "rev_auc_debate": {
+      "value": 0.001149425287356176,
+      "ci95": [
+       -0.04444568038561371,
+       0.05204414374445424
+      ]
+     }
+    }
+   },
+   "act[rev_auc]": {
+    "auroc_all": {
+     "value": 0.7514589475146006,
+     "ci95": [
+      0.6985489670627312,
+      0.8036685309109053
+     ]
+    },
+    "auroc_pre": {
+     "value": 0.689397043004293,
+     "ci95": [
+      0.6122451200519609,
+      0.7652364894484993
+     ]
+    },
+    "within_panel": {
+     "value": 0.7198697068403909,
+     "ci95": [
+      0.6391328795501627,
+      0.7965077729911968
+     ]
+    },
+    "within_panel_pre": {
+     "value": 0.6923076923076923,
+     "ci95": [
+      0.543850114416476,
+      0.8301886792452831
+     ]
+    },
+    "rev_auc": {
+     "value": 0.731764172927966,
+     "ci95": [
+      0.6431745717444667,
+      0.8181143843477204
+     ]
+    },
+    "rev_auc_debate": {
+     "value": 0.7137931034482758,
+     "ci95": [
+      0.5715997979271233,
+      0.8402590943539218
+     ]
+    },
+    "minus_out+text_lr": {
+     "auroc_all": {
+      "value": -0.03515060182488494,
+      "ci95": [
+       -0.08358473605033526,
+       0.016338578038447956
+      ]
+     },
+     "auroc_pre": {
+      "value": -0.039926881236789,
+      "ci95": [
+       -0.15910948956606288,
+       0.07370658941461208
+      ]
+     },
+     "within_panel": {
+      "value": 0.03583061889250816,
+      "ci95": [
+       -0.07259152585765483,
+       0.14814814814814814
+      ]
+     },
+     "within_panel_pre": {
+      "value": 0.11538461538461542,
+      "ci95": [
+       -0.10204081632653061,
+       0.3382471537001897
+      ]
+     },
+     "rev_auc": {
+      "value": 0.06448901443196575,
+      "ci95": [
+       -0.11406630758829943,
+       0.23740652025220627
+      ]
+     },
+     "rev_auc_debate": {
+      "value": 0.16206896551724137,
+      "ci95": [
+       -0.07415603402445507,
+       0.411067602336887
+      ]
+     }
+    },
+    "minus_out+text_hgb": {
+     "auroc_all": {
+      "value": -0.006699440815599922,
+      "ci95": [
+       -0.06849362893568786,
+       0.051884903694206265
+      ]
+     },
+     "auroc_pre": {
+      "value": 0.028108100786294887,
+      "ci95": [
+       -0.07444371922550033,
+       0.13395957370975578
+      ]
+     },
+     "within_panel": {
+      "value": 0.026058631921824116,
+      "ci95": [
+       -0.07754646085102053,
+       0.12848341318234605
+      ]
+     },
+     "within_panel_pre": {
+      "value": 0.17307692307692302,
+      "ci95": [
+       -0.0227404862579281,
+       0.37499999999999994
+      ]
+     },
+     "rev_auc": {
+      "value": 0.05742719196699919,
+      "ci95": [
+       -0.08862494684875016,
+       0.20079778150688596
+      ]
+     },
+     "rev_auc_debate": {
+      "value": 0.12068965517241381,
+      "ci95": [
+       -0.0845638243335612,
+       0.3331443798449612
+      ]
+     }
+    },
+    "minus_out+text_pair": {
+     "auroc_all": {
+      "value": 0.07679162270628992,
+      "ci95": [
+       0.023213624143122013,
+       0.12644905662028286
+      ]
+     },
+     "auroc_pre": {
+      "value": 0.11578716579216963,
+      "ci95": [
+       0.016515392097466285,
+       0.20834324500678972
+      ]
+     },
+     "within_panel": {
+      "value": 0.026058631921824116,
+      "ci95": [
+       -0.0764754901960785,
+       0.12976049354719
+      ]
+     },
+     "within_panel_pre": {
+      "value": 0.038461538461538436,
+      "ci95": [
+       -0.17950000000000002,
+       0.2623166522864537
+      ]
+     },
+     "rev_auc": {
+      "value": 0.05772781726762455,
+      "ci95": [
+       -0.10635771394428742,
+       0.21764489918474392
+      ]
+     },
+     "rev_auc_debate": {
+      "value": 0.1206896551724137,
+      "ci95": [
+       -0.11177886526232109,
+       0.3484886081660274
+      ]
+     }
+    }
+   },
+   "stacked[rev_auc]": {
+    "auroc_all": {
+     "value": 0.7890538684988961,
+     "ci95": [
+      0.7356169502943987,
+      0.8394917783143662
+     ]
+    },
+    "auroc_pre": {
+     "value": 0.7357212903621221,
+     "ci95": [
+      0.6579291824442272,
+      0.8149382981717705
+     ]
+    },
+    "within_panel": {
+     "value": 0.7003257328990228,
+     "ci95": [
+      0.6134427850518277,
+      0.7884978991596636
+     ]
+    },
+    "within_panel_pre": {
+     "value": 0.5961538461538461,
+     "ci95": [
+      0.41933608402100525,
+      0.772763929618768
+     ]
+    },
+    "rev_auc": {
+     "value": 0.6768327776948466,
+     "ci95": [
+      0.5251882543111047,
+      0.827783879308365
+     ]
+    },
+    "rev_auc_debate": {
+     "value": 0.5620689655172414,
+     "ci95": [
+      0.34576344086021515,
+      0.7834177442528735
+     ]
+    },
+    "minus_out+text_lr": {
+     "auroc_all": {
+      "value": 0.0024443191594105684,
+      "ci95": [
+       -0.0073535355674436975,
+       0.0121933631755306
+      ]
+     },
+     "auroc_pre": {
+      "value": 0.006397366121040027,
+      "ci95": [
+       -0.013167537025658625,
+       0.027601693000441532
+      ]
+     },
+     "within_panel": {
+      "value": 0.016286644951140072,
+      "ci95": [
+       -0.0064945675239792364,
+       0.04114250552541689
+      ]
+     },
+     "within_panel_pre": {
+      "value": 0.019230769230769273,
+      "ci95": [
+       0.0,
+       0.0625332446808509
+      ]
+     },
+     "rev_auc": {
+      "value": 0.009557619198846345,
+      "ci95": [
+       -0.006948499019977172,
+       0.025170547200276748
+      ]
+     },
+     "rev_auc_debate": {
+      "value": 0.010344827586206917,
+      "ci95": [
+       -0.021645987940630843,
+       0.03928923451100866
+      ]
+     }
+    },
+    "minus_out+text_hgb": {
+     "auroc_all": {
+      "value": 0.030895480168695588,
+      "ci95": [
+       -0.013483658585294088,
+       0.07464241023140537
+      ]
+     },
+     "auroc_pre": {
+      "value": 0.07443234814412392,
+      "ci95": [
+       0.0017479439906655544,
+       0.14993279888345482
+      ]
+     },
+     "within_panel": {
+      "value": 0.006514657980456029,
+      "ci95": [
+       -0.06192261191837466,
+       0.07075677537896174
+      ]
+     },
+     "within_panel_pre": {
+      "value": 0.07692307692307687,
+      "ci95": [
+       -0.033912916423144375,
+       0.19566283034953108
+      ]
+     },
+     "rev_auc": {
+      "value": 0.002495796733879785,
+      "ci95": [
+       -0.09511634008160062,
+       0.09750156858792314
+      ]
+     },
+     "rev_auc_debate": {
+      "value": -0.03103448275862064,
+      "ci95": [
+       -0.14523962148962152,
+       0.09701420454545426
+      ]
+     }
+    },
+    "minus_out+text_pair": {
+     "auroc_all": {
+      "value": 0.11438654369058543,
+      "ci95": [
+       0.05438905808499546,
+       0.16860403898125578
+      ]
+     },
+     "auroc_pre": {
+      "value": 0.16211141314999866,
+      "ci95": [
+       0.060201649558171796,
+       0.25415601515919456
+      ]
+     },
+     "within_panel": {
+      "value": 0.006514657980456029,
+      "ci95": [
+       -0.06859294259219931,
+       0.08710685483870968
+      ]
+     },
+     "within_panel_pre": {
+      "value": -0.05769230769230771,
+      "ci95": [
+       -0.24394522892597345,
+       0.13514658726523132
+      ]
+     },
+     "rev_auc": {
+      "value": 0.0027964220345051416,
+      "ci95": [
+       -0.11064900935172829,
+       0.11369464116733215
+      ]
+     },
+     "rev_auc_debate": {
+      "value": -0.03103448275862075,
+      "ci95": [
+       -0.18106194478937815,
+       0.12711137820512794
+      ]
+     }
+    }
+   },
+   "pair[rev_auc]": {
+    "auroc_all": {
+     "value": 0.7241662705832181,
+     "ci95": [
+      0.668353420209019,
+      0.781227742025573
+     ]
+    },
+    "auroc_pre": {
+     "value": 0.6281559719283504,
+     "ci95": [
+      0.5520552626519997,
+      0.7030666071290911
+     ]
+    },
+    "within_panel": {
+     "value": 0.7133550488599348,
+     "ci95": [
+      0.6169982214610368,
+      0.8030649555491824
+     ]
+    },
+    "within_panel_pre": {
+     "value": 0.7115384615384616,
+     "ci95": [
+      0.5294117647058824,
+      0.8727344877344877
+     ]
+    },
+    "rev_auc": {
+     "value": 0.6952300963488844,
+     "ci95": [
+      0.5521353103081331,
+      0.8322715277933422
+     ]
+    },
+    "rev_auc_debate": {
+     "value": 0.6160919540229884,
+     "ci95": [
+      0.40420490083905414,
+      0.8102602258852254
+     ]
+    },
+    "minus_out+text_lr": {
+     "auroc_all": {
+      "value": -0.06244327875626743,
+      "ci95": [
+       -0.11196454326736432,
+       -0.010286197183217095
+      ]
+     },
+     "auroc_pre": {
+      "value": -0.10116795231273168,
+      "ci95": [
+       -0.19681327943863708,
+       0.002243976334279188
+      ]
+     },
+     "within_panel": {
+      "value": 0.02931596091205213,
+      "ci95": [
+       -0.052636544190665394,
+       0.10512453630100675
+      ]
+     },
+     "within_panel_pre": {
+      "value": 0.1346153846153847,
+      "ci95": [
+       -0.05359577922077925,
+       0.3181818181818181
+      ]
+     },
+     "rev_auc": {
+      "value": 0.027954937852884165,
+      "ci95": [
+       -0.09334429662932145,
+       0.14249820359225313
+      ]
+     },
+     "rev_auc_debate": {
+      "value": 0.06436781609195397,
+      "ci95": [
+       -0.10436373873873875,
+       0.223627806975633
+      ]
+     }
+    },
+    "minus_out+text_hgb": {
+     "auroc_all": {
+      "value": -0.03399211774698241,
+      "ci95": [
+       -0.09685671009366006,
+       0.025653934591074207
+      ]
+     },
+     "auroc_pre": {
+      "value": -0.03313297028964779,
+      "ci95": [
+       -0.13266016433314387,
+       0.0715062450496416
+      ]
+     },
+     "within_panel": {
+      "value": 0.019543973941368087,
+      "ci95": [
+       -0.06595238095238094,
+       0.0969996743201433
+      ]
+     },
+     "within_panel_pre": {
+      "value": 0.1923076923076923,
+      "ci95": [
+       0.046511627906976716,
+       0.3488662790697673
+      ]
+     },
+     "rev_auc": {
+      "value": 0.020893115387917605,
+      "ci95": [
+       -0.09911736006066059,
+       0.13853292093169922
+      ]
+     },
+     "rev_auc_debate": {
+      "value": 0.02298850574712641,
+      "ci95": [
+       -0.14337749546279488,
+       0.19468839568950794
+      ]
+     }
+    },
+    "minus_out+text_pair": {
+     "auroc_all": {
+      "value": 0.04949894577490743,
+      "ci95": [
+       0.02239854214722737,
+       0.07590547180112028
+      ]
+     },
+     "auroc_pre": {
+      "value": 0.054546094716226956,
+      "ci95": [
+       0.011545519767877549,
+       0.0960235218086304
+      ]
+     },
+     "within_panel": {
+      "value": 0.019543973941368087,
+      "ci95": [
+       -0.013413347705517636,
+       0.05373941105284384
+      ]
+     },
+     "within_panel_pre": {
+      "value": 0.05769230769230771,
+      "ci95": [
+       -0.028581780538302286,
+       0.16326530612244894
+      ]
+     },
+     "rev_auc": {
+      "value": 0.02119374068854296,
+      "ci95": [
+       -0.017924136553244485,
+       0.06401488208971007
+      ]
+     },
+     "rev_auc_debate": {
+      "value": 0.022988505747126298,
+      "ci95": [
+       -0.024797810556106987,
+       0.0800370370370369
+      ]
+     }
+    }
+   }
+  }
+ },
+ "secs": 1034
+}

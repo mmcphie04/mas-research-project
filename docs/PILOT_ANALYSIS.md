@@ -148,3 +148,112 @@ Nothing here tests the activation hypothesis. As measured: over all states, outp
 predict correctness as well as or better than a single activation layer; on revision events,
 no predictor separates beneficial from harmful well enough for a gate to beat keeping first
 answers at this n; the original vote is 9 questions below the panel-optimal ceiling.
+
+## 3. Probe search (`scripts/probe_search.py` → `artifacts/pilot12b/probe_search/`)
+
+Requested after §2: try reduced-dimension probes and keep trying until a probe reliably predicts,
+or the activations look uninformative. Exploratory and on the pilot pool only; how the search
+could fool itself is part of the result.
+
+**What changed from §2.**
+- One correctness probe is trained on every answer state: 360 round-0 states plus 1,440 revised
+  states from the four conditions (1,800 states, folds by question), not 360 debate events.
+- Reduced dimensions: a mean-difference direction, PCA (8–256) then logistic regression, and
+  shrinkage LDA (dropped: slow, no better). Optional transforms: *letter* (subtract the training
+  mean of states with the same answer letter -- the readout is near-deterministic, mean P(own
+  letter) 0.995, so its state is dominated by which letter comes next) and *panel* (subtract the
+  panel's mean, label-free).
+- Metrics that never compare scores from different fold models: per-fold AUROC; **within-panel**
+  AUROC (pairs of the three agents answering the same prompt); **revision AUROC** (score after −
+  score before, beneficial vs harmful, within each condition, averaged). An earlier pooled "pair
+  accuracy" was dropped: a probe that merely scores revised states lower gets 0.60 because 196 of
+  the 325 one-sided revisions are harmful.
+- A stronger output-only comparator: letter-invariant output summaries, verbalized confidence,
+  per-letter log-probabilities, **panel agreement** (how many other agents gave my answer), shown-
+  peer agreement, whether the agent revised, and **option text** (length, relative length,
+  longest-option flag, positions). Logistic (`out+text_lr`) and boosted (`out+text_hgb`).
+
+**Measurements** (out of fold; intervals: 2,000 question-level bootstrap draws).
+
+1. *A broad search overfits.* Screening 11,766 configurations (49 layers × 4 positions × 4
+   transforms × 5 methods × 3 CV seeds) gives best means of about 0.78 (all states), 0.77
+   (within panel) and 0.80 (revisions). Nested CV over 896 single-layer candidates -- selection
+   redone inside each outer training fold -- gives, on the outer questions, 0.64–0.73, 0.62–0.71
+   and 0.59–0.69 (two outer seeds), while the chosen candidates' inner estimates were 0.77–0.85.
+   With 120 questions, picking one layer from hundreds mostly picks noise.
+2. *Layer ensembles fix this.* Averaging fold-standardized scores over a band of layers needs no
+   layer choice. Nested CV over 48 ensembles (4 positions × raw/letter × mean-difference/PCA16 ×
+   layers 12–24, 21–33, 15–39), three selection criteria × three outer seeds: within panel 0.70–0.73
+   and revisions 0.69–0.74 averaged over seeds (single runs 0.66–0.76 and 0.63–0.81);
+   the selections converge on the position before the stated answer letter, letter-centered,
+   PCA16, layers 21–33.
+3. *A recipe declared before those runs* -- readout position, letter-centered, mean difference,
+   layers 15–39 averaged (chosen a priori for the template-fixed position and the simplest method;
+   the band avoids picking a peak) -- on six CV partitions:
+
+   | | all states | within panel | round-0 panels | revisions | debate revisions |
+   |---|---|---|---|---|---|
+   | activation (declared recipe) | 0.74–0.77 (lower ≥ 0.69) | 0.73–0.78 (≥ 0.63) | 0.60–0.73 | 0.71–0.75 (≥ 0.59) | 0.68–0.73 (≥ 0.51) |
+   | out+text_lr | 0.78–0.82 | 0.68–0.73 | 0.56–0.67 | 0.66–0.70 | 0.55–0.61 |
+   | out+text_hgb | 0.74–0.80 | 0.68–0.72 | 0.52–0.75 | 0.66–0.73 | 0.59–0.71 |
+
+   Round-0 panels have only 62 mixed-label pairs (intervals about ±0.15).
+4. *Controls.*
+   - **Option text alone** (no model state): within panel 0.62–0.65, round-0 panels 0.69–0.71,
+     revisions 0.61–0.63 -- the correct option is the longest one for 43% of correct states vs
+     25% of incorrect ones (a known MMLU-Pro artifact).
+   - Regressing the option-text features out of the activations (training rows only) leaves the
+     probe at 0.72–0.73 within panel and 0.68–0.69 on revisions; on 90 within-panel pairs matched
+     for answer length (same longest-option status, relative length within 0.5 SD) the probe
+     scores 0.78–0.79, out+text_lr 0.70–0.71, out+text_hgb 0.70–0.78.
+   - Regressing out **all** output-only features: all-state AUROC falls to 0.54–0.58 and within
+     panel to 0.58–0.60, but revisions stay at 0.67–0.68 (lower bounds 0.58–0.59; debate
+     0.72–0.73, lower bounds 0.60–0.61).
+   - Leave one condition out (its revised states never trained on): revision AUROC on it is
+     unchanged -- debate 0.69/0.69, 0.73/0.72, 0.71/0.72 (trained with / held out); answer-only,
+     self-reconsideration and misleading-peer likewise within 0.03.
+   - Layer profiles are smooth (rising to layers ~21–30, then a gentle decline); layer 0 scores
+     exactly 0.50. At the last generated token, layer 3 already reaches 0.72 (all states) -- that
+     position reads the surface of the answer text -- whereas the readout position, a fixed
+     template token, is near chance in early layers and gains with depth.
+5. *Beyond outputs.*
+   - Stacked logistic model (activation score + output features + option text) vs out+text_lr:
+     within panel +0.01 to +0.03 (lower bounds ≈ 0.00), revisions +0.01 to +0.02.
+   - Equal-weight sum of the fold-standardized activation and out+text_lr scores (no fitting;
+     **post hoc** -- proposed after seeing that the stacker dilutes the revision signal) vs
+     out+text_lr: within panel +0.05 to +0.09 (lower bounds −0.00 to +0.04; above zero in four of
+     six partitions), revisions +0.05 to +0.08 (lower bounds −0.02 to +0.01). Against
+     out+text_hgb the same sum gains +0.00 to +0.06 within panel and +0.03 to +0.05 on revisions,
+     all intervals including zero (six partitions).
+6. *Panel decisions* (debate; rules fixed before scoring, no thresholds; six partitions; original
+   vote 69 of 120). Best of all six answers by score: activation 71–75 (vs original: +0.017 to
+   +0.050; lower bounds −0.017 to +0.008, above zero once), out+text_lr 68–70, out+text_hgb
+   69–72. Highest-scoring first answer: activation 69–74, outputs 68–72. Gate revisions by
+   score(after) > score(before): every scorer 68–71. (`combination.json`.)
+
+**Interpretation, with the cheaper explanations.**
+- The activations reliably contain information about whether an answer is correct: a simple,
+  low-variance probe ranks states, agents within a panel, and the two sides of a revision at
+  AUROC ≈ 0.72–0.77, stable over six partitions, transferring to an unseen condition, and not
+  explained by answer length. "No useful information" is ruled out for this pilot.
+- Whether that information goes *beyond* output-only information is not established at 120
+  questions. For overall correctness the outputs (with panel agreement) are as good or better;
+  for ranking agents within a panel and for the direction of a revision, adding activations helps
+  by roughly +0.03 to +0.09 AUROC depending on the comparator, with intervals at or just above
+  zero. The residual after removing all linear output information still ranks revisions at about
+  0.67, which is the strongest single hint that something non-output is there.
+- Within-panel pairs always involve two different chosen options, so a probe that scored the
+  *option* (how plausible the model finds it) rather than the *agent's state* would look the same;
+  correctness labels cannot separate the two. For gating, either serves.
+- Post-revision states attend to the peers' answers; linear agreement is in the comparator and
+  is regressed out above, but nonlinear uses of peer context remain possible.
+- The declared recipe was fixed after the screen (a mild selection); the nested estimate over 48
+  ensembles (item 2) is the honest bound for the search.
+
+**For the main run** (decisions for the preregistration, not made here): if this is to be the
+primary probe, specify it now -- pooled all-state correctness probe, layer-band ensemble,
+letter-centered, at the before-answer or readout position -- with within-panel and revision
+AUROC against an output comparator that includes panel agreement and option text. At 120
+questions the interval on such a difference is about ±0.04 to ±0.07; it shrinks roughly as
+1/√n, to about ±0.02 to ±0.03 at 600 questions, enough to resolve a +0.05 difference if it is real. Panel accuracy
+remains underpowered.
