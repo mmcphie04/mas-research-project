@@ -644,3 +644,4 @@ def test_notebook_validation_stage_needs_a_cap_and_reserves_its_questions_from_m
     assert "VALIDATION_MAX_HOURS  = None" in settings and "MAX_HOURS = VALIDATION_MAX_HOURS" in settings
     src = "\n".join(cells)
     assert '"--validation-size", str(VALIDATION_SIZE)' in src  # passed to every stage, so main starts after it
+    assert 'SMOKE_FOR   = "pilot"' in settings and "_FOR = SMOKE_FOR if STAGE == \"smoke\" else STAGE" in settings

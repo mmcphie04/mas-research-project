@@ -408,6 +408,74 @@ def summarize_cmd(cache, work, out, n_boot):
                                     + "\n".join(md) + "\n")
 
 
+def freeze(cache, frozen, out):
+    """Fit every scorer of both recipes on ALL pilot questions (all conditions pooled) and save
+    them for application to new questions without refitting. The pickle holds fitted
+    parameters (weights), so it stays local (runs/); its SHA-256 goes to the preregistration."""
+    D = CS.StateData.from_cache(cache)
+    train = np.ones(len(D.y), bool)
+    models = {rk: _scorers(D, rk, train, seed=0, fold=0) for rk in RECIPES}
+    feature_names = {rk: {n: getattr(m, "names", None) for n, m in ms.items()} for rk, ms in models.items()}
+    Path(frozen).parent.mkdir(parents=True, exist_ok=True)
+    with open(frozen, "wb") as fh:
+        pickle.dump({"models": models, "trained_on": {"cache": str(cache), "questions": int(len(set(D.qid))),
+                                                       "states": int(len(D.y)), "conditions": D.conditions},
+                     "feature_names": feature_names, "pilot_ref_z": {rk: {n: m.ref_z for n, m in ms.items()}
+                                                                     for rk, ms in models.items()}}, fh)
+    h = hashlib.sha256(Path(frozen).read_bytes()).hexdigest()
+    commit = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, cwd=ROOT).stdout.strip()
+    dirty = bool(subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True, cwd=ROOT).stdout.strip())
+    rec = {"frozen_file": str(frozen), "sha256": h, "code_commit": commit, "code_dirty": dirty,
+           "command": "python scripts/probe_validate.py freeze", "trained_on_questions": int(len(set(D.qid))),
+           "trained_on_states": int(len(D.y)), "conditions": D.conditions,
+           "recipes": {rk: {"recipe": RECIPES[rk], "layers": CS.parse_recipe(RECIPES[rk])[3]} for rk in RECIPES},
+           "params": {rk: {n: m.params() for n, m in ms.items()} for rk, ms in models.items()}}
+    Path(out).mkdir(parents=True, exist_ok=True)
+    (Path(out) / "frozen_scorers.json").write_text(json.dumps(rec, indent=1, default=float))
+    print(f"frozen scorers: {frozen} sha256 {h}")
+
+
+def apply_frozen(frozen, cache, out, primary="debate", n_boot=2000):
+    """Score a NEW archive with frozen scorers (one fitted model: no cross-fold issue) and
+    evaluate: ranking metrics and decisions per condition, by question bootstrap. Refuses if
+    the output-feature columns differ from those the scorers were trained on."""
+    F = pickle.load(open(frozen, "rb"))
+    D = CS.StateData.from_cache(cache)
+    qs = np.array(sorted(set(D.qid)))
+    qindex = {q: i for i, q in enumerate(qs)}
+    W = CS.boot_weights(len(qs), n_boot, 0)
+    folds = np.zeros(len(D.y), int)
+    allrows = np.ones(len(D.y), bool)
+    report = {"frozen_sha256": hashlib.sha256(Path(frozen).read_bytes()).hexdigest(), "conditions": D.conditions,
+              "n_questions": int(len(qs)), "recipes": {}}
+    for rk, models in F["models"].items():
+        for n, m in models.items():
+            want = F["feature_names"][rk][n]
+            if want is not None and m.features(D)[1] != want:
+                raise SystemExit(f"{rk}/{n}: output feature columns differ from training; refusing to apply")
+        z = {n: m.score(D, allrows)[1] for n, m in models.items()}
+        present = D.present(CS.parse_recipe(RECIPES[rk])[0])
+        rep = {}
+        for cond in D.conditions:
+            elig = CS.eligible_questions(D, present, cond)
+            names = [n for n in z if n != "act_fb"]
+            sel = [n for n in SELECT_SCORERS if n in z]
+            dec = CS.decisions(D, cond, {n: np.where(np.isin(D.qid, elig), z[n], np.nan) for n in sel})
+            dec = dec[dec.index.isin(elig)]
+            rep[cond] = {"n_questions": int(len(elig)),
+                         "scorers": {n: CS.evaluate_scores(D, z[n], folds, cond, elig, W, qindex) for n in names},
+                         "decisions": decision_summary(dec, sel, 0)}
+            # distribution shift: frozen probabilities vs outcomes (calibration-in-the-large)
+            rows = np.isin(D.qid, elig) & (D.states.condition == cond).to_numpy()
+            rep[cond]["calibration_in_the_large"] = {
+                n: {"mean_p": float(np.nanmean(models[n].score(D, rows)[2][rows])), "observed": float(D.y[rows].mean())}
+                for n in names}
+        report["recipes"][rk] = rep
+    Path(out).mkdir(parents=True, exist_ok=True)
+    (Path(out) / "frozen_application.json").write_text(json.dumps(report, indent=1, default=float))
+    print(f"applied {frozen} to {cache}: {len(qs)} questions, conditions {D.conditions}")
+
+
 def provenance(cache, out, argv):
     cache, out = Path(cache), Path(out)
     meta = json.loads((cache / "meta.json").read_text())
@@ -440,7 +508,8 @@ def provenance(cache, out, argv):
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", choices=["fit", "evaluate", "summarize", "loco", "provenance"])
+    ap.add_argument("cmd", choices=["fit", "evaluate", "summarize", "loco", "freeze", "apply", "provenance"])
+    ap.add_argument("--frozen", default="runs/frozen/pilot12b_scorers.pkl")
     ap.add_argument("--cache", default="runs/cache/probe12b")
     ap.add_argument("--work", default="runs/cache/probe12b/validate")
     ap.add_argument("--out", default="artifacts/pilot12b/probe_validation")
@@ -471,6 +540,10 @@ def main(argv=None) -> int:
                 h = [per[s][cond]["held_out"]["revision_auc"] for s in per]
                 print(f"{rk} {cond:20s} revision AUROC with {np.median(w):.3f} ({min(w):.2f}-{max(w):.2f})  "
                       f"held out {np.median(h):.3f} ({min(h):.2f}-{max(h):.2f})", flush=True)
+    elif args.cmd == "freeze":
+        freeze(args.cache, args.frozen, args.out)
+    elif args.cmd == "apply":
+        apply_frozen(args.frozen, args.cache, args.out, n_boot=args.n_boot)
     else:
         provenance(args.cache, args.out, sys.argv if argv is None else ["probe_validate.py", *argv])
     return 0
