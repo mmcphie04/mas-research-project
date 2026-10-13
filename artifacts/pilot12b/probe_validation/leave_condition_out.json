@@ -1,0 +1,894 @@
+{
+ "R1": {
+  "0": {
+   "debate": {
+    "trained_with": {
+     "state_auc_post": 0.738530638434392,
+     "state_auc_pre": 0.632452465356107,
+     "panel_pre": 0.6612903225806451,
+     "panel_post": 0.7083333333333334,
+     "six": 0.626984126984127,
+     "revision_auc": 0.7194570135746606
+    },
+    "held_out": {
+     "state_auc_post": 0.7327558549887713,
+     "state_auc_pre": 0.6329358685143409,
+     "panel_pre": 0.6290322580645161,
+     "panel_post": 0.7291666666666666,
+     "six": 0.623015873015873,
+     "revision_auc": 0.7239819004524887
+    }
+   },
+   "debate_answer_only": {
+    "trained_with": {
+     "state_auc_post": 0.7105348460291734,
+     "state_auc_pre": 0.632452465356107,
+     "panel_pre": 0.6612903225806451,
+     "panel_post": 0.6666666666666666,
+     "six": 0.604,
+     "revision_auc": 0.6521739130434783
+    },
+    "held_out": {
+     "state_auc_post": 0.7102106969205835,
+     "state_auc_pre": 0.6345472123751209,
+     "panel_pre": 0.5806451612903226,
+     "panel_post": 0.6666666666666666,
+     "six": 0.572,
+     "revision_auc": 0.6473429951690821
+    }
+   },
+   "misleading_one": {
+    "trained_with": {
+     "state_auc_post": 0.8229895784725463,
+     "state_auc_pre": 0.632452465356107,
+     "panel_pre": 0.6612903225806451,
+     "panel_post": 0.8809523809523809,
+     "six": 0.7493333333333333,
+     "revision_auc": 0.8308157099697885
+    },
+    "held_out": {
+     "state_auc_post": 0.812256960647068,
+     "state_auc_pre": 0.6293909120206252,
+     "panel_pre": 0.6451612903225806,
+     "panel_post": 0.8452380952380952,
+     "six": 0.7466666666666667,
+     "revision_auc": 0.8187311178247734
+    }
+   },
+   "self_reconsider": {
+    "trained_with": {
+     "state_auc_post": 0.7904295641187619,
+     "state_auc_pre": 0.632452465356107,
+     "panel_pre": 0.6612903225806451,
+     "panel_post": 0.7682926829268293,
+     "six": 0.7145748987854251,
+     "revision_auc": 0.6069565217391304
+    },
+    "held_out": {
+     "state_auc_post": 0.7942198357548957,
+     "state_auc_pre": 0.6337415404447309,
+     "panel_pre": 0.6612903225806451,
+     "panel_post": 0.7560975609756098,
+     "six": 0.7145748987854251,
+     "revision_auc": 0.6260869565217392
+    }
+   }
+  },
+  "1": {
+   "debate": {
+    "trained_with": {
+     "state_auc_post": 0.76752,
+     "state_auc_pre": 0.6519417475728155,
+     "panel_pre": 0.6129032258064516,
+     "panel_post": 0.6875,
+     "six": 0.6031746031746031,
+     "revision_auc": 0.7272727272727273
+    },
+    "held_out": {
+     "state_auc_post": 0.76864,
+     "state_auc_pre": 0.647411003236246,
+     "panel_pre": 0.6290322580645161,
+     "panel_post": 0.6875,
+     "six": 0.623015873015873,
+     "revision_auc": 0.7320574162679426
+    }
+   },
+   "debate_answer_only": {
+    "trained_with": {
+     "state_auc_post": 0.763080444735121,
+     "state_auc_pre": 0.6519417475728155,
+     "panel_pre": 0.6129032258064516,
+     "panel_post": 0.6190476190476191,
+     "six": 0.588,
+     "revision_auc": 0.6882352941176471
+    },
+    "held_out": {
+     "state_auc_post": 0.7645519947678221,
+     "state_auc_pre": 0.652588996763754,
+     "panel_pre": 0.5806451612903226,
+     "panel_post": 0.6666666666666666,
+     "six": 0.56,
+     "revision_auc": 0.6823529411764706
+    }
+   },
+   "misleading_one": {
+    "trained_with": {
+     "state_auc_post": 0.8327202942587558,
+     "state_auc_pre": 0.6519417475728155,
+     "panel_pre": 0.6129032258064516,
+     "panel_post": 0.8571428571428571,
+     "six": 0.7546666666666667,
+     "revision_auc": 0.8432432432432433
+    },
+    "held_out": {
+     "state_auc_post": 0.8253638253638254,
+     "state_auc_pre": 0.6529126213592233,
+     "panel_pre": 0.6290322580645161,
+     "panel_post": 0.8571428571428571,
+     "six": 0.76,
+     "revision_auc": 0.8432432432432433
+    }
+   },
+   "self_reconsider": {
+    "trained_with": {
+     "state_auc_post": 0.7995429317662422,
+     "state_auc_pre": 0.6519417475728155,
+     "panel_pre": 0.6129032258064516,
+     "panel_post": 0.7804878048780488,
+     "six": 0.7064777327935222,
+     "revision_auc": 0.6826758147512865
+    },
+    "held_out": {
+     "state_auc_post": 0.8054195233431276,
+     "state_auc_pre": 0.6553398058252428,
+     "panel_pre": 0.6129032258064516,
+     "panel_post": 0.7804878048780488,
+     "six": 0.708502024291498,
+     "revision_auc": 0.6775300171526587
+    }
+   }
+  },
+  "2": {
+   "debate": {
+    "trained_with": {
+     "state_auc_post": 0.7484819431128156,
+     "state_auc_pre": 0.6522368844544577,
+     "panel_pre": 0.5806451612903226,
+     "panel_post": 0.625,
+     "six": 0.5873015873015873,
+     "revision_auc": 0.6863636363636364
+    },
+    "held_out": {
+     "state_auc_post": 0.7454458293384468,
+     "state_auc_pre": 0.6480527840360476,
+     "panel_pre": 0.5967741935483871,
+     "panel_post": 0.6666666666666666,
+     "six": 0.5912698412698413,
+     "revision_auc": 0.6863636363636364
+    }
+   },
+   "debate_answer_only": {
+    "trained_with": {
+     "state_auc_post": 0.7408487204405572,
+     "state_auc_pre": 0.6522368844544577,
+     "panel_pre": 0.5806451612903226,
+     "panel_post": 0.6428571428571429,
+     "six": 0.568,
+     "revision_auc": 0.68
+    },
+    "held_out": {
+     "state_auc_post": 0.7392290249433107,
+     "state_auc_pre": 0.6536852269069843,
+     "panel_pre": 0.5645161290322581,
+     "panel_post": 0.6428571428571429,
+     "six": 0.564,
+     "revision_auc": 0.675
+    }
+   },
+   "misleading_one": {
+    "trained_with": {
+     "state_auc_post": 0.8223776223776224,
+     "state_auc_pre": 0.6522368844544577,
+     "panel_pre": 0.5806451612903226,
+     "panel_post": 0.8571428571428571,
+     "six": 0.7333333333333333,
+     "revision_auc": 0.7908847184986595
+    },
+    "held_out": {
+     "state_auc_post": 0.8163170163170164,
+     "state_auc_pre": 0.6496620534277439,
+     "panel_pre": 0.6129032258064516,
+     "panel_post": 0.8452380952380952,
+     "six": 0.736,
+     "revision_auc": 0.7828418230563002
+    }
+   },
+   "self_reconsider": {
+    "trained_with": {
+     "state_auc_post": 0.7937440457288027,
+     "state_auc_pre": 0.6522368844544577,
+     "panel_pre": 0.5806451612903226,
+     "panel_post": 0.7560975609756098,
+     "six": 0.6923076923076923,
+     "revision_auc": 0.6261682242990654
+    },
+    "held_out": {
+     "state_auc_post": 0.8018418545570022,
+     "state_auc_pre": 0.6530415191503057,
+     "panel_pre": 0.5806451612903226,
+     "panel_post": 0.7317073170731707,
+     "six": 0.6862348178137652,
+     "revision_auc": 0.6242990654205608
+    }
+   }
+  },
+  "10": {
+   "debate": {
+    "trained_with": {
+     "state_auc_post": 0.7595407503234153,
+     "state_auc_pre": 0.6501443695861405,
+     "panel_pre": 0.6129032258064516,
+     "panel_post": 0.6875,
+     "six": 0.6150793650793651,
+     "revision_auc": 0.6956521739130435
+    },
+    "held_out": {
+     "state_auc_post": 0.7571151358344114,
+     "state_auc_pre": 0.6470965672120629,
+     "panel_pre": 0.5967741935483871,
+     "panel_post": 0.6875,
+     "six": 0.6031746031746031,
+     "revision_auc": 0.6869565217391305
+    }
+   },
+   "debate_answer_only": {
+    "trained_with": {
+     "state_auc_post": 0.7428341384863124,
+     "state_auc_pre": 0.6501443695861405,
+     "panel_pre": 0.6129032258064516,
+     "panel_post": 0.6190476190476191,
+     "six": 0.592,
+     "revision_auc": 0.6836158192090396
+    },
+    "held_out": {
+     "state_auc_post": 0.7444444444444445,
+     "state_auc_pre": 0.6535129932627527,
+     "panel_pre": 0.5483870967741935,
+     "panel_post": 0.6190476190476191,
+     "six": 0.564,
+     "revision_auc": 0.6836158192090396
+    }
+   },
+   "misleading_one": {
+    "trained_with": {
+     "state_auc_post": 0.826093774502117,
+     "state_auc_pre": 0.6501443695861405,
+     "panel_pre": 0.6129032258064516,
+     "panel_post": 0.8452380952380952,
+     "six": 0.744,
+     "revision_auc": 0.8421052631578947
+    },
+    "held_out": {
+     "state_auc_post": 0.8199780461031834,
+     "state_auc_pre": 0.6472569778633301,
+     "panel_pre": 0.6612903225806451,
+     "panel_post": 0.8571428571428571,
+     "six": 0.7573333333333333,
+     "revision_auc": 0.8365650969529086
+    }
+   },
+   "self_reconsider": {
+    "trained_with": {
+     "state_auc_post": 0.7876049063912202,
+     "state_auc_pre": 0.6501443695861405,
+     "panel_pre": 0.6129032258064516,
+     "panel_post": 0.7804878048780488,
+     "six": 0.7125506072874493,
+     "revision_auc": 0.6283018867924528
+    },
+    "held_out": {
+     "state_auc_post": 0.7919625564880568,
+     "state_auc_pre": 0.6591273660571062,
+     "panel_pre": 0.5967741935483871,
+     "panel_post": 0.7682926829268293,
+     "six": 0.7105263157894737,
+     "revision_auc": 0.6471698113207547
+    }
+   }
+  },
+  "11": {
+   "debate": {
+    "trained_with": {
+     "state_auc_post": 0.7860901019401513,
+     "state_auc_pre": 0.6798302872062664,
+     "panel_pre": 0.6612903225806451,
+     "panel_post": 0.6875,
+     "six": 0.623015873015873,
+     "revision_auc": 0.7181818181818181
+    },
+    "held_out": {
+     "state_auc_post": 0.7828017099638277,
+     "state_auc_pre": 0.6785248041775457,
+     "panel_pre": 0.6290322580645161,
+     "panel_post": 0.6875,
+     "six": 0.6150793650793651,
+     "revision_auc": 0.7090909090909091
+    }
+   },
+   "debate_answer_only": {
+    "trained_with": {
+     "state_auc_post": 0.7740019795447047,
+     "state_auc_pre": 0.6798302872062664,
+     "panel_pre": 0.6612903225806451,
+     "panel_post": 0.7142857142857143,
+     "six": 0.62,
+     "revision_auc": 0.7272727272727273
+    },
+    "held_out": {
+     "state_auc_post": 0.7735070933685252,
+     "state_auc_pre": 0.6788511749347258,
+     "panel_pre": 0.5806451612903226,
+     "panel_post": 0.7142857142857143,
+     "six": 0.58,
+     "revision_auc": 0.7215909090909091
+    }
+   },
+   "misleading_one": {
+    "trained_with": {
+     "state_auc_post": 0.8492748900114062,
+     "state_auc_pre": 0.6798302872062664,
+     "panel_pre": 0.6612903225806451,
+     "panel_post": 0.8690476190476191,
+     "six": 0.7546666666666667,
+     "revision_auc": 0.8306010928961749
+    },
+    "held_out": {
+     "state_auc_post": 0.840964640703927,
+     "state_auc_pre": 0.6809725848563969,
+     "panel_pre": 0.7096774193548387,
+     "panel_post": 0.8571428571428571,
+     "six": 0.768,
+     "revision_auc": 0.8087431693989071
+    }
+   },
+   "self_reconsider": {
+    "trained_with": {
+     "state_auc_post": 0.7906148867313916,
+     "state_auc_pre": 0.6798302872062664,
+     "panel_pre": 0.6612903225806451,
+     "panel_post": 0.7804878048780488,
+     "six": 0.7246963562753036,
+     "revision_auc": 0.6813996316758748
+    },
+    "held_out": {
+     "state_auc_post": 0.7946601941747573,
+     "state_auc_pre": 0.6840731070496083,
+     "panel_pre": 0.6129032258064516,
+     "panel_post": 0.7682926829268293,
+     "six": 0.7145748987854251,
+     "revision_auc": 0.6906077348066298
+    }
+   }
+  },
+  "12": {
+   "debate": {
+    "trained_with": {
+     "state_auc_post": 0.7489586670938801,
+     "state_auc_pre": 0.6605827729747038,
+     "panel_pre": 0.6612903225806451,
+     "panel_post": 0.6666666666666666,
+     "six": 0.623015873015873,
+     "revision_auc": 0.7136929460580913
+    },
+    "held_out": {
+     "state_auc_post": 0.7451137455943608,
+     "state_auc_pre": 0.6623439000960615,
+     "panel_pre": 0.6774193548387096,
+     "panel_post": 0.6458333333333334,
+     "six": 0.6309523809523809,
+     "revision_auc": 0.7136929460580913
+    }
+   },
+   "debate_answer_only": {
+    "trained_with": {
+     "state_auc_post": 0.7382888744307091,
+     "state_auc_pre": 0.6605827729747038,
+     "panel_pre": 0.6612903225806451,
+     "panel_post": 0.6428571428571429,
+     "six": 0.612,
+     "revision_auc": 0.6747572815533981
+    },
+    "held_out": {
+     "state_auc_post": 0.7378009108653221,
+     "state_auc_pre": 0.6604226705091258,
+     "panel_pre": 0.6129032258064516,
+     "panel_post": 0.6428571428571429,
+     "six": 0.584,
+     "revision_auc": 0.6796116504854369
+    }
+   },
+   "misleading_one": {
+    "trained_with": {
+     "state_auc_post": 0.8315462315462315,
+     "state_auc_pre": 0.6605827729747038,
+     "panel_pre": 0.6612903225806451,
+     "panel_post": 0.8452380952380952,
+     "six": 0.76,
+     "revision_auc": 0.7647058823529411
+    },
+    "held_out": {
+     "state_auc_post": 0.8262626262626263,
+     "state_auc_pre": 0.659782260646814,
+     "panel_pre": 0.6774193548387096,
+     "panel_post": 0.8333333333333334,
+     "six": 0.7626666666666667,
+     "revision_auc": 0.7558823529411764
+    }
+   },
+   "self_reconsider": {
+    "trained_with": {
+     "state_auc_post": 0.7936862244897959,
+     "state_auc_pre": 0.6605827729747038,
+     "panel_pre": 0.6612903225806451,
+     "panel_post": 0.8048780487804879,
+     "six": 0.7267206477732794,
+     "revision_auc": 0.616871704745167
+    },
+    "held_out": {
+     "state_auc_post": 0.7986288265306123,
+     "state_auc_pre": 0.6674671789945565,
+     "panel_pre": 0.6290322580645161,
+     "panel_post": 0.7926829268292683,
+     "six": 0.7145748987854251,
+     "revision_auc": 0.6239015817223199
+    }
+   }
+  }
+ },
+ "R2": {
+  "0": {
+   "debate": {
+    "trained_with": {
+     "state_auc_post": 0.757847533632287,
+     "state_auc_pre": 0.6733966745843231,
+     "panel_pre": 0.74,
+     "panel_post": 0.7619047619047619,
+     "six": 0.6796116504854369,
+     "revision_auc": 0.7710843373493976
+    },
+    "held_out": {
+     "state_auc_post": 0.7599922012088126,
+     "state_auc_pre": 0.6753760886777513,
+     "panel_pre": 0.74,
+     "panel_post": 0.7380952380952381,
+     "six": 0.7038834951456311,
+     "revision_auc": 0.7710843373493976
+    }
+   },
+   "debate_answer_only": {
+    "trained_with": {
+     "state_auc_post": 0.6964003164556962,
+     "state_auc_pre": 0.6733966745843231,
+     "panel_pre": 0.74,
+     "panel_post": 0.6842105263157895,
+     "six": 0.6341463414634146,
+     "revision_auc": 0.6824324324324325
+    },
+    "held_out": {
+     "state_auc_post": 0.6861155063291139,
+     "state_auc_pre": 0.6678543151227236,
+     "panel_pre": 0.76,
+     "panel_post": 0.6842105263157895,
+     "six": 0.6292682926829268,
+     "revision_auc": 0.7027027027027027
+    }
+   },
+   "misleading_one": {
+    "trained_with": {
+     "state_auc_post": 0.876848212614636,
+     "state_auc_pre": 0.6733966745843231,
+     "panel_pre": 0.74,
+     "panel_post": 0.8846153846153846,
+     "six": 0.8277945619335347,
+     "revision_auc": 0.9176029962546817
+    },
+    "held_out": {
+     "state_auc_post": 0.8658057271195957,
+     "state_auc_pre": 0.668646080760095,
+     "panel_pre": 0.72,
+     "panel_post": 0.8333333333333334,
+     "six": 0.8096676737160121,
+     "revision_auc": 0.8876404494382022
+    }
+   },
+   "self_reconsider": {
+    "trained_with": {
+     "state_auc_post": 0.7699182354059707,
+     "state_auc_pre": 0.6733966745843231,
+     "panel_pre": 0.74,
+     "panel_post": 0.7361111111111112,
+     "six": 0.7360178970917226,
+     "revision_auc": 0.6302681992337165
+    },
+    "held_out": {
+     "state_auc_post": 0.748241110477277,
+     "state_auc_pre": 0.6741884402216943,
+     "panel_pre": 0.76,
+     "panel_post": 0.7638888888888888,
+     "six": 0.7404921700223713,
+     "revision_auc": 0.6628352490421456
+    }
+   }
+  },
+  "1": {
+   "debate": {
+    "trained_with": {
+     "state_auc_post": 0.7687940485512921,
+     "state_auc_pre": 0.6705695574518754,
+     "panel_pre": 0.64,
+     "panel_post": 0.6904761904761905,
+     "six": 0.6407766990291263,
+     "revision_auc": 0.7485029940119761
+    },
+    "held_out": {
+     "state_auc_post": 0.7640955364134691,
+     "state_auc_pre": 0.6822782298075015,
+     "panel_pre": 0.68,
+     "panel_post": 0.6904761904761905,
+     "six": 0.6844660194174758,
+     "revision_auc": 0.7664670658682635
+    }
+   },
+   "debate_answer_only": {
+    "trained_with": {
+     "state_auc_post": 0.7441253263707572,
+     "state_auc_pre": 0.6705695574518754,
+     "panel_pre": 0.64,
+     "panel_post": 0.6578947368421053,
+     "six": 0.6195121951219512,
+     "revision_auc": 0.7557251908396947
+    },
+    "held_out": {
+     "state_auc_post": 0.7360915846555534,
+     "state_auc_pre": 0.6777138321095455,
+     "panel_pre": 0.64,
+     "panel_post": 0.6578947368421053,
+     "six": 0.6146341463414634,
+     "revision_auc": 0.7633587786259542
+    }
+   },
+   "misleading_one": {
+    "trained_with": {
+     "state_auc_post": 0.8745887362105671,
+     "state_auc_pre": 0.6705695574518754,
+     "panel_pre": 0.64,
+     "panel_post": 0.8717948717948718,
+     "six": 0.8157099697885196,
+     "revision_auc": 0.8633333333333333
+    },
+    "held_out": {
+     "state_auc_post": 0.865492548867815,
+     "state_auc_pre": 0.6741416947807105,
+     "panel_pre": 0.66,
+     "panel_post": 0.8461538461538461,
+     "six": 0.8006042296072508,
+     "revision_auc": 0.86
+    }
+   },
+   "self_reconsider": {
+    "trained_with": {
+     "state_auc_post": 0.7990635973468592,
+     "state_auc_pre": 0.6705695574518754,
+     "panel_pre": 0.64,
+     "panel_post": 0.7777777777777778,
+     "six": 0.727069351230425,
+     "revision_auc": 0.7281368821292775
+    },
+    "held_out": {
+     "state_auc_post": 0.7618025751072961,
+     "state_auc_pre": 0.6798968049216114,
+     "panel_pre": 0.62,
+     "panel_post": 0.75,
+     "six": 0.70917225950783,
+     "revision_auc": 0.7585551330798479
+    }
+   }
+  },
+  "2": {
+   "debate": {
+    "trained_with": {
+     "state_auc_post": 0.7535950252623397,
+     "state_auc_pre": 0.6691508138850755,
+     "panel_pre": 0.66,
+     "panel_post": 0.7142857142857143,
+     "six": 0.6407766990291263,
+     "revision_auc": 0.7010869565217391
+    },
+    "held_out": {
+     "state_auc_post": 0.7497085114652157,
+     "state_auc_pre": 0.6787605412826044,
+     "panel_pre": 0.62,
+     "panel_post": 0.7619047619047619,
+     "six": 0.6504854368932039,
+     "revision_auc": 0.7282608695652174
+    }
+   },
+   "debate_answer_only": {
+    "trained_with": {
+     "state_auc_post": 0.7131099353321576,
+     "state_auc_pre": 0.6691508138850755,
+     "panel_pre": 0.66,
+     "panel_post": 0.631578947368421,
+     "six": 0.6,
+     "revision_auc": 0.6845238095238095
+    },
+    "held_out": {
+     "state_auc_post": 0.7078189300411523,
+     "state_auc_pre": 0.6809178270249069,
+     "panel_pre": 0.68,
+     "panel_post": 0.6578947368421053,
+     "six": 0.6097560975609756,
+     "revision_auc": 0.6785714285714286
+    }
+   },
+   "misleading_one": {
+    "trained_with": {
+     "state_auc_post": 0.8731524789522919,
+     "state_auc_pre": 0.6691508138850755,
+     "panel_pre": 0.66,
+     "panel_post": 0.8846153846153846,
+     "six": 0.8126888217522659,
+     "revision_auc": 0.8888888888888888
+    },
+    "held_out": {
+     "state_auc_post": 0.8606173994387278,
+     "state_auc_pre": 0.68209452833889,
+     "panel_pre": 0.66,
+     "panel_post": 0.8717948717948718,
+     "six": 0.7945619335347432,
+     "revision_auc": 0.8790849673202614
+    }
+   },
+   "self_reconsider": {
+    "trained_with": {
+     "state_auc_post": 0.7706229758049152,
+     "state_auc_pre": 0.6691508138850755,
+     "panel_pre": 0.66,
+     "panel_post": 0.75,
+     "six": 0.7203579418344519,
+     "revision_auc": 0.7085106382978723
+    },
+    "held_out": {
+     "state_auc_post": 0.7378548294913316,
+     "state_auc_pre": 0.6795450088252598,
+     "panel_pre": 0.6,
+     "panel_post": 0.7361111111111112,
+     "six": 0.7158836689038032,
+     "revision_auc": 0.7382978723404255
+    }
+   }
+  },
+  "10": {
+   "debate": {
+    "trained_with": {
+     "state_auc_post": 0.7736036573245876,
+     "state_auc_pre": 0.6511075949367089,
+     "panel_pre": 0.74,
+     "panel_post": 0.7619047619047619,
+     "six": 0.6844660194174758,
+     "revision_auc": 0.7931034482758621
+    },
+    "held_out": {
+     "state_auc_post": 0.7722122838401908,
+     "state_auc_pre": 0.6511075949367089,
+     "panel_pre": 0.68,
+     "panel_post": 0.7619047619047619,
+     "six": 0.6893203883495146,
+     "revision_auc": 0.7931034482758621
+    }
+   },
+   "debate_answer_only": {
+    "trained_with": {
+     "state_auc_post": 0.715729001584786,
+     "state_auc_pre": 0.6511075949367089,
+     "panel_pre": 0.74,
+     "panel_post": 0.6052631578947368,
+     "six": 0.6487804878048781,
+     "revision_auc": 0.8114754098360656
+    },
+    "held_out": {
+     "state_auc_post": 0.7149366085578447,
+     "state_auc_pre": 0.6574367088607594,
+     "panel_pre": 0.74,
+     "panel_post": 0.6578947368421053,
+     "six": 0.6487804878048781,
+     "revision_auc": 0.819672131147541
+    }
+   },
+   "misleading_one": {
+    "trained_with": {
+     "state_auc_post": 0.8709181713407607,
+     "state_auc_pre": 0.6511075949367089,
+     "panel_pre": 0.74,
+     "panel_post": 0.9358974358974359,
+     "six": 0.851963746223565,
+     "revision_auc": 0.9342560553633218
+    },
+    "held_out": {
+     "state_auc_post": 0.8613138686131386,
+     "state_auc_pre": 0.6493275316455697,
+     "panel_pre": 0.7,
+     "panel_post": 0.8846153846153846,
+     "six": 0.8277945619335347,
+     "revision_auc": 0.8996539792387543
+    }
+   },
+   "self_reconsider": {
+    "trained_with": {
+     "state_auc_post": 0.7539619651347068,
+     "state_auc_pre": 0.6511075949367089,
+     "panel_pre": 0.74,
+     "panel_post": 0.7777777777777778,
+     "six": 0.7494407158836689,
+     "revision_auc": 0.7085106382978723
+    },
+    "held_out": {
+     "state_auc_post": 0.7343502377179081,
+     "state_auc_pre": 0.6556566455696202,
+     "panel_pre": 0.7,
+     "panel_post": 0.75,
+     "six": 0.7472035794183445,
+     "revision_auc": 0.776595744680851
+    }
+   }
+  },
+  "11": {
+   "debate": {
+    "trained_with": {
+     "state_auc_post": 0.7803859160533121,
+     "state_auc_pre": 0.6750801282051282,
+     "panel_pre": 0.68,
+     "panel_post": 0.7142857142857143,
+     "six": 0.6747572815533981,
+     "revision_auc": 0.8103448275862069
+    },
+    "held_out": {
+     "state_auc_post": 0.7793912870499303,
+     "state_auc_pre": 0.6806891025641025,
+     "panel_pre": 0.72,
+     "panel_post": 0.7142857142857143,
+     "six": 0.7135922330097088,
+     "revision_auc": 0.8275862068965517
+    }
+   },
+   "debate_answer_only": {
+    "trained_with": {
+     "state_auc_post": 0.7345592644413352,
+     "state_auc_pre": 0.6750801282051282,
+     "panel_pre": 0.68,
+     "panel_post": 0.7105263157894737,
+     "six": 0.6487804878048781,
+     "revision_auc": 0.7903225806451613
+    },
+    "held_out": {
+     "state_auc_post": 0.7301619028582851,
+     "state_auc_pre": 0.6702724358974359,
+     "panel_pre": 0.72,
+     "panel_post": 0.6842105263157895,
+     "six": 0.6585365853658537,
+     "revision_auc": 0.8064516129032258
+    }
+   },
+   "misleading_one": {
+    "trained_with": {
+     "state_auc_post": 0.8843283582089553,
+     "state_auc_pre": 0.6750801282051282,
+     "panel_pre": 0.68,
+     "panel_post": 0.8461538461538461,
+     "six": 0.8126888217522659,
+     "revision_auc": 0.898989898989899
+    },
+    "held_out": {
+     "state_auc_post": 0.8750981932443048,
+     "state_auc_pre": 0.6722756410256411,
+     "panel_pre": 0.74,
+     "panel_post": 0.8205128205128205,
+     "six": 0.8126888217522659,
+     "revision_auc": 0.8754208754208754
+    }
+   },
+   "self_reconsider": {
+    "trained_with": {
+     "state_auc_post": 0.7630859375,
+     "state_auc_pre": 0.6750801282051282,
+     "panel_pre": 0.68,
+     "panel_post": 0.7222222222222222,
+     "six": 0.7337807606263982,
+     "revision_auc": 0.6989473684210527
+    },
+    "held_out": {
+     "state_auc_post": 0.73203125,
+     "state_auc_pre": 0.6772836538461539,
+     "panel_pre": 0.7,
+     "panel_post": 0.7083333333333334,
+     "six": 0.7293064876957495,
+     "revision_auc": 0.6905263157894737
+    }
+   }
+  },
+  "12": {
+   "debate": {
+    "trained_with": {
+     "state_auc_post": 0.7525038520801233,
+     "state_auc_pre": 0.720438377235147,
+     "panel_pre": 0.66,
+     "panel_post": 0.7380952380952381,
+     "six": 0.6699029126213593,
+     "revision_auc": 0.819672131147541
+    },
+    "held_out": {
+     "state_auc_post": 0.7530816640986132,
+     "state_auc_pre": 0.720438377235147,
+     "panel_pre": 0.66,
+     "panel_post": 0.7619047619047619,
+     "six": 0.7038834951456311,
+     "revision_auc": 0.8469945355191257
+    }
+   },
+   "debate_answer_only": {
+    "trained_with": {
+     "state_auc_post": 0.7205479452054795,
+     "state_auc_pre": 0.720438377235147,
+     "panel_pre": 0.66,
+     "panel_post": 0.6842105263157895,
+     "six": 0.6341463414634146,
+     "revision_auc": 0.7375886524822695
+    },
+    "held_out": {
+     "state_auc_post": 0.7201565557729941,
+     "state_auc_pre": 0.720438377235147,
+     "panel_pre": 0.68,
+     "panel_post": 0.6842105263157895,
+     "six": 0.6439024390243903,
+     "revision_auc": 0.7659574468085106
+    }
+   },
+   "misleading_one": {
+    "trained_with": {
+     "state_auc_post": 0.8718900854066097,
+     "state_auc_pre": 0.720438377235147,
+     "panel_pre": 0.66,
+     "panel_post": 0.8974358974358975,
+     "six": 0.824773413897281,
+     "revision_auc": 0.8880597014925373
+    },
+    "held_out": {
+     "state_auc_post": 0.8620497586334942,
+     "state_auc_pre": 0.7167852336089213,
+     "panel_pre": 0.72,
+     "panel_post": 0.8717948717948718,
+     "six": 0.8277945619335347,
+     "revision_auc": 0.8843283582089553
+    }
+   },
+   "self_reconsider": {
+    "trained_with": {
+     "state_auc_post": 0.7831210796426535,
+     "state_auc_pre": 0.720438377235147,
+     "panel_pre": 0.66,
+     "panel_post": 0.7638888888888888,
+     "six": 0.738255033557047,
+     "revision_auc": 0.6841085271317829
+    },
+    "held_out": {
+     "state_auc_post": 0.7627827409237787,
+     "state_auc_pre": 0.7244760622957124,
+     "panel_pre": 0.68,
+     "panel_post": 0.7916666666666666,
+     "six": 0.7494407158836689,
+     "revision_auc": 0.7558139534883721
+    }
+   }
+  }
+ }
+}

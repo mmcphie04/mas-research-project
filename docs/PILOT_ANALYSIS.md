@@ -151,6 +151,14 @@ answers at this n; the original vote is 9 questions below the panel-optimal ceil
 
 ## 3. Probe search (`scripts/probe_search.py` → `artifacts/pilot12b/probe_search/`)
 
+> **Corrected 2026-10-13 — read docs/PROBE_AUDIT.md first.** The numbers in this section were
+> produced at `7787b68`, before three corrections: revision AUROC pooled score differences across
+> fold models; ensemble and combination scores were standardized within the held-out fold; and the
+> logistic output comparator omitted the per-letter log-probabilities. The audit's before/after
+> table says which statements survive. Against a matched, tuned output model, the activation
+> advantage is confined to ranking within revised debate panels and to revision direction, with
+> intervals that include zero.
+
 Requested after §2: try reduced-dimension probes and keep trying until a probe reliably predicts,
 or the activations look uninformative. Exploratory and on the pilot pool only; how the search
 could fool itself is part of the result.
@@ -181,13 +189,13 @@ could fool itself is part of the result.
    redone inside each outer training fold -- gives, on the outer questions, 0.64–0.73, 0.62–0.71
    and 0.59–0.69 (two outer seeds), while the chosen candidates' inner estimates were 0.77–0.85.
    With 120 questions, picking one layer from hundreds mostly picks noise.
-2. *Layer ensembles fix this.* Averaging fold-standardized scores over a band of layers needs no
-   layer choice. Nested CV over 48 ensembles (4 positions × raw/letter × mean-difference/PCA16 ×
+2. *Layer ensembles did better in this pilot.* Averaging scores over a band of layers (here
+   standardized within the held-out fold; corrected in the audit) needs no layer choice. Nested CV over 48 ensembles (4 positions × raw/letter × mean-difference/PCA16 ×
    layers 12–24, 21–33, 15–39), three selection criteria × three outer seeds: within panel 0.70–0.73
    and revisions 0.69–0.74 averaged over seeds (single runs 0.66–0.76 and 0.63–0.81);
    the selections converge on the position before the stated answer letter, letter-centered,
    PCA16, layers 21–33.
-3. *A recipe declared before those runs* -- readout position, letter-centered, mean difference,
+3. *A recipe fixed after the screen, before the ensemble and follow-up runs* -- readout position, letter-centered, mean difference,
    layers 15–39 averaged (chosen a priori for the template-fixed position and the simplest method;
    the band avoids picking a peak) -- on six CV partitions:
 
@@ -232,23 +240,28 @@ could fool itself is part of the result.
    score(after) > score(before): every scorer 68–71. (`combination.json`.)
 
 **Interpretation, with the cheaper explanations.**
-- The activations reliably contain information about whether an answer is correct: a simple,
-  low-variance probe ranks states, agents within a panel, and the two sides of a revision at
-  AUROC ≈ 0.72–0.77, stable over six partitions, transferring to an unseen condition, and not
-  explained by answer length. "No useful information" is ruled out for this pilot.
+- In this pilot, a simple, low-variance activation probe ranked states, agents within a panel,
+  and the two sides of a revision above chance on held-out questions. The pre-correction values
+  were 0.72–0.77; the corrected natural-debate values are in the audit. The probe was stable over
+  six partitions, transferred to an unseen condition, and was not explained by answer length.
+  This is exploratory evidence of correctness information, measured on the same 120 questions
+  that shaped the recipe.
 - Whether that information goes *beyond* output-only information is not established at 120
   questions. For overall correctness the outputs (with panel agreement) are as good or better;
   for ranking agents within a panel and for the direction of a revision, adding activations helps
   by roughly +0.03 to +0.09 AUROC depending on the comparator, with intervals at or just above
-  zero. The residual after removing all linear output information still ranks revisions at about
-  0.67, which is the strongest single hint that something non-output is there.
+  zero. Against the matched, tuned comparator of the audit, the gain survives only within revised
+  debate panels. The residual after removing all linear output information still ranks revisions
+  at about 0.67. That shows the remaining signal is not a *linear* function of the outputs, not
+  that it is unavailable from them (audit, item 7).
 - Within-panel pairs always involve two different chosen options, so a probe that scored the
   *option* (how plausible the model finds it) rather than the *agent's state* would look the same;
   correctness labels cannot separate the two. For gating, either serves.
 - Post-revision states attend to the peers' answers; linear agreement is in the comparator and
   is regressed out above, but nonlinear uses of peer context remain possible.
-- The declared recipe was fixed after the screen (a mild selection); the nested estimate over 48
-  ensembles (item 2) is the honest bound for the search.
+- The recipe was fixed after the screen. The nested estimate over 48 ensembles (item 2)
+  estimates that particular selection procedure. It does not undo the earlier recipe-family
+  choices made on this pilot, and it is not a bound.
 
 **For the main run** (decisions for the preregistration, not made here): if this is to be the
 primary probe, specify it now -- pooled all-state correctness probe, layer-band ensemble,

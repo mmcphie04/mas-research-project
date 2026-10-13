@@ -1,6 +1,6 @@
 # Preregistration — DRAFT, not yet committed
 
-**Status:** draft, revised 2026-10-10 against the code at the reviewed commit. Not in force until
+**Status:** draft, revised 2026-10-10 against the code at the reviewed commit; §10 (validation tranche) added 2026-10-13. Not in force until
 the author and advisor confirm the checklist (§8), date it, and commit it **after the pilot and
 before any main-pool question is generated.** Values in this draft are proposals to confirm;
 the only items left open are N (from the pilot, by the §9 rule) and the remaining budget.
@@ -21,7 +21,9 @@ probabilities and the observable debate already tell us, well enough to change p
   session and checked on every resume (`mad/job.py`).
 - **Data and estimand:** MMLU-Pro test split in one fixed master order — subjects interleaved
   round-robin; within a subject, by a seeded hash of the id (seed 7) (`mad.job.master_order`).
-  The first 120 are the **pilot pool**; the **main pool** is the rest. A main run of N questions
+  The first 120 are the **pilot pool**; the **main pool** is the rest -- or, once the validation
+  tranche (§10) is reserved, everything after position 320 (positions 121–320 are the validation
+  pool; the driver refuses overlapping jobs). A main run of N questions
   is the first N of the main pool, so it holds roughly equal numbers per subject. **Every
   accuracy is therefore a subject-balanced estimate, not an estimate for MMLU-Pro's natural
   subject mix.**
@@ -218,8 +220,51 @@ larger N requires amending this cap here before any main data is generated). It
 is computed from the pilot report, written into §8, and frozen -- together with the split made
 for exactly those N questions -- before any main-pool question is generated.
 
+## 10. Validation tranche (DRAFT — to be dated before its collection starts)
+
+A development step between the pilot and the confirmation run (docs/NEXT_STEP_MEMO.md;
+collection specification docs/VALIDATION_JOB.md). Its results may change the main design, so it
+is **not** the confirmatory test. Everything below is fixed before any of its questions are
+generated.
+
+- **Questions:** master-order positions 121–320 (`--pool validation --pilot-size 120
+  --validation-size 200`). From then on the main/confirmation pool starts at position 321.
+- **Conditions:** shared round 0, `debate`, `independent` (three fresh first-prompt answers);
+  optional `self_reconsider` on the first 100, under the usage rule in docs/VALIDATION_JOB.md.
+- **Scorers, frozen:** `scripts/probe_validate.py freeze` fits on all 120 pilot questions, all
+  four pilot conditions pooled:
+  - R1 `readout_last:letter:meandiff:15-39` (layers 15, 18, …, 39);
+  - R2 `before_stated_answer:letter:pca16:21-33` (layers 21, 24, 27, 30, 33);
+  - `out_lr[full]` (all output features; C from {0.001, 0.01, 0.1, 1} by grouped inner-CV
+    log-loss), `out_hgb[full]`, and the equal-weight sums with each activation scorer.
+
+  The SHA-256 of the fitted pickle is recorded here at freezing: `1a9b2ed58809fae60cf0672fd510bd3023738239ae61677ba7411f34c7399716` (frozen at `8a59105`).
+  `probe_validate.py apply` scores the new archive without refitting, and refuses if the output
+  feature columns differ. All states are read after the answer is written: these are
+  retrospective candidate scorers, not pre-generation gates.
+- **Training-population shift:** the frozen scorers never saw `independent` states. Report, per
+  condition, the Platt calibration-in-the-large (mean predicted vs observed) and round-0 ranking
+  AUROC next to the pilot's out-of-fold values. A shift changes how probabilities are read, not
+  the ranking endpoints.
+- **Endpoints** (natural debate primary; other branches reported separately; question bootstrap,
+  10,000 draws; one frozen model, so pairs never cross fitted models):
+  1. Six-candidate AUROC, revised-panel AUROC, revision AUROC (helpful vs harmful) for R1 and
+     R2, each with its paired difference from `out_lr[full]`, with pair and question counts.
+  2. Questions correct under: original, revised and pooled-six votes (preregistered tie-break,
+     plus the random tie-break expectation); best first answer, best of the debate six and best
+     of the independent six, by each frozen scorer; the zero-threshold gate. Paired against
+     pooled-six voting and against the matched output selector, with wins, losses and ids.
+  3. Coverage (any correct) of the 3 first answers, the debate six and the independent six; how
+     often a correct option is new in each branch.
+- **Decision rules D1–D4** (docs/NEXT_STEP_MEMO.md), applied as written. D1: R1 or R2 has both
+  six-candidate and revision AUROC intervals above 0.5. D2: the same recipe's activation or
+  equal-weight score beats `out_lr[full]` by ≥ +0.05 on revision or revised-panel AUROC, with the
+  interval's lower bound above 0. D3: its best-of-six is at least pooled-six voting and the
+  matched output selector. D4: best-of-six and coverage of the independent six vs the debate six.
+
 ## Deviation log
 
 | date | change | reason | made before or after seeing main-pool results |
 |---|---|---|---|
 | 2026-10-12 (draft, pre-dating) | model selection by grouped CV log-loss instead of AUROC; monotone calibration | found on the pilot's exploratory analysis: AUROC selection chose near-constant models and Platt slopes reversed rankings (docs/PILOT_ANALYSIS.md) | before any main-pool data exists |
+| 2026-10-13 (draft, pre-dating) | revision AUROC compared only within one fitted model's (condition, fold) cell; scores normalized from training-only cross-fitted references; validation pool (positions 121–320) reserved before the main pool; frozen pilot scorers for the validation tranche | audit of the pilot probe search (docs/PROBE_AUDIT.md): the earlier metric pooled score differences across fold models and ensembles were standardized within the evaluated fold | before any validation- or main-pool data exists |
