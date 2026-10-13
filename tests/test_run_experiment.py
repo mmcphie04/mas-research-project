@@ -285,6 +285,27 @@ def test_pilot_and_main_pools_are_disjoint(driver, tmp_path):
     assert not ids["p"] & ids["m"]
 
 
+def test_pilot_validation_and_main_pools_are_disjoint(driver, tmp_path):
+    sizes = ["--pilot-size", "8", "--validation-size", "8"]
+    driver.main(_args(tmp_path, "--pool", "pilot", *sizes, n=8, name="p"))
+    driver.main(_args(tmp_path, "--pool", "validation", *sizes, n=8, name="v"))
+    driver.main(_args(tmp_path, "--pool", "main", *sizes, n=8, name="m"))
+    ids = {n: [q["id"] for q in json.loads((tmp_path / f"{n}-job.json").read_text())["questions"]]
+           for n in ("p", "v", "m")}
+    assert all(len(v) == 8 for v in ids.values())
+    assert not set(ids["p"]) & set(ids["v"]) and not set(ids["v"]) & set(ids["m"]) and not set(ids["p"]) & set(ids["m"])
+    v = json.loads((tmp_path / "v-job.json").read_text())
+    assert v["identity"]["pool"] == {**v["identity"]["pool"], "name": "validation", "validation_size": 8}
+
+
+def test_a_job_overlapping_another_pools_questions_is_refused(driver, tmp_path):
+    """A main job that forgets the reserved validation tranche would start on its questions."""
+    driver.main(_args(tmp_path, "--pool", "validation", "--pilot-size", "8", "--validation-size", "8", n=8, name="v"))
+    with pytest.raises(SystemExit, match="shares questions"):
+        driver.main(_args(tmp_path, "--pool", "main", "--pilot-size", "8", n=8, name="m"))
+    assert not (tmp_path / "m-job.json").exists()
+
+
 def test_time_cap_persists_across_sessions(driver, tmp_path):
     assert driver.main(_args(tmp_path, "--max-hours", "0")) == 0
     status = json.loads((tmp_path / "t-status.json").read_text())
@@ -570,7 +591,7 @@ def test_notebook_defaults_to_smoke_and_guards_collection_by_stage():
     settings = next(c for c in cells if c.startswith("STAGE"))
     assert 'STAGE       = "smoke"' in settings, "Run all must default to the smoke test only"
     collect = next(c for c in cells if "run(BASE_CMD)" in c)
-    assert 'if STAGE in ("pilot", "main")' in collect
+    assert 'if STAGE in ("pilot", "validation", "main")' in collect
     smoke = next(c for c in cells if '"--smoke"' in c)
     assert 'if STAGE == "smoke"' in smoke
 
@@ -612,6 +633,14 @@ def test_notebook_main_stage_shows_no_outcomes_and_needs_a_cumulative_cap():
     settings = next(c for c in cells if c.startswith("STAGE"))
     assert "MAIN_MAX_HOURS = None" in settings and "MAX_HOURS = MAIN_MAX_HOURS" in settings
     summary = next(c for c in cells if "scripts/summarize_run.py" in c)
-    main_branch = summary.split('elif STAGE == "main":')[1].split("else:")[0]
+    main_branch = summary.split('elif STAGE in ("validation", "main"):')[1].split("else:")[0]
     assert "summarize_run" not in main_branch and "pilot_report" not in main_branch
     assert "verify_archive" in main_branch
+
+
+def test_notebook_validation_stage_needs_a_cap_and_reserves_its_questions_from_main():
+    _, cells = _code_cells()
+    settings = next(c for c in cells if c.startswith("STAGE"))
+    assert "VALIDATION_MAX_HOURS  = None" in settings and "MAX_HOURS = VALIDATION_MAX_HOURS" in settings
+    src = "\n".join(cells)
+    assert '"--validation-size", str(VALIDATION_SIZE)' in src  # passed to every stage, so main starts after it

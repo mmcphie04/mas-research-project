@@ -54,6 +54,7 @@ from mad.job import (  # noqa: E402
     chunk_tag,
     master_order,
     open_job,
+    pool_overlaps,
     select,
 )
 from mad.multi import run_chunk  # noqa: E402
@@ -427,9 +428,11 @@ def main(argv=None) -> int:
     ap.add_argument("--out-root", required=True, help="where runs are written (a Drive path on Colab)")
     ap.add_argument("--name", required=True, help="the job name; prefix for every run directory")
     ap.add_argument("--dataset", choices=sorted(DATASETS), default="mmlu-pro")
-    ap.add_argument("--pool", choices=["pilot", "main"], default="main",
+    ap.add_argument("--pool", choices=["pilot", "validation", "main"], default="main",
                     help="pilot: the first --pilot-size questions of the fixed order; main: the rest")
     ap.add_argument("--pilot-size", type=int, default=120)
+    ap.add_argument("--validation-size", type=int, default=0,
+                    help="questions reserved after the pilot pool for validation; the main pool starts after them")
     ap.add_argument("--n-questions", type=int, default=60)
     ap.add_argument("--conditions", nargs="+", default=["self_reconsider", "debate", "misleading_one"],
                     choices=sorted(CONDITION_SPECS))
@@ -491,13 +494,19 @@ def main(argv=None) -> int:
         args.dataset = parent["identity"]["dataset"]["key"]
         args.pool = parent["identity"]["pool"]["name"]
         args.pilot_size = parent["identity"]["pool"]["pilot_size"]
+        args.validation_size = parent["identity"]["pool"].get("validation_size", 0)
         cfg.data.dataset, cfg.data.split = DATASETS[args.dataset]
         intended, chunk = _child_questions(out_root, parent, args.subset_n), parent["identity"]["chunk_size"]
         n_total = len(intended)
     else:
         pool = load_pool(args.dataset, cfg)
         master = master_order(pool, cfg.data.sample_seed)
-        intended = select(master, args.pool, n_total, args.pilot_size)
+        intended = select(master, args.pool, n_total, args.pilot_size, args.validation_size)
+        clash = pool_overlaps(out_root, args.pool, args.dataset, [q.question_id for q in intended], name)
+        if clash and not args.smoke:
+            raise SystemExit(f"{name} ({args.pool} pool) shares questions with job(s) of another pool in "
+                             f"{out_root}: { {k: len(v) for k, v in clash.items()} }. Check --pilot-size / "
+                             "--validation-size.")
     # The split is checked BEFORE any model is loaded, so a main run with a missing or wrong split
     # costs nothing.
     split_info, split_src = None, None
@@ -553,7 +562,7 @@ def main(argv=None) -> int:
         mine = build_identity(name=name, cfg=cfg, dataset_key=args.dataset, pool=args.pool,
                               pilot_size=args.pilot_size, chunk_size=chunk, conditions={},
                               templates_hash=prompt_hashes(P.TEMPLATES), backend_desc=desc,
-                              master_ids_sha="")
+                              master_ids_sha="", validation_size=args.validation_size)
         for k in ("config", "prompt_template_hashes", "backend"):
             if mine[k] != parent["identity"][k]:
                 raise SystemExit(f"a child job must use its parent's {k}; it differs")
@@ -564,7 +573,8 @@ def main(argv=None) -> int:
         identity = build_identity(
             name=name, cfg=cfg, dataset_key=args.dataset, pool=args.pool, pilot_size=args.pilot_size,
             chunk_size=chunk, conditions={c["name"]: CONDITION_SPECS[c["name"]] for c in conds_all},
-            templates_hash=prompt_hashes(P.TEMPLATES), backend_desc=desc, master_ids_sha=master_sha)
+            templates_hash=prompt_hashes(P.TEMPLATES), backend_desc=desc, master_ids_sha=master_sha,
+            validation_size=args.validation_size)
         chunks = None
     if split_info is not None:
         identity["split"] = split_info

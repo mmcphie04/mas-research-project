@@ -14,8 +14,10 @@ The job file fixes all of those once, and every later session must match it or s
 Question order. The dataset is put in one fixed MASTER ORDER: subjects interleaved round-robin,
 each subject's questions in an order set by a seeded hash of their ids. Any prefix is therefore
 subject-balanced, and asking for more questions APPENDS to the existing ones instead of drawing a
-new sample. The first ``pilot_size`` questions of the master order are the pilot pool; the main
-pool is everything after it, so pilot questions can never reach the main test set.
+new sample. The first ``pilot_size`` questions of the master order are the pilot pool; the next
+``validation_size`` (0 unless reserved) are the validation pool; the main pool is everything after
+both, so pilot and validation questions can never reach the main (confirmation) test set. The
+driver also refuses a job whose questions overlap a job of a different pool in the same out_root.
 """
 
 from __future__ import annotations
@@ -65,15 +67,44 @@ def master_order(pool: list[Question], seed: int) -> list[Question]:
     return order
 
 
-def select(master: list[Question], pool: str, n: int, pilot_size: int) -> list[Question]:
-    if pool not in ("pilot", "main"):
-        raise ValueError(f"pool must be 'pilot' or 'main', got {pool!r}")
-    if pilot_size >= len(master):
-        raise ValueError(f"pilot_size {pilot_size} leaves no main pool in {len(master)} questions")
-    src = master[:pilot_size] if pool == "pilot" else master[pilot_size:]
+POOLS = ("pilot", "validation", "main")
+
+
+def select(master: list[Question], pool: str, n: int, pilot_size: int, validation_size: int = 0) -> list[Question]:
+    if pool not in POOLS:
+        raise ValueError(f"pool must be one of {POOLS}, got {pool!r}")
+    if validation_size < 0 or (pool == "validation" and validation_size == 0):
+        raise ValueError("the validation pool needs validation_size > 0")
+    if pilot_size + validation_size >= len(master):
+        raise ValueError(f"pilot_size {pilot_size} + validation_size {validation_size} leaves no main pool "
+                         f"in {len(master)} questions")
+    src = {"pilot": master[:pilot_size],
+           "validation": master[pilot_size:pilot_size + validation_size],
+           "main": master[pilot_size + validation_size:]}[pool]
     if n > len(src):
         raise ValueError(f"asked for {n} questions; the {pool} pool has {len(src)}")
     return src[:n]
+
+
+def pool_overlaps(out_root: Path, pool: str, dataset_key: str, question_ids: list[str], name: str) -> dict:
+    """Jobs in ``out_root`` from a DIFFERENT pool (same dataset) that share questions with this
+    one: {job name: [shared ids]}. A pilot or validation question in a main job would leak
+    development data into the confirmation set."""
+    mine, out = set(question_ids), {}
+    for p in sorted(Path(out_root).glob("*-job.json")):
+        try:
+            j = json.loads(p.read_text())
+        except (OSError, ValueError):
+            continue
+        ident = j.get("identity", {})
+        if ident.get("name") == name or ident.get("dataset", {}).get("key") != dataset_key:
+            continue
+        if ident.get("pool", {}).get("name") == pool:
+            continue
+        shared = mine & {q["id"] for q in j.get("questions", [])}
+        if shared:
+            out[ident.get("name", p.name)] = sorted(shared)
+    return out
 
 
 def chunks_of(ids: list[str], size: int) -> list[list[str]]:
@@ -106,13 +137,14 @@ def _atomic_write(path: Path, text: str) -> None:
 
 
 def build_identity(*, name, cfg, dataset_key, pool, pilot_size, chunk_size, conditions,
-                   templates_hash, backend_desc, master_ids_sha) -> dict:
+                   templates_hash, backend_desc, master_ids_sha, validation_size: int = 0) -> dict:
     return {
         "name": name,
         "dataset": {"key": dataset_key, "name": cfg.data.dataset, "split": cfg.data.split,
                     "revision": cfg.data.dataset_revision},
         "pool": {"name": pool, "pilot_size": pilot_size, "order_seed": cfg.data.sample_seed,
-                 "master_order_sha256": master_ids_sha},
+                 "master_order_sha256": master_ids_sha,
+                 **({"validation_size": validation_size} if validation_size else {})},
         "chunk_size": chunk_size,
         "conditions": conditions,
         "config": _strip_execution(cfg.to_dict()),

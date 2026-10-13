@@ -6,12 +6,18 @@ Results and their interpretation: docs/PILOT_ANALYSIS.md section 3.
     python scripts/probe_search.py nested   --out DIR --recipes POS:TRANSFORM:METHOD ... --layers ...
     python scripts/probe_search.py nested-ens --out DIR --recipes POS:TRANSFORM:METHOD:A-B ... --fixed R
     python scripts/probe_search.py followup --out DIR --recipe R [--layer L]   # controls for one recipe
-    python scripts/probe_search.py combine  --out FILE --runs TAG_seedN ...    # post hoc sum; decisions
+
+Corrected after 7787b68 (docs/PROBE_AUDIT.md): revision AUROC compares score differences only
+inside one (condition, fold) cell; ensemble layers are normalized with training-only statistics
+(cross-fitted reference scores) instead of the held-out fold's own mean and SD; residualizing
+covariates are imputed from training rows. The saved results in artifacts/pilot12b/probe_search/
+were produced BEFORE these corrections. The post hoc ``combine`` command is retired; its
+corrected successor is scripts/probe_validate.py (fitted, batch-invariant scorers).
 
 Every answer-bearing state is a training example for ONE correctness probe: the 360 round-0
 states (shared by all conditions) and the 1,440 revised states of the four conditions -- 1,800
 states, always split by question. A single-layer recipe reads one layer at one token position of
-the state being scored; an ensemble recipe averages fold-standardized scores over a layer band.
+the state being scored; an ensemble recipe averages training-normalized scores over a layer band.
 
 Metrics (out of fold, folds by question; scores from different fold models are compared only in
 the per-fold auroc_* averages):
@@ -19,8 +25,9 @@ the per-fold auroc_* averages):
   within_panel           pairs of the three agents answering the same prompt, different labels
   within_q               pairs within a question across conditions (a condition-recognising probe
                          could exploit it; reported, not relied on)
-  rev_auc                AUROC of score(after) - score(before), beneficial vs harmful, within each
-                         condition, averaged -- invariant to constant phase or condition offsets
+  rev_auc                beneficial vs harmful revisions, score(after) - score(before), compared only
+                         inside a (condition, fold) cell and pooled over cells by pair count --
+                         invariant to constant offsets and to rescaling any one fold
 """
 
 from __future__ import annotations
@@ -37,7 +44,7 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-CONDS = ("debate", "debate_answer_only", "self_reconsider", "misleading_one")
+CONDS = ("debate", "debate_answer_only", "self_reconsider", "misleading_one")  # the pilot's; not assumed by the code
 POSITIONS = ("readout_last", "generation_last", "before_stated_answer", "stated_answer")
 LP_COLS = {"readout": "readout_logprobs", "generation_last": "pos_generation_last_logprobs",
            "before_stated_answer": "pos_before_stated_answer_logprobs",
@@ -47,18 +54,42 @@ LP_COLS = {"readout": "readout_logprobs", "generation_last": "pos_generation_las
 # ----------------------------------------------------------------------------- cache
 
 
-def build_cache(root: Path, prefix: str, cache: Path, states_only: bool = False) -> None:
+def discover_conditions(root: Path, prefix: str) -> list[str]:
+    """Condition views in an archive: <prefix>-<condition>/ with agent_states and an activation
+    index (chunk directories -cNNN and round-0 caches are not views)."""
+    out = []
+    for p in sorted(root.glob(f"{prefix}-*/agent_states.parquet")):
+        name = p.parent.name[len(prefix) + 1:]
+        if (p.parent / "activation_index.parquet").exists() and not name.startswith("round0") \
+                and not (len(name) > 5 and name[-5:-3] == "-c" and name[-3:].isdigit()):
+            out.append(name)
+    return out
+
+
+def build_cache(root: Path, prefix: str, cache: Path, states_only: bool = False, conditions=None) -> None:
     """Layer-major float32 copies of every pre/post/peer_exposure state, plus one table of keys,
-    labels and letter-invariant output features. Round-0 states are taken once (from debate)."""
+    labels and letter-invariant output features. Conditions are discovered from the archive
+    unless given. Round-0 states are taken once (from the first condition), after checking that
+    every condition shares them: identical first answers and the same round-0 shard files."""
     from mad.analysis.states import StateBank
 
+    conds = list(conditions) if conditions else discover_conditions(root, prefix)
+    if not conds:
+        raise ValueError(f"no condition views under {root} for {prefix}")
     cache.mkdir(parents=True, exist_ok=True)
     banks, parts = {}, []
-    for c in CONDS:
+    first_pre, first_paths = None, None
+    for c in conds:
         b = StateBank(root / f"{prefix}-{c}")
         ix = b.index.copy()
         ix["bank_row"] = np.arange(len(ix))
-        if c != "debate":
+        pre_paths = set(ix.loc[ix.phase == "pre", "shard_path"].map(lambda x: Path(x).parent.name)) \
+            if "shard_path" in ix.columns else set()
+        if first_paths is None:
+            first_paths = pre_paths
+        elif pre_paths != first_paths:
+            raise ValueError(f"{c}: round-0 states do not reference the same round-0 caches as {conds[0]}")
+        if c != conds[0]:
             ix = ix[ix.phase != "pre"]
         ix["bank"] = c
         banks[c] = b
@@ -66,10 +97,16 @@ def build_cache(root: Path, prefix: str, cache: Path, states_only: bool = False)
     keys = pd.concat(parts, ignore_index=True)
     keys["question_id"] = keys.question_id.astype(str)
     states = []
-    for c in CONDS:
+    for c in conds:
         s = pd.read_parquet(root / f"{prefix}-{c}" / "agent_states.parquet")
         s["question_id"] = s.question_id.astype(str)
-        if c != "debate":
+        pre = s[s.phase == "pre"].sort_values(["question_id", "agent_id"])[["question_id", "agent_id", "answer"]]
+        pre = pre.reset_index(drop=True)
+        if first_pre is None:
+            first_pre = pre
+        elif not pre.equals(first_pre):
+            raise ValueError(f"{c}: round-0 answers differ from {conds[0]}'s; round 0 is not shared")
+        if c != conds[0]:
             s = s[s.phase != "pre"]
         states.append(s)
     st = pd.concat(states, ignore_index=True)
@@ -80,18 +117,19 @@ def build_cache(root: Path, prefix: str, cache: Path, states_only: bool = False)
     keys.to_parquet(cache / "keys.parquet", index=False)
     if states_only:
         return
-    n_layers = banks["debate"].n_layers
+    n_layers = banks[conds[0]].n_layers
     for L in range(n_layers + 1):
         t = time.time()
-        X = np.empty((len(keys), banks["debate"].d_model), np.float32)
-        for c in CONDS:
+        X = np.empty((len(keys), banks[conds[0]].d_model), np.float32)
+        for c in conds:
             m = (keys.bank == c).to_numpy()
             X[m] = banks[c].layer(L)[keys.bank_row.to_numpy()[m]]
         if not np.isfinite(X).all():
             raise ValueError(f"non-finite activations at layer {L}")
         np.save(cache / f"L{L:02d}.npy", X)
         print(f"layer {L} {X.shape} {time.time() - t:.1f}s", flush=True)
-    (cache / "meta.json").write_text(json.dumps({"n_layers": n_layers, "root": str(root), "prefix": prefix}))
+    (cache / "meta.json").write_text(json.dumps({"n_layers": n_layers, "root": str(root), "prefix": prefix,
+                                                 "conditions": conds, "round0_from": conds[0]}))
 
 
 def _lp(series) -> np.ndarray:
@@ -196,18 +234,14 @@ class Data:
         return X, present
 
     def covs(self, kind: str) -> dict:
-        """Covariates for the residualizing transforms, NaN-filled with missing indicators."""
+        """Raw covariates (NaN where missing) for the residualizing transforms. Imputation values
+        and which missingness indicators exist are fitted on training rows inside ``transform``
+        (corrected after 7787b68, which imputed with whole-dataset means)."""
         out = {}
         for key, sets in (("rtext", ("ot",)), ("rout", ("of", "ol", "ot"))):
             if key in kind:
                 if key not in self._covs:
-                    M = self.output(sets)
-                    miss = ~np.isfinite(M)
-                    with np.errstate(all="ignore"):
-                        mu = np.nanmean(M, 0)
-                    M = np.where(miss, np.where(np.isfinite(mu), mu, 0.0), M)
-                    keep = miss.any(0)
-                    self._covs[key] = np.hstack([M, miss[:, keep].astype(float)])
+                    self._covs[key] = self.output(sets)
                 out[key] = self._covs[key]
         return out
 
@@ -268,6 +302,12 @@ def transform(X: np.ndarray, kind: str, tr: np.ndarray, letters: np.ndarray, pan
     for key in ("rtext", "rout"):
         if key in kind:
             Z = covs[key]
+            miss = ~np.isfinite(Z)
+            with np.errstate(all="ignore"):
+                fill = np.nanmean(Z[tr], 0)
+            fill = np.where(np.isfinite(fill), fill, 0.0)
+            ind = np.flatnonzero(miss[tr].any(0))  # indicators only for columns missing in TRAINING rows
+            Z = np.hstack([np.where(miss, fill, Z), miss[:, ind].astype(float)])
             mu, sd = Z[tr].mean(0), Z[tr].std(0) + 1e-6
             Zt = np.hstack([np.ones((len(Z), 1)), (Z - mu) / sd])
             B, *_ = np.linalg.lstsq(Zt[tr], X[tr], rcond=None)
@@ -351,13 +391,31 @@ def pair_auroc(y, s, groups) -> tuple[float, int]:
     return (num / den if den else float("nan")), den
 
 
+def _rev_cells(p: pd.DataFrame, folds: np.ndarray):
+    """(beneficial index, harmful index) pairs inside one (condition, fold) cell of the
+    revision table ``p`` -- both score differences come from the same fitted model."""
+    bi, hi = [], []
+    cell = p.condition.astype(str).to_numpy() + "|" + folds[p.post.to_numpy()].astype(str)
+    ben = p.beneficial.to_numpy()
+    for c in np.unique(cell):
+        b_ = np.flatnonzero((cell == c) & (ben == 1))
+        h_ = np.flatnonzero((cell == c) & (ben == 0))
+        if len(b_) and len(h_):
+            bi.append(np.repeat(b_, len(h_)))
+            hi.append(np.tile(h_, len(b_)))
+    if not bi:
+        return np.array([], int), np.array([], int)
+    return np.concatenate(bi), np.concatenate(hi)
+
+
 def metrics(D: Data, s: np.ndarray, folds: np.ndarray, present: np.ndarray, pairs: pd.DataFrame) -> dict:
-    """Ranking metrics that never compare scores from different fold models except auroc_*
-    (averaged per fold). ``within_q`` mixes conditions and phases of a question (a probe that
+    """Ranking metrics. ``within_q`` mixes conditions and phases of a question (a probe that
     recognises the condition from the prompt could exploit it); ``within_panel`` compares only
-    the three agents answering the same prompt. ``rev_auc``: AUROC of score(after) - score(before)
-    for beneficial vs harmful revisions, within each condition, averaged over conditions --
-    invariant to any constant offset between phases or conditions."""
+    the three agents answering the same prompt. ``auroc_*`` are per-fold AUROCs averaged.
+    ``rev_auc``: beneficial vs harmful revisions, score(after) - score(before), compared only
+    inside one (condition, fold) cell (one fitted model), pooled over cells by their pair counts;
+    ``rev_auc_debate`` the debate cells only. (Corrected after 7787b68, which pooled differences
+    across fold models within a condition; ``rev_auc_crossfold`` keeps that as a diagnostic.)"""
     y, st = D.y, D.states
     pre = (st.phase == "pre").to_numpy()
     out = {}
@@ -370,14 +428,16 @@ def metrics(D: Data, s: np.ndarray, folds: np.ndarray, present: np.ndarray, pair
     out["within_panel"], out["within_panel_pairs"] = pair_auroc(y[present], s[present], panels[present])
     m = present & pre
     out["within_panel_pre"], out["within_panel_pre_pairs"] = pair_auroc(y[m], s[m], panels[m])
-    ok = present[pairs.pre.to_numpy()] & present[pairs.post.to_numpy()]
-    p = pairs[ok]
+    ok = present[pairs.pre.to_numpy()] & present[pairs.post.to_numpy()] & (folds[pairs.post.to_numpy()] >= 0)
+    p = pairs[ok].reset_index(drop=True)
     d = s[p.post.to_numpy()] - s[p.pre.to_numpy()]
-    per = {c: auroc(p.beneficial.to_numpy()[(p.condition == c).to_numpy()], d[(p.condition == c).to_numpy()])
-           for c in sorted(p.condition.unique())}
-    out["rev_auc"] = float(np.nanmean(list(per.values())))
-    out["rev_auc_debate"] = per.get("debate", float("nan"))
-    out["rev_auc_pooled"] = auroc(p.beneficial.to_numpy(), d)
+    bi, hi = _rev_cells(p, folds)
+    c = (d[bi] > d[hi]) + 0.5 * (d[bi] == d[hi])
+    out["rev_auc"] = float(c.mean()) if len(c) else float("nan")
+    deb = (p.condition.to_numpy()[bi] == "debate")
+    out["rev_auc_debate"] = float(c[deb].mean()) if deb.any() else float("nan")
+    out["rev_pairs"], out["rev_pairs_debate"] = int(len(c)), int(deb.sum())
+    out["rev_auc_crossfold"] = auroc(p.beneficial.to_numpy(), d)
     out["rev_n"] = int(len(p))
     return out
 
@@ -448,39 +508,52 @@ def parse_ens(recipe: str):
     return parts[0], parts[1], parts[2], list(range(a, b + 1, step))
 
 
+def _layer_scores_trainnorm(D, X, present, kind, method, folds, train_ok, k_ref=5, seed=0):
+    """Held-out scores of one layer, each fold's scores normalized with statistics from that
+    fold's TRAINING rows only: cross-fitted reference scores (k_ref groups of training questions;
+    a model fitted without group r scores group r) give the mean and SD; the model applied to
+    the held-out rows is refitted on all training rows. (Before 7787b68's correction this used
+    the held-out fold's own mean and SD.)"""
+    s = np.full(len(D.y), np.nan)
+    letters = D.states.answer.to_numpy()
+    for f in np.unique(folds[folds >= 0]):
+        tr = (folds != f) & (folds >= 0) & present & train_ok
+        te = (folds == f) & present
+        rf = np.full(len(D.y), -1)
+        rf[tr] = make_folds(D.groups[tr], k_ref, seed + 7919 * int(f))
+        ref = np.full(len(D.y), np.nan)
+        for r in range(k_ref):
+            a_, b_ = tr & (rf != r), tr & (rf == r)
+            Xt = transform(X, kind, a_, letters, D.panels, D.covs(kind))
+            ref[b_] = fit_score(method, Xt[a_], D.y[a_], Xt[b_])
+        mu, sd = np.nanmean(ref[tr]), np.nanstd(ref[tr]) + 1e-9
+        Xt = transform(X, kind, tr, letters, D.panels, D.covs(kind))
+        s[te] = (fit_score(method, Xt[tr], D.y[tr], Xt[te]) - mu) / sd
+    return s
+
+
 def ensemble_config(D, recipe, present_rows, folds) -> np.ndarray:
-    """Out-of-fold scores averaged over a band of layers: each layer's held-out scores are
-    standardized within the fold (label-free) and averaged, so no single layer is chosen."""
+    """Out-of-fold scores averaged over a band of layers, each layer normalized with
+    training-only statistics (see _layer_scores_trainnorm), so no single layer is chosen and no
+    evaluation row influences another's score."""
     position, kind, method, layers = parse_ens(recipe)
-    acc, n = np.zeros(len(D.y)), 0
+    acc = np.zeros(len(D.y))
     for L in layers:
         X, present = D.X(L, position)
-        s = run_config(D, X, present & present_rows, D.states.answer.to_numpy(), D.panels, kind, method, folds)
-        for f in np.unique(folds[folds >= 0]):
-            m = (folds == f) & np.isfinite(s)
-            if m.sum() > 1:
-                s[m] = (s[m] - s[m].mean()) / (s[m].std() + 1e-9)
-        acc = acc + s
-        n += 1
-    return acc / n
+        acc = acc + _layer_scores_trainnorm(D, X, present & present_rows, kind, method, folds,
+                                            np.ones(len(D.y), bool))
+    return acc / len(layers)
 
 
 def ens_scores(D, recipe, folds, train_exclude=None) -> np.ndarray:
     """Layer-ensemble scores for every fold, optionally never training on ``train_exclude``
-    rows (still scoring them): used for leave-one-condition-out."""
+    rows (still scoring them): used for leave-one-condition-out. Training-only normalization."""
     position, kind, method, layers = parse_ens(recipe)
     excl = np.zeros(len(D.y), bool) if train_exclude is None else train_exclude
     acc = np.zeros(len(D.y))
     for L in layers:
         X, present = D.X(L, position)
-        s = np.full(len(D.y), np.nan)
-        for f in np.unique(folds[folds >= 0]):
-            tr = (folds != f) & (folds >= 0) & present & ~excl
-            te = (folds == f) & present
-            Xt = transform(X, kind, tr, D.states.answer.to_numpy(), D.panels, D.covs(kind))
-            z = fit_score(method, Xt[tr], D.y[tr], Xt[te])
-            s[te] = (z - z.mean()) / (z.std() + 1e-9)
-        acc = acc + s
+        acc = acc + _layer_scores_trainnorm(D, X, present, kind, method, folds, ~excl)
     return acc / len(layers)
 
 
@@ -613,10 +686,12 @@ def _boot_values(D, s, folds, present, pairs, W) -> dict:
 
     wp, wpp = per_q(present), per_q(present & pre)
     ok = present[pairs.pre.to_numpy()] & present[pairs.post.to_numpy()]
-    p = pairs[ok]
+    p = pairs[ok].reset_index(drop=True)
     d = s[p.post.to_numpy()] - s[p.pre.to_numpy()]
-    pq, ben = g[p.pre.to_numpy()], p.beneficial.to_numpy()
-    conds = sorted(p.condition.unique())
+    pq = g[p.pre.to_numpy()]
+    bi, hi = _rev_cells(p, folds)
+    conc = (d[bi] > d[hi]) + 0.5 * (d[bi] == d[hi])
+    deb = p.condition.to_numpy()[bi] == "debate"
 
     def wauc(yy, ss, ww):
         return roc_auc_score(yy, ss, sample_weight=ww) if 0 < (ww * yy).sum() < ww.sum() else np.nan
@@ -633,10 +708,9 @@ def _boot_values(D, s, folds, present, pairs, W) -> dict:
         out["auroc_pre"].append(np.nanmean(ap))
         out["within_panel"].append((w @ wp[0]) / (w @ wp[1]))
         out["within_panel_pre"].append((w @ wpp[0]) / (w @ wpp[1]))
-        per = [wauc(ben[(p.condition == c).to_numpy()], d[(p.condition == c).to_numpy()],
-                    w[pq[(p.condition == c).to_numpy()]]) for c in conds]
-        out["rev_auc"].append(np.nanmean(per))
-        out["rev_auc_debate"].append(per[conds.index("debate")] if "debate" in conds else np.nan)
+        pw = w[pq[bi]] * w[pq[hi]]  # a pair of events from two questions counts w_a * w_b times
+        out["rev_auc"].append(pw @ conc / pw.sum() if pw.sum() else np.nan)
+        out["rev_auc_debate"].append(pw[deb] @ conc[deb] / pw[deb].sum() if pw[deb].sum() else np.nan)
     return {k: np.array(v) for k, v in out.items()}
 
 
@@ -845,6 +919,7 @@ def main(argv=None) -> int:
     c.add_argument("--prefix", default="pilot12b")
     c.add_argument("--cache", default="runs/cache/probe12b")
     c.add_argument("--states-only", action="store_true", help="rebuild the state table, not the layers")
+    c.add_argument("--conditions", nargs="+", default=None, help="default: every condition view in the archive")
     s = sub.add_parser("screen")
     s.add_argument("--cache", default="runs/cache/probe12b")
     s.add_argument("--out", required=True)
@@ -884,49 +959,7 @@ def main(argv=None) -> int:
     ne.add_argument("--n-boot", type=int, default=2000)
     ne.add_argument("--jobs", type=int, default=11)
     ne.add_argument("--tag", default="nested_ens")
-    cb = sub.add_parser("combine", help="post hoc: equal-weight sum of output and activation scores; panel decisions")
-    cb.add_argument("--cache", default="runs/cache/probe12b")
-    cb.add_argument("--out", required=True)
-    cb.add_argument("--runs", nargs="+", required=True, help="score files: TAG_seedN (folds key 'folds' or 'outer')")
-    cb.add_argument("--act", default="act[fixed]", help="activation score key (e.g. act or act[fixed])")
-    cb.add_argument("--n-boot", type=int, default=2000)
     args = ap.parse_args(argv)
-    if args.cmd == "combine":
-        D = Data(Path(args.cache))
-        pairs = D.revision_pairs()
-
-        def zf(v, folds):
-            v = v.copy()
-            for f in np.unique(folds):
-                m = (folds == f) & np.isfinite(v)
-                v[m] = (v[m] - v[m].mean()) / (v[m].std() + 1e-9)
-            return v
-
-        report, rng = {}, np.random.default_rng(0)
-        for run in args.runs:
-            z = np.load(Path(args.cache) / f"scores_{run}.npz")
-            folds = z["folds"] if "folds" in z.files else z["outer"]
-            act_key = args.act if args.act in z.files else "act"
-            sc = {k: z[k] for k in ("out+text_lr", "out+text_hgb")}
-            sc["act"] = z[act_key]
-            sc["comb_lr"] = zf(sc["out+text_lr"], folds) + zf(sc["act"], folds)
-            sc["comb_hgb"] = zf(sc["out+text_hgb"], folds) + zf(sc["act"], folds)
-            seed = int(run.rsplit("seed", 1)[1])
-            rep = {"comparison": compare(D, sc, folds, pairs, refs=("out+text_lr", "out+text_hgb"), n_boot=args.n_boot,
-                                         seed=seed), "decisions": {}}
-            dec = {k: decisions(D, v) for k, v in sc.items()}
-            for k, d in dec.items():
-                rep["decisions"][k] = {}
-                for rule in ("gate", "pick_first", "best_of_six"):
-                    diff = (d[rule] - d["original_vote"]).to_numpy(float)
-                    boot = diff[rng.integers(0, len(diff), (10000, len(diff)))].mean(1)
-                    rep["decisions"][k][rule] = {"correct": int(d[rule].sum()), "original_vote": int(d["original_vote"].sum()),
-                                                 "minus_original": float(diff.mean()),
-                                                 "ci95": [float(np.quantile(boot, 0.025)), float(np.quantile(boot, 0.975))]}
-            report[run] = rep
-            print(run, {k: {r: v["correct"] for r, v in d.items()} for k, d in rep["decisions"].items()}, flush=True)
-        Path(args.out).write_text(json.dumps(report, indent=1))
-        return 0
     if args.cmd == "nested-ens":
         out = Path(args.out)
         out.mkdir(parents=True, exist_ok=True)
@@ -1003,14 +1036,17 @@ def main(argv=None) -> int:
                                          n_boot=args.n_boot, seed=seed)}
             rep["length_matched_within_panel"] = {k: matched_pairs(D, v, np.isfinite(v), qp, sp) for k, v in sc.items()}
             lo = {}
-            for c in CONDS:
+            for c in sorted(set(D.states.condition) - {"round0"}):
                 post_c = ((D.states.condition == c) & (D.states.phase == "post")).to_numpy()
                 sl = act(args.recipe, folds, post_c)
-                pc = pairs[pairs.condition == c]
+                pc = pairs[pairs.condition == c].reset_index(drop=True)
                 for name, v in (("trained_with", sc["act"]), ("held_out", sl)):
                     d = v[pc.post.to_numpy()] - v[pc.pre.to_numpy()]
+                    bi, hi = _rev_cells(pc, folds)  # within (condition, fold) cells
+                    cc = (d[bi] > d[hi]) + 0.5 * (d[bi] == d[hi])
                     m = (D.states.condition == c).to_numpy() & np.isfinite(v)
-                    lo.setdefault(c, {})[name] = {"rev_auc": auroc(pc.beneficial.to_numpy(), d),
+                    lo.setdefault(c, {})[name] = {"rev_auc": float(cc.mean()) if len(cc) else float("nan"),
+                                                  "rev_pairs": int(len(cc)),
                                                   "within_panel": pair_auroc(D.y[m], v[m], D.panels[m])[0]}
             rep["leave_condition_out"] = lo
             report["seeds"][str(seed)] = rep
@@ -1054,7 +1090,7 @@ def main(argv=None) -> int:
                 print(f"  {k:24s} {line}", flush=True)
         return 0
     if args.cmd == "cache":
-        build_cache(Path(args.root), args.prefix, Path(args.cache), args.states_only)
+        build_cache(Path(args.root), args.prefix, Path(args.cache), args.states_only, args.conditions)
         return 0
     if args.cmd == "screen":
         from joblib import Parallel, delayed

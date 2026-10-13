@@ -97,3 +97,28 @@ def test_residualizing_removes_linear_covariate_information():
     tr = np.ones(200, bool)
     R = PS.transform(X, "raw+rout", tr, np.zeros(200, int), np.arange(200), {"rout": Z})
     assert np.abs(R).max() < 0.1  # X was (almost) a linear function of Z
+
+
+def test_rev_auc_is_invariant_to_rescaling_one_fold():
+    """Reviewer's reproducer: fold 0 helpful delta 2 vs harmful 1; fold 1 helpful .2 vs harmful
+    .1. Within each fold the helpful revision ranks first, so rev_auc is 1.0 -- before and after
+    multiplying fold 0's scores by .1. (Pooling differences across folds gave .75.)"""
+    rows = []
+    for q, kind in enumerate(["helpful", "harmful", "helpful", "harmful"]):
+        pre_c, post_c = (0, 1) if kind == "helpful" else (1, 0)
+        rows += [{"condition": "round0", "question_id": f"q{q}", "agent_id": 0, "phase": "pre", "answer": 0,
+                  "correct": pre_c},
+                 {"condition": "debate", "question_id": f"q{q}", "agent_id": 0, "phase": "post", "answer": 1,
+                  "correct": post_c}]
+    st = pd.DataFrame(rows)
+    D = SimpleNamespace(states=st, y=st.correct.to_numpy(), groups=pd.factorize(st.question_id)[0],
+                        panels=PS.panel_ids(st))
+    pairs = pd.DataFrame([{"pre": 2 * q, "post": 2 * q + 1, "condition": "debate", "beneficial": int(q % 2 == 0)}
+                          for q in range(4)])
+    folds = np.repeat([0, 0, 1, 1], 2)
+    delta = np.repeat([2.0, 1.0, 0.2, 0.1], 2)
+    s = np.where(st.phase == "pre", 0.0, delta)
+    present = np.ones(len(s), bool)
+    assert PS.metrics(D, s, folds, present, pairs)["rev_auc"] == 1.0
+    assert PS.metrics(D, np.where(folds == 0, 0.1 * s, s), folds, present, pairs)["rev_auc"] == 1.0
+    assert PS.metrics(D, s, folds, present, pairs)["rev_auc_crossfold"] == 0.75

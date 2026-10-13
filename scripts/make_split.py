@@ -66,7 +66,9 @@ def main(argv=None) -> int:
     ap.add_argument("--out-root", help="existing job mode: where the job lives")
     ap.add_argument("--name", help="existing job mode: the job name")
     ap.add_argument("--dataset", help="selection mode (before generation): mmlu-pro | arc-challenge | ...")
-    ap.add_argument("--pool", choices=["pilot", "main"], default="main")
+    ap.add_argument("--pool", choices=["pilot", "validation", "main"], default="main")
+    ap.add_argument("--validation-size", type=int, default=0,
+                    help="questions reserved after the pilot pool for validation (as passed to the driver)")
     ap.add_argument("--pilot-size", type=int, default=120)
     ap.add_argument("--n-questions", type=int)
     ap.add_argument("--order-seed", type=int, default=7, help="data.sample_seed (master-order seed)")
@@ -95,9 +97,11 @@ def main(argv=None) -> int:
         data = DataConfig(sample_seed=args.order_seed)
         data.dataset, data.split = DATASETS[args.dataset]
         pool = load_pool(args.dataset, SimpleNamespace(data=data))
-        qs = select(master_order(pool, args.order_seed), args.pool, args.n_questions, args.pilot_size)
+        qs = select(master_order(pool, args.order_seed), args.pool, args.n_questions, args.pilot_size,
+                    args.validation_size)
         made_for = {"selection": {"dataset": args.dataset, "pool": args.pool, "pilot_size": args.pilot_size,
-                                  "n_questions": args.n_questions, "order_seed": args.order_seed}}
+                                  "n_questions": args.n_questions, "order_seed": args.order_seed,
+                                  **({"validation_size": args.validation_size} if args.validation_size else {})}}
     raw = make_splits(qs, tuple(args.fracs), seed=args.seed)
     assignment = {q: ("validation" if s == "val" else s) for q, s in raw.items()}
     counts = {s: sum(v == s for v in assignment.values()) for s in SPLITS}
