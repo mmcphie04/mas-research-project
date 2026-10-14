@@ -1,0 +1,212 @@
+{
+ "identity": {
+  "name": "smoke-val12b",
+  "dataset": {
+   "key": "mmlu-pro",
+   "name": "TIGER-Lab/MMLU-Pro",
+   "split": "test",
+   "revision": "b189ec765aa7ed75c8acfea42df31fdae71f97be"
+  },
+  "pool": {
+   "name": "validation",
+   "pilot_size": 120,
+   "order_seed": 7,
+   "master_order_sha256": "c4c67294e44a85e4de0be2cab8d26c630e0859b8b37e434c65c960f4fa471afd",
+   "validation_size": 200
+  },
+  "chunk_size": 2,
+  "conditions": {
+   "debate": {
+    "kind": "debate",
+    "peer_confidence": false
+   },
+   "independent": {
+    "kind": "independent"
+   }
+  },
+  "config": {
+   "seed": 20260909,
+   "model": {
+    "backend": "hf",
+    "repo_id": "google/gemma-3-12b-it",
+    "revision": null,
+    "dtype": "bfloat16",
+    "device": "cuda",
+    "max_new_tokens": 768,
+    "temperature": 0.7,
+    "top_p": 0.95
+   },
+   "stub": {
+    "base_accuracy": 0.42,
+    "accuracy_spread": 0.3,
+    "revision_rate_correct": 0.14,
+    "revision_rate_incorrect": 0.28,
+    "switch_to_correct": 0.45,
+    "conformity": 0.6,
+    "control_revision_scale": 0.5,
+    "n_layers": 8,
+    "d_model": 64,
+    "noise_scale": 1.0,
+    "probe_signal": 1.2,
+    "difficulty_leak": 0.0,
+    "signal_peak_layer": 0.6,
+    "peer_exposure_commit": 0.6,
+    "freetext_noise": 0.03,
+    "confidence_signal": 0.55,
+    "confidence_noise": 1.1
+   },
+   "debate": {
+    "n_agents": 3,
+    "n_rounds": 1,
+    "condition": "debate",
+    "tie_break": "round0_then_agent0",
+    "canonical_answer": "stated",
+    "personas": [
+     "You are a careful, methodical reasoner."
+    ],
+    "peer_shows_confidence": false,
+    "ask_verbalized_confidence": true
+   },
+   "data": {
+    "dataset": "TIGER-Lab/MMLU-Pro",
+    "dataset_revision": "b189ec765aa7ed75c8acfea42df31fdae71f97be",
+    "split": "test",
+    "subjects": null,
+    "stratify": true,
+    "permutation_seed": 12345,
+    "split_fracs": [
+     0.5,
+     0.2,
+     0.3
+    ],
+    "split_seed": 20260909,
+    "sample_seed": 7
+   },
+   "activations": {
+    "layers": "all",
+    "positions": [
+     "readout_last",
+     "generation_last",
+     "stated_answer",
+     "before_stated_answer"
+    ],
+    "dtype": "bfloat16",
+    "shard_size": 256
+   }
+  },
+  "prompt_template_hashes": {
+   "adversarial_peer": "b428604be34b875d",
+   "brevity": "ab1d02c3aa05d3cd",
+   "candidate_block": "5d9819941923f9a3",
+   "candidate_system": "caa3691bca130cc9",
+   "ending_conf": "a48849121707c4d7",
+   "ending_no_conf": "558b14973471cf5e",
+   "endorsement": "366342ebd3b084e9",
+   "mild_peer": "22963fb9b187cb53",
+   "peer_answer_only": "ba1f0cd92b83ea19",
+   "peer_block": "e8cff792d7c5f195",
+   "peer_entry": "90ec002c5b81d578",
+   "peer_no_answer": "1e009318543bd6e4",
+   "question": "1e3650fb59d929b6",
+   "readout_suffix": "b12a68884c9ecf8b",
+   "self_block": "9d30c3365474ae99",
+   "system": "5d659e0e90d9f7ef",
+   "system_no_conf": "3c240fc3055975c2"
+  },
+  "backend": {
+   "backend": "hf",
+   "n_layers": 48,
+   "d_model": 3840,
+   "repo_id": "google/gemma-3-12b-it",
+   "requested_revision": null,
+   "model_commit": "96b6f1eccf38110c56df3a15bffe176da04bfd80",
+   "tokenizer_class": "GemmaTokenizer",
+   "tokenizer_vocab_size": 262145,
+   "chat_template_sha256": "7de1c58e208eda46e9c7f86397df37ec49883aeece39fb961e0a6b24088dd3c4",
+   "supports_system_role": true,
+   "special_tokens": {
+    "bos": [
+     "<bos>",
+     2
+    ],
+    "eos": [
+     "<eos>",
+     1
+    ],
+    "pad": [
+     "<pad>",
+     0
+    ],
+    "generation_stop_ids": [
+     1,
+     106
+    ]
+   },
+   "letter_token_ids": {
+    "A": 236776,
+    "B": 236799,
+    "C": 236780,
+    "D": 236796,
+    "E": 236788,
+    "F": 236811,
+    "G": 236823,
+    "H": 236814,
+    "I": 236777,
+    "J": 236863
+   },
+   "readout_suffix": "\nFinal answer: (",
+   "dtype": "torch.bfloat16",
+   "device": "cuda"
+  }
+ },
+ "identity_sha256": "e17c736f94458f8c6fced71c6837dff011937b41f11d2f409e91cc79371ed03d",
+ "code": {
+  "git_sha": "e4f39aade06c7fef55627848f9b87bcdc24746e6",
+  "git_dirty": false,
+  "git_dirty_files": []
+ },
+ "questions": [
+  {
+   "id": "1660",
+   "sha256": "5c50b388ad7da700515377b0d94f74a0a4e7d0687486f4687ebd7e67a142c319"
+  },
+  {
+   "id": "8695",
+   "sha256": "085a1c0116076ea977c37afa93f08b43d3c24236b2926224ddc1717a27ff2192"
+  }
+ ],
+ "chunks": [
+  [
+   "1660",
+   "8695"
+  ]
+ ],
+ "history": [
+  {
+   "time": "2026-10-14T03:50:38+0000",
+   "git_sha": "e4f39aade06c7fef55627848f9b87bcdc24746e6",
+   "git_dirty": false,
+   "n_questions": 2,
+   "execution": {
+    "batch_size": 8,
+    "readout_batch_size": 4,
+    "packages": {
+     "python": "3.13.15",
+     "numpy": "2.1.3",
+     "pandas": "2.2.3",
+     "scikit-learn": "1.6.1",
+     "scipy": "1.16.3",
+     "torch": "2.11.0+cu130",
+     "transformers": "5.17.0",
+     "datasets": "5.0.1",
+     "vllm": null
+    },
+    "torch_cuda": "13.0",
+    "gpu": "NVIDIA A100-SXM4-40GB",
+    "gpu_total_gb": 42.41,
+    "nvidia_driver": "580.82.07"
+   },
+   "event": "created"
+  }
+ ]
+}

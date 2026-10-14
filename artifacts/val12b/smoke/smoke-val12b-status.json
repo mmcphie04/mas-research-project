@@ -1,0 +1,53 @@
+{
+  "name": "smoke-val12b",
+  "state": "finished",
+  "chunks_done": 1,
+  "chunks_total": 1,
+  "questions_total": 2,
+  "conditions": [
+    "debate",
+    "independent"
+  ],
+  "sessions": 1,
+  "elapsed_hours_total": 0.077,
+  "max_hours": null,
+  "timings": [
+    {
+      "chunk": "c000",
+      "questions": 2,
+      "seconds": 75.6,
+      "seconds_per_question": 37.8,
+      "round0_reloaded": false,
+      "stages": {
+        "round0_s": 28.51,
+        "debate/exposure_readout_s": 0.98,
+        "debate/generation_s": 16.73,
+        "debate/readout_s": 1.19,
+        "debate/write_s": 0.12,
+        "independent/exposure_readout_s": 0.28,
+        "independent/generation_s": 26.96,
+        "independent/readout_s": 0.56,
+        "independent/write_s": 0.09
+      },
+      "device": "NVIDIA A100-SXM4-40GB",
+      "peak_allocated_gb": 27.85,
+      "peak_reserved_gb": 29.94,
+      "total_gb": 42.41
+    }
+  ],
+  "failures": [],
+  "diagnostics_last_chunk": {
+    "pre": {
+      "stated_answer_parsed": 1.0,
+      "hit_token_cap": 0.0,
+      "stated_agrees_readout": 1.0,
+      "median_tokens": 174.0
+    },
+    "post": {
+      "stated_answer_parsed": 1.0,
+      "hit_token_cap": 0.0,
+      "stated_agrees_readout": 1.0,
+      "median_tokens": 166.0
+    }
+  }
+}

@@ -35,35 +35,71 @@ class ColabRemote(B.Remote):
         self.session, self.code_dir, self.root, self.state_dir, self.job = session, code_dir, remote_root, state_dir, job
 
     def _colab(self, *args, timeout=600) -> str:
-        r = subprocess.run(["colab", "--auth=adc", *args], capture_output=True, text=True, timeout=timeout)
+        """One CLI call. A hung call (seen live: the CLI waited on output indefinitely) becomes
+        a RuntimeError, which every caller treats as retryable; exec also gets the CLI's own
+        execution timeout."""
+        cmd = ["colab", "--auth=adc", *args]
+        if args and args[0] == "exec":
+            cmd += ["--timeout", str(max(30, timeout - 60))]
+        try:
+            r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+        except subprocess.TimeoutExpired as exc:
+            raise RuntimeError(f"colab {args[0]} timed out after {timeout}s") from exc
         if r.returncode != 0:
             raise RuntimeError(f"colab {args[0]} failed: {(r.stderr or r.stdout)[-400:]}")
         return r.stdout
 
-    def _exec(self, body: str, timeout=900):
+    def _exec(self, body: str, timeout=900, retries=3):
+        """Run code on the runtime and return its JSON result. Retried on failure: use only for
+        idempotent bodies (prepare and status reads are; acknowledge is handled separately)."""
         code = (f"import sys, json\nsys.path.insert(0, {self.code_dir + '/src'!r})\n"
                 f"from mad import cli_backup as B\n{body}\n")
         with tempfile.NamedTemporaryFile("w", suffix=".py", delete=False) as fh:
             fh.write(code)
-        out = self._colab("exec", "-s", self.session, "-f", fh.name, timeout=timeout)
-        Path(fh.name).unlink(missing_ok=True)
-        if MARK not in out:
-            raise RuntimeError(f"no result from the runtime: {out[-400:]}")
-        return json.loads(out.split(MARK, 1)[1].strip().splitlines()[0])
-
-    def prepare(self, prefix):
-        return self._exec(f"print({MARK!r} + json.dumps(B.prepare({self.root!r}, {prefix!r}, {self.state_dir!r})))")
+        last = None
+        try:
+            for attempt in range(retries):
+                try:
+                    out = self._colab("exec", "-s", self.session, "-f", fh.name, timeout=timeout)
+                    if MARK not in out:
+                        raise RuntimeError(f"no result from the runtime: {out[-400:]}")
+                    return json.loads(out.split(MARK, 1)[1].strip().splitlines()[0])
+                except RuntimeError as exc:
+                    last = exc
+                    if attempt + 1 < retries:
+                        time.sleep(10)
+            raise last
+        finally:
+            Path(fh.name).unlink(missing_ok=True)
 
     def download(self, remote_path, local_path):
         self._colab("download", "-s", self.session, remote_path, str(local_path), timeout=3600)
 
     def acknowledge(self, batch_id):
-        self._exec(f"print({MARK!r} + json.dumps(B.acknowledge({self.state_dir!r}, {batch_id!r})))")
+        """Not idempotent on the runtime, so not blindly retried. If the reply is lost, read the
+        runtime's backup state: the batch is acknowledged iff it is no longer the pending one."""
+        try:
+            self._exec(f"print({MARK!r} + json.dumps(B.acknowledge({self.state_dir!r}, {batch_id!r})))",
+                       timeout=300, retries=1)
+        except RuntimeError:
+            if self.pending_batch() == batch_id:
+                raise
+            # the runtime recorded it; only the reply was lost
+
+    def pending_batch(self):
+        """Read-only: the id of the runtime's pending (unacknowledged) batch, or None."""
+        body = (f"import os\np = os.path.join({self.state_dir!r}, 'pending.json')\n"
+                f"print({MARK!r} + json.dumps(json.load(open(p))['batch_id'] if os.path.exists(p) else None))")
+        return self._exec(body, timeout=150)
 
     def process_alive(self):
         body = (f"import subprocess\npid = int(open({self.root + '/' + self.job + '.pid'!r}).read())\n"
                 f"print({MARK!r} + json.dumps(subprocess.run(['ps', '-p', str(pid)], capture_output=True).returncode == 0))")
         return bool(self._exec(body, timeout=150))
+
+    def prepare(self, prefix):
+        return self._exec(f"print({MARK!r} + json.dumps(B.prepare({self.root!r}, {prefix!r}, {self.state_dir!r})))",
+                          timeout=900)
 
     def stop(self):
         self._colab("stop", "-s", self.session, timeout=300)

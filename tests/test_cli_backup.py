@@ -142,3 +142,64 @@ def test_final_stops_only_after_the_complete_local_archive_verifies(job, tmp_pat
                            "--conditions", "debate"]) == 0
     assert B.final(remote2, "j", tmp_path / "laptop2", tmp_path / "work2", log=logs.append) is True
     assert remote2.stopped
+
+
+class LostReplyRemote(FakeRemote):
+    """The runtime records the acknowledgment but the reply never arrives (seen live: the CLI
+    call hung after the remote code ran)."""
+
+    def __init__(self, *a):
+        super().__init__(*a)
+        self.lost = 1
+
+    def acknowledge(self, batch_id):
+        B.acknowledge(self.state_dir, batch_id)
+        if self.lost:
+            self.lost -= 1
+            raise RuntimeError("colab exec timed out after 300s")
+
+
+def test_a_lost_acknowledgment_reply_is_not_fatal(job, tmp_path):
+    remote, dest, work = job
+    r = LostReplyRemote(remote.out_root, remote.state_dir)
+    assert B.final(r, "j", dest, work, attempts=3, log=lambda m: None) is True
+    assert r.stopped and not B.prepare(r.out_root, "j", r.state_dir)["items"]
+
+
+def _colab_backup():
+    spec = importlib.util.spec_from_file_location("colab_backup", ROOT / "scripts" / "colab_backup.py")
+    m = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    return m
+
+
+def test_a_hung_cli_call_becomes_a_retryable_error(monkeypatch):
+    CB = _colab_backup()
+    import subprocess
+
+    def hang(*a, **k):
+        raise subprocess.TimeoutExpired(a[0], k.get("timeout"))
+
+    monkeypatch.setattr(CB.subprocess, "run", hang)
+    remote = CB.ColabRemote("s", "/code", "/root", "/state", "j")
+    with pytest.raises(RuntimeError, match="timed out"):
+        remote._colab("exec", "-s", "s", "-f", "x.py", timeout=60)
+
+
+def test_a_lost_acknowledgment_is_confirmed_from_the_runtime_state(monkeypatch):
+    CB = _colab_backup()
+    remote = CB.ColabRemote("s", "/code", "/root", "/state", "j")
+    calls = []
+
+    def fake_exec(body, timeout=900, retries=3):
+        calls.append(body)
+        if "B.acknowledge" in body:
+            raise RuntimeError("colab exec timed out")
+        return state["pending"]
+
+    monkeypatch.setattr(remote, "_exec", fake_exec)
+    state = {"pending": None}  # the runtime recorded it
+    remote.acknowledge("b1")
+    state["pending"] = "b1"  # still pending: genuinely not acknowledged
+    with pytest.raises(RuntimeError):
+        remote.acknowledge("b1")
