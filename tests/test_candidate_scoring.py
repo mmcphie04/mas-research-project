@@ -153,3 +153,36 @@ def test_missing_position_states_are_absent_not_imputed():
     absent = ~D.present("before_stated_answer") & ~train
     assert np.isnan(z[absent]).all()
     assert np.isfinite(z[~train & D.present("before_stated_answer")]).all()
+
+
+def test_tuning_preprocessing_is_fitted_inside_each_fold(monkeypatch):
+    """Imputation/standardization for C tuning and references never see the held-out fold:
+    only the final refit is fitted on all training rows."""
+    D = synthetic()
+    train = CS.make_folds(D.groups, 4, 0) != 0
+    sizes = []
+    orig = CS.TabularScorer._prep_fit
+
+    def spy(self, M_rows):
+        sizes.append(len(M_rows))
+        return orig(self, M_rows)
+
+    monkeypatch.setattr(CS.TabularScorer, "_prep_fit", spy)
+    s = CS.TabularScorer("out", ("of", "ol", "ot"), "lr", None, k_ref=3, seed=1).fit(D, train)
+    assert sizes.count(int(s.train.sum())) == 1 and len(sizes) == 3 + 1
+
+
+def test_combined_reference_features_do_not_depend_on_the_held_out_fold_labels():
+    """For reference fold r, the activation column of the OTHER rows comes from an activation
+    scorer refitted without fold r: flipping fold r's labels must not change it."""
+    D = synthetic()
+    train = CS.make_folds(D.groups, 4, 0) != 0
+    act = CS.ActivationScorer("readout_last:letter:meandiff:3-9", k_ref=3, seed=1).fit(D, train)
+    comb = CS.CombinedScorer("comb", act, ("of", "ol", "ot"), None, k_ref=3, seed=1)
+    T = train & np.isfinite(D.output(comb.sets)[0]).any(1)
+    rf = CS._ref_folds(D, T, 3, 1)
+    M0 = next(iter(comb._fold_matrices(D, T, rf)))[1]
+    D.y = np.where(T & (rf == 0), 1 - D.y, D.y)  # flip fold 0's labels
+    M1 = next(iter(comb._fold_matrices(D, T, rf)))[1]
+    other = T & (rf != 0)
+    assert np.allclose(M0[other, -1], M1[other, -1])

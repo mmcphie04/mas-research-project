@@ -138,12 +138,16 @@ class StateData:
     def present(self, position: str) -> np.ndarray:
         return self._present[position] if position in self._present else self.X(0, position)[1]
 
+    def output_names(self, sets=("of", "ol", "ot")) -> list[str]:
+        """Column names of ``output(sets)``, in order, without building the matrix."""
+        return [c for c in self.states.columns if c[:3] in tuple(f"{s}_" for s in sets)]
+
     def output(self, sets=("of", "ol", "ot")) -> tuple[np.ndarray, list[str]]:
         """Output-only features by set, with their exact column names:
         ``of`` letter-invariant output summaries, verbalized confidence, agreement, revised flag;
         ``ol`` per-letter option log-probabilities at each saved position;
         ``ot`` properties of the chosen option's text (no model involved)."""
-        names = [c for c in self.states.columns if c[:3] in tuple(f"{s}_" for s in sets)]
+        names = self.output_names(sets)
         return self.states[names].to_numpy(float), names
 
 
@@ -384,32 +388,38 @@ def _platt_params(p: PlattScaler) -> dict:
 # ----------------------------------------------------------------------------- output-only and combined
 
 
-def _lr_cv_logloss(Z, y, g, C, k=5, seed=0):
-    from sklearn.linear_model import LogisticRegression
-    from sklearn.metrics import log_loss
-    f = make_folds(g, k, seed)
-    ll = []
-    for r in range(k):
-        a, b = f != r, f == r
-        if len(np.unique(y[a])) < 2 or len(np.unique(y[b])) < 2:
-            continue
-        m = LogisticRegression(C=C, max_iter=4000).fit(Z[a], y[a])
-        ll.append(log_loss(y[b], m.predict_proba(Z[b])[:, 1], labels=[0, 1]))
-    return float(np.mean(ll))
-
-
 class TabularScorer:
-    """Logistic regression (C fixed or chosen from C_GRID by grouped inner-CV log-loss on the
-    training rows) or gradient boosting, on a named feature matrix. Imputation, indicators and
-    standardization are fitted on training rows. Normalizer and Platt from cross-fitted training
-    reference scores. ``features(D, rows)`` returns the matrix; subclasses add columns."""
+    """Logistic regression (C fixed, or chosen from C_GRID) or gradient boosting on a named
+    feature matrix.
+
+    One set of ``k_ref`` reference folds over the TRAINING questions serves both purposes: for
+    each fold r, imputation, indicators and standardization are fitted on the other folds only,
+    every candidate C is fitted there and scored on fold r. C is the value with the lowest mean
+    log-loss over folds; the fold-r scores at that C are the out-of-fold reference scores that
+    give the normalizer and the Platt calibrator. (Choosing one of four C values on the same
+    folds makes the references very slightly optimistic; it affects only scale and calibration.)
+    The final model is refitted on all training rows. Subclasses supply the per-fold, final and
+    evaluation feature matrices; ``schema`` gives the column names without building anything."""
 
     def __init__(self, name, sets=("of", "ol", "ot"), model="lr", C=None, k_ref=5, seed=0):
         self.name, self.sets, self.model, self.C_fixed, self.k_ref, self.seed = name, sets, model, C, k_ref, seed
 
-    def features(self, D):
-        return D.output(self.sets)
+    # -- feature hooks
+    def schema(self, D) -> list[str]:
+        return D.output_names(self.sets)
 
+    def _fold_matrices(self, D, T, rf):
+        M = D.output(self.sets)[0]
+        for r in range(self.k_ref):
+            yield r, M
+
+    def _final_matrix(self, D, T):
+        return D.output(self.sets)[0]
+
+    def _eval_matrix(self, D, rows):
+        return D.output(self.sets)[0]
+
+    # -- model
     def _fit_model(self, Z, y, C):
         if self.model == "hgb":
             from sklearn.ensemble import HistGradientBoostingClassifier
@@ -423,43 +433,46 @@ class TabularScorer:
             return np.log(p / (1 - p))
         return m.decision_function(Z)
 
-    def _prep_fit(self, M, rows):
-        imp = Imputer().fit(M[rows])
-        Mi = imp.transform(M)
-        std = Standardizer().fit(Mi[rows]) if self.model == "lr" else None
+    def _prep_fit(self, M_rows):
+        imp = Imputer().fit(M_rows)
+        std = Standardizer().fit(imp.transform(M_rows)) if self.model == "lr" else None
         return imp, std
 
-    def _prep(self, M, imp, std):
-        Mi = imp.transform(M)
+    @staticmethod
+    def _prep(M_rows, imp, std):
+        Mi = imp.transform(M_rows)
         return std.transform(Mi) if std is not None else Mi
 
     def fit(self, D: StateData, train: np.ndarray):
-        M, self.names = self.features(D)
-        T = train & np.isfinite(M).any(1)
-        if self.model == "lr" and self.C_fixed is None:
-            imp, std = self._prep_fit(M, T)
-            Z = self._prep(M, imp, std)
-            self.cv = {C: _lr_cv_logloss(Z[T], D.y[T], D.groups[T], C, seed=self.seed) for C in C_GRID}
+        self.names = self.schema(D)
+        T = train & np.isfinite(D.output(self.sets)[0]).any(1)
+        rf = _ref_folds(D, T, self.k_ref, self.seed)
+        Cs = list(C_GRID) if (self.model == "lr" and self.C_fixed is None) else \
+            [self.C_fixed if self.C_fixed is not None else 1.0]
+        dec = {C: np.full(len(D.y), np.nan) for C in Cs}
+        for r, M in self._fold_matrices(D, T, rf):
+            a, b = T & (rf != r), T & (rf == r)
+            imp, std = self._prep_fit(M[a])
+            Za, Zb = self._prep(M[a], imp, std), self._prep(M[b], imp, std)
+            for C in Cs:
+                dec[C][b] = self._decision(self._fit_model(Za, D.y[a], C), Zb)
+        if len(Cs) > 1:
+            self.cv = {C: _mean_fold_logloss(dec[C], D.y, rf, T) for C in Cs}
             self.C = min(self.cv, key=self.cv.get)
         else:
-            self.C, self.cv = (self.C_fixed if self.C_fixed is not None else 1.0), None
-        rf = _ref_folds(D, T, self.k_ref, self.seed)
-        ref = np.full(len(D.y), np.nan)
-        for r in range(self.k_ref):
-            a, b = T & (rf != r), T & (rf == r)
-            imp, std = self._prep_fit(M, a)
-            m = self._fit_model(self._prep(M[a], imp, std), D.y[a], self.C)
-            ref[b] = self._decision(m, self._prep(M[b], imp, std))
+            self.C, self.cv = Cs[0], None
+        ref = dec[self.C]
         self.norm = Normalizer().fit(ref[T])
         self.ref_z = self.norm(ref)
         self.platt = PlattScaler().fit(self.ref_z[T], D.y[T])
-        self.imp, self.std = self._prep_fit(M, T)
+        M = self._final_matrix(D, T)
+        self.imp, self.std = self._prep_fit(M[T])
         self.m = self._fit_model(self._prep(M[T], self.imp, self.std), D.y[T], self.C)
         self.train = T
         return self
 
     def score(self, D: StateData, rows: np.ndarray):
-        M, _ = self.features(D)
+        M = self._eval_matrix(D, rows)
         raw = np.full(len(D.y), np.nan)
         raw[rows] = self._decision(self.m, self._prep(M[rows], self.imp, self.std))
         z = self.norm(raw)
@@ -477,32 +490,63 @@ class TabularScorer:
         return out
 
 
+def _mean_fold_logloss(dec, y, rf, T):
+    """Mean over reference folds of the log-loss of sigmoid(decision) on that fold's rows."""
+    out = []
+    for r in np.unique(rf[T]):
+        m = T & (rf == r)
+        if len(np.unique(y[m])) < 2:
+            continue
+        p = np.clip(1 / (1 + np.exp(-dec[m])), 1e-12, 1 - 1e-12)
+        out.append(float(-np.mean(y[m] * np.log(p) + (1 - y[m]) * np.log(1 - p))))
+    return float(np.mean(out))
+
+
 class CombinedScorer(TabularScorer):
-    """The matched output model plus one activation column. Training rows use the activation
-    scorer's cross-fitted REFERENCE z (never in-sample scores); evaluation rows use its fitted z.
-    Same feature set, same C grid and same selection rule as the matched output-only scorer."""
+    """The matched output model plus one activation column (same output features, same C grid,
+    same selection objective as the output-only scorer).
+
+    Purity of the internal predictions: for reference fold r, the activation column of the
+    other folds' rows comes from an activation scorer REFITTED WITHOUT fold r (its own
+    cross-fitted references), and fold r's column from that scorer's predictions -- so no
+    held-out label of fold r reaches the training features through the upstream probe. The same
+    holds for the fallback column (output scorer refitted without fold r). The final model is
+    trained on the full-training activation scorer's cross-fitted references; evaluation rows use
+    the frozen activation scorer's predictions for exactly those rows."""
 
     def __init__(self, name, act, sets=("of", "ol", "ot"), C=None, k_ref=5, seed=0, fallback=None):
         super().__init__(name, sets, "lr", C, k_ref, seed)
         self.act, self.fallback = act, fallback
-        self._eval_z = None
 
-    def features(self, D):
-        M, names = D.output(self.sets)
-        a = self.act.ref_z.copy() if self._eval_z is None else self._eval_z
-        if self.fallback is not None:  # operational fallback for absent activation states
-            fb = self.fallback.ref_z if self._eval_z is None else self._fb_eval
+    def schema(self, D) -> list[str]:
+        return [*D.output_names(self.sets), f"act:{self.act.recipe}"]
+
+    def _with_act(self, M, a, fb=None):
+        if fb is not None:
             a = np.where(np.isfinite(a), a, fb)
-        return np.hstack([M, a[:, None]]), [*names, f"act:{self.act.recipe}"]
+        return np.hstack([M, a[:, None]])
 
-    def score(self, D, rows):
-        self._eval_z = self.act.score(D, rows)[1]
-        if self.fallback is not None:
-            self._fb_eval = self.fallback.score(D, rows)[1]
-        try:
-            return super().score(D, rows)
-        finally:
-            self._eval_z = None
+    def _fold_matrices(self, D, T, rf):
+        M = D.output(self.sets)[0]
+        for r in range(self.k_ref):
+            a, b = T & (rf != r), T & (rf == r)
+            act_r = ActivationScorer(self.act.recipe, k_ref=self.act.k_ref, seed=self.seed * 31 + r + 1,
+                                     cov_sets=self.act.cov_sets).fit(D, a)
+            col = np.where(a, act_r.ref_z, act_r.score(D, b)[1])
+            fb = None
+            if self.fallback is not None:
+                fb_r = TabularScorer(self.fallback.name, self.fallback.sets, self.fallback.model,
+                                     self.fallback.C_fixed, self.fallback.k_ref, self.seed * 31 + r + 1).fit(D, a)
+                fb = np.where(a, fb_r.ref_z, fb_r.score(D, b)[1])
+            yield r, self._with_act(M, col, fb)
+
+    def _final_matrix(self, D, T):
+        return self._with_act(D.output(self.sets)[0], self.act.ref_z,
+                              None if self.fallback is None else self.fallback.ref_z)
+
+    def _eval_matrix(self, D, rows):
+        return self._with_act(D.output(self.sets)[0], self.act.score(D, rows)[1],
+                              None if self.fallback is None else self.fallback.score(D, rows)[1])
 
 
 class SumScorer:
@@ -643,8 +687,12 @@ def boot_weights(n_questions: int, n_boot: int, seed: int) -> np.ndarray:
 
 
 def summarize(vals: np.ndarray) -> dict:
-    return {"value": float(vals[0]), "ci95": [float(np.nanquantile(vals[1:], 0.025)),
-                                              float(np.nanquantile(vals[1:], 0.975))]}
+    """Point value (row 0) and percentile interval; None where undefined (no comparison pairs,
+    or one-class populations), never NaN."""
+    v0 = float(vals[0]) if np.isfinite(vals[0]) else None
+    rest = vals[1:][np.isfinite(vals[1:])]
+    ci = [float(np.quantile(rest, 0.025)), float(np.quantile(rest, 0.975))] if len(rest) else [None, None]
+    return {"value": v0, "ci95": ci, "n_finite_draws": int(len(rest))}
 
 
 def population_masks(D: StateData, condition: str) -> dict:

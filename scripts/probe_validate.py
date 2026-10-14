@@ -58,10 +58,10 @@ K_OUTER = 5
 # ----------------------------------------------------------------------------- fitting
 
 
-def _scorers(D, recipe_key, train, seed, fold):
+def _scorers(D, recipe_key, train, seed, fold, recipes=None):
     """Fit every scorer for one outer fold. Reference folds use a seed derived from (seed, fold)."""
     rs = 1000 * seed + fold
-    recipe = RECIPES[recipe_key]
+    recipe = (recipes or RECIPES)[recipe_key]
     act = CS.ActivationScorer(recipe, seed=rs).fit(D, train)
     out_ofot = CS.TabularScorer("out_lr[of+ot]", ("of", "ot"), "lr", C=1.0, seed=rs).fit(D, train)
     out_full = CS.TabularScorer("out_lr[full]", ("of", "ol", "ot"), "lr", C=None, seed=rs).fit(D, train)
@@ -355,10 +355,10 @@ def summarize_cmd(cache, work, out, n_boot):
             for dk, per in diffs.get(key, {}).items():
                 cells = []
                 for m in METRICS:
-                    v = [per[s][m]["value"] for s in seeds]
-                    up = sum(per[s][m]["ci95"][0] > 0 for s in seeds)
-                    dn = sum(per[s][m]["ci95"][1] < 0 for s in seeds)
-                    cells.append(f"{np.median(v):+.3f} ({up}/{dn})")
+                    v = [x for x in (per[s][m]["value"] for s in seeds) if x is not None]
+                    up = sum((per[s][m]["ci95"][0] or 0) > 0 for s in seeds)
+                    dn = sum((per[s][m]["ci95"][1] or 0) < 0 for s in seeds)
+                    cells.append(f"{np.median(v):+.3f} ({up}/{dn})" if v else "n/a")
                 md.append(f"| {dk} | " + " | ".join(cells) + " |")
             dec = {s: P[s]["decisions"] for s in seeds}
             rules = sorted(dec[seeds[0]]["counts"])
@@ -408,72 +408,256 @@ def summarize_cmd(cache, work, out, n_boot):
                                     + "\n".join(md) + "\n")
 
 
-def freeze(cache, frozen, out):
-    """Fit every scorer of both recipes on ALL pilot questions (all conditions pooled) and save
-    them for application to new questions without refitting. The pickle holds fitted
-    parameters (weights), so it stays local (runs/); its SHA-256 goes to the preregistration."""
-    D = CS.StateData.from_cache(cache)
+def freeze(cache, frozen, out, recipes=None):
+    """Fit every scorer of both fixed recipes on ALL pilot questions (all conditions pooled) and
+    save them for application to new questions without refitting. The pickle holds fitted
+    parameters (weights), so it stays local (runs/); its SHA-256 goes to the preregistration.
+    Nothing in a frozen scorer's prediction path refers to the training rows."""
+    recipes = recipes or RECIPES
+    D = CS.StateData.from_cache(cache) if not isinstance(cache, CS.StateData) else cache
     train = np.ones(len(D.y), bool)
-    models = {rk: _scorers(D, rk, train, seed=0, fold=0) for rk in RECIPES}
-    feature_names = {rk: {n: getattr(m, "names", None) for n, m in ms.items()} for rk, ms in models.items()}
+    models = {rk: _scorers(D, rk, train, seed=0, fold=0, recipes=recipes) for rk in recipes}
+    schema = {rk: {n: (m.schema(D) if hasattr(m, "schema") else None) for n, m in ms.items()} for rk, ms in models.items()}
+    params = {rk: {n: m.params() for n, m in ms.items()} for rk, ms in models.items()}
+    for ms in models.values():  # drop training-length arrays: the prediction path must not need them
+        for m in ms.values():
+            for attr in ("ref_z", "train"):
+                if hasattr(m, attr):
+                    setattr(m, attr, None)
     Path(frozen).parent.mkdir(parents=True, exist_ok=True)
     with open(frozen, "wb") as fh:
-        pickle.dump({"models": models, "trained_on": {"cache": str(cache), "questions": int(len(set(D.qid))),
-                                                       "states": int(len(D.y)), "conditions": D.conditions},
-                     "feature_names": feature_names, "pilot_ref_z": {rk: {n: m.ref_z for n, m in ms.items()}
-                                                                     for rk, ms in models.items()}}, fh)
+        pickle.dump({"models": models, "recipes": dict(recipes), "feature_names": schema,
+                     "train_base_rate": float(D.y.mean()),
+                     "trained_on": {"questions": int(len(set(D.qid))), "states": int(len(D.y)),
+                                    "conditions": D.conditions}}, fh)
     h = hashlib.sha256(Path(frozen).read_bytes()).hexdigest()
     commit = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, cwd=ROOT).stdout.strip()
     dirty = bool(subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True, cwd=ROOT).stdout.strip())
     rec = {"frozen_file": str(frozen), "sha256": h, "code_commit": commit, "code_dirty": dirty,
            "command": "python scripts/probe_validate.py freeze", "trained_on_questions": int(len(set(D.qid))),
-           "trained_on_states": int(len(D.y)), "conditions": D.conditions,
-           "recipes": {rk: {"recipe": RECIPES[rk], "layers": CS.parse_recipe(RECIPES[rk])[3]} for rk in RECIPES},
-           "params": {rk: {n: m.params() for n, m in ms.items()} for rk, ms in models.items()}}
-    Path(out).mkdir(parents=True, exist_ok=True)
-    (Path(out) / "frozen_scorers.json").write_text(json.dumps(rec, indent=1, default=float))
+           "trained_on_states": int(len(D.y)), "train_base_rate": float(D.y.mean()), "conditions": D.conditions,
+           "recipes": {rk: {"recipe": r, "layers": CS.parse_recipe(r)[3]} for rk, r in recipes.items()},
+           "feature_names": schema, "params": params}
+    if out:
+        Path(out).mkdir(parents=True, exist_ok=True)
+        (Path(out) / "frozen_scorers.json").write_text(json.dumps(rec, indent=1, default=float))
     print(f"frozen scorers: {frozen} sha256 {h}")
+    return h
 
 
-def apply_frozen(frozen, cache, out, primary="debate", n_boot=2000):
-    """Score a NEW archive with frozen scorers (one fitted model: no cross-fold issue) and
-    evaluate: ranking metrics and decisions per condition, by question bootstrap. Refuses if
-    the output-feature columns differ from those the scorers were trained on."""
-    F = pickle.load(open(frozen, "rb"))
-    D = CS.StateData.from_cache(cache)
+TARGETS = {"selection_accuracy": 0.02, "revision_auc": 0.05}
+
+
+def classify(diff: dict, target: float, n: int, secs_per_question: float | None = None) -> dict:
+    """Development reading of one paired difference against a practical target (not a powered
+    test): promising (point estimate reaches the target; 'demonstrated' only if the interval is
+    above 0), uncompetitive (the interval's upper end is below the target), else inconclusive --
+    with the fresh sample needed for an interval half-width of target/2 (n scales as 1/hw^2)."""
+    v, (lo, hi) = diff.get("value", diff.get("mean")), diff["ci95"]
+    if v is None or lo is None:
+        return {"reading": "undefined (no comparisons)"}
+    if v >= target:
+        reading = "promising: interval above 0" if lo > 0 else "promising, provisional: interval includes 0"
+    elif hi < target:
+        reading = "uncompetitive at the target"
+    else:
+        reading = "inconclusive"
+    out = {"reading": reading, "value": v, "ci95": [lo, hi], "target": target}
+    if reading == "inconclusive":
+        hw = (hi - lo) / 2
+        need = int(np.ceil(n * (hw / (target / 2)) ** 2))
+        out["questions_needed_for_halfwidth_target_over_2"] = need
+        if secs_per_question:
+            out["projected_raw_gpu_hours"] = round(need * secs_per_question / 3600, 1)
+    return out
+
+
+def _dict_nan_to_none(x):
+    if isinstance(x, dict):
+        return {k: _dict_nan_to_none(v) for k, v in x.items()}
+    if isinstance(x, list):
+        return [_dict_nan_to_none(v) for v in x]
+    if isinstance(x, float) and not np.isfinite(x):
+        return None
+    return x
+
+
+def _source_comparison(D, a_cond, b_cond, z_by, questions, seed=0):
+    """Paired comparison of two six-answer pools that share the same first three answers
+    (e.g. debate vs independent), on identical questions: coverage, pooled-six vote, best of
+    six and best first answer by each scorer, per question and as paired differences."""
+    da = CS.decisions(D, a_cond, z_by)
+    db = CS.decisions(D, b_cond, z_by)
+    q = sorted(set(questions) & set(da.index) & set(db.index))
+    da, db = da.loc[q], db.loc[q]
+    per = pd.DataFrame(index=pd.Index(q, name="question_id"))
+    per["any_round0_correct"] = da.any_round0_correct
+    per[f"coverage_six:{a_cond}"] = ((da.any_round0_correct + da.any_revised_correct) > 0).astype(int)
+    per[f"coverage_six:{b_cond}"] = ((db.any_round0_correct + db.any_revised_correct) > 0).astype(int)
+    per[f"new_correct_option:{a_cond}"] = da.debate_introduced_correct
+    per[f"new_correct_option:{b_cond}"] = db.debate_introduced_correct
+    per[f"pooled6_vote:{a_cond}"] = da["correct:pooled6_vote"]
+    per[f"pooled6_vote:{b_cond}"] = db["correct:pooled6_vote"]
+    per["original_vote"] = da["correct:original_vote"]
+    rows = {"n_questions": len(q), "comparisons": []}
+    comps = [("coverage_six", f"coverage_six:{a_cond}", f"coverage_six:{b_cond}"),
+             ("pooled6_vote", f"pooled6_vote:{a_cond}", f"pooled6_vote:{b_cond}")]
+    for s in z_by:
+        per[f"best_six[{s}]:{a_cond}"] = da[f"correct:best_six[{s}]"]
+        per[f"best_six[{s}]:{b_cond}"] = db[f"correct:best_six[{s}]"]
+        per[f"best_original[{s}]"] = da[f"correct:best_original[{s}]"]
+        comps.append((f"best_six[{s}]", f"best_six[{s}]:{a_cond}", f"best_six[{s}]:{b_cond}"))
+        for c in (a_cond, b_cond):
+            comps.append((f"best_six[{s}]:{c} - best_original[{s}]", f"best_six[{s}]:{c}", f"best_original[{s}]"))
+    for label, x, y in comps:
+        d = (per[x] - per[y]).to_numpy(float)
+        win, loss = per.index[d > 0], per.index[d < 0]
+        rows["comparisons"].append({"comparison": label, "a": x, "b": y, "a_count": int(per[x].sum()),
+                                    "b_count": int(per[y].sum()), **_boot_diff(per[x], per[y], seed=seed),
+                                    "wins": len(win), "losses": len(loss),
+                                    "win_ids": list(map(str, win)), "loss_ids": list(map(str, loss))})
+    return per, rows
+
+
+def _ops(D):
+    """Missingness, parse and cap rates per (condition, phase): operational, outcome-free."""
+    st = D.states
+    out = {}
+    for (c, ph), g in st.groupby(["condition", "phase"]):
+        idx = g.index.to_numpy()
+        out[f"{c}|{ph}"] = {"states": int(len(g)),
+                            "answer_fallback_rate": float((g.answer_source != "stated").mean()),
+                            "capped_rate": float((g.stop_reason == "length").mean()),
+                            "absent_by_position": {pos: int((~D.present(pos)[idx]).sum()) for pos in CS.POSITIONS}}
+    return out
+
+
+def apply_frozen_data(F, D, out, n_boot=10000, sha=None, pilot_metrics=None, secs_per_question=None):
+    """Score NEW states with frozen scorers and run the frozen validation analysis
+    (docs/preregistration.md section 10). One fitted model per scorer, so every comparison is
+    within that model; bootstrap by question with shared draws for paired differences."""
+    out = Path(out)
+    out.mkdir(parents=True, exist_ok=True)
+    for rk, models in F["models"].items():  # schema only: no feature columns are built here
+        for n, m in models.items():
+            want = F["feature_names"][rk].get(n)
+            if want is not None and m.schema(D) != want:
+                raise SystemExit(f"{rk}/{n}: output feature columns differ from training; refusing to apply")
     qs = np.array(sorted(set(D.qid)))
     qindex = {q: i for i, q in enumerate(qs)}
     W = CS.boot_weights(len(qs), n_boot, 0)
     folds = np.zeros(len(D.y), int)
     allrows = np.ones(len(D.y), bool)
-    report = {"frozen_sha256": hashlib.sha256(Path(frozen).read_bytes()).hexdigest(), "conditions": D.conditions,
-              "n_questions": int(len(qs)), "recipes": {}}
+    st = D.states.copy()
+    states = st[["row_id", "question_id", "agent_id", "phase", "condition", "answer", "gold_display", "correct",
+                 "subject", "answer_source", "stop_reason"]].copy()
+    for pos in CS.POSITIONS:
+        states[f"present:{pos}"] = D.present(pos).astype(int)
+    states.to_csv(out / "states.csv", index=False)
+    report = {"frozen_sha256": sha, "conditions": D.conditions, "n_questions": int(len(qs)), "n_boot": n_boot,
+              "note_independent": "independent 'revised' states are fresh samples of the original prompt: "
+                                  "its old/new transitions are resampling comparisons, not persuasion; its "
+                                  "'peer_exposure' state is an original-prompt state (no peer shown).",
+              "operational": _ops(D), "recipes": {}}
     for rk, models in F["models"].items():
+        act = models["act"]
+        z, sc = {}, pd.DataFrame({"row_id": st.row_id})
         for n, m in models.items():
-            want = F["feature_names"][rk][n]
-            if want is not None and m.features(D)[1] != want:
-                raise SystemExit(f"{rk}/{n}: output feature columns differ from training; refusing to apply")
-        z = {n: m.score(D, allrows)[1] for n, m in models.items()}
-        present = D.present(CS.parse_recipe(RECIPES[rk])[0])
-        rep = {}
+            raw, zz, p = m.score(D, allrows)
+            z[n] = zz
+            sc[f"{n}:raw"], sc[f"{n}:z"], sc[f"{n}:p"] = np.round(raw, 6), np.round(zz, 6), np.round(p, 6)
+        sc.to_csv(out / f"scores_{rk}.csv.gz", index=False)
+        present = D.present(act.position)
+        has_missing = bool((~present).any())
+        rep = {"recipe": act.recipe, "layers": act.layers, "position": act.position, "conditions": {}}
+        decs = []
         for cond in D.conditions:
-            elig = CS.eligible_questions(D, present, cond)
-            names = [n for n in z if n != "act_fb"]
-            sel = [n for n in SELECT_SCORERS if n in z]
-            dec = CS.decisions(D, cond, {n: np.where(np.isin(D.qid, elig), z[n], np.nan) for n in sel})
-            dec = dec[dec.index.isin(elig)]
-            rep[cond] = {"n_questions": int(len(elig)),
-                         "scorers": {n: CS.evaluate_scores(D, z[n], folds, cond, elig, W, qindex) for n in names},
-                         "decisions": decision_summary(dec, sel, 0)}
-            # distribution shift: frozen probabilities vs outcomes (calibration-in-the-large)
-            rows = np.isin(D.qid, elig) & (D.states.condition == cond).to_numpy()
-            rep[cond]["calibration_in_the_large"] = {
-                n: {"mean_p": float(np.nanmean(models[n].score(D, rows)[2][rows])), "observed": float(D.y[rows].mean())}
-                for n in names}
+            pops = {"complete_case": CS.eligible_questions(D, present, cond)}
+            if has_missing and "act_fb" in z:
+                pops["all_fallback"] = qs
+            for pop, qset in pops.items():
+                act_name = "act_fb" if pop == "all_fallback" else "act"
+                names = [n for n in z if n not in (("act",) if pop == "all_fallback" else ("act_fb",))]
+                ev = {n: CS.evaluate_scores(D, z[n], folds, cond, qset, W, qindex, return_vals=True) for n in names}
+                diffs = {}
+                for a_, b_ in DIFFS:
+                    a2 = act_name if a_ == "act" else a_
+                    if a2 in ev and b_ in ev:
+                        diffs[f"{a2} - {b_}"] = {mm: CS.summarize(ev[a2]["vals"][mm] - ev[b_]["vals"][mm]) for mm in METRICS}
+                sel = [s_ for s_ in SELECT_SCORERS if s_ in z and not (pop == "all_fallback" and s_ == "act")]
+                if pop == "all_fallback":
+                    sel = ["act_fb", *sel]
+                zsub = {s_: np.where(np.isin(D.qid, qset), z[s_], np.nan) for s_ in sel}
+                dec = CS.decisions(D, cond, zsub)
+                dec = dec[dec.index.isin(qset)]
+                dsum = decision_summary(dec, sel, 0) if len(dec) else {"n_questions": 0}
+                calib = {}
+                for n in names:
+                    rows = np.isin(D.qid, qset) & (st.condition == cond).to_numpy()
+                    p_ = models[n].score(D, rows)[2]
+                    calib[n] = {**CS.calibration(D, p_, rows, base_rate=F.get("train_base_rate", 0.5)),
+                                "mean_p": float(np.nanmean(p_[rows])),
+                                "observed": float(D.y[rows].mean())} if rows.any() else None
+                rep["conditions"][f"{cond}|{pop}"] = {
+                    "n_questions": int(len(qset)),
+                    "metrics": {n: {"metrics": e["metrics"], "counts": e["counts"]} for n, e in ev.items()},
+                    "differences": diffs, "decisions": dsum, "calibration": calib}
+                decs.append(dec.reset_index().assign(condition=cond, population=pop))
+        pd.concat(decs).to_csv(out / f"decisions_{rk}.csv", index=False)
+        # candidate source: debate vs independent on identical questions
+        if {"debate", "independent"} <= set(D.conditions):
+            src = {}
+            for pop in (["complete_case", "all_fallback"] if has_missing and "act_fb" in z else ["complete_case"]):
+                if pop == "complete_case":
+                    qset = np.intersect1d(CS.eligible_questions(D, present, "debate"),
+                                          CS.eligible_questions(D, present, "independent"))
+                    sel = [s_ for s_ in SELECT_SCORERS if s_ in z]
+                else:
+                    qset, sel = qs, ["act_fb", *[s_ for s_ in SELECT_SCORERS if s_ in z and s_ != "act"]]
+                per, rows_ = _source_comparison(D, "debate", "independent",
+                                                {s_: np.where(np.isin(D.qid, qset), z[s_], np.nan) for s_ in sel}, qset)
+                per.to_csv(out / f"source_comparison_{rk}_{pop}.csv")
+                src[pop] = rows_
+            rep["source_comparison"] = src
+        # development readings of the primary and key comparisons (debate)
+        key = "debate|complete_case"
+        if key in rep["conditions"]:
+            C_ = rep["conditions"][key]
+            n_q = C_["n_questions"]
+            pr = {}
+            for p_ in C_["decisions"].get("paired", []):
+                if p_["a"] == f"best_six[{'act'}]" and p_["b"] in (f"best_six[{MATCHED_OUTPUT}]", "pooled6_vote"):
+                    pr[f"{p_['a']} - {p_['b']}"] = classify(p_, TARGETS["selection_accuracy"], n_q, secs_per_question)
+            d = C_["differences"].get(f"act - {MATCHED_OUTPUT}", {})
+            for mm in ("revision_auc", "panel_post"):
+                if mm in d:
+                    pr[f"act - {MATCHED_OUTPUT} | {mm}"] = classify(d[mm], TARGETS["revision_auc"], n_q, secs_per_question)
+            rep["readings"] = pr
+        # shift: round-0 ranking on the new questions vs the pilot's out-of-fold values
+        if pilot_metrics and rk in pilot_metrics:
+            r0 = rep["conditions"].get("debate|complete_case", {}).get("metrics", {})
+            rep["shift"] = {n: {"state_auc_pre_new": r0.get(n, {}).get("metrics", {}).get("state_auc_pre", {}).get("value"),
+                                "state_auc_pre_pilot_oof_median": pilot_metrics[rk].get(n)} for n in ("act", MATCHED_OUTPUT)}
         report["recipes"][rk] = rep
-    Path(out).mkdir(parents=True, exist_ok=True)
-    (Path(out) / "frozen_application.json").write_text(json.dumps(report, indent=1, default=float))
-    print(f"applied {frozen} to {cache}: {len(qs)} questions, conditions {D.conditions}")
+    (out / "frozen_application.json").write_text(json.dumps(_dict_nan_to_none(report), indent=1, default=float))
+    return report
+
+
+def apply_frozen(frozen, cache, out, n_boot=10000, pilot_dir="artifacts/pilot12b/probe_validation",
+                 secs_per_question=None):
+    F = pickle.load(open(frozen, "rb"))
+    D = CS.StateData.from_cache(cache)
+    pm = {}
+    for rk in F["models"]:
+        f = Path(pilot_dir) / f"metrics_{rk}.json"
+        if f.exists():
+            M = json.loads(f.read_text())
+            pm[rk] = {n: float(np.median([M["seeds"][s]["populations"]["debate|eligible"]["scorers"][n]["metrics"]
+                                          ["state_auc_pre"]["value"] for s in M["seeds"]]))
+                      for n in ("act", MATCHED_OUTPUT)}
+    sha = hashlib.sha256(Path(frozen).read_bytes()).hexdigest()
+    apply_frozen_data(F, D, out, n_boot=n_boot, sha=sha, pilot_metrics=pm, secs_per_question=secs_per_question)
+    print(f"applied {frozen} (sha256 {sha[:12]}) to {cache}: {len(set(D.qid))} questions, conditions {D.conditions}")
 
 
 def provenance(cache, out, argv):
@@ -510,6 +694,8 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("cmd", choices=["fit", "evaluate", "summarize", "loco", "freeze", "apply", "provenance"])
     ap.add_argument("--frozen", default="runs/frozen/pilot12b_scorers.pkl")
+    ap.add_argument("--secs-per-question", type=float, default=None,
+                    help="apply: measured GPU seconds per question, for sample-size cost projections")
     ap.add_argument("--cache", default="runs/cache/probe12b")
     ap.add_argument("--work", default="runs/cache/probe12b/validate")
     ap.add_argument("--out", default="artifacts/pilot12b/probe_validation")
@@ -543,7 +729,7 @@ def main(argv=None) -> int:
     elif args.cmd == "freeze":
         freeze(args.cache, args.frozen, args.out)
     elif args.cmd == "apply":
-        apply_frozen(args.frozen, args.cache, args.out, n_boot=args.n_boot)
+        apply_frozen(args.frozen, args.cache, args.out, n_boot=args.n_boot, secs_per_question=args.secs_per_question)
     else:
         provenance(args.cache, args.out, sys.argv if argv is None else ["probe_validate.py", *argv])
     return 0
