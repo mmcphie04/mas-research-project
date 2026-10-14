@@ -90,4 +90,56 @@ More agents or more rounds are not automatic next steps. Each needs a specific h
 estimate, and the storage and prompt changes it requires. Most of the remaining budget stays in
 reserve.
 
-*(Results and the recommendation are appended below after the frozen analysis.)*
+---
+
+## Results (frozen analysis run once, 2026-10-14; details in docs/VALIDATION_RESULTS.md)
+
+| level | comparison | result | reading |
+|---|---|---|---|
+| 1 primary | R1 best-of-six − matched output best-of-six (debate, 200 q) | +0.000 [−0.045, +0.045], wins/losses 10/10 | **inconclusive**: no observed difference; about 4,050 fresh questions (≈ 54 raw GPU-h) to resolve ±1 point |
+| 1 primary | R1 best-of-six − pooled-six vote | +0.030 [−0.015, +0.075], 14/8 | provisional lead, but the matched output selector gains the same (+0.030) and HGB more (+0.050 [+0.015, +0.090]): not activation-specific |
+| 2 key | R1 − matched output, revision AUROC / revised panel | −0.095 [−0.27, +0.09] / −0.118 [−0.31, +0.08] | the pilot's activation advantage **did not reproduce**; formally inconclusive at +0.05 |
+| 3 source | independent six − debate six: coverage / pooled vote | +0.060 [+0.025, +0.100] (14 vs 2 q) / +0.020 [−0.005, +0.050] | independent sampling yields more correct candidates; selection results equal across pools |
+| 4 secondary | R2; combinations; gates; reconsideration | no R2 advantage; the HGB comparator is the best selector and gate (+4.5 to +5 points over pooled voting); reconsideration shows an activation revision-AUROC hint (+0.12 [−0.06, +0.29], 100 q) | hypotheses for later, not substitutes for the primary |
+
+Mixed results kept separate:
+
+- **Activations:** they still rank correctness on fresh states (round-0 AUROC 0.71, no shift
+  degradation), but add nothing measurable to selection beyond output-only scorers, and lost
+  their revision-ranking edge in debate.
+- **Debate:** it improved the plain vote here (119 vs 116), yet as a source of candidates it was
+  dominated by three more independent samples.
+
+## Recommendation: candidate-generation research (simpler controls dominate)
+
+Of the three paths, the evidence supports the third:
+
+- **Not confirmation of activation-based selection:** no difference from the matched output
+  selector, and resolving a 2-point gap would cost far more than the remaining budget.
+- **Not the endorsement diagnostic:** the revision-ranking signal it would explain did not
+  reproduce on fresh debate data.
+- **Candidate generation:** independent sampling and output-only selection beat the debate and
+  activation machinery that the project set out to test.
+
+**Proposed follow-up (not launched).** An output-only candidate-generation study on fresh
+questions from the main pool (positions 321 onward), with:
+
+- an independent-sampling coverage curve: 3, 6, 9 and 12 answers per question;
+- selection by vote, matched output logistic and HGB (frozen from pilot + validation);
+- debate and reconsideration as fixed comparison arms at matched sample counts.
+
+It needs no activation storage, which cuts disk and readout time.
+
+- **Hypotheses**, stated before data:
+  1. coverage and HGB-selected accuracy rise with independent samples;
+  2. at matched answer counts, debate does not beat independent sampling.
+- **Budget:** used so far about 7.7 A100-h (pilot 3.5 + this phase 4.2), against the
+  author's 10–20 h goal. A 300-question, 12-sample study without activation readout is
+  estimated at 3–4 raw GPU-h (to be benchmarked). That leaves the remainder in reserve.
+
+More agents or more rounds are not proposed: the data give no hypothesis that needs them. A
+paper framing consistent with these results: internal-activation probes reproduce correctness
+signal but not incremental value for selection over strong output-only scorers; and in one-round
+debate, peers' answers mostly redistribute existing options, which independent sampling supplies
+more cheaply.
+
