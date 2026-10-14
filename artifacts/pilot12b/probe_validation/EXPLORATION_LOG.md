@@ -14,4 +14,6 @@ ones. Nothing here is a confirmatory sample. Dates are 2026.
 | 7 | 10-12 | equal-weight activation + output sum | **post hoc**, proposed after seeing the stacked model dilute the revision signal | old version used fold-own standardization (superseded) |
 | 8 | 10-13 | audit corrections (docs/PROBE_AUDIT.md §1) | none | — |
 | 9 | 10-13 | corrected comparison of R1 and R2 `before_stated_answer:letter:pca16:21-33` (R2 = the configuration step 4's selections converged on), six partitions (seeds 0, 1, 2, 10, 11, 12), matched comparators, natural debate primary | the two recipes were fixed by the brief before this run. No third recipe was chosen from its results. The output C grid was widened once, after a smoke run, for the comparator | this directory |
-| 10 | 10-13 | frozen scorers fitted on the whole pilot (`frozen_scorers.json`) | none (fixed recipes and comparators) | for the validation tranche, before its data exist |
+| 10 | 10-13 | frozen scorers fitted on the whole pilot at 8a59105 | none | superseded |
+| 11 | 10-13 | second correction round at 3857a72: frozen application by schema, tuning preprocessing inside folds, pure combined-scorer references; bounded comparison re-run (same recipes, seeds) | none | ranking metrics and decisions unchanged except R2's learned combination; this directory |
+| 12 | 10-13 | final frozen scorers at 3857a72, SHA-256 8e5785fe… (`frozen_scorers.json`) | none (fixed recipes and comparators) | for the validation tranche, before its data exist |

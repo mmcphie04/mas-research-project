@@ -126,7 +126,7 @@ Origin of best-of-six picks (partition 0): act: 74 from revisions, 1 new options
 
 Gate, agent level (partition 0): gate0[act]: helpful_accepted 12, helpful_blocked 20, harmful_accepted 6, harmful_blocked 26, wrong_to_wrong_accepted 10, wrong_to_wrong_blocked 36; gate_tuned[act]: helpful_accepted 16, helpful_blocked 16, harmful_accepted 14, harmful_blocked 18, wrong_to_wrong_accepted 17, wrong_to_wrong_blocked 29; gate0[out_lr[full]]: helpful_accepted 22, helpful_blocked 10, harmful_accepted 8, harmful_blocked 24, wrong_to_wrong_accepted 13, wrong_to_wrong_blocked 33; gate0[out_hgb[full]]: helpful_accepted 16, helpful_blocked 16, harmful_accepted 6, harmful_blocked 26, wrong_to_wrong_accepted 16, wrong_to_wrong_blocked 30; gate0[out_lr[of+ot]]: helpful_accepted 17, helpful_blocked 15, harmful_accepted 11, harmful_blocked 21, wrong_to_wrong_accepted 15, wrong_to_wrong_blocked 31; gate0[comb_lr[full+act]]: helpful_accepted 22, helpful_blocked 10, harmful_accepted 7, harmful_blocked 25, wrong_to_wrong_accepted 12, wrong_to_wrong_blocked 34; gate0[eq[act+out_lr_full]]: helpful_accepted 14, helpful_blocked 18, harmful_accepted 5, harmful_blocked 27, wrong_to_wrong_accepted 9, wrong_to_wrong_blocked 37; gate0[eq[act+out_lr_of+ot]]: helpful_accepted 13, helpful_blocked 19, harmful_accepted 5, harmful_blocked 27, wrong_to_wrong_accepted 8, wrong_to_wrong_blocked 38
 
-Calibration of revised-state probabilities (median over partitions): act Brier 0.202 (constant 0.248), ECE 0.081; act_rout Brier 0.250 (constant 0.248), ECE 0.047; comb_lr[full+act] Brier 0.184 (constant 0.248), ECE 0.064; eq[act+out_lr_full] Brier 0.186 (constant 0.248), ECE 0.082; eq[act+out_lr_of+ot] Brier 0.190 (constant 0.248), ECE 0.098; out_hgb[full] Brier 0.203 (constant 0.248), ECE 0.049; out_lr[full] Brier 0.184 (constant 0.248), ECE 0.068; out_lr[of+ot] Brier 0.197 (constant 0.248), ECE 0.069
+Calibration of revised-state probabilities (median over partitions): act Brier 0.202 (constant 0.248), ECE 0.081; act_rout Brier 0.250 (constant 0.248), ECE 0.047; comb_lr[full+act] Brier 0.184 (constant 0.248), ECE 0.069; eq[act+out_lr_full] Brier 0.186 (constant 0.248), ECE 0.082; eq[act+out_lr_of+ot] Brier 0.190 (constant 0.248), ECE 0.098; out_hgb[full] Brier 0.203 (constant 0.248), ECE 0.049; out_lr[full] Brier 0.184 (constant 0.248), ECE 0.068; out_lr[of+ot] Brier 0.197 (constant 0.248), ECE 0.069
 
 ### debate_answer_only|eligible (120 questions; absent states 0)
 
@@ -250,7 +250,7 @@ Origin of best-of-six picks (partition 0): act: 70 from revisions, 1 new options
 
 Gate, agent level (partition 0): gate0[act]: helpful_accepted 10, helpful_blocked 22, harmful_accepted 2, harmful_blocked 24, wrong_to_wrong_accepted 9, wrong_to_wrong_blocked 36; gate_tuned[act]: helpful_accepted 16, helpful_blocked 16, harmful_accepted 8, harmful_blocked 18, wrong_to_wrong_accepted 12, wrong_to_wrong_blocked 33; gate0[out_lr[full]]: helpful_accepted 18, helpful_blocked 14, harmful_accepted 4, harmful_blocked 22, wrong_to_wrong_accepted 14, wrong_to_wrong_blocked 31; gate0[out_hgb[full]]: helpful_accepted 15, helpful_blocked 17, harmful_accepted 5, harmful_blocked 21, wrong_to_wrong_accepted 11, wrong_to_wrong_blocked 34; gate0[out_lr[of+ot]]: helpful_accepted 15, helpful_blocked 17, harmful_accepted 7, harmful_blocked 19, wrong_to_wrong_accepted 12, wrong_to_wrong_blocked 33; gate0[comb_lr[full+act]]: helpful_accepted 18, helpful_blocked 14, harmful_accepted 5, harmful_blocked 21, wrong_to_wrong_accepted 13, wrong_to_wrong_blocked 32; gate0[eq[act+out_lr_full]]: helpful_accepted 14, helpful_blocked 18, harmful_accepted 3, harmful_blocked 23, wrong_to_wrong_accepted 4, wrong_to_wrong_blocked 41; gate0[eq[act+out_lr_of+ot]]: helpful_accepted 12, helpful_blocked 20, harmful_accepted 3, harmful_blocked 23, wrong_to_wrong_accepted 5, wrong_to_wrong_blocked 40
 
-Calibration of revised-state probabilities (median over partitions): act Brier 0.200 (constant 0.247), ECE 0.058; act_rout Brier 0.251 (constant 0.247), ECE 0.053; comb_lr[full+act] Brier 0.182 (constant 0.247), ECE 0.079; eq[act+out_lr_full] Brier 0.183 (constant 0.247), ECE 0.083; eq[act+out_lr_of+ot] Brier 0.184 (constant 0.247), ECE 0.075; out_hgb[full] Brier 0.199 (constant 0.247), ECE 0.062; out_lr[full] Brier 0.183 (constant 0.247), ECE 0.081; out_lr[of+ot] Brier 0.186 (constant 0.247), ECE 0.063
+Calibration of revised-state probabilities (median over partitions): act Brier 0.200 (constant 0.247), ECE 0.058; act_rout Brier 0.251 (constant 0.247), ECE 0.053; comb_lr[full+act] Brier 0.182 (constant 0.247), ECE 0.080; eq[act+out_lr_full] Brier 0.183 (constant 0.247), ECE 0.083; eq[act+out_lr_of+ot] Brier 0.184 (constant 0.247), ECE 0.075; out_hgb[full] Brier 0.199 (constant 0.247), ECE 0.062; out_lr[full] Brier 0.183 (constant 0.247), ECE 0.081; out_lr[of+ot] Brier 0.186 (constant 0.247), ECE 0.063
 
 ### self_reconsider|eligible (120 questions; absent states 0)
 
@@ -374,7 +374,7 @@ Origin of best-of-six picks (partition 0): act: 15 from revisions, 0 new options
 
 Gate, agent level (partition 0): gate0[act]: helpful_accepted 0, helpful_blocked 35, harmful_accepted 3, harmful_blocked 76, wrong_to_wrong_accepted 9, wrong_to_wrong_blocked 58; gate_tuned[act]: helpful_accepted 4, helpful_blocked 31, harmful_accepted 10, harmful_blocked 69, wrong_to_wrong_accepted 15, wrong_to_wrong_blocked 52; gate0[out_lr[full]]: helpful_accepted 10, helpful_blocked 25, harmful_accepted 8, harmful_blocked 71, wrong_to_wrong_accepted 15, wrong_to_wrong_blocked 52; gate0[out_hgb[full]]: helpful_accepted 10, helpful_blocked 25, harmful_accepted 11, harmful_blocked 68, wrong_to_wrong_accepted 18, wrong_to_wrong_blocked 49; gate0[out_lr[of+ot]]: helpful_accepted 12, helpful_blocked 23, harmful_accepted 4, harmful_blocked 75, wrong_to_wrong_accepted 11, wrong_to_wrong_blocked 56; gate0[comb_lr[full+act]]: helpful_accepted 9, helpful_blocked 26, harmful_accepted 8, harmful_blocked 71, wrong_to_wrong_accepted 14, wrong_to_wrong_blocked 53; gate0[eq[act+out_lr_full]]: helpful_accepted 1, helpful_blocked 34, harmful_accepted 2, harmful_blocked 77, wrong_to_wrong_accepted 8, wrong_to_wrong_blocked 59; gate0[eq[act+out_lr_of+ot]]: helpful_accepted 1, helpful_blocked 34, harmful_accepted 1, harmful_blocked 78, wrong_to_wrong_accepted 6, wrong_to_wrong_blocked 61
 
-Calibration of revised-state probabilities (median over partitions): act Brier 0.188 (constant 0.254), ECE 0.062; act_rout Brier 0.253 (constant 0.254), ECE 0.088; comb_lr[full+act] Brier 0.177 (constant 0.254), ECE 0.072; eq[act+out_lr_full] Brier 0.167 (constant 0.254), ECE 0.061; eq[act+out_lr_of+ot] Brier 0.169 (constant 0.254), ECE 0.061; out_hgb[full] Brier 0.195 (constant 0.254), ECE 0.053; out_lr[full] Brier 0.178 (constant 0.254), ECE 0.071; out_lr[of+ot] Brier 0.177 (constant 0.254), ECE 0.049
+Calibration of revised-state probabilities (median over partitions): act Brier 0.188 (constant 0.254), ECE 0.062; act_rout Brier 0.253 (constant 0.254), ECE 0.088; comb_lr[full+act] Brier 0.177 (constant 0.254), ECE 0.074; eq[act+out_lr_full] Brier 0.167 (constant 0.254), ECE 0.061; eq[act+out_lr_of+ot] Brier 0.169 (constant 0.254), ECE 0.061; out_hgb[full] Brier 0.195 (constant 0.254), ECE 0.053; out_lr[full] Brier 0.178 (constant 0.254), ECE 0.071; out_lr[of+ot] Brier 0.177 (constant 0.254), ECE 0.049
 
 ### misleading_one|eligible (120 questions; absent states 0)
 
@@ -500,7 +500,7 @@ Gate, agent level (partition 0): gate0[act]: helpful_accepted 6, helpful_blocked
 
 Calibration of revised-state probabilities (median over partitions): act Brier 0.181 (constant 0.252), ECE 0.086; act_rout Brier 0.252 (constant 0.252), ECE 0.045; comb_lr[full+act] Brier 0.165 (constant 0.252), ECE 0.063; eq[act+out_lr_full] Brier 0.158 (constant 0.252), ECE 0.073; eq[act+out_lr_of+ot] Brier 0.163 (constant 0.252), ECE 0.092; out_hgb[full] Brier 0.185 (constant 0.252), ECE 0.064; out_lr[full] Brier 0.166 (constant 0.252), ECE 0.063; out_lr[of+ot] Brier 0.170 (constant 0.252), ECE 0.077
 
-Alignment: held-out z SD (1 = reference scale), median (range) over folds × partitions: act 0.98 (0.80–1.09); out_lr[of+ot] 0.92 (0.79–1.23); out_lr[full] 0.98 (0.83–1.26); out_hgb[full] 0.92 (0.80–1.02); comb_lr[full+act] 0.99 (0.85–1.23); eq[act+out_lr_full] 1.83 (1.52–2.17); eq[act+out_lr_of+ot] 1.76 (1.49–1.97); act_rout 0.90 (0.71–1.13)
+Alignment: held-out z SD (1 = reference scale), median (range) over folds × partitions: act 0.98 (0.80–1.09); out_lr[of+ot] 0.92 (0.79–1.23); out_lr[full] 0.98 (0.83–1.26); out_hgb[full] 0.92 (0.80–1.02); comb_lr[full+act] 1.00 (0.85–1.24); eq[act+out_lr_full] 1.83 (1.52–2.17); eq[act+out_lr_of+ot] 1.76 (1.49–1.97); act_rout 0.90 (0.71–1.13)
 
 Orthogonality, act: held-out R² from all output features 0.82 (0.57–0.86); largest |r| with one output feature 0.68 (0.56–0.79).
 Orthogonality, act_rout: held-out R² from all output features -0.22 (-1.93–-0.03); largest |r| with one output feature 0.28 (0.19–0.59).
@@ -514,7 +514,7 @@ Ranking (median over 6 partitions, range):
 | scorer | state_auc_pre | state_auc_post | panel_pre | panel_post | six | revision_auc |
 |---|---|---|---|---|---|---|
 | act | 0.672 (0.65–0.72) | 0.763 (0.75–0.78) | 0.670 (0.64–0.74) | 0.726 (0.69–0.76) | 0.672 (0.64–0.68) | 0.782 (0.70–0.82) |
-| comb_lr[full+act] | 0.767 (0.74–0.79) | 0.816 (0.80–0.82) | 0.660 (0.60–0.72) | 0.571 (0.50–0.62) | 0.643 (0.60–0.70) | 0.631 (0.59–0.70) |
+| comb_lr[full+act] | 0.769 (0.74–0.79) | 0.817 (0.80–0.82) | 0.640 (0.60–0.72) | 0.571 (0.50–0.62) | 0.643 (0.60–0.70) | 0.631 (0.60–0.70) |
 | eq[act+out_lr_full] | 0.765 (0.75–0.78) | 0.812 (0.80–0.83) | 0.690 (0.64–0.76) | 0.690 (0.64–0.76) | 0.682 (0.65–0.72) | 0.711 (0.64–0.74) |
 | eq[act+out_lr_of+ot] | 0.747 (0.72–0.78) | 0.792 (0.78–0.81) | 0.670 (0.60–0.72) | 0.595 (0.50–0.67) | 0.648 (0.60–0.66) | 0.706 (0.62–0.72) |
 | out_hgb[full] | 0.688 (0.64–0.74) | 0.754 (0.72–0.78) | 0.600 (0.56–0.68) | 0.595 (0.57–0.62) | 0.609 (0.56–0.65) | 0.616 (0.52–0.66) |
@@ -529,7 +529,7 @@ Paired differences (median over partitions; partitions whose 95% interval exclud
 |---|---|---|---|---|---|---|
 | act - out_lr[full] | -0.094 (0/1) | -0.039 (0/0) | +0.040 (0/0) | +0.179 (0/0) | +0.015 (0/0) | +0.123 (0/0) |
 | act - out_hgb[full] | -0.027 (0/0) | +0.012 (0/0) | +0.080 (0/0) | +0.131 (0/0) | +0.063 (0/0) | +0.168 (0/0) |
-| comb_lr[full+act] - out_lr[full] | +0.006 (0/0) | +0.003 (0/0) | +0.010 (0/0) | +0.024 (0/0) | +0.005 (0/0) | +0.006 (0/0) |
+| comb_lr[full+act] - out_lr[full] | +0.006 (0/0) | +0.003 (0/0) | +0.000 (0/0) | +0.024 (0/0) | +0.000 (0/0) | +0.006 (0/0) |
 | eq[act+out_lr_full] - out_lr[full] | -0.001 (0/0) | +0.005 (0/0) | +0.080 (1/0) | +0.143 (4/0) | +0.029 (0/0) | +0.076 (1/0) |
 | eq[act+out_lr_of+ot] - out_lr[of+ot] | +0.009 (0/0) | +0.021 (0/0) | +0.040 (1/0) | +0.155 (1/0) | +0.070 (1/0) | +0.134 (2/0) |
 
@@ -538,14 +538,14 @@ Panel decisions, questions correct per partition (original vote / pooled six do 
 | rule | 0 | 1 | 2 | 10 | 11 | 12 |
 |---|---|---|---|---|---|---|
 | best_original[act] | 68 | 67 | 67 | 68 | 67 | 66 |
-| best_original[comb_lr[full+act]] | 66 | 65 | 66 | 67 | 64 | 64 |
+| best_original[comb_lr[full+act]] | 66 | 65 | 65 | 67 | 64 | 64 |
 | best_original[eq[act+out_lr_full]] | 68 | 67 | 65 | 67 | 66 | 66 |
 | best_original[eq[act+out_lr_of+ot]] | 67 | 65 | 64 | 66 | 68 | 66 |
 | best_original[out_hgb[full]] | 65 | 65 | 64 | 67 | 65 | 65 |
 | best_original[out_lr[full]] | 66 | 65 | 66 | 68 | 64 | 64 |
 | best_original[out_lr[of+ot]] | 66 | 64 | 64 | 67 | 65 | 65 |
 | best_six[act] | 67 | 66 | 67 | 68 | 66 | 67 |
-| best_six[comb_lr[full+act]] | 66 | 66 | 67 | 67 | 65 | 64 |
+| best_six[comb_lr[full+act]] | 66 | 66 | 66 | 67 | 65 | 64 |
 | best_six[eq[act+out_lr_full]] | 68 | 66 | 65 | 67 | 66 | 67 |
 | best_six[eq[act+out_lr_of+ot]] | 68 | 66 | 64 | 67 | 67 | 67 |
 | best_six[out_hgb[full]] | 65 | 66 | 63 | 66 | 63 | 65 |
@@ -598,13 +598,13 @@ Paired decision differences (median; wins−losses per partition):
 | best_six[out_lr[of+ot]] − best_six[out_lr[full]] | -0.018 | 0/1, 1/3, 1/3, 0/2, 0/2, 3/1 |
 | best_original[out_lr[of+ot]] − best_original[out_lr[full]] | -0.005 | 0/0, 1/2, 1/3, 0/1, 2/1, 1/0 |
 | gate0[out_lr[of+ot]] − gate0[out_lr[full]] | -0.018 | 0/2, 1/3, 1/3, 1/3, 0/2, 2/2 |
-| best_six[comb_lr[full+act]] − pooled6_vote | +0.000 | 2/2, 1/1, 2/1, 2/1, 1/2, 1/3 |
+| best_six[comb_lr[full+act]] − pooled6_vote | +0.000 | 2/2, 1/1, 2/2, 2/1, 1/2, 1/3 |
 | best_six[comb_lr[full+act]] − best_original[comb_lr[full+act]] | +0.005 | 1/1, 1/0, 1/0, 1/1, 1/0, 1/1 |
-| best_original[comb_lr[full+act]] − original_vote | +0.005 | 2/1, 1/1, 2/1, 2/0, 1/2, 1/2 |
+| best_original[comb_lr[full+act]] − original_vote | +0.000 | 2/1, 1/1, 2/2, 2/0, 1/2, 1/2 |
 | gate0[comb_lr[full+act]] − original_vote | +0.014 | 3/1, 2/1, 3/1, 3/1, 1/1, 1/2 |
 | gate0[comb_lr[full+act]] − pooled6_vote | +0.005 | 2/1, 1/1, 2/1, 2/1, 0/1, 0/2 |
-| best_six[comb_lr[full+act]] − best_six[out_lr[full]] | +0.000 | 0/0, 0/0, 0/0, 0/0, 0/1, 0/0 |
-| best_original[comb_lr[full+act]] − best_original[out_lr[full]] | +0.000 | 0/0, 0/0, 0/0, 0/1, 0/0, 0/0 |
+| best_six[comb_lr[full+act]] − best_six[out_lr[full]] | +0.000 | 0/0, 0/0, 0/1, 0/0, 0/1, 0/0 |
+| best_original[comb_lr[full+act]] − best_original[out_lr[full]] | +0.000 | 0/0, 0/0, 0/1, 0/1, 0/0, 0/0 |
 | gate0[comb_lr[full+act]] − gate0[out_lr[full]] | +0.000 | 0/0, 0/0, 0/0, 0/0, 0/1, 0/1 |
 | best_six[eq[act+out_lr_full]] − pooled6_vote | +0.005 | 2/0, 1/1, 1/2, 1/0, 1/1, 1/0 |
 | best_six[eq[act+out_lr_full]] − best_original[eq[act+out_lr_full]] | +0.000 | 0/0, 0/1, 0/0, 0/0, 1/1, 1/0 |
@@ -628,7 +628,7 @@ Origin of best-of-six picks (partition 0): act: 73 from revisions, 0 new options
 
 Gate, agent level (partition 0): gate0[act]: helpful_accepted 5, helpful_blocked 22, harmful_accepted 1, harmful_blocked 28, wrong_to_wrong_accepted 1, wrong_to_wrong_blocked 37; gate_tuned[act]: helpful_accepted 15, helpful_blocked 12, harmful_accepted 13, harmful_blocked 16, wrong_to_wrong_accepted 16, wrong_to_wrong_blocked 22; gate0[out_lr[full]]: helpful_accepted 17, helpful_blocked 10, harmful_accepted 7, harmful_blocked 22, wrong_to_wrong_accepted 12, wrong_to_wrong_blocked 26; gate0[out_hgb[full]]: helpful_accepted 13, helpful_blocked 14, harmful_accepted 6, harmful_blocked 23, wrong_to_wrong_accepted 15, wrong_to_wrong_blocked 23; gate0[out_lr[of+ot]]: helpful_accepted 13, helpful_blocked 14, harmful_accepted 9, harmful_blocked 20, wrong_to_wrong_accepted 15, wrong_to_wrong_blocked 23; gate0[comb_lr[full+act]]: helpful_accepted 17, helpful_blocked 10, harmful_accepted 6, harmful_blocked 23, wrong_to_wrong_accepted 11, wrong_to_wrong_blocked 27; gate0[eq[act+out_lr_full]]: helpful_accepted 9, helpful_blocked 18, harmful_accepted 2, harmful_blocked 27, wrong_to_wrong_accepted 6, wrong_to_wrong_blocked 32; gate0[eq[act+out_lr_of+ot]]: helpful_accepted 8, helpful_blocked 19, harmful_accepted 2, harmful_blocked 27, wrong_to_wrong_accepted 5, wrong_to_wrong_blocked 33
 
-Calibration of revised-state probabilities (median over partitions): act Brier 0.199 (constant 0.247), ECE 0.086; comb_lr[full+act] Brier 0.186 (constant 0.247), ECE 0.088; eq[act+out_lr_full] Brier 0.184 (constant 0.247), ECE 0.095; eq[act+out_lr_of+ot] Brier 0.190 (constant 0.247), ECE 0.092; out_hgb[full] Brier 0.207 (constant 0.247), ECE 0.064; out_lr[full] Brier 0.187 (constant 0.247), ECE 0.077; out_lr[of+ot] Brier 0.202 (constant 0.247), ECE 0.088
+Calibration of revised-state probabilities (median over partitions): act Brier 0.199 (constant 0.247), ECE 0.086; comb_lr[full+act] Brier 0.185 (constant 0.247), ECE 0.082; eq[act+out_lr_full] Brier 0.184 (constant 0.247), ECE 0.095; eq[act+out_lr_of+ot] Brier 0.190 (constant 0.247), ECE 0.092; out_hgb[full] Brier 0.207 (constant 0.247), ECE 0.064; out_lr[full] Brier 0.187 (constant 0.247), ECE 0.077; out_lr[of+ot] Brier 0.202 (constant 0.247), ECE 0.088
 
 ### debate|all_fallback (120 questions; absent states 18)
 
@@ -637,7 +637,7 @@ Ranking (median over 6 partitions, range):
 | scorer | state_auc_pre | state_auc_post | panel_pre | panel_post | six | revision_auc |
 |---|---|---|---|---|---|---|
 | act_fb | 0.681 (0.67–0.72) | 0.759 (0.74–0.78) | 0.653 (0.63–0.71) | 0.677 (0.65–0.73) | 0.651 (0.62–0.67) | 0.785 (0.72–0.81) |
-| comb_lr[full+act] | 0.772 (0.74–0.79) | 0.817 (0.79–0.82) | 0.661 (0.61–0.69) | 0.583 (0.52–0.62) | 0.651 (0.62–0.69) | 0.654 (0.64–0.72) |
+| comb_lr[full+act] | 0.773 (0.74–0.79) | 0.818 (0.79–0.82) | 0.637 (0.61–0.69) | 0.583 (0.52–0.62) | 0.647 (0.61–0.69) | 0.654 (0.62–0.72) |
 | eq[act+out_lr_full] | 0.770 (0.75–0.78) | 0.808 (0.79–0.82) | 0.685 (0.65–0.74) | 0.688 (0.65–0.75) | 0.681 (0.65–0.71) | 0.727 (0.67–0.77) |
 | eq[act+out_lr_of+ot] | 0.753 (0.72–0.78) | 0.790 (0.78–0.81) | 0.645 (0.60–0.68) | 0.604 (0.52–0.67) | 0.645 (0.62–0.65) | 0.705 (0.65–0.73) |
 | out_hgb[full] | 0.700 (0.64–0.74) | 0.764 (0.73–0.79) | 0.613 (0.58–0.73) | 0.625 (0.60–0.65) | 0.633 (0.59–0.69) | 0.660 (0.59–0.70) |
@@ -652,7 +652,7 @@ Paired differences (median over partitions; partitions whose 95% interval exclud
 |---|---|---|---|---|---|---|
 | act_fb - out_lr[full] | -0.089 (0/1) | -0.047 (0/0) | +0.016 (0/0) | +0.115 (0/0) | -0.014 (0/0) | +0.096 (0/0) |
 | act_fb - out_hgb[full] | -0.024 (0/0) | -0.006 (0/0) | +0.040 (0/0) | +0.062 (0/0) | +0.020 (0/0) | +0.129 (0/0) |
-| comb_lr[full+act] - out_lr[full] | +0.007 (0/0) | +0.002 (0/0) | +0.008 (0/0) | +0.010 (0/0) | -0.002 (0/0) | +0.016 (0/0) |
+| comb_lr[full+act] - out_lr[full] | +0.007 (0/0) | +0.002 (0/0) | +0.000 (0/0) | +0.010 (0/0) | -0.004 (0/0) | +0.016 (0/0) |
 | eq[act+out_lr_full] - out_lr[full] | -0.001 (0/0) | -0.001 (0/0) | +0.056 (0/0) | +0.115 (3/0) | +0.020 (0/0) | +0.071 (1/0) |
 | eq[act+out_lr_of+ot] - out_lr[of+ot] | +0.011 (0/0) | +0.012 (0/0) | +0.048 (1/0) | +0.125 (1/0) | +0.063 (1/0) | +0.126 (3/0) |
 
@@ -661,14 +661,14 @@ Panel decisions, questions correct per partition (original vote / pooled six do 
 | rule | 0 | 1 | 2 | 10 | 11 | 12 |
 |---|---|---|---|---|---|---|
 | best_original[act_fb] | 73 | 72 | 72 | 73 | 72 | 71 |
-| best_original[comb_lr[full+act]] | 71 | 70 | 71 | 72 | 69 | 69 |
+| best_original[comb_lr[full+act]] | 71 | 70 | 69 | 72 | 69 | 69 |
 | best_original[eq[act+out_lr_full]] | 73 | 72 | 70 | 72 | 71 | 71 |
 | best_original[eq[act+out_lr_of+ot]] | 71 | 69 | 69 | 70 | 72 | 71 |
 | best_original[out_hgb[full]] | 70 | 71 | 69 | 72 | 70 | 70 |
 | best_original[out_lr[full]] | 71 | 70 | 71 | 73 | 69 | 69 |
 | best_original[out_lr[of+ot]] | 70 | 68 | 68 | 71 | 69 | 69 |
 | best_six[act_fb] | 72 | 71 | 72 | 73 | 71 | 72 |
-| best_six[comb_lr[full+act]] | 71 | 71 | 72 | 72 | 70 | 69 |
+| best_six[comb_lr[full+act]] | 71 | 71 | 70 | 72 | 70 | 69 |
 | best_six[eq[act+out_lr_full]] | 73 | 71 | 70 | 72 | 71 | 72 |
 | best_six[eq[act+out_lr_of+ot]] | 72 | 70 | 68 | 71 | 71 | 72 |
 | best_six[out_hgb[full]] | 70 | 72 | 68 | 71 | 68 | 70 |
@@ -713,13 +713,13 @@ Paired decision differences (median; wins−losses per partition):
 | best_six[out_lr[of+ot]] − best_six[out_lr[full]] | -0.025 | 0/2, 1/4, 1/4, 0/3, 0/3, 3/2 |
 | best_original[out_lr[of+ot]] − best_original[out_lr[full]] | -0.013 | 0/1, 1/3, 1/4, 0/2, 2/2, 1/1 |
 | gate0[out_lr[of+ot]] − gate0[out_lr[full]] | -0.021 | 0/3, 1/4, 1/4, 1/3, 0/2, 2/2 |
-| best_six[comb_lr[full+act]] − pooled6_vote | +0.000 | 3/3, 2/2, 3/2, 3/2, 2/3, 2/4 |
+| best_six[comb_lr[full+act]] − pooled6_vote | -0.004 | 3/3, 2/2, 2/3, 3/2, 2/3, 2/4 |
 | best_six[comb_lr[full+act]] − best_original[comb_lr[full+act]] | +0.004 | 1/1, 1/0, 1/0, 1/1, 1/0, 1/1 |
-| best_original[comb_lr[full+act]] − original_vote | +0.013 | 3/1, 2/1, 3/1, 3/0, 2/2, 2/2 |
+| best_original[comb_lr[full+act]] − original_vote | +0.004 | 3/1, 2/1, 3/3, 3/0, 2/2, 2/2 |
 | gate0[comb_lr[full+act]] − original_vote | +0.017 | 5/2, 4/2, 5/2, 4/2, 2/2, 2/3 |
 | gate0[comb_lr[full+act]] − pooled6_vote | +0.000 | 2/1, 1/1, 2/1, 2/2, 0/2, 0/3 |
-| best_six[comb_lr[full+act]] − best_six[out_lr[full]] | +0.000 | 0/0, 0/0, 0/0, 0/0, 0/1, 0/0 |
-| best_original[comb_lr[full+act]] − best_original[out_lr[full]] | +0.000 | 0/0, 0/0, 0/0, 0/1, 0/0, 0/0 |
+| best_six[comb_lr[full+act]] − best_six[out_lr[full]] | +0.000 | 0/0, 0/0, 0/2, 0/0, 0/1, 0/0 |
+| best_original[comb_lr[full+act]] − best_original[out_lr[full]] | +0.000 | 0/0, 0/0, 0/2, 0/1, 0/0, 0/0 |
 | gate0[comb_lr[full+act]] − gate0[out_lr[full]] | +0.000 | 0/0, 0/0, 0/0, 0/0, 0/1, 0/1 |
 | best_six[eq[act+out_lr_full]] − pooled6_vote | +0.004 | 3/1, 2/2, 2/3, 2/1, 2/2, 2/1 |
 | best_six[eq[act+out_lr_full]] − best_original[eq[act+out_lr_full]] | +0.000 | 0/0, 0/1, 0/0, 0/0, 1/1, 1/0 |
@@ -751,7 +751,7 @@ Origin of best-of-six picks (partition 0): out_lr[full]: 76 from revisions, 0 ne
 
 Gate, agent level (partition 0): gate0[out_lr[full]]: helpful_accepted 22, helpful_blocked 10, harmful_accepted 8, harmful_blocked 24, wrong_to_wrong_accepted 13, wrong_to_wrong_blocked 33; gate0[out_hgb[full]]: helpful_accepted 16, helpful_blocked 16, harmful_accepted 6, harmful_blocked 26, wrong_to_wrong_accepted 16, wrong_to_wrong_blocked 30; gate0[out_lr[of+ot]]: helpful_accepted 17, helpful_blocked 15, harmful_accepted 11, harmful_blocked 21, wrong_to_wrong_accepted 15, wrong_to_wrong_blocked 31; gate0[comb_lr[full+act]]: helpful_accepted 22, helpful_blocked 10, harmful_accepted 7, harmful_blocked 25, wrong_to_wrong_accepted 12, wrong_to_wrong_blocked 34; gate0[eq[act+out_lr_full]]: helpful_accepted 14, helpful_blocked 18, harmful_accepted 3, harmful_blocked 29, wrong_to_wrong_accepted 7, wrong_to_wrong_blocked 39; gate0[eq[act+out_lr_of+ot]]: helpful_accepted 12, helpful_blocked 20, harmful_accepted 3, harmful_blocked 29, wrong_to_wrong_accepted 6, wrong_to_wrong_blocked 40; gate0[act_fb]: helpful_accepted 9, helpful_blocked 23, harmful_accepted 3, harmful_blocked 29, wrong_to_wrong_accepted 4, wrong_to_wrong_blocked 42; gate_tuned[act_fb]: helpful_accepted 19, helpful_blocked 13, harmful_accepted 16, harmful_blocked 16, wrong_to_wrong_accepted 22, wrong_to_wrong_blocked 24
 
-Calibration of revised-state probabilities (median over partitions): act_fb Brier 0.202 (constant 0.248), ECE 0.080; comb_lr[full+act] Brier 0.183 (constant 0.248), ECE 0.073; eq[act+out_lr_full] Brier 0.185 (constant 0.248), ECE 0.086; eq[act+out_lr_of+ot] Brier 0.190 (constant 0.248), ECE 0.089; out_hgb[full] Brier 0.203 (constant 0.248), ECE 0.049; out_lr[full] Brier 0.184 (constant 0.248), ECE 0.068; out_lr[of+ot] Brier 0.197 (constant 0.248), ECE 0.069
+Calibration of revised-state probabilities (median over partitions): act_fb Brier 0.202 (constant 0.248), ECE 0.080; comb_lr[full+act] Brier 0.183 (constant 0.248), ECE 0.069; eq[act+out_lr_full] Brier 0.185 (constant 0.248), ECE 0.086; eq[act+out_lr_of+ot] Brier 0.190 (constant 0.248), ECE 0.089; out_hgb[full] Brier 0.203 (constant 0.248), ECE 0.049; out_lr[full] Brier 0.184 (constant 0.248), ECE 0.068; out_lr[of+ot] Brier 0.197 (constant 0.248), ECE 0.069
 
 ### debate_answer_only|eligible (109 questions; absent states 18)
 
@@ -760,7 +760,7 @@ Ranking (median over 6 partitions, range):
 | scorer | state_auc_pre | state_auc_post | panel_pre | panel_post | six | revision_auc |
 |---|---|---|---|---|---|---|
 | act | 0.672 (0.65–0.72) | 0.718 (0.70–0.74) | 0.670 (0.64–0.74) | 0.671 (0.61–0.71) | 0.634 (0.60–0.65) | 0.747 (0.68–0.81) |
-| comb_lr[full+act] | 0.767 (0.74–0.79) | 0.806 (0.77–0.82) | 0.660 (0.60–0.72) | 0.632 (0.58–0.66) | 0.627 (0.60–0.66) | 0.613 (0.54–0.67) |
+| comb_lr[full+act] | 0.769 (0.74–0.79) | 0.809 (0.77–0.82) | 0.640 (0.60–0.72) | 0.632 (0.58–0.66) | 0.624 (0.60–0.66) | 0.604 (0.54–0.67) |
 | eq[act+out_lr_full] | 0.765 (0.75–0.78) | 0.795 (0.76–0.81) | 0.690 (0.64–0.76) | 0.658 (0.63–0.74) | 0.641 (0.61–0.65) | 0.702 (0.64–0.80) |
 | eq[act+out_lr_of+ot] | 0.747 (0.72–0.78) | 0.764 (0.74–0.79) | 0.670 (0.60–0.72) | 0.632 (0.58–0.68) | 0.654 (0.61–0.67) | 0.692 (0.60–0.78) |
 | out_hgb[full] | 0.688 (0.64–0.74) | 0.748 (0.72–0.77) | 0.600 (0.56–0.68) | 0.645 (0.53–0.74) | 0.639 (0.58–0.68) | 0.640 (0.54–0.78) |
@@ -775,7 +775,7 @@ Paired differences (median over partitions; partitions whose 95% interval exclud
 |---|---|---|---|---|---|---|
 | act - out_lr[full] | -0.094 (0/1) | -0.078 (0/2) | +0.040 (0/0) | +0.026 (0/0) | -0.005 (0/0) | +0.146 (0/0) |
 | act - out_hgb[full] | -0.027 (0/0) | -0.032 (0/0) | +0.080 (0/0) | +0.013 (0/0) | -0.002 (0/0) | +0.107 (0/0) |
-| comb_lr[full+act] - out_lr[full] | +0.006 (0/0) | -0.003 (0/0) | +0.010 (0/0) | +0.013 (0/0) | -0.002 (0/0) | +0.003 (0/0) |
+| comb_lr[full+act] - out_lr[full] | +0.006 (0/0) | -0.003 (0/0) | +0.000 (0/0) | +0.013 (0/0) | -0.002 (0/0) | -0.006 (0/0) |
 | eq[act+out_lr_full] - out_lr[full] | -0.001 (0/0) | -0.011 (0/0) | +0.080 (1/0) | +0.053 (0/0) | +0.015 (0/0) | +0.098 (2/0) |
 | eq[act+out_lr_of+ot] - out_lr[of+ot] | +0.009 (0/0) | -0.012 (0/0) | +0.040 (1/0) | +0.000 (0/0) | +0.032 (0/0) | +0.071 (0/0) |
 
@@ -784,14 +784,14 @@ Panel decisions, questions correct per partition (original vote / pooled six do 
 | rule | 0 | 1 | 2 | 10 | 11 | 12 |
 |---|---|---|---|---|---|---|
 | best_original[act] | 68 | 67 | 67 | 68 | 67 | 66 |
-| best_original[comb_lr[full+act]] | 66 | 65 | 66 | 67 | 64 | 64 |
+| best_original[comb_lr[full+act]] | 66 | 65 | 65 | 67 | 64 | 64 |
 | best_original[eq[act+out_lr_full]] | 68 | 67 | 65 | 67 | 66 | 66 |
 | best_original[eq[act+out_lr_of+ot]] | 67 | 65 | 64 | 66 | 68 | 66 |
 | best_original[out_hgb[full]] | 65 | 65 | 64 | 67 | 65 | 65 |
 | best_original[out_lr[full]] | 66 | 65 | 66 | 68 | 64 | 64 |
 | best_original[out_lr[of+ot]] | 66 | 64 | 64 | 67 | 65 | 65 |
 | best_six[act] | 69 | 68 | 68 | 68 | 67 | 67 |
-| best_six[comb_lr[full+act]] | 64 | 64 | 66 | 67 | 64 | 63 |
+| best_six[comb_lr[full+act]] | 64 | 64 | 65 | 67 | 64 | 63 |
 | best_six[eq[act+out_lr_full]] | 66 | 66 | 66 | 67 | 65 | 65 |
 | best_six[eq[act+out_lr_of+ot]] | 67 | 67 | 66 | 68 | 67 | 66 |
 | best_six[out_hgb[full]] | 65 | 67 | 64 | 67 | 65 | 67 |
@@ -844,13 +844,13 @@ Paired decision differences (median; wins−losses per partition):
 | best_six[out_lr[of+ot]] − best_six[out_lr[full]] | +0.000 | 0/0, 1/1, 0/2, 0/1, 0/0, 0/0 |
 | best_original[out_lr[of+ot]] − best_original[out_lr[full]] | -0.005 | 0/0, 1/2, 1/3, 0/1, 2/1, 1/0 |
 | gate0[out_lr[of+ot]] − gate0[out_lr[full]] | -0.009 | 1/2, 2/2, 0/2, 1/1, 0/1, 1/2 |
-| best_six[comb_lr[full+act]] − pooled6_vote | -0.009 | 2/3, 1/2, 2/1, 3/1, 2/3, 1/3 |
+| best_six[comb_lr[full+act]] − pooled6_vote | -0.009 | 2/3, 1/2, 2/2, 3/1, 2/3, 1/3 |
 | best_six[comb_lr[full+act]] − best_original[comb_lr[full+act]] | -0.005 | 0/2, 0/1, 0/0, 1/1, 1/1, 1/2 |
-| best_original[comb_lr[full+act]] − original_vote | +0.005 | 2/1, 1/1, 2/1, 2/0, 1/2, 1/2 |
+| best_original[comb_lr[full+act]] − original_vote | +0.000 | 2/1, 1/1, 2/2, 2/0, 1/2, 1/2 |
 | gate0[comb_lr[full+act]] − original_vote | +0.000 | 2/1, 1/2, 1/1, 1/1, 2/2, 2/2 |
 | gate0[comb_lr[full+act]] − pooled6_vote | +0.000 | 2/1, 1/2, 1/1, 1/1, 2/2, 2/2 |
-| best_six[comb_lr[full+act]] − best_six[out_lr[full]] | +0.000 | 0/0, 0/0, 0/0, 0/0, 0/0, 0/1 |
-| best_original[comb_lr[full+act]] − best_original[out_lr[full]] | +0.000 | 0/0, 0/0, 0/0, 0/1, 0/0, 0/0 |
+| best_six[comb_lr[full+act]] − best_six[out_lr[full]] | +0.000 | 0/0, 0/0, 0/1, 0/0, 0/0, 0/1 |
+| best_original[comb_lr[full+act]] − best_original[out_lr[full]] | +0.000 | 0/0, 0/0, 0/1, 0/1, 0/0, 0/0 |
 | gate0[comb_lr[full+act]] − gate0[out_lr[full]] | +0.000 | 0/0, 0/0, 0/0, 0/0, 1/0, 0/0 |
 | best_six[eq[act+out_lr_full]] − pooled6_vote | +0.009 | 3/2, 2/1, 1/0, 2/0, 1/1, 1/1 |
 | best_six[eq[act+out_lr_full]] − best_original[eq[act+out_lr_full]] | -0.009 | 0/2, 0/1, 1/0, 1/1, 1/2, 0/1 |
@@ -874,7 +874,7 @@ Origin of best-of-six picks (partition 0): act: 78 from revisions, 0 new options
 
 Gate, agent level (partition 0): gate0[act]: helpful_accepted 4, helpful_blocked 22, harmful_accepted 1, harmful_blocked 22, wrong_to_wrong_accepted 2, wrong_to_wrong_blocked 34; gate_tuned[act]: helpful_accepted 17, helpful_blocked 9, harmful_accepted 9, harmful_blocked 14, wrong_to_wrong_accepted 18, wrong_to_wrong_blocked 18; gate0[out_lr[full]]: helpful_accepted 14, helpful_blocked 12, harmful_accepted 4, harmful_blocked 19, wrong_to_wrong_accepted 12, wrong_to_wrong_blocked 24; gate0[out_hgb[full]]: helpful_accepted 13, helpful_blocked 13, harmful_accepted 5, harmful_blocked 18, wrong_to_wrong_accepted 10, wrong_to_wrong_blocked 26; gate0[out_lr[of+ot]]: helpful_accepted 12, helpful_blocked 14, harmful_accepted 5, harmful_blocked 18, wrong_to_wrong_accepted 11, wrong_to_wrong_blocked 25; gate0[comb_lr[full+act]]: helpful_accepted 14, helpful_blocked 12, harmful_accepted 4, harmful_blocked 19, wrong_to_wrong_accepted 12, wrong_to_wrong_blocked 24; gate0[eq[act+out_lr_full]]: helpful_accepted 9, helpful_blocked 17, harmful_accepted 1, harmful_blocked 22, wrong_to_wrong_accepted 5, wrong_to_wrong_blocked 31; gate0[eq[act+out_lr_of+ot]]: helpful_accepted 8, helpful_blocked 18, harmful_accepted 1, harmful_blocked 22, wrong_to_wrong_accepted 2, wrong_to_wrong_blocked 34
 
-Calibration of revised-state probabilities (median over partitions): act Brier 0.210 (constant 0.246), ECE 0.070; comb_lr[full+act] Brier 0.187 (constant 0.246), ECE 0.078; eq[act+out_lr_full] Brier 0.192 (constant 0.246), ECE 0.073; eq[act+out_lr_of+ot] Brier 0.195 (constant 0.246), ECE 0.062; out_hgb[full] Brier 0.203 (constant 0.246), ECE 0.059; out_lr[full] Brier 0.185 (constant 0.246), ECE 0.083; out_lr[of+ot] Brier 0.192 (constant 0.246), ECE 0.073
+Calibration of revised-state probabilities (median over partitions): act Brier 0.210 (constant 0.246), ECE 0.070; comb_lr[full+act] Brier 0.187 (constant 0.246), ECE 0.081; eq[act+out_lr_full] Brier 0.192 (constant 0.246), ECE 0.073; eq[act+out_lr_of+ot] Brier 0.195 (constant 0.246), ECE 0.062; out_hgb[full] Brier 0.203 (constant 0.246), ECE 0.059; out_lr[full] Brier 0.185 (constant 0.246), ECE 0.083; out_lr[of+ot] Brier 0.192 (constant 0.246), ECE 0.073
 
 ### debate_answer_only|all_fallback (120 questions; absent states 18)
 
@@ -883,7 +883,7 @@ Ranking (median over 6 partitions, range):
 | scorer | state_auc_pre | state_auc_post | panel_pre | panel_post | six | revision_auc |
 |---|---|---|---|---|---|---|
 | act_fb | 0.681 (0.67–0.72) | 0.721 (0.70–0.74) | 0.653 (0.63–0.71) | 0.690 (0.62–0.74) | 0.634 (0.60–0.65) | 0.732 (0.68–0.81) |
-| comb_lr[full+act] | 0.772 (0.74–0.79) | 0.808 (0.78–0.82) | 0.661 (0.61–0.69) | 0.655 (0.60–0.69) | 0.648 (0.61–0.66) | 0.646 (0.58–0.71) |
+| comb_lr[full+act] | 0.773 (0.74–0.79) | 0.810 (0.78–0.82) | 0.637 (0.61–0.69) | 0.655 (0.60–0.69) | 0.640 (0.61–0.66) | 0.629 (0.58–0.71) |
 | eq[act+out_lr_full] | 0.770 (0.75–0.78) | 0.793 (0.77–0.81) | 0.685 (0.65–0.74) | 0.667 (0.67–0.76) | 0.654 (0.63–0.66) | 0.719 (0.69–0.80) |
 | eq[act+out_lr_of+ot] | 0.753 (0.72–0.78) | 0.770 (0.75–0.80) | 0.645 (0.60–0.68) | 0.667 (0.62–0.71) | 0.648 (0.62–0.66) | 0.695 (0.59–0.76) |
 | out_hgb[full] | 0.700 (0.64–0.74) | 0.764 (0.73–0.79) | 0.613 (0.58–0.73) | 0.655 (0.55–0.71) | 0.636 (0.60–0.70) | 0.691 (0.58–0.81) |
@@ -898,7 +898,7 @@ Paired differences (median over partitions; partitions whose 95% interval exclud
 |---|---|---|---|---|---|---|
 | act_fb - out_lr[full] | -0.089 (0/1) | -0.081 (0/3) | +0.016 (0/0) | +0.012 (0/0) | -0.016 (0/0) | +0.111 (0/0) |
 | act_fb - out_hgb[full] | -0.024 (0/0) | -0.045 (0/0) | +0.040 (0/0) | +0.036 (0/0) | -0.002 (0/0) | +0.041 (0/0) |
-| comb_lr[full+act] - out_lr[full] | +0.007 (0/0) | -0.003 (0/1) | +0.008 (0/0) | +0.000 (0/0) | -0.002 (0/0) | +0.005 (0/0) |
+| comb_lr[full+act] - out_lr[full] | +0.007 (0/0) | -0.003 (0/0) | +0.000 (0/0) | +0.000 (0/0) | -0.002 (0/0) | -0.001 (0/0) |
 | eq[act+out_lr_full] - out_lr[full] | -0.001 (0/0) | -0.014 (0/0) | +0.056 (0/0) | +0.048 (0/0) | +0.004 (0/0) | +0.093 (1/0) |
 | eq[act+out_lr_of+ot] - out_lr[of+ot] | +0.011 (0/0) | -0.017 (0/0) | +0.048 (1/0) | +0.000 (0/0) | +0.036 (1/0) | +0.068 (1/0) |
 
@@ -907,14 +907,14 @@ Panel decisions, questions correct per partition (original vote / pooled six do 
 | rule | 0 | 1 | 2 | 10 | 11 | 12 |
 |---|---|---|---|---|---|---|
 | best_original[act_fb] | 73 | 72 | 72 | 73 | 72 | 71 |
-| best_original[comb_lr[full+act]] | 71 | 70 | 71 | 72 | 69 | 69 |
+| best_original[comb_lr[full+act]] | 71 | 70 | 69 | 72 | 69 | 69 |
 | best_original[eq[act+out_lr_full]] | 73 | 72 | 70 | 72 | 71 | 71 |
 | best_original[eq[act+out_lr_of+ot]] | 71 | 69 | 69 | 70 | 72 | 71 |
 | best_original[out_hgb[full]] | 70 | 71 | 69 | 72 | 70 | 70 |
 | best_original[out_lr[full]] | 71 | 70 | 71 | 73 | 69 | 69 |
 | best_original[out_lr[of+ot]] | 70 | 68 | 68 | 71 | 69 | 69 |
 | best_six[act_fb] | 74 | 73 | 73 | 73 | 72 | 72 |
-| best_six[comb_lr[full+act]] | 69 | 70 | 72 | 72 | 69 | 68 |
+| best_six[comb_lr[full+act]] | 69 | 70 | 70 | 72 | 69 | 68 |
 | best_six[eq[act+out_lr_full]] | 71 | 72 | 71 | 72 | 70 | 70 |
 | best_six[eq[act+out_lr_of+ot]] | 71 | 72 | 71 | 72 | 71 | 71 |
 | best_six[out_hgb[full]] | 70 | 73 | 69 | 72 | 71 | 72 |
@@ -959,13 +959,13 @@ Paired decision differences (median; wins−losses per partition):
 | best_six[out_lr[of+ot]] − best_six[out_lr[full]] | -0.008 | 0/1, 1/2, 0/3, 0/2, 0/1, 0/1 |
 | best_original[out_lr[of+ot]] − best_original[out_lr[full]] | -0.013 | 0/1, 1/3, 1/4, 0/2, 2/2, 1/1 |
 | gate0[out_lr[of+ot]] − gate0[out_lr[full]] | -0.021 | 1/4, 3/3, 0/3, 1/1, 0/3, 1/3 |
-| best_six[comb_lr[full+act]] − pooled6_vote | -0.004 | 3/4, 2/2, 3/1, 4/2, 3/4, 2/4 |
+| best_six[comb_lr[full+act]] − pooled6_vote | -0.004 | 3/4, 2/2, 2/2, 4/2, 3/4, 2/4 |
 | best_six[comb_lr[full+act]] − best_original[comb_lr[full+act]] | +0.000 | 0/2, 1/1, 1/0, 1/1, 1/1, 1/2 |
-| best_original[comb_lr[full+act]] − original_vote | +0.013 | 3/1, 2/1, 3/1, 3/0, 2/2, 2/2 |
+| best_original[comb_lr[full+act]] − original_vote | +0.004 | 3/1, 2/1, 3/3, 3/0, 2/2, 2/2 |
 | gate0[comb_lr[full+act]] − original_vote | +0.008 | 4/2, 3/2, 3/2, 2/2, 3/2, 3/2 |
 | gate0[comb_lr[full+act]] − pooled6_vote | +0.000 | 2/1, 2/2, 1/1, 1/2, 3/3, 3/3 |
-| best_six[comb_lr[full+act]] − best_six[out_lr[full]] | +0.000 | 0/0, 0/0, 0/0, 0/0, 0/0, 0/1 |
-| best_original[comb_lr[full+act]] − best_original[out_lr[full]] | +0.000 | 0/0, 0/0, 0/0, 0/1, 0/0, 0/0 |
+| best_six[comb_lr[full+act]] − best_six[out_lr[full]] | +0.000 | 0/0, 0/0, 0/2, 0/0, 0/0, 0/1 |
+| best_original[comb_lr[full+act]] − best_original[out_lr[full]] | +0.000 | 0/0, 0/0, 0/2, 0/1, 0/0, 0/0 |
 | gate0[comb_lr[full+act]] − gate0[out_lr[full]] | +0.000 | 0/1, 1/0, 0/1, 0/0, 1/0, 0/0 |
 | best_six[eq[act+out_lr_full]] − pooled6_vote | +0.008 | 4/3, 3/1, 2/1, 3/1, 2/2, 2/2 |
 | best_six[eq[act+out_lr_full]] − best_original[eq[act+out_lr_full]] | -0.004 | 0/2, 1/1, 1/0, 1/1, 1/2, 0/1 |
@@ -997,7 +997,7 @@ Origin of best-of-six picks (partition 0): out_lr[full]: 77 from revisions, 0 ne
 
 Gate, agent level (partition 0): gate0[out_lr[full]]: helpful_accepted 18, helpful_blocked 14, harmful_accepted 4, harmful_blocked 22, wrong_to_wrong_accepted 14, wrong_to_wrong_blocked 31; gate0[out_hgb[full]]: helpful_accepted 15, helpful_blocked 17, harmful_accepted 5, harmful_blocked 21, wrong_to_wrong_accepted 11, wrong_to_wrong_blocked 34; gate0[out_lr[of+ot]]: helpful_accepted 15, helpful_blocked 17, harmful_accepted 7, harmful_blocked 19, wrong_to_wrong_accepted 12, wrong_to_wrong_blocked 33; gate0[comb_lr[full+act]]: helpful_accepted 18, helpful_blocked 14, harmful_accepted 5, harmful_blocked 21, wrong_to_wrong_accepted 13, wrong_to_wrong_blocked 32; gate0[eq[act+out_lr_full]]: helpful_accepted 13, helpful_blocked 19, harmful_accepted 2, harmful_blocked 24, wrong_to_wrong_accepted 7, wrong_to_wrong_blocked 38; gate0[eq[act+out_lr_of+ot]]: helpful_accepted 10, helpful_blocked 22, harmful_accepted 2, harmful_blocked 24, wrong_to_wrong_accepted 3, wrong_to_wrong_blocked 42; gate0[act_fb]: helpful_accepted 5, helpful_blocked 27, harmful_accepted 2, harmful_blocked 24, wrong_to_wrong_accepted 5, wrong_to_wrong_blocked 40; gate_tuned[act_fb]: helpful_accepted 21, helpful_blocked 11, harmful_accepted 12, harmful_blocked 14, wrong_to_wrong_accepted 25, wrong_to_wrong_blocked 20
 
-Calibration of revised-state probabilities (median over partitions): act_fb Brier 0.213 (constant 0.247), ECE 0.058; comb_lr[full+act] Brier 0.184 (constant 0.247), ECE 0.077; eq[act+out_lr_full] Brier 0.193 (constant 0.247), ECE 0.080; eq[act+out_lr_of+ot] Brier 0.193 (constant 0.247), ECE 0.058; out_hgb[full] Brier 0.199 (constant 0.247), ECE 0.062; out_lr[full] Brier 0.183 (constant 0.247), ECE 0.081; out_lr[of+ot] Brier 0.186 (constant 0.247), ECE 0.063
+Calibration of revised-state probabilities (median over partitions): act_fb Brier 0.213 (constant 0.247), ECE 0.058; comb_lr[full+act] Brier 0.184 (constant 0.247), ECE 0.076; eq[act+out_lr_full] Brier 0.193 (constant 0.247), ECE 0.080; eq[act+out_lr_of+ot] Brier 0.193 (constant 0.247), ECE 0.058; out_hgb[full] Brier 0.199 (constant 0.247), ECE 0.062; out_lr[full] Brier 0.183 (constant 0.247), ECE 0.081; out_lr[of+ot] Brier 0.186 (constant 0.247), ECE 0.063
 
 ### self_reconsider|eligible (109 questions; absent states 21)
 
@@ -1006,7 +1006,7 @@ Ranking (median over 6 partitions, range):
 | scorer | state_auc_pre | state_auc_post | panel_pre | panel_post | six | revision_auc |
 |---|---|---|---|---|---|---|
 | act | 0.672 (0.65–0.72) | 0.770 (0.75–0.80) | 0.670 (0.64–0.74) | 0.757 (0.72–0.78) | 0.735 (0.72–0.75) | 0.704 (0.63–0.73) |
-| comb_lr[full+act] | 0.767 (0.74–0.79) | 0.799 (0.79–0.83) | 0.660 (0.60–0.72) | 0.764 (0.72–0.81) | 0.709 (0.71–0.73) | 0.772 (0.72–0.82) |
+| comb_lr[full+act] | 0.769 (0.74–0.79) | 0.800 (0.79–0.83) | 0.640 (0.60–0.72) | 0.764 (0.72–0.81) | 0.709 (0.71–0.73) | 0.768 (0.72–0.82) |
 | eq[act+out_lr_full] | 0.765 (0.75–0.78) | 0.818 (0.81–0.85) | 0.690 (0.64–0.76) | 0.819 (0.79–0.88) | 0.744 (0.73–0.75) | 0.802 (0.74–0.83) |
 | eq[act+out_lr_of+ot] | 0.747 (0.72–0.78) | 0.828 (0.82–0.84) | 0.670 (0.60–0.72) | 0.840 (0.82–0.86) | 0.746 (0.73–0.76) | 0.809 (0.74–0.83) |
 | out_hgb[full] | 0.688 (0.64–0.74) | 0.755 (0.73–0.80) | 0.600 (0.56–0.68) | 0.715 (0.62–0.75) | 0.705 (0.66–0.72) | 0.712 (0.62–0.75) |
@@ -1021,7 +1021,7 @@ Paired differences (median over partitions; partitions whose 95% interval exclud
 |---|---|---|---|---|---|---|
 | act - out_lr[full] | -0.094 (0/1) | -0.032 (0/0) | +0.040 (0/0) | -0.021 (0/0) | +0.029 (0/0) | -0.053 (0/0) |
 | act - out_hgb[full] | -0.027 (0/0) | +0.022 (0/0) | +0.080 (0/0) | +0.056 (0/0) | +0.037 (0/0) | -0.023 (0/0) |
-| comb_lr[full+act] - out_lr[full] | +0.006 (0/0) | -0.002 (0/0) | +0.010 (0/0) | +0.014 (0/0) | +0.001 (0/0) | +0.010 (0/0) |
+| comb_lr[full+act] - out_lr[full] | +0.006 (0/0) | -0.001 (0/0) | +0.000 (0/0) | +0.014 (0/0) | +0.001 (0/0) | +0.006 (0/0) |
 | eq[act+out_lr_full] - out_lr[full] | -0.001 (0/0) | +0.016 (0/0) | +0.080 (1/0) | +0.069 (1/0) | +0.034 (0/0) | +0.023 (0/0) |
 | eq[act+out_lr_of+ot] - out_lr[of+ot] | +0.009 (0/0) | +0.022 (0/0) | +0.040 (1/0) | +0.049 (0/0) | -0.001 (0/0) | +0.028 (0/0) |
 
@@ -1030,7 +1030,7 @@ Panel decisions, questions correct per partition (original vote / pooled six do 
 | rule | 0 | 1 | 2 | 10 | 11 | 12 |
 |---|---|---|---|---|---|---|
 | best_original[act] | 68 | 67 | 67 | 68 | 67 | 66 |
-| best_original[comb_lr[full+act]] | 66 | 65 | 66 | 67 | 64 | 64 |
+| best_original[comb_lr[full+act]] | 66 | 65 | 65 | 67 | 64 | 64 |
 | best_original[eq[act+out_lr_full]] | 68 | 67 | 65 | 67 | 66 | 66 |
 | best_original[eq[act+out_lr_of+ot]] | 67 | 65 | 64 | 66 | 68 | 66 |
 | best_original[out_hgb[full]] | 65 | 65 | 64 | 67 | 65 | 65 |
@@ -1091,12 +1091,12 @@ Paired decision differences (median; wins−losses per partition):
 | best_original[out_lr[of+ot]] − best_original[out_lr[full]] | -0.005 | 0/0, 1/2, 1/3, 0/1, 2/1, 1/0 |
 | gate0[out_lr[of+ot]] − gate0[out_lr[full]] | +0.023 | 4/0, 2/0, 4/2, 3/0, 3/2, 4/0 |
 | best_six[comb_lr[full+act]] − pooled6_vote | -0.014 | 4/6, 4/5, 5/5, 5/5, 4/6, 4/6 |
-| best_six[comb_lr[full+act]] − best_original[comb_lr[full+act]] | +0.009 | 2/3, 2/1, 2/1, 3/3, 3/2, 4/3 |
-| best_original[comb_lr[full+act]] − original_vote | +0.005 | 2/1, 1/1, 2/1, 2/0, 1/2, 1/2 |
+| best_six[comb_lr[full+act]] − best_original[comb_lr[full+act]] | +0.009 | 2/3, 2/1, 3/1, 3/3, 3/2, 4/3 |
+| best_original[comb_lr[full+act]] − original_vote | +0.000 | 2/1, 1/1, 2/2, 2/0, 1/2, 1/2 |
 | gate0[comb_lr[full+act]] − original_vote | -0.014 | 1/3, 2/2, 2/3, 1/2, 1/3, 1/3 |
 | gate0[comb_lr[full+act]] − pooled6_vote | -0.032 | 2/6, 2/4, 3/6, 2/5, 2/6, 2/6 |
-| best_six[comb_lr[full+act]] − best_six[out_lr[full]] | +0.000 | 0/1, 2/0, 0/1, 1/1, 1/0, 0/0 |
-| best_original[comb_lr[full+act]] − best_original[out_lr[full]] | +0.000 | 0/0, 0/0, 0/0, 0/1, 0/0, 0/0 |
+| best_six[comb_lr[full+act]] − best_six[out_lr[full]] | +0.000 | 0/1, 2/0, 1/2, 1/1, 1/0, 0/0 |
+| best_original[comb_lr[full+act]] − best_original[out_lr[full]] | +0.000 | 0/0, 0/0, 0/1, 0/1, 0/0, 0/0 |
 | gate0[comb_lr[full+act]] − gate0[out_lr[full]] | +0.000 | 0/0, 0/0, 0/1, 1/1, 0/0, 0/0 |
 | best_six[eq[act+out_lr_full]] − pooled6_vote | -0.005 | 4/3, 3/3, 2/3, 4/3, 2/4, 2/3 |
 | best_six[eq[act+out_lr_full]] − best_original[eq[act+out_lr_full]] | +0.000 | 2/2, 2/2, 1/0, 2/1, 1/2, 1/1 |
@@ -1120,7 +1120,7 @@ Origin of best-of-six picks (partition 0): act: 29 from revisions, 1 new options
 
 Gate, agent level (partition 0): gate0[act]: helpful_accepted 1, helpful_blocked 31, harmful_accepted 1, harmful_blocked 76, wrong_to_wrong_accepted 1, wrong_to_wrong_blocked 56; gate_tuned[act]: helpful_accepted 17, helpful_blocked 15, harmful_accepted 25, harmful_blocked 52, wrong_to_wrong_accepted 24, wrong_to_wrong_blocked 33; gate0[out_lr[full]]: helpful_accepted 9, helpful_blocked 23, harmful_accepted 8, harmful_blocked 69, wrong_to_wrong_accepted 13, wrong_to_wrong_blocked 44; gate0[out_hgb[full]]: helpful_accepted 9, helpful_blocked 23, harmful_accepted 11, harmful_blocked 66, wrong_to_wrong_accepted 17, wrong_to_wrong_blocked 40; gate0[out_lr[of+ot]]: helpful_accepted 11, helpful_blocked 21, harmful_accepted 3, harmful_blocked 74, wrong_to_wrong_accepted 10, wrong_to_wrong_blocked 47; gate0[comb_lr[full+act]]: helpful_accepted 8, helpful_blocked 24, harmful_accepted 8, harmful_blocked 69, wrong_to_wrong_accepted 13, wrong_to_wrong_blocked 44; gate0[eq[act+out_lr_full]]: helpful_accepted 2, helpful_blocked 30, harmful_accepted 2, harmful_blocked 75, wrong_to_wrong_accepted 4, wrong_to_wrong_blocked 53; gate0[eq[act+out_lr_of+ot]]: helpful_accepted 0, helpful_blocked 32, harmful_accepted 0, harmful_blocked 77, wrong_to_wrong_accepted 5, wrong_to_wrong_blocked 52
 
-Calibration of revised-state probabilities (median over partitions): act Brier 0.192 (constant 0.254), ECE 0.065; comb_lr[full+act] Brier 0.180 (constant 0.254), ECE 0.073; eq[act+out_lr_full] Brier 0.170 (constant 0.254), ECE 0.060; eq[act+out_lr_of+ot] Brier 0.172 (constant 0.254), ECE 0.060; out_hgb[full] Brier 0.199 (constant 0.254), ECE 0.052; out_lr[full] Brier 0.180 (constant 0.254), ECE 0.081; out_lr[of+ot] Brier 0.180 (constant 0.254), ECE 0.050
+Calibration of revised-state probabilities (median over partitions): act Brier 0.192 (constant 0.254), ECE 0.065; comb_lr[full+act] Brier 0.181 (constant 0.254), ECE 0.074; eq[act+out_lr_full] Brier 0.170 (constant 0.254), ECE 0.060; eq[act+out_lr_of+ot] Brier 0.172 (constant 0.254), ECE 0.060; out_hgb[full] Brier 0.199 (constant 0.254), ECE 0.052; out_lr[full] Brier 0.180 (constant 0.254), ECE 0.081; out_lr[of+ot] Brier 0.180 (constant 0.254), ECE 0.050
 
 ### self_reconsider|all_fallback (120 questions; absent states 21)
 
@@ -1129,7 +1129,7 @@ Ranking (median over 6 partitions, range):
 | scorer | state_auc_pre | state_auc_post | panel_pre | panel_post | six | revision_auc |
 |---|---|---|---|---|---|---|
 | act_fb | 0.681 (0.67–0.72) | 0.751 (0.75–0.78) | 0.653 (0.63–0.71) | 0.744 (0.72–0.77) | 0.721 (0.71–0.73) | 0.684 (0.62–0.71) |
-| comb_lr[full+act] | 0.772 (0.74–0.79) | 0.803 (0.79–0.83) | 0.661 (0.61–0.69) | 0.768 (0.73–0.79) | 0.706 (0.70–0.73) | 0.759 (0.72–0.80) |
+| comb_lr[full+act] | 0.773 (0.74–0.79) | 0.804 (0.79–0.83) | 0.637 (0.61–0.69) | 0.768 (0.73–0.79) | 0.706 (0.70–0.72) | 0.759 (0.72–0.80) |
 | eq[act+out_lr_full] | 0.770 (0.75–0.78) | 0.810 (0.80–0.84) | 0.685 (0.65–0.74) | 0.811 (0.78–0.85) | 0.735 (0.72–0.74) | 0.787 (0.74–0.82) |
 | eq[act+out_lr_of+ot] | 0.753 (0.72–0.78) | 0.821 (0.81–0.83) | 0.645 (0.60–0.68) | 0.817 (0.79–0.82) | 0.727 (0.72–0.74) | 0.778 (0.74–0.81) |
 | out_hgb[full] | 0.700 (0.64–0.74) | 0.762 (0.75–0.81) | 0.613 (0.58–0.73) | 0.726 (0.65–0.74) | 0.702 (0.67–0.72) | 0.727 (0.63–0.77) |
@@ -1144,7 +1144,7 @@ Paired differences (median over partitions; partitions whose 95% interval exclud
 |---|---|---|---|---|---|---|
 | act_fb - out_lr[full] | -0.089 (0/1) | -0.052 (0/1) | +0.016 (0/0) | -0.018 (0/0) | +0.015 (0/0) | -0.066 (0/0) |
 | act_fb - out_hgb[full] | -0.024 (0/0) | -0.006 (0/0) | +0.040 (0/0) | +0.037 (0/0) | +0.019 (0/0) | -0.047 (0/0) |
-| comb_lr[full+act] - out_lr[full] | +0.007 (0/0) | -0.002 (0/0) | +0.008 (0/0) | +0.006 (0/0) | +0.001 (0/0) | +0.003 (0/0) |
+| comb_lr[full+act] - out_lr[full] | +0.007 (0/0) | -0.002 (0/0) | +0.000 (0/0) | +0.006 (0/0) | +0.001 (0/0) | +0.001 (0/0) |
 | eq[act+out_lr_full] - out_lr[full] | -0.001 (0/0) | +0.007 (0/0) | +0.056 (0/0) | +0.055 (1/0) | +0.028 (0/0) | +0.025 (0/0) |
 | eq[act+out_lr_of+ot] - out_lr[of+ot] | +0.011 (0/0) | +0.007 (0/0) | +0.048 (1/0) | +0.030 (0/0) | -0.009 (0/0) | +0.024 (0/0) |
 
@@ -1153,14 +1153,14 @@ Panel decisions, questions correct per partition (original vote / pooled six do 
 | rule | 0 | 1 | 2 | 10 | 11 | 12 |
 |---|---|---|---|---|---|---|
 | best_original[act_fb] | 73 | 72 | 72 | 73 | 72 | 71 |
-| best_original[comb_lr[full+act]] | 71 | 70 | 71 | 72 | 69 | 69 |
+| best_original[comb_lr[full+act]] | 71 | 70 | 69 | 72 | 69 | 69 |
 | best_original[eq[act+out_lr_full]] | 73 | 72 | 70 | 72 | 71 | 71 |
 | best_original[eq[act+out_lr_of+ot]] | 71 | 69 | 69 | 70 | 72 | 71 |
 | best_original[out_hgb[full]] | 70 | 71 | 69 | 72 | 70 | 70 |
 | best_original[out_lr[full]] | 71 | 70 | 71 | 73 | 69 | 69 |
 | best_original[out_lr[of+ot]] | 70 | 68 | 68 | 71 | 69 | 69 |
 | best_six[act_fb] | 74 | 72 | 73 | 74 | 73 | 73 |
-| best_six[comb_lr[full+act]] | 70 | 71 | 72 | 72 | 70 | 70 |
+| best_six[comb_lr[full+act]] | 70 | 71 | 71 | 72 | 70 | 70 |
 | best_six[eq[act+out_lr_full]] | 73 | 72 | 71 | 73 | 70 | 71 |
 | best_six[eq[act+out_lr_of+ot]] | 73 | 72 | 70 | 72 | 72 | 72 |
 | best_six[out_hgb[full]] | 70 | 68 | 71 | 68 | 71 | 69 |
@@ -1205,13 +1205,13 @@ Paired decision differences (median; wins−losses per partition):
 | best_six[out_lr[of+ot]] − best_six[out_lr[full]] | -0.008 | 2/4, 4/5, 3/7, 3/4, 5/5, 3/4 |
 | best_original[out_lr[of+ot]] − best_original[out_lr[full]] | -0.013 | 0/1, 1/3, 1/4, 0/2, 2/2, 1/1 |
 | gate0[out_lr[of+ot]] − gate0[out_lr[full]] | +0.017 | 4/0, 2/0, 4/2, 3/1, 3/2, 4/0 |
-| best_six[comb_lr[full+act]] − pooled6_vote | -0.013 | 5/7, 5/6, 6/6, 6/6, 5/7, 5/7 |
-| best_six[comb_lr[full+act]] − best_original[comb_lr[full+act]] | +0.008 | 2/3, 2/1, 2/1, 3/3, 3/2, 4/3 |
-| best_original[comb_lr[full+act]] − original_vote | +0.013 | 3/1, 2/1, 3/1, 3/0, 2/2, 2/2 |
+| best_six[comb_lr[full+act]] − pooled6_vote | -0.013 | 5/7, 5/6, 6/7, 6/6, 5/7, 5/7 |
+| best_six[comb_lr[full+act]] − best_original[comb_lr[full+act]] | +0.008 | 2/3, 2/1, 3/1, 3/3, 3/2, 4/3 |
+| best_original[comb_lr[full+act]] − original_vote | +0.004 | 3/1, 2/1, 3/3, 3/0, 2/2, 2/2 |
 | gate0[comb_lr[full+act]] − original_vote | -0.013 | 1/3, 2/2, 2/3, 1/2, 1/3, 1/3 |
 | gate0[comb_lr[full+act]] − pooled6_vote | -0.037 | 2/7, 2/5, 3/7, 2/6, 2/7, 2/7 |
-| best_six[comb_lr[full+act]] − best_six[out_lr[full]] | +0.000 | 0/1, 2/1, 0/1, 1/1, 1/0, 0/0 |
-| best_original[comb_lr[full+act]] − best_original[out_lr[full]] | +0.000 | 0/0, 0/0, 0/0, 0/1, 0/0, 0/0 |
+| best_six[comb_lr[full+act]] − best_six[out_lr[full]] | +0.000 | 0/1, 2/1, 1/3, 1/1, 1/0, 0/0 |
+| best_original[comb_lr[full+act]] − best_original[out_lr[full]] | +0.000 | 0/0, 0/0, 0/2, 0/1, 0/0, 0/0 |
 | gate0[comb_lr[full+act]] − gate0[out_lr[full]] | +0.000 | 0/0, 0/0, 0/1, 1/1, 0/0, 0/0 |
 | best_six[eq[act+out_lr_full]] − pooled6_vote | -0.004 | 5/4, 4/4, 3/4, 5/4, 3/5, 3/4 |
 | best_six[eq[act+out_lr_full]] − best_original[eq[act+out_lr_full]] | +0.000 | 2/2, 2/2, 1/0, 2/1, 1/2, 1/1 |
@@ -1243,7 +1243,7 @@ Origin of best-of-six picks (partition 0): out_lr[full]: 38 from revisions, 4 ne
 
 Gate, agent level (partition 0): gate0[out_lr[full]]: helpful_accepted 10, helpful_blocked 25, harmful_accepted 8, harmful_blocked 71, wrong_to_wrong_accepted 15, wrong_to_wrong_blocked 52; gate0[out_hgb[full]]: helpful_accepted 10, helpful_blocked 25, harmful_accepted 11, harmful_blocked 68, wrong_to_wrong_accepted 18, wrong_to_wrong_blocked 49; gate0[out_lr[of+ot]]: helpful_accepted 12, helpful_blocked 23, harmful_accepted 4, harmful_blocked 75, wrong_to_wrong_accepted 11, wrong_to_wrong_blocked 56; gate0[comb_lr[full+act]]: helpful_accepted 9, helpful_blocked 26, harmful_accepted 8, harmful_blocked 71, wrong_to_wrong_accepted 15, wrong_to_wrong_blocked 52; gate0[eq[act+out_lr_full]]: helpful_accepted 2, helpful_blocked 33, harmful_accepted 2, harmful_blocked 77, wrong_to_wrong_accepted 7, wrong_to_wrong_blocked 60; gate0[eq[act+out_lr_of+ot]]: helpful_accepted 1, helpful_blocked 34, harmful_accepted 1, harmful_blocked 78, wrong_to_wrong_accepted 6, wrong_to_wrong_blocked 61; gate0[act_fb]: helpful_accepted 1, helpful_blocked 34, harmful_accepted 1, harmful_blocked 78, wrong_to_wrong_accepted 5, wrong_to_wrong_blocked 62; gate_tuned[act_fb]: helpful_accepted 19, helpful_blocked 16, harmful_accepted 27, harmful_blocked 52, wrong_to_wrong_accepted 30, wrong_to_wrong_blocked 37
 
-Calibration of revised-state probabilities (median over partitions): act_fb Brier 0.196 (constant 0.254), ECE 0.062; comb_lr[full+act] Brier 0.179 (constant 0.254), ECE 0.065; eq[act+out_lr_full] Brier 0.174 (constant 0.254), ECE 0.060; eq[act+out_lr_of+ot] Brier 0.174 (constant 0.254), ECE 0.059; out_hgb[full] Brier 0.195 (constant 0.254), ECE 0.053; out_lr[full] Brier 0.178 (constant 0.254), ECE 0.071; out_lr[of+ot] Brier 0.177 (constant 0.254), ECE 0.049
+Calibration of revised-state probabilities (median over partitions): act_fb Brier 0.196 (constant 0.254), ECE 0.062; comb_lr[full+act] Brier 0.179 (constant 0.254), ECE 0.072; eq[act+out_lr_full] Brier 0.174 (constant 0.254), ECE 0.060; eq[act+out_lr_of+ot] Brier 0.174 (constant 0.254), ECE 0.059; out_hgb[full] Brier 0.195 (constant 0.254), ECE 0.053; out_lr[full] Brier 0.178 (constant 0.254), ECE 0.071; out_lr[of+ot] Brier 0.177 (constant 0.254), ECE 0.049
 
 ### misleading_one|eligible (109 questions; absent states 18)
 
@@ -1252,7 +1252,7 @@ Ranking (median over 6 partitions, range):
 | scorer | state_auc_pre | state_auc_post | panel_pre | panel_post | six | revision_auc |
 |---|---|---|---|---|---|---|
 | act | 0.672 (0.65–0.72) | 0.874 (0.87–0.88) | 0.670 (0.64–0.74) | 0.885 (0.85–0.94) | 0.820 (0.81–0.85) | 0.894 (0.86–0.93) |
-| comb_lr[full+act] | 0.767 (0.74–0.79) | 0.850 (0.83–0.86) | 0.660 (0.60–0.72) | 0.776 (0.77–0.82) | 0.763 (0.75–0.79) | 0.759 (0.72–0.78) |
+| comb_lr[full+act] | 0.769 (0.74–0.79) | 0.849 (0.83–0.86) | 0.640 (0.60–0.72) | 0.776 (0.77–0.82) | 0.763 (0.75–0.79) | 0.756 (0.72–0.78) |
 | eq[act+out_lr_full] | 0.765 (0.75–0.78) | 0.884 (0.87–0.89) | 0.690 (0.64–0.76) | 0.885 (0.82–0.90) | 0.816 (0.79–0.83) | 0.841 (0.82–0.91) |
 | eq[act+out_lr_of+ot] | 0.747 (0.72–0.78) | 0.874 (0.86–0.89) | 0.670 (0.60–0.72) | 0.878 (0.86–0.90) | 0.816 (0.79–0.83) | 0.871 (0.83–0.88) |
 | out_hgb[full] | 0.688 (0.64–0.74) | 0.811 (0.77–0.83) | 0.600 (0.56–0.68) | 0.782 (0.71–0.82) | 0.757 (0.71–0.78) | 0.755 (0.70–0.81) |
@@ -1267,7 +1267,7 @@ Paired differences (median over partitions; partitions whose 95% interval exclud
 |---|---|---|---|---|---|---|
 | act - out_lr[full] | -0.094 (0/1) | +0.034 (0/0) | +0.040 (0/0) | +0.122 (5/0) | +0.073 (0/0) | +0.165 (4/0) |
 | act - out_hgb[full] | -0.027 (0/0) | +0.068 (4/0) | +0.080 (0/0) | +0.103 (3/0) | +0.071 (1/0) | +0.138 (1/0) |
-| comb_lr[full+act] - out_lr[full] | +0.006 (0/0) | +0.010 (4/0) | +0.010 (0/0) | +0.026 (0/0) | +0.012 (2/0) | +0.018 (0/0) |
+| comb_lr[full+act] - out_lr[full] | +0.006 (0/0) | +0.010 (4/0) | +0.000 (0/0) | +0.019 (0/0) | +0.009 (1/0) | +0.017 (0/0) |
 | eq[act+out_lr_full] - out_lr[full] | -0.001 (0/0) | +0.046 (5/0) | +0.080 (1/0) | +0.115 (6/0) | +0.059 (2/0) | +0.115 (6/0) |
 | eq[act+out_lr_of+ot] - out_lr[of+ot] | +0.009 (0/0) | +0.043 (6/0) | +0.040 (1/0) | +0.090 (6/0) | +0.039 (3/0) | +0.109 (6/0) |
 
@@ -1276,21 +1276,21 @@ Panel decisions, questions correct per partition (original vote / pooled six do 
 | rule | 0 | 1 | 2 | 10 | 11 | 12 |
 |---|---|---|---|---|---|---|
 | best_original[act] | 68 | 67 | 67 | 68 | 67 | 66 |
-| best_original[comb_lr[full+act]] | 66 | 65 | 66 | 67 | 64 | 64 |
+| best_original[comb_lr[full+act]] | 66 | 65 | 65 | 67 | 64 | 64 |
 | best_original[eq[act+out_lr_full]] | 68 | 67 | 65 | 67 | 66 | 66 |
 | best_original[eq[act+out_lr_of+ot]] | 67 | 65 | 64 | 66 | 68 | 66 |
 | best_original[out_hgb[full]] | 65 | 65 | 64 | 67 | 65 | 65 |
 | best_original[out_lr[full]] | 66 | 65 | 66 | 68 | 64 | 64 |
 | best_original[out_lr[of+ot]] | 66 | 64 | 64 | 67 | 65 | 65 |
 | best_six[act] | 70 | 68 | 68 | 69 | 66 | 68 |
-| best_six[comb_lr[full+act]] | 65 | 66 | 68 | 67 | 65 | 65 |
+| best_six[comb_lr[full+act]] | 65 | 66 | 67 | 67 | 65 | 65 |
 | best_six[eq[act+out_lr_full]] | 69 | 68 | 67 | 68 | 67 | 67 |
 | best_six[eq[act+out_lr_of+ot]] | 69 | 67 | 67 | 68 | 69 | 68 |
 | best_six[out_hgb[full]] | 63 | 64 | 63 | 65 | 65 | 65 |
 | best_six[out_lr[full]] | 66 | 64 | 67 | 66 | 65 | 64 |
 | best_six[out_lr[of+ot]] | 68 | 67 | 67 | 69 | 68 | 68 |
 | gate0[act] | 66 | 67 | 66 | 67 | 67 | 67 |
-| gate0[comb_lr[full+act]] | 63 | 64 | 65 | 67 | 64 | 64 |
+| gate0[comb_lr[full+act]] | 63 | 64 | 64 | 67 | 64 | 64 |
 | gate0[eq[act+out_lr_full]] | 64 | 65 | 64 | 66 | 64 | 65 |
 | gate0[eq[act+out_lr_of+ot]] | 66 | 65 | 66 | 65 | 66 | 67 |
 | gate0[out_hgb[full]] | 63 | 65 | 65 | 66 | 64 | 66 |
@@ -1336,14 +1336,14 @@ Paired decision differences (median; wins−losses per partition):
 | best_six[out_lr[of+ot]] − best_six[out_lr[full]] | +0.028 | 3/1, 4/1, 1/1, 3/0, 3/0, 5/1 |
 | best_original[out_lr[of+ot]] − best_original[out_lr[full]] | -0.005 | 0/0, 1/2, 1/3, 0/1, 2/1, 1/0 |
 | gate0[out_lr[of+ot]] − gate0[out_lr[full]] | +0.009 | 3/1, 2/1, 2/1, 1/1, 2/0, 3/2 |
-| best_six[comb_lr[full+act]] − pooled6_vote | -0.005 | 2/3, 2/2, 2/0, 3/2, 1/2, 2/3 |
+| best_six[comb_lr[full+act]] − pooled6_vote | -0.005 | 2/3, 2/2, 2/1, 3/2, 1/2, 2/3 |
 | best_six[comb_lr[full+act]] − best_original[comb_lr[full+act]] | +0.009 | 1/2, 2/1, 2/0, 2/2, 1/0, 3/2 |
-| best_original[comb_lr[full+act]] − original_vote | +0.005 | 2/1, 1/1, 2/1, 2/0, 1/2, 1/2 |
-| gate0[comb_lr[full+act]] − original_vote | -0.009 | 0/2, 1/2, 1/1, 2/0, 0/1, 1/2 |
-| gate0[comb_lr[full+act]] − pooled6_vote | -0.018 | 0/3, 1/3, 1/2, 2/1, 0/2, 1/3 |
-| best_six[comb_lr[full+act]] − best_six[out_lr[full]] | +0.009 | 0/1, 2/0, 1/0, 1/0, 0/0, 1/0 |
-| best_original[comb_lr[full+act]] − best_original[out_lr[full]] | +0.000 | 0/0, 0/0, 0/0, 0/1, 0/0, 0/0 |
-| gate0[comb_lr[full+act]] − gate0[out_lr[full]] | +0.005 | 0/0, 0/0, 1/0, 1/0, 1/0, 0/0 |
+| best_original[comb_lr[full+act]] − original_vote | +0.000 | 2/1, 1/1, 2/2, 2/0, 1/2, 1/2 |
+| gate0[comb_lr[full+act]] − original_vote | -0.009 | 0/2, 1/2, 1/2, 2/0, 0/1, 1/2 |
+| gate0[comb_lr[full+act]] − pooled6_vote | -0.018 | 0/3, 1/3, 1/3, 2/1, 0/2, 1/3 |
+| best_six[comb_lr[full+act]] − best_six[out_lr[full]] | +0.005 | 0/1, 2/0, 1/1, 1/0, 0/0, 1/0 |
+| best_original[comb_lr[full+act]] − best_original[out_lr[full]] | +0.000 | 0/0, 0/0, 0/1, 0/1, 0/0, 0/0 |
+| gate0[comb_lr[full+act]] − gate0[out_lr[full]] | +0.000 | 0/0, 0/0, 1/1, 1/0, 1/0, 0/0 |
 | best_six[eq[act+out_lr_full]] − pooled6_vote | +0.014 | 3/0, 2/0, 1/0, 2/0, 1/0, 1/0 |
 | best_six[eq[act+out_lr_full]] − best_original[eq[act+out_lr_full]] | +0.009 | 1/0, 1/0, 2/0, 1/0, 1/0, 1/0 |
 | best_original[eq[act+out_lr_full]] − original_vote | +0.014 | 3/0, 2/0, 1/1, 2/0, 1/0, 2/1 |
@@ -1366,7 +1366,7 @@ Origin of best-of-six picks (partition 0): act: 66 from revisions, 0 new options
 
 Gate, agent level (partition 0): gate0[act]: helpful_accepted 9, helpful_blocked 17, harmful_accepted 2, harmful_blocked 53, wrong_to_wrong_accepted 1, wrong_to_wrong_blocked 60; gate_tuned[act]: helpful_accepted 17, helpful_blocked 9, harmful_accepted 16, harmful_blocked 39, wrong_to_wrong_accepted 20, wrong_to_wrong_blocked 41; gate0[out_lr[full]]: helpful_accepted 13, helpful_blocked 13, harmful_accepted 8, harmful_blocked 47, wrong_to_wrong_accepted 14, wrong_to_wrong_blocked 47; gate0[out_hgb[full]]: helpful_accepted 11, helpful_blocked 15, harmful_accepted 9, harmful_blocked 46, wrong_to_wrong_accepted 17, wrong_to_wrong_blocked 44; gate0[out_lr[of+ot]]: helpful_accepted 12, helpful_blocked 14, harmful_accepted 5, harmful_blocked 50, wrong_to_wrong_accepted 16, wrong_to_wrong_blocked 45; gate0[comb_lr[full+act]]: helpful_accepted 13, helpful_blocked 13, harmful_accepted 7, harmful_blocked 48, wrong_to_wrong_accepted 14, wrong_to_wrong_blocked 47; gate0[eq[act+out_lr_full]]: helpful_accepted 8, helpful_blocked 18, harmful_accepted 2, harmful_blocked 53, wrong_to_wrong_accepted 4, wrong_to_wrong_blocked 57; gate0[eq[act+out_lr_of+ot]]: helpful_accepted 10, helpful_blocked 16, harmful_accepted 0, harmful_blocked 55, wrong_to_wrong_accepted 7, wrong_to_wrong_blocked 54
 
-Calibration of revised-state probabilities (median over partitions): act Brier 0.155 (constant 0.251), ECE 0.093; comb_lr[full+act] Brier 0.167 (constant 0.251), ECE 0.050; eq[act+out_lr_full] Brier 0.146 (constant 0.251), ECE 0.069; eq[act+out_lr_of+ot] Brier 0.152 (constant 0.251), ECE 0.071; out_hgb[full] Brier 0.190 (constant 0.251), ECE 0.063; out_lr[full] Brier 0.172 (constant 0.251), ECE 0.070; out_lr[of+ot] Brier 0.177 (constant 0.251), ECE 0.074
+Calibration of revised-state probabilities (median over partitions): act Brier 0.155 (constant 0.251), ECE 0.093; comb_lr[full+act] Brier 0.167 (constant 0.251), ECE 0.048; eq[act+out_lr_full] Brier 0.146 (constant 0.251), ECE 0.069; eq[act+out_lr_of+ot] Brier 0.152 (constant 0.251), ECE 0.071; out_hgb[full] Brier 0.190 (constant 0.251), ECE 0.063; out_lr[full] Brier 0.172 (constant 0.251), ECE 0.070; out_lr[of+ot] Brier 0.177 (constant 0.251), ECE 0.074
 
 ### misleading_one|all_fallback (120 questions; absent states 18)
 
@@ -1375,7 +1375,7 @@ Ranking (median over 6 partitions, range):
 | scorer | state_auc_pre | state_auc_post | panel_pre | panel_post | six | revision_auc |
 |---|---|---|---|---|---|---|
 | act_fb | 0.681 (0.67–0.72) | 0.867 (0.86–0.88) | 0.653 (0.63–0.71) | 0.893 (0.86–0.94) | 0.805 (0.80–0.83) | 0.877 (0.85–0.90) |
-| comb_lr[full+act] | 0.772 (0.74–0.79) | 0.859 (0.84–0.87) | 0.661 (0.61–0.69) | 0.786 (0.79–0.83) | 0.761 (0.74–0.78) | 0.753 (0.71–0.78) |
+| comb_lr[full+act] | 0.773 (0.74–0.79) | 0.858 (0.84–0.87) | 0.637 (0.61–0.69) | 0.786 (0.79–0.83) | 0.760 (0.74–0.78) | 0.751 (0.71–0.78) |
 | eq[act+out_lr_full] | 0.770 (0.75–0.78) | 0.885 (0.87–0.89) | 0.685 (0.65–0.74) | 0.887 (0.83–0.90) | 0.804 (0.79–0.82) | 0.832 (0.80–0.87) |
 | eq[act+out_lr_of+ot] | 0.753 (0.72–0.78) | 0.875 (0.86–0.89) | 0.645 (0.60–0.68) | 0.881 (0.87–0.90) | 0.797 (0.79–0.81) | 0.842 (0.81–0.85) |
 | out_hgb[full] | 0.700 (0.64–0.74) | 0.823 (0.79–0.85) | 0.613 (0.58–0.73) | 0.798 (0.73–0.83) | 0.756 (0.72–0.78) | 0.759 (0.70–0.82) |
@@ -1390,7 +1390,7 @@ Paired differences (median over partitions; partitions whose 95% interval exclud
 |---|---|---|---|---|---|---|
 | act_fb - out_lr[full] | -0.089 (0/1) | +0.019 (0/0) | +0.016 (0/0) | +0.113 (5/0) | +0.057 (0/0) | +0.138 (3/0) |
 | act_fb - out_hgb[full] | -0.024 (0/0) | +0.051 (2/0) | +0.040 (0/0) | +0.095 (3/0) | +0.053 (1/0) | +0.115 (1/0) |
-| comb_lr[full+act] - out_lr[full] | +0.007 (0/0) | +0.008 (3/0) | +0.008 (0/0) | +0.024 (0/0) | +0.011 (2/0) | +0.016 (1/0) |
+| comb_lr[full+act] - out_lr[full] | +0.007 (0/0) | +0.008 (3/0) | +0.000 (0/0) | +0.018 (0/0) | +0.008 (1/0) | +0.013 (0/0) |
 | eq[act+out_lr_full] - out_lr[full] | -0.001 (0/0) | +0.032 (3/0) | +0.056 (0/0) | +0.107 (6/0) | +0.056 (3/0) | +0.100 (6/0) |
 | eq[act+out_lr_of+ot] - out_lr[of+ot] | +0.011 (0/0) | +0.032 (3/0) | +0.048 (1/0) | +0.095 (6/0) | +0.043 (5/0) | +0.101 (6/0) |
 
@@ -1399,21 +1399,21 @@ Panel decisions, questions correct per partition (original vote / pooled six do 
 | rule | 0 | 1 | 2 | 10 | 11 | 12 |
 |---|---|---|---|---|---|---|
 | best_original[act_fb] | 73 | 72 | 72 | 73 | 72 | 71 |
-| best_original[comb_lr[full+act]] | 71 | 70 | 71 | 72 | 69 | 69 |
+| best_original[comb_lr[full+act]] | 71 | 70 | 69 | 72 | 69 | 69 |
 | best_original[eq[act+out_lr_full]] | 73 | 72 | 70 | 72 | 71 | 71 |
 | best_original[eq[act+out_lr_of+ot]] | 71 | 69 | 69 | 70 | 72 | 71 |
 | best_original[out_hgb[full]] | 70 | 71 | 69 | 72 | 70 | 70 |
 | best_original[out_lr[full]] | 71 | 70 | 71 | 73 | 69 | 69 |
 | best_original[out_lr[of+ot]] | 70 | 68 | 68 | 71 | 69 | 69 |
 | best_six[act_fb] | 75 | 73 | 73 | 74 | 71 | 73 |
-| best_six[comb_lr[full+act]] | 70 | 71 | 73 | 72 | 70 | 70 |
+| best_six[comb_lr[full+act]] | 70 | 71 | 71 | 72 | 70 | 70 |
 | best_six[eq[act+out_lr_full]] | 74 | 73 | 72 | 73 | 72 | 72 |
 | best_six[eq[act+out_lr_of+ot]] | 73 | 71 | 71 | 72 | 73 | 72 |
 | best_six[out_hgb[full]] | 68 | 70 | 68 | 69 | 70 | 70 |
 | best_six[out_lr[full]] | 71 | 69 | 72 | 71 | 70 | 69 |
 | best_six[out_lr[of+ot]] | 72 | 71 | 71 | 73 | 72 | 72 |
 | gate0[act_fb] | 71 | 71 | 71 | 72 | 72 | 72 |
-| gate0[comb_lr[full+act]] | 68 | 68 | 70 | 72 | 69 | 68 |
+| gate0[comb_lr[full+act]] | 68 | 68 | 69 | 72 | 69 | 68 |
 | gate0[eq[act+out_lr_full]] | 69 | 69 | 69 | 71 | 69 | 70 |
 | gate0[eq[act+out_lr_of+ot]] | 71 | 69 | 71 | 69 | 71 | 72 |
 | gate0[out_hgb[full]] | 68 | 70 | 70 | 71 | 69 | 71 |
@@ -1451,14 +1451,14 @@ Paired decision differences (median; wins−losses per partition):
 | best_six[out_lr[of+ot]] − best_six[out_lr[full]] | +0.017 | 3/2, 4/2, 1/2, 3/1, 3/1, 5/2 |
 | best_original[out_lr[of+ot]] − best_original[out_lr[full]] | -0.013 | 0/1, 1/3, 1/4, 0/2, 2/2, 1/1 |
 | gate0[out_lr[of+ot]] − gate0[out_lr[full]] | +0.008 | 3/2, 3/1, 2/2, 1/2, 2/1, 3/2 |
-| best_six[comb_lr[full+act]] − pooled6_vote | -0.013 | 2/4, 2/3, 2/1, 3/3, 1/3, 2/4 |
+| best_six[comb_lr[full+act]] − pooled6_vote | -0.013 | 2/4, 2/3, 2/3, 3/3, 1/3, 2/4 |
 | best_six[comb_lr[full+act]] − best_original[comb_lr[full+act]] | +0.008 | 1/2, 2/1, 2/0, 2/2, 1/0, 3/2 |
-| best_original[comb_lr[full+act]] − original_vote | +0.013 | 3/1, 2/1, 3/1, 3/0, 2/2, 2/2 |
-| gate0[comb_lr[full+act]] − original_vote | -0.004 | 1/2, 1/2, 2/1, 3/0, 1/1, 2/3 |
-| gate0[comb_lr[full+act]] − pooled6_vote | -0.029 | 0/4, 1/5, 1/3, 2/2, 0/3, 1/5 |
-| best_six[comb_lr[full+act]] − best_six[out_lr[full]] | +0.008 | 0/1, 2/0, 1/0, 1/0, 0/0, 1/0 |
-| best_original[comb_lr[full+act]] − best_original[out_lr[full]] | +0.000 | 0/0, 0/0, 0/0, 0/1, 0/0, 0/0 |
-| gate0[comb_lr[full+act]] − gate0[out_lr[full]] | +0.004 | 0/0, 0/0, 1/0, 1/0, 1/0, 0/0 |
+| best_original[comb_lr[full+act]] − original_vote | +0.004 | 3/1, 2/1, 3/3, 3/0, 2/2, 2/2 |
+| gate0[comb_lr[full+act]] − original_vote | -0.004 | 1/2, 1/2, 2/2, 3/0, 1/1, 2/3 |
+| gate0[comb_lr[full+act]] − pooled6_vote | -0.029 | 0/4, 1/5, 1/4, 2/2, 0/3, 1/5 |
+| best_six[comb_lr[full+act]] − best_six[out_lr[full]] | +0.004 | 0/1, 2/0, 1/2, 1/0, 0/0, 1/0 |
+| best_original[comb_lr[full+act]] − best_original[out_lr[full]] | +0.000 | 0/0, 0/0, 0/2, 0/1, 0/0, 0/0 |
+| gate0[comb_lr[full+act]] − gate0[out_lr[full]] | +0.000 | 0/0, 0/0, 1/1, 1/0, 1/0, 0/0 |
 | best_six[eq[act+out_lr_full]] − pooled6_vote | +0.004 | 3/1, 2/1, 1/1, 2/1, 1/1, 1/1 |
 | best_six[eq[act+out_lr_full]] − best_original[eq[act+out_lr_full]] | +0.008 | 1/0, 1/0, 2/0, 1/0, 1/0, 1/0 |
 | best_original[eq[act+out_lr_full]] − original_vote | +0.021 | 4/0, 3/0, 2/1, 3/0, 2/0, 3/1 |
@@ -1489,9 +1489,9 @@ Origin of best-of-six picks (partition 0): out_lr[full]: 53 from revisions, 4 ne
 
 Gate, agent level (partition 0): gate0[out_lr[full]]: helpful_accepted 15, helpful_blocked 15, harmful_accepted 10, harmful_blocked 49, wrong_to_wrong_accepted 15, wrong_to_wrong_blocked 60; gate0[out_hgb[full]]: helpful_accepted 13, helpful_blocked 17, harmful_accepted 10, harmful_blocked 49, wrong_to_wrong_accepted 19, wrong_to_wrong_blocked 56; gate0[out_lr[of+ot]]: helpful_accepted 14, helpful_blocked 16, harmful_accepted 7, harmful_blocked 52, wrong_to_wrong_accepted 17, wrong_to_wrong_blocked 58; gate0[comb_lr[full+act]]: helpful_accepted 15, helpful_blocked 15, harmful_accepted 9, harmful_blocked 50, wrong_to_wrong_accepted 15, wrong_to_wrong_blocked 60; gate0[eq[act+out_lr_full]]: helpful_accepted 10, helpful_blocked 20, harmful_accepted 4, harmful_blocked 55, wrong_to_wrong_accepted 5, wrong_to_wrong_blocked 70; gate0[eq[act+out_lr_of+ot]]: helpful_accepted 12, helpful_blocked 18, harmful_accepted 2, harmful_blocked 57, wrong_to_wrong_accepted 7, wrong_to_wrong_blocked 68; gate0[act_fb]: helpful_accepted 11, helpful_blocked 19, harmful_accepted 4, harmful_blocked 55, wrong_to_wrong_accepted 4, wrong_to_wrong_blocked 71; gate_tuned[act_fb]: helpful_accepted 20, helpful_blocked 10, harmful_accepted 19, harmful_blocked 40, wrong_to_wrong_accepted 29, wrong_to_wrong_blocked 46
 
-Calibration of revised-state probabilities (median over partitions): act_fb Brier 0.158 (constant 0.252), ECE 0.089; comb_lr[full+act] Brier 0.163 (constant 0.252), ECE 0.051; eq[act+out_lr_full] Brier 0.146 (constant 0.252), ECE 0.070; eq[act+out_lr_of+ot] Brier 0.150 (constant 0.252), ECE 0.077; out_hgb[full] Brier 0.185 (constant 0.252), ECE 0.064; out_lr[full] Brier 0.166 (constant 0.252), ECE 0.063; out_lr[of+ot] Brier 0.170 (constant 0.252), ECE 0.077
+Calibration of revised-state probabilities (median over partitions): act_fb Brier 0.158 (constant 0.252), ECE 0.089; comb_lr[full+act] Brier 0.163 (constant 0.252), ECE 0.053; eq[act+out_lr_full] Brier 0.146 (constant 0.252), ECE 0.070; eq[act+out_lr_of+ot] Brier 0.150 (constant 0.252), ECE 0.077; out_hgb[full] Brier 0.185 (constant 0.252), ECE 0.064; out_lr[full] Brier 0.166 (constant 0.252), ECE 0.063; out_lr[of+ot] Brier 0.170 (constant 0.252), ECE 0.077
 
-Alignment: held-out z SD (1 = reference scale), median (range) over folds × partitions: act 0.99 (0.77–1.09); out_lr[of+ot] 0.92 (0.79–1.23); out_lr[full] 0.98 (0.83–1.26); out_hgb[full] 0.92 (0.80–1.02); comb_lr[full+act] 0.98 (0.82–1.24); eq[act+out_lr_full] 1.83 (1.51–2.10); eq[act+out_lr_of+ot] 1.75 (1.38–2.08); act_fb 0.98 (0.77–1.11)
+Alignment: held-out z SD (1 = reference scale), median (range) over folds × partitions: act 0.99 (0.77–1.09); out_lr[of+ot] 0.92 (0.79–1.23); out_lr[full] 0.98 (0.83–1.26); out_hgb[full] 0.92 (0.80–1.02); comb_lr[full+act] 1.00 (0.82–1.25); eq[act+out_lr_full] 1.83 (1.51–2.10); eq[act+out_lr_of+ot] 1.75 (1.38–2.08); act_fb 0.98 (0.77–1.11)
 
 Orthogonality, act: held-out R² from all output features 0.69 (0.54–0.81); largest |r| with one output feature 0.66 (0.57–0.75).
 

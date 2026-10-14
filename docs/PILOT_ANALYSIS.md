@@ -252,8 +252,9 @@ could fool itself is part of the result.
   by roughly +0.03 to +0.09 AUROC depending on the comparator, with intervals at or just above
   zero. Against the matched, tuned comparator of the audit, the gain survives only within revised
   debate panels. The residual after removing all linear output information still ranks revisions
-  at about 0.67. That shows the remaining signal is not a *linear* function of the outputs, not
-  that it is unavailable from them (audit, item 7).
+  at about 0.67. One tested linear predictor of that residual from the outputs explained none of
+  its held-out variance. That is not evidence that the signal is unavailable from the outputs
+  (audit, item 7).
 - Within-panel pairs always involve two different chosen options, so a probe that scored the
   *option* (how plausible the model finds it) rather than the *agent's state* would look the same;
   correctness labels cannot separate the two. For gating, either serves.

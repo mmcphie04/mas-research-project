@@ -1,0 +1,104 @@
+{
+ "code_commit": "3e0eea0c233ace0408d20df597a563750a883c7b",
+ "code_dirty": false,
+ "command": "scripts/probe_validate.py provenance --out /tmp/claude-1000/-home-mmcph-projects-mas-research-project/45186bcc-554a-4fe5-b6d9-3ac8e11487c6/scratchpad/pv_new",
+ "packages": {
+  "python": "3.12.14",
+  "numpy": "2.3.5",
+  "pandas": "3.0.5",
+  "scikit-learn": "1.9.0"
+ },
+ "archive": {
+  "root": "runs/colab",
+  "prefix": "pilot12b",
+  "verify_json_sha256": "117396e3eebf63b0f01440146ffd642431e879c0417d2be77e076e296f7326de",
+  "questions_sha256": "b9a446fd84e9ccd92e80847ec75a3e0394f3f5687dbdc24d3bd820aebe038957",
+  "chunk_completion_sha256": {
+   "pilot12b-debate-c000": "9512643fd96640b6d34d0bf56a4c73df84bb7c3fe1233746defe90c48711ea28",
+   "pilot12b-debate-c001": "278b54481b439f49cf16b89e871ca81e86893e3289fff926c40bed84d314a9ca",
+   "pilot12b-debate-c002": "2c9cca5714d53113ac0d736dabdab7e8c3eb65103ef33936d0c11267b3c92036",
+   "pilot12b-debate-c003": "9ae98d1d5928f4d25e5794fa477738286b0c04c228ee7da8823895d17ec5bdf8",
+   "pilot12b-debate-c004": "c7231af4ac7c86d4448423c6ce6ba8cbfd215de653eff68781432604282031f5",
+   "pilot12b-debate-c005": "84f0d9688152e767fece468415bb48c0a14e3b9674a3b43d138490bb3f4ade18",
+   "pilot12b-debate_answer_only-c000": "a6245f5ccc2c281f9a36d86897f9d73abd4c1cb8f7de97f8cc96181196506ca6",
+   "pilot12b-debate_answer_only-c001": "65544ae56668dfd4cd607af59700186836e0edd03da3add76b2ee1959616bf98",
+   "pilot12b-debate_answer_only-c002": "f4329eeb7c9f662929305389e186c5678230dbab19bd532467c6e9dad8889b0b",
+   "pilot12b-debate_answer_only-c003": "6dedac7e94277a76e70a03350ed6bd0f62aca2d34f938a34bf4f7525e1130144",
+   "pilot12b-debate_answer_only-c004": "43be7edd338425b929ef7ee09f89954b52c494791ba756b3e53d40a79ad53355",
+   "pilot12b-debate_answer_only-c005": "fa533b73b09312728a09a37ab4d228f792266c4b793ce78ab5d16c431b04fb30",
+   "pilot12b-misleading_one-c000": "d1a4b9f12d82e3beecb267f10166837ea12f8fbe68e8fd8c8f4423287679aa33",
+   "pilot12b-misleading_one-c001": "6308f86b1ea5973dbd9253bdf800663277e900c944e8134b43042235be99149e",
+   "pilot12b-misleading_one-c002": "5ec3a261621f54ac241ae5b95f25e520940274c9999cc32059b95009577084ac",
+   "pilot12b-misleading_one-c003": "bb840a59c0c9c2027485d8fe74ee0ae6ecee25bed0a4cac5a468af24b037746a",
+   "pilot12b-misleading_one-c004": "d698f382c28dbb52b204f684833bcbb0506b7164ad2eda1bec4bbb53cb9504af",
+   "pilot12b-misleading_one-c005": "16c480fb7c86e513ab1c5e4276fa8e15cd0b840456bd38fab69bb33fd56b2915",
+   "pilot12b-round0-c000": "f61112e8482d5bf35ab610c00d38b1154e7dbfd2f7fae6d6b9507a1cbe48b544",
+   "pilot12b-round0-c001": "ca29787311bab1091ff6f7b31e7239405e3d57096013c8b385fe3d0341095c97",
+   "pilot12b-round0-c002": "8dc32e6bab31e59de8f1a0e6e3b291c644bafdb3f5ddb895e2343a367738f5c4",
+   "pilot12b-round0-c003": "f6993d5ec0569f9c003338cf863046147b498de91f48d5db320f95ad94daaaef",
+   "pilot12b-round0-c004": "c2e5d6f238a5595ffdb5aa0fb6e9aa29dc769f0d546be6f6904f22e666040dfc",
+   "pilot12b-round0-c005": "30e5b8f1d4294ab8c4e0690334fdf52acd4c60ea5e634b2c591b96ee992dedcd",
+   "pilot12b-self_reconsider-c000": "7b5593db6225ae0f6715e0c311438e870744125b5eb64a8ba023c8224b1a5306",
+   "pilot12b-self_reconsider-c001": "f63756674970e3fdc941231cfd37f7922eaab730ec5d3a8cc965948e148cd3eb",
+   "pilot12b-self_reconsider-c002": "1db4d30b5c0f10e898d9e5820888077a2d9786d285b4571eb63b271e7c4aa8d1",
+   "pilot12b-self_reconsider-c003": "fbea7c35d747f6ea1c4c1d1bfdca03913e9047d7b98fe7518ba5e7d32659b24d",
+   "pilot12b-self_reconsider-c004": "253155de8173c3da9231f88329391deae2530f2209d743628b7390792df6c497",
+   "pilot12b-self_reconsider-c005": "f0bdb6ecc5750c6f38611ec885bc436be1a8312d7007685aa4522f4dd3d04598"
+  }
+ },
+ "cache": {
+  "keys.parquet": "01090eed769e882517a546c58b813e627ee383471eb4e32c71101441bb9554c2",
+  "states.parquet": "d29c46af2d031e73f3fe3a7bc2979383662a08f65da3ff80392cf364360e4397",
+  "L15.npy": "68985e7cdc78770192f40c8396ffadb588509c11b3fe492783c128d0e79ca59f",
+  "L18.npy": "f477bb6fbd6a93dd79699d5aa4735281f71c035615fc5813b0e46d2125b7b253",
+  "L21.npy": "1df4ffa108f85dfc8eb2ee649802ac0036df117a896fd156eb853e7c8abac9b2",
+  "L24.npy": "b3b2bd65f74e01fb181699332e18347a518537ff8021379f831c64ab417f5a3a",
+  "L27.npy": "745abe1978c720c0a68d59a961e0ec5a97370c4abef104d38973633fcfe699a6",
+  "L30.npy": "568262c1622dc660d9dbd622a47e8cb102e65fbc7bea7a65e84b44cb879292c4",
+  "L33.npy": "08844c4d72b87bca616e1bdb1b6daaae3de9bca7e727dc4b2ab088f7fc49b767",
+  "L36.npy": "1bf99d7ec83aece2411dcfacdba659dae5e2683943ce8a5d637ba18cfb7772a5",
+  "L39.npy": "5f7da0337ef0a59671f123959a4d6e6225c79f2dbd0318e1595315a561662b43"
+ },
+ "recipes": {
+  "R1": {
+   "recipe": "readout_last:letter:meandiff:15-39",
+   "layers": [
+    15,
+    18,
+    21,
+    24,
+    27,
+    30,
+    33,
+    36,
+    39
+   ]
+  },
+  "R2": {
+   "recipe": "before_stated_answer:letter:pca16:21-33",
+   "layers": [
+    21,
+    24,
+    27,
+    30,
+    33
+   ]
+  }
+ },
+ "seeds": [
+  0,
+  1,
+  2,
+  10,
+  11,
+  12
+ ],
+ "k_outer": 5,
+ "k_ref": 5,
+ "C_grid": [
+  0.001,
+  0.01,
+  0.1,
+  1.0
+ ]
+}

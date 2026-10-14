@@ -1,8 +1,10 @@
 # Probe audit: corrected evaluation of the pilot probe result (2026-10-13)
 
 Requested review of `7787b68` (the exploratory probe search, docs/PILOT_ANALYSIS.md §3). CPU only,
-on the 12B pilot archive (120 questions; collection commit `5ff52b3`). Analysis code: `3e0eea0`
-(re-run from a clean tree; byte-identical to the first run); frozen scorers: `8a59105`. Code:
+on the 12B pilot archive (120 questions; collection commit `5ff52b3`). Analysis code: `3857a72`
+(after a second correction round, §6; clean tree); frozen scorers for the validation tranche: SHA-256
+`8e5785fe…` at `3857a72`. The first corrected run (`3e0eea0`) is kept under
+`artifacts/pilot12b/superseded/probe_validation_3e0eea0/`. Code:
 (`mad.analysis.candidate_scoring`, `scripts/probe_validate.py`, corrections in
 `scripts/probe_search.py`). Exports: `artifacts/pilot12b/probe_validation/` (generated tables in
 `summary.md`). No GPU work was run.
@@ -45,9 +47,9 @@ debate state at that position). Medians over the six partitions (range).
 | 2 | Within-panel 0.73–0.78 | Pooled over all conditions' panels, that number mixed populations. Debate: round-0 panels R1 0.637 / R2 0.670 (62 / 50 pairs); revised panels 0.688 / 0.726 (48 / 42 pairs); six candidates per question 0.619 / 0.672 (252 / 206 pairs, 33 / 27 questions). | Narrower than stated; round-0 panel ranking ≈ output model. |
 | 3 | Revision AUROC 0.71–0.75; debate 0.68–0.73 | Fold-stratified, debate: R1 0.716 (0.69–0.73), R2 0.782 (0.70–0.82); 32 helpful / 32 harmful revisions (R2: 27 / 29), 221 / 166 within-cell pairs. | Survives. |
 | 4 | Equal-weight activation + output sum: +0.05 to +0.09 within panel, +0.05 to +0.08 on revisions | Against the same weak comparator (`out_lr[of+ot]`): revised panel +0.167 (interval above 0 in 4/6), revisions +0.116 (3/6). Against the matched, tuned `out_lr[full]`: revised panel **+0.125 (3/6)**, revisions +0.056 (0/6), six candidates +0.004, round-0 panel 0.000. | Survives only for ranking within the revised debate panel. Much of the earlier size reflected a weak comparator. |
-| 5 | Stacked model adds +0.01 to +0.03 | Cross-fitted learned combination with matched features and tuning: in the folds inspected the activation coefficient ranks 4th–7th of 115, but its scores correlate 0.998 with the output model's and every panel decision is identical. | Withdrawn: no measurable gain from a learned combination. |
+| 5 | Stacked model adds +0.01 to +0.03 | Cross-fitted learned combination with matched features and tuning: in the folds inspected the activation coefficient ranks 4th–7th of 115, but its scores correlate 0.998 with the output model's and every panel decision is identical. | Withdrawn as stated: the learned combination gives little practical improvement (its activation coefficient is not small, but the combined scores track the output model's). |
 | 6 | Best of six by activation 71–75 vs 68–72 by outputs, 69 original vote | Selection inside a question is unchanged by normalization: R1 71–75. Pooled-six vote 71; matched output selector 69–72. Activation − pooled six: wins/losses 4/0, 0/0, 2/1, 2/0, 3/0, 2/1. Activation − matched output: 6/2, 2/2, 4/4, 4/3, 6/3, 6/3. R2 (109 questions): 66–68 vs pooled six 66. | Counts survive; the gain over pooled-six voting is 0–4 questions. |
-| 7 | Residual after removing all linear output information still ranks revisions at 0.67–0.68 | `act_rout` (R1, residualize then letter-center): debate revisions 0.704 (0.65–0.79). After the **complete** transform its held-out score is not linearly predictable from the outputs (R² −0.22, largest single-feature \|r\| 0.28, range 0.19–0.59). For comparison, the ordinary activation score has held-out R² 0.82 from the output features. | Measurement survives; it rules out *linear* redundancy only, not nonlinear functions of outputs. Not evidence of information unavailable from outputs. |
+| 7 | Residual after removing all linear output information still ranks revisions at 0.67–0.68 | `act_rout` (R1, residualize then letter-center): debate revisions 0.704 (0.65–0.79). After the **complete** transform its held-out score is not linearly predictable from the outputs (R² −0.22, largest single-feature \|r\| 0.28, range 0.19–0.59). For comparison, the ordinary activation score has held-out R² 0.82 from the output features. | Measurement survives, interpretation narrowed: one tested linear predictor (least squares on all output features, fitted on training references) explained none of the held-out variance (R² −0.22; fold range −1.93 to −0.03). That is one predictor's failure, with wide fold-to-fold variation, not proof that the activations carry information unavailable from the outputs. |
 | 8 | Leave-one-condition-out: unchanged | Fold-stratified, debate R1 0.716 → 0.711, R2 0.782 → 0.782 (trained with → held out); other conditions within −0.02 to +0.05. | Survives. |
 | 9 | Option text alone within-panel 0.62–0.65 | Within-panel pairs come from one fitted model; unaffected. | Stands. |
 | 10 | Broad nested search: inner 0.77–0.85, outer 0.59–0.73 | Within-panel figures unaffected; its revision figures used the cross-fold metric. | Within-panel stands; revision figures superseded. |
@@ -128,8 +130,8 @@ existed in the code.
 - Against a strong, matched output model, its advantage is confined to ranking among an agent's
   revised states within a debate panel and to the direction of a revision (+0.06 to +0.18
   AUROC, intervals including 0 in every partition at this n). For overall correctness and for
-  ranking the six candidates of a question it is not better, and a learned combination does not
-  use it.
+  ranking the six candidates of a question it is not better, and a learned combination gives
+  little practical improvement over the output model.
 - In end-to-end decisions, selecting by activation score matches or slightly exceeds pooled-six
   voting (0–4 questions of 120) and the matched output selector (median +2), and almost all of
   that comes from choosing among answers already present in round 0.
@@ -139,3 +141,32 @@ existed in the code.
   endorsement sensitivity of the output features rather than knowledge in the activations.
 
 Next step: docs/NEXT_STEP_MEMO.md. GPU specification: docs/VALIDATION_JOB.md.
+
+## 6. Second correction round (`3857a72`, 2026-10-13)
+
+Requested after review of `f7a8f4d`; recipes, seeds and populations unchanged.
+
+- **A. Frozen application on any dataset size.** Feature columns are now validated by schema
+  (names only). The old check built the combined scorer's columns from the saved, pilot-length
+  training references, which fails whenever the new dataset has a different number of states. The
+  planned 200 × 9 = 1,800 states only coincides with the pilot's 120 × 15. Evaluation activation
+  columns always come from the frozen scorers applied to the new states. `freeze` strips the
+  training-length arrays, so prediction cannot depend on training rows. End-to-end test
+  (`tests/test_frozen_apply.py`): stub archives through the real cache builder, frozen on 12
+  questions; the training cache is then deleted, and the scorers are applied to 8 questions (only
+  `debate` and `independent`, absent before-answer states) and to a complete-chunk partial archive.
+- **B. Validation endpoints** in `probe_validate.py apply` (docs/preregistration.md §10).
+- **C. Training-only inner preprocessing.** Imputation and standardization are now fitted inside
+  each tuning and reference fold, and C is chosen on those folds by log-loss, identically for the
+  output-only and activation-augmented models. The combined scorer's internal reference
+  predictions are now pure: for each reference fold the activation column of the other rows comes
+  from an activation scorer refitted without that fold, so the held-out fold's labels cannot reach
+  its training features through the upstream probe. (Outer-test predictions were never affected;
+  this concerned the internal references used for normalization and calibration.)
+- **Effect of C on the bounded comparison:** ranking metrics and decisions are identical for every
+  scorer, because the final models use the same C on the same rows, except R2's learned
+  combination (round-0 panel median 0.660 → 0.640; one partition's best-of-six 67 → 66). Only the
+  normalizers and Platt calibrations moved.
+- **D.** Rows 5 and 7 above and §5 reworded (learned combination: little practical improvement;
+  residual score: what the tested linear predictor explained, not a proof of unique information).
+

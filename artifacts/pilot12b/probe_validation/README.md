@@ -1,6 +1,8 @@
 # Corrected probe comparison: portable exports (no activation arrays)
 
-Produced by `scripts/probe_validate.py` at the commit in `provenance.json` (clean tree). With
+Produced by `scripts/probe_validate.py` at the commit in `provenance.json` (3857a72, clean tree).
+`leave_condition_out.json` is carried over from 3e0eea0: it uses only the activation scorer, whose
+code did not change. The earlier version of this directory is in `../superseded/probe_validation_3e0eea0/`. With
 these files the result can be audited without the 7 GB activation cache. Interpretation:
 docs/PROBE_AUDIT.md. Exploration history: `EXPLORATION_LOG.md`.
 

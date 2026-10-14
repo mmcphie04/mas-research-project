@@ -1,7 +1,7 @@
 {
- "code_commit": "3e0eea0c233ace0408d20df597a563750a883c7b",
+ "code_commit": "3857a72ec37bf846de91bf249a6f44409d1ece09",
  "code_dirty": false,
- "command": "scripts/probe_validate.py provenance --out /tmp/claude-1000/-home-mmcph-projects-mas-research-project/45186bcc-554a-4fe5-b6d9-3ac8e11487c6/scratchpad/pv_new",
+ "command": "scripts/probe_validate.py provenance --out /tmp/claude-1000/-home-mmcph-projects-mas-research-project/45186bcc-554a-4fe5-b6d9-3ac8e11487c6/scratchpad/pv_3857",
  "packages": {
   "python": "3.12.14",
   "numpy": "2.3.5",

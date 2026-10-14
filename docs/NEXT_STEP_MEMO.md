@@ -1,92 +1,93 @@
-# Next step: recommendation (2026-10-13)
+# Validation plan and how its results will be read (dated 2026-10-13, before collection)
 
-Based on the corrected pilot comparison (docs/PROBE_AUDIT.md). One path is recommended. The
-other two are kept as conditional follow-ons, triggered by the decision rules below.
+The corrected pilot (docs/PROBE_AUDIT.md, exploratory, 120 questions) supports a possible
+revision-ranking signal. It does not support an established practical advantage over strong
+output controls:
 
-## What the corrected pilot says
+- **Selection:** R1 picks 71–75 of 120 correct answers, against 71 for pooled-six voting. Its
+  zero-threshold gate gets 70.
+- **Little from revised candidates:** adding them improves on the same scorer's best first answer
+  by only 0–2 questions.
+- **New correct options are rare:** natural debate supplied a correct option missing from the
+  first answers on 1/120 questions; reconsideration alone did so on 9/120.
 
-- **Ranking signal survives correction.** A fixed activation recipe ranks answer states by
-  correctness above chance on held-out pilot questions. Natural-debate helpful vs harmful
-  revisions score 0.72 (R1) and 0.78 (R2), and the signal transfers to a held-out condition.
-- **Its edge over a strong, matched output model is narrow.**
-  - Inside a revised debate panel: +0.12 to +0.18.
-  - Revision direction: +0.06 to +0.12.
-  - Six-candidate ranking, round-0 ranking and single-state correctness: nothing.
-  - No interval excludes zero in any partition, and a learned combination ignores it.
-- **Selection is competitive, not established.** Activation-based selection matches or slightly
-  exceeds pooled-six voting (0–4 of 120) and the matched output selector (median +2).
-- **Debate barely contributed.** It added a correct option missing from round 0 on 1 of 120
-  questions. Best-of-six picks are the same answers whichever debate variant supplied the revised
-  candidates.
+Two questions are kept apart:
 
-Per the brief's rule, a useful ranking signal remains and activation-augmented selection is
-competitive with strong output baselines. That points to the candidate-assessment path, with one
-adjustment: the pilot itself says debate's value as a candidate source is doubtful, so the
-independent branch is essential, not optional.
+1. Does discussion produce better candidates than additional independent samples?
+2. Do internal representations improve selection among the available candidates beyond output-only
+   information?
 
-## Recommendation: candidate assessment on fresh questions
+Little new coverage from debate would not rule out debate improving the *assessment* of existing
+options.
 
-**Question.** On new questions, does a compact internal scorer, frozen from the pilot, help choose
-among candidate answers better than strong output-only scorers? And is discussion a better source
-of candidates than more independent samples?
+**What is not claimed.** The six pilot partitions are not replications. An AUROC is not
+final-answer accuracy. The probes score completed candidate answers; they are not gates that act
+before generation.
 
-- **Population and split.**
-  - 200 fresh MMLU-Pro questions (master-order positions 121–320, subject-balanced), disjoint from
-    the pilot and from the reserved confirmation pool (positions 321 onward), enforced by the
-    driver.
-  - No re-splitting: every scorer is fitted once on the whole pilot and frozen.
-  - This tranche is validation/development; it may change the main design.
-- **Collection.**
-  - The same first three answers feed natural debate and an `independent` branch (three fresh
-    answers), so the debate six and the independent six share their first half exactly.
-  - Optionally, self-reconsideration on the first 100 questions, under a usage rule.
-  - Specification and caps: docs/VALIDATION_JOB.md.
-- **Cost.** About 2.8 h of raw chunk compute and 3.3–4.1 h expected account usage. Hard stop at
-  5.0 h (26.5 units) including the smoke test.
-- **Budget.** Measured quota: 281.34 units, about 53 A100-h at 5.30/h. Against the 10–20 h working
-  budget, about 3.5 h are used. After this job at least 11.5 h of a 20-h budget remains, the
-  majority, for fresh confirmation and one robustness check.
-- **Frozen before the data exist** (preregistration §10):
-  - the two recipes R1 and R2, scorers fitted on the whole pilot (SHA-256 recorded);
-  - the comparators: `out_lr[full]`, `out_hgb[full]`, and the equal-weight sum;
-  - the endpoints below, and these decision rules.
+## The validation tranche
 
-### Endpoints (natural debate primary; question bootstrap; one frozen model, so no fold issue)
+200 fresh questions (positions 121–320). Shared round 0 feeds natural debate and an independent
+branch: matched six-answer pools with identical first halves. Collection and caps:
+docs/VALIDATION_JOB.md. Frozen analysis: preregistration §10.
 
-1. **Ranking:** six-candidate AUROC, revised-panel AUROC and revision AUROC (helpful vs harmful)
-   for R1 and R2, each paired against `out_lr[full]`.
-2. **Selection:** best of the debate six, best of the independent six, and best first answer, by
-   activation, output and equal-weight scores. Each is compared against pooled-six voting (debate
-   and independent) and the matched output selector. Report wins and losses with question ids.
-3. **Candidate source:** coverage (any correct) and pooled votes for 3 first answers, debate six
-   and independent six. Report how often a correct option is new in each branch.
-4. **Shift check:** calibration-in-the-large of the frozen Platt probabilities, and round-0
-   ranking on the new questions vs the pilot.
+The frozen scorers are fitted on the pilot only, with no recalibration or tuning on validation
+outcomes:
 
-### Decision rules (stated before the data)
+- R1 `readout_last:letter:meandiff:15-39` (layers 15, 18, 21, 24, 27, 30, 33, 36, 39);
+- R2 `before_stated_answer:letter:pca16:21-33` (layers 21, 24, 27, 30, 33);
+- the full-feature output logistic model, the full-feature HGB, and the equal-weight
+  activation + output sums.
 
-- **D1, ranking reproduces:** for R1 or R2, the six-candidate AUROC and the revision AUROC both
-  have 95% intervals above 0.5.
-- **D2, incremental value:** for the same recipe, activation or the equal-weight sum minus
-  `out_lr[full]` is at least +0.05 on revision AUROC or revised-panel AUROC, with the interval's
-  lower bound above 0.
-- **D3, practical value:** best-of-six by the D2 scorer is at least as good as both pooled-six
-  voting and the matched output selector (point estimates).
-- **D4, candidate source:** best-of-six from the independent six vs from the debate six.
+Any later validation-trained analysis is separate and labelled developmental.
 
-| outcome | next step |
-|---|---|
-| D1 and D2 and D3 hold | Confirmation run on the reserved pool, candidate assessment as the primary hypothesis, analysis copied from §10. Size from the observed effect; at most the remaining budget. |
-| D1 holds, D2 fails | Fixed-candidate endorsement diagnostic (hold question and candidate fixed; vary peer endorsement; plausible wrong candidates; matched-format training; output controls) at small scale before any confirmation. |
-| D1 fails | Stop the activation line. Report the pilot as exploratory, and spend the remainder on the debate-protocol study (simultaneous swaps, round 2 with symmetric presentation). |
-| D4 favours independent sampling, whatever else | The paper reports debate's candidate value as null and frames selection as assessment among samples. More agents only after an independent-sampling coverage curve. |
+## Reporting hierarchy
 
-## Why not the others now
+1. **Primary practical comparison:** R1 activation best-of-six vs the matched output-only
+   best-of-six, natural debate, all collected validation questions. Also the paired difference
+   against pooled-six voting.
+2. **Key explanatory comparison:** R1 activation vs matched output on revision AUROC (helpful vs
+   harmful), and on ranking within the revised panel.
+3. **Candidate source:** independent six vs debate six on identical questions (shared round 0):
+   coverage, pooled voting, and each fixed selector, including best-of-six minus best first answer.
+4. **Secondary:** R2 (complete-case on a common eligible population, and the all-question fallback),
+   equal-weight combinations, HGB, zero-threshold gates, missingness sensitivity, reconsideration
+   (the optional child).
 
-- **Endorsement diagnostic.** It answers what the score means, which matters only if the score
-  reproduces on fresh questions. It also needs new prompts and matched-format training. It is the
-  designated follow-on if D2 fails. The pilot hint for it is that the activation advantage
-  concentrates where a peer endorses a wrong answer.
-- **Debate dynamics (round 2).** It needs round-aware storage and new long-context memory checks.
-  The pilot shows debate rarely creates correct options, so a second round is a weaker bet than
-  first testing whether debate beats independent sampling at all, which D4 does at no extra cost.
+## Reading the results (practical targets, not established effects or power promises)
+
+Targets for this development decision: **+2 percentage points** of selection accuracy, and
+**+0.05** revision AUROC.
+
+- **Promising.** The fixed comparison reaches its target in point estimate, with coherent
+  diagnostics and competitive operational performance. An interval that includes zero makes it a
+  *provisional lead*, not a demonstrated improvement. An interval entirely above zero is stronger
+  evidence.
+- **Inconclusive.** The interval includes both no gain and a worthwhile gain. Report the paired
+  disagreements (wins and losses) and project the fresh sample size and GPU cost needed to resolve
+  it. Lack of significance is not proof of failure. More collection is not launched automatically.
+- **Uncompetitive at the chosen targets.** A reasonably narrow interval's upper end excludes the
+  worthwhile gain, or the frozen policy clearly loses to simpler controls. The conclusion is scoped
+  to these recipes in this setting.
+
+How the three kinds of result combine:
+
+- **Mixed results stay mixed.** Good revision ranking with weak selection is a reason to
+  investigate what the score measures. Failure on revision AUROC alone does not settle candidate
+  selection, and vice versa.
+- **No silent substitution.** Secondary successes suggest a later hypothesis; they do not replace a
+  failed primary endpoint.
+- **No size changes.** The sample size is not changed after seeing validation outcomes.
+
+## Possible next steps (one is recommended after the analysis; none is launched under this plan)
+
+- **Fresh confirmation of candidate selection**, if its practical advantage looks worth pursuing.
+- **A small fixed-candidate / peer-endorsement diagnostic**, if a revision-ranking signal
+  reproduces but its meaning or extra value remains unclear.
+- **Candidate-generation or debate-protocol research**, if simpler controls dominate: independent
+  sampling, reconsideration, or later a carefully implemented round-2 / presentation experiment.
+
+More agents or more rounds are not automatic next steps. Each needs a specific hypothesis, a cost
+estimate, and the storage and prompt changes it requires. Most of the remaining budget stays in
+reserve.
+
+*(Results and the recommendation are appended below after the frozen analysis.)*
