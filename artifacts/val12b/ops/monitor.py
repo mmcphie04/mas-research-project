@@ -19,7 +19,10 @@ ENV = {"PATH": f"{Path.home()}/.local/bin:{Path.home()}/google-cloud-sdk/bin:/us
 
 
 def colab(*a, timeout=120):
-    r = subprocess.run(["colab", "--auth=adc", *a], capture_output=True, text=True, timeout=timeout, env=ENV)
+    try:
+        r = subprocess.run(["colab", "--auth=adc", *a], capture_output=True, text=True, timeout=timeout, env=ENV)
+    except subprocess.TimeoutExpired:  # a hung CLI call (seen live) must not end the watch
+        return 124, "timed out"
     return r.returncode, r.stdout + r.stderr
 
 

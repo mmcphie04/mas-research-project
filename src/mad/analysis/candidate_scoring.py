@@ -678,6 +678,30 @@ def weighted_rate(values, weights):
     return np.where(den > 0, weights @ values / np.where(den > 0, den, 1), np.nan)
 
 
+def pair_rate_within(c, q, W):
+    """weighted_rate(c, W[:, q]) without the (draws x pairs) matrix: pairs inside one question
+    are summed per question first (identical result, memory draws x questions)."""
+    nq = W.shape[1]
+    num = np.bincount(q, weights=c, minlength=nq)
+    den = np.bincount(q, minlength=nq).astype(float)
+    d = W @ den
+    return np.where(d > 0, (W @ num) / np.where(d > 0, d, 1), np.nan)
+
+
+def pair_rate_across(c, qa, qb, W):
+    """weighted_rate(c, W[:, qa] * W[:, qb]) without the (draws x pairs) matrix: concordance
+    and pair counts are summed into question-by-question matrices C, N, and each draw's value
+    is w'Cw / w'Nw (identical result, memory draws x questions)."""
+    nq = W.shape[1]
+    C = np.zeros((nq, nq))
+    N = np.zeros((nq, nq))
+    np.add.at(C, (qa, qb), c)
+    np.add.at(N, (qa, qb), 1.0)
+    num = np.einsum("bi,ij,bj->b", W, C, W, optimize=True)
+    den = np.einsum("bi,ij,bj->b", W, N, W, optimize=True)
+    return np.where(den > 0, num / np.where(den > 0, den, 1), np.nan)
+
+
 def boot_weights(n_questions: int, n_boot: int, seed: int) -> np.ndarray:
     """Row 0 is the point estimate (all ones); rows 1.. are question multiplicities."""
     rng = np.random.default_rng(seed)
@@ -731,14 +755,14 @@ def evaluate_scores(D: StateData, z: np.ndarray, folds: np.ndarray, condition: s
     def within(name, mask, groups):
         i, j = pairs_within(groups, D.y, mask & inq & np.isfinite(z))
         c = concordance(z, i, j)
-        vals = weighted_rate(c, W[:, qi[i]]) if len(i) else np.full(len(W), np.nan)
+        vals = pair_rate_within(c, qi[i], W) if len(i) else np.full(len(W), np.nan)
         out[name], raw[name] = summarize(vals), vals
         counts[name] = {"pairs": int(len(i)), "questions": int(len(np.unique(D.qid[i]))) if len(i) else 0}
 
     def across(name, mask):
         i, j = pairs_within(folds, D.y, mask & inq & np.isfinite(z))
         c = concordance(z, i, j)
-        vals = weighted_rate(c, W[:, qi[i]] * W[:, qi[j]]) if len(i) else np.full(len(W), np.nan)
+        vals = pair_rate_across(c, qi[i], qi[j], W) if len(i) else np.full(len(W), np.nan)
         out[name], raw[name] = summarize(vals), vals
         counts[name] = {"pairs": int(len(i)), "states": int((mask & inq & np.isfinite(z)).sum())}
 
@@ -755,7 +779,7 @@ def evaluate_scores(D: StateData, z: np.ndarray, folds: np.ndarray, condition: s
     i, j, cells = revision_pairs(ev, folds, D)
     c = (d[i] > d[j]) + 0.5 * (d[i] == d[j])
     eq = np.array([qindex[q] for q in ev.question_id])
-    vals = weighted_rate(c, W[:, eq[i]] * W[:, eq[j]]) if len(i) else np.full(len(W), np.nan)
+    vals = pair_rate_across(c, eq[i], eq[j], W) if len(i) else np.full(len(W), np.nan)
     out["revision_auc"], raw["revision_auc"] = summarize(vals), vals
     counts["revision_auc"] = {"pairs": int(len(i)), "cells": cells,
                               "helpful": int((ev.kind == "helpful").sum()), "harmful": int((ev.kind == "harmful").sum()),

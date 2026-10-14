@@ -186,3 +186,15 @@ def test_combined_reference_features_do_not_depend_on_the_held_out_fold_labels()
     M1 = next(iter(comb._fold_matrices(D, T, rf)))[1]
     other = T & (rf != 0)
     assert np.allclose(M0[other, -1], M1[other, -1])
+
+
+def test_aggregated_pair_bootstrap_equals_the_dense_computation():
+    """The memory-light question-level aggregation gives the same values as weighting every
+    pair by W[:, q_a] * W[:, q_b] (or W[:, q] within a question)."""
+    rng = np.random.default_rng(5)
+    nq, npairs = 30, 400
+    W = CS.boot_weights(nq, 50, 0)
+    qa, qb = rng.integers(0, nq, npairs), rng.integers(0, nq, npairs)
+    c = rng.choice([0.0, 0.5, 1.0], npairs)
+    assert np.allclose(CS.pair_rate_across(c, qa, qb, W), CS.weighted_rate(c, W[:, qa] * W[:, qb]), equal_nan=True)
+    assert np.allclose(CS.pair_rate_within(c, qa, W), CS.weighted_rate(c, W[:, qa]), equal_nan=True)
