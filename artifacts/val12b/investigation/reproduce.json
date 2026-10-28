@@ -1,0 +1,44 @@
+{
+ "frozen_sha256": "8e5785fe62c222c036df888fa9c28b2fccfdce766be33e0047face64461a67fb",
+ "states": 1800,
+ "cache_path_vs_export": {
+  "raw": 4.999771118230356e-07,
+  "z": 4.99711195089958e-07,
+  "p": 4.997366352954558e-07
+ },
+ "archive_manual_vs_export": {
+  "z": 4.99711195089958e-07,
+  "p": 4.997366352954558e-07
+ },
+ "round0_identical_across_views": true,
+ "answer_letter_matches_response_text": {
+  "matched": 1744,
+  "checked": 1744
+ },
+ "post_index": {
+  "pre_rows": 600,
+  "post_rows": {
+   "debate": 600,
+   "independent": 600
+  },
+  "every_post_has_matching_pre": true
+ },
+ "validation_z": {
+  "mean": 0.5244590269153759,
+  "sd": 0.8266611175515187
+ },
+ "option_changes": {
+  "debate": {
+   "questions": 200,
+   "revised_only_vs_first": 23,
+   "six_vs_first": 0,
+   "six_pick_is_a_revised_state": 137
+  },
+  "independent": {
+   "questions": 200,
+   "revised_only_vs_first": 56,
+   "six_vs_first": 31,
+   "six_pick_is_a_revised_state": 106
+  }
+ }
+}

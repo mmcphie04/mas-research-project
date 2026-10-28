@@ -255,7 +255,7 @@ class LayerProbe:
                 X[m] -= self.letter_means.get(int(a), self.global_mean)
         return X
 
-    def fit(self, X, y, letters, C=None):
+    def fit(self, X, y, letters, C=None, groups=None):
         if "rout" in self.kind:
             imp = Imputer().fit(C)
             Ci = imp.transform(C)
@@ -275,6 +275,8 @@ class LayerProbe:
         Xs = self.std.transform(Xp)
         if self.method == "meandiff":
             self.w = Xs[y == 1].mean(0) - Xs[y == 0].mean(0)
+        elif self.method == "wqmeandiff":
+            self.w = within_question_direction(Xs, y, groups)
         elif self.method.startswith("pca"):
             from sklearn.decomposition import PCA
             from sklearn.linear_model import LogisticRegression
@@ -296,9 +298,31 @@ class LayerProbe:
 
     def score(self, X, letters, C=None):
         Xs = self.std.transform(self._prep(X, letters, C))
-        if self.method == "meandiff":
+        if self.method in ("meandiff", "wqmeandiff"):
             return Xs @ self.w
         return self.lr.decision_function(self.zstd.transform(self.pca.transform(Xs)))
+
+
+def within_question_direction(Xs, y, groups):
+    """Mean over questions with both labels of (mean correct - mean incorrect) inside the
+    question: a direction learned only from within-question contrasts, so differences BETWEEN
+    questions (difficulty, agreement, context) cannot drive it. Scores are then ranked within a
+    question, where any per-question offset cancels."""
+    if groups is None:
+        raise ValueError("wqmeandiff needs question groups")
+    diffs = []
+    for g in np.unique(groups):
+        m = groups == g
+        if 0 < y[m].sum() < m.sum():
+            diffs.append(Xs[m & (y == 1)].mean(0) - Xs[m & (y == 0)].mean(0))
+    return np.mean(diffs, axis=0) if diffs else np.zeros(Xs.shape[1])
+
+
+class LinearDirection:
+    """A fitted direction w: decision = Z @ w (mean-difference estimators for tabular features)."""
+
+    def __init__(self, w):
+        self.w = w
 
 
 def parse_recipe(recipe: str):
@@ -340,12 +364,13 @@ class ActivationScorer:
             ref = np.full(len(D.y), np.nan)
             for r in range(self.k_ref):
                 a, b = T & (rf != r), T & (rf == r)
-                p = LayerProbe(self.kind, self.method).fit(X[a], D.y[a], D.letters[a], None if C is None else C[a])
+                p = LayerProbe(self.kind, self.method).fit(X[a], D.y[a], D.letters[a], None if C is None else C[a],
+                                                           groups=D.groups[a])
                 ref[b] = p.score(X[b], D.letters[b], None if C is None else C[b])
             self.layer_norm[L] = Normalizer().fit(ref[T])
             refs.append(self.layer_norm[L](ref))
             self.probes[L] = LayerProbe(self.kind, self.method).fit(X[T], D.y[T], D.letters[T],
-                                                                     None if C is None else C[T])
+                                                                     None if C is None else C[T], groups=D.groups[T])
         ens_ref = np.mean(refs, axis=0)
         self.norm = Normalizer().fit(ens_ref[T])
         self.ref_z = self.norm(ens_ref)               # NaN outside training rows
@@ -420,7 +445,11 @@ class TabularScorer:
         return D.output(self.sets)[0]
 
     # -- model
-    def _fit_model(self, Z, y, C):
+    def _fit_model(self, Z, y, C, groups=None):
+        if self.model == "meandiff":
+            return LinearDirection(Z[y == 1].mean(0) - Z[y == 0].mean(0))
+        if self.model == "wqmeandiff":
+            return LinearDirection(within_question_direction(Z, y, groups))
         if self.model == "hgb":
             from sklearn.ensemble import HistGradientBoostingClassifier
             return HistGradientBoostingClassifier(max_depth=3, max_iter=200, learning_rate=0.05, random_state=0).fit(Z, y)
@@ -428,6 +457,8 @@ class TabularScorer:
         return LogisticRegression(C=C, max_iter=4000).fit(Z, y)
 
     def _decision(self, m, Z):
+        if isinstance(m, LinearDirection):
+            return Z @ m.w
         if self.model == "hgb":
             p = np.clip(m.predict_proba(Z)[:, 1], 1e-6, 1 - 1e-6)
             return np.log(p / (1 - p))
@@ -435,7 +466,7 @@ class TabularScorer:
 
     def _prep_fit(self, M_rows):
         imp = Imputer().fit(M_rows)
-        std = Standardizer().fit(imp.transform(M_rows)) if self.model == "lr" else None
+        std = Standardizer().fit(imp.transform(M_rows)) if self.model in ("lr", "meandiff", "wqmeandiff") else None
         return imp, std
 
     @staticmethod
@@ -455,7 +486,7 @@ class TabularScorer:
             imp, std = self._prep_fit(M[a])
             Za, Zb = self._prep(M[a], imp, std), self._prep(M[b], imp, std)
             for C in Cs:
-                dec[C][b] = self._decision(self._fit_model(Za, D.y[a], C), Zb)
+                dec[C][b] = self._decision(self._fit_model(Za, D.y[a], C, D.groups[a]), Zb)
         if len(Cs) > 1:
             self.cv = {C: _mean_fold_logloss(dec[C], D.y, rf, T) for C in Cs}
             self.C = min(self.cv, key=self.cv.get)
@@ -467,7 +498,7 @@ class TabularScorer:
         self.platt = PlattScaler().fit(self.ref_z[T], D.y[T])
         M = self._final_matrix(D, T)
         self.imp, self.std = self._prep_fit(M[T])
-        self.m = self._fit_model(self._prep(M[T], self.imp, self.std), D.y[T], self.C)
+        self.m = self._fit_model(self._prep(M[T], self.imp, self.std), D.y[T], self.C, D.groups[T])
         self.train = T
         return self
 
@@ -484,7 +515,9 @@ class TabularScorer:
         out = {"name": self.name, "model": self.model, "feature_names": list(self.names), "C": self.C,
                "C_cv_logloss": self.cv, "normalizer": [self.norm.mu, self.norm.sd],
                "platt": _platt_params(self.platt), "n_train_states": int(self.train.sum())}
-        if self.model == "lr":
+        if isinstance(self.m, LinearDirection):
+            out["direction"] = [float(c) for c in self.m.w]
+        elif self.model == "lr":
             out["coef"] = [float(c) for c in self.m.coef_[0]]
             out["intercept"] = float(self.m.intercept_[0])
         return out

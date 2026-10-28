@@ -1,0 +1,1876 @@
+{
+ "note": "exploratory: estimators and training sets chosen after inspecting the validation tranche",
+ "pilot_cv": {
+  "originals": {
+   "act_across (R1)": {
+    "ranking": {
+     "state_auc_post": 0.6993904395251844,
+     "state_auc_pre": 0.6057041572671608,
+     "panel_pre": 0.6612903225806451,
+     "panel_post": 0.7291666666666666,
+     "six": 0.6190476190476191,
+     "revision_auc": 0.7058823529411765
+    },
+    "ranking_ci": {
+     "state_auc_post": [
+      0.5951385487404188,
+      0.7910625145457009
+     ],
+     "state_auc_pre": [
+      0.5075326002862793,
+      0.690504798932503
+     ],
+     "panel_pre": [
+      0.5,
+      0.8035908385093167
+     ],
+     "panel_post": [
+      0.5416666666666666,
+      0.9038461538461539
+     ],
+     "six": [
+      0.49158109092012253,
+      0.7307795698924731
+     ],
+     "revision_auc": [
+      0.4889716439339555,
+      0.8995334928229665
+     ]
+    },
+    "best_six_correct": 72,
+    "best_first_correct": 71,
+    "pooled6_vote": 71,
+    "n_questions": 120,
+    "six_option_differs_from_first": 5
+   },
+   "act_within_question": {
+    "ranking": {
+     "state_auc_post": 0.7042027590632018,
+     "state_auc_pre": 0.6013535288430552,
+     "panel_pre": 0.5645161290322581,
+     "panel_post": 0.7916666666666666,
+     "six": 0.6071428571428571,
+     "revision_auc": 0.6787330316742082
+    },
+    "ranking_ci": {
+     "state_auc_post": [
+      0.6030508984593906,
+      0.7949949571150352
+     ],
+     "state_auc_pre": [
+      0.5004641383687718,
+      0.6936528301182747
+     ],
+     "panel_pre": [
+      0.4090909090909091,
+      0.7200555555555552
+     ],
+     "panel_post": [
+      0.625,
+      0.9375
+     ],
+     "six": [
+      0.4912733237813019,
+      0.7142996651785714
+     ],
+     "revision_auc": [
+      0.47635574305933587,
+      0.8405311591863092
+     ]
+    },
+    "best_six_correct": 71,
+    "best_first_correct": 70,
+    "pooled6_vote": 71,
+    "n_questions": 120,
+    "six_option_differs_from_first": 3
+   },
+   "out_across": {
+    "ranking": {
+     "state_auc_post": 0.7738209817131858,
+     "state_auc_pre": 0.7429906542056075,
+     "panel_pre": 0.5806451612903226,
+     "panel_post": 0.5,
+     "six": 0.5634920634920635,
+     "revision_auc": 0.6334841628959276
+    },
+    "ranking_ci": {
+     "state_auc_post": [
+      0.6901870503209839,
+      0.8401029452217345
+     ],
+     "state_auc_pre": [
+      0.6565804693412252,
+      0.81328574659572
+     ],
+     "panel_pre": [
+      0.40384615384615385,
+      0.75
+     ],
+     "panel_post": [
+      0.3333333333333333,
+      0.6786071428571427
+     ],
+     "six": [
+      0.42294226250419603,
+      0.7038614548707062
+     ],
+     "revision_auc": [
+      0.3909507139408153,
+      0.8157001005530417
+     ]
+    },
+    "best_six_correct": 69,
+    "best_first_correct": 69,
+    "pooled6_vote": 71,
+    "n_questions": 120,
+    "six_option_differs_from_first": 8
+   },
+   "out_within_question": {
+    "ranking": {
+     "state_auc_post": 0.6405197305101059,
+     "state_auc_pre": 0.5328714147599097,
+     "panel_pre": 0.5483870967741935,
+     "panel_post": 0.6875,
+     "six": 0.5912698412698413,
+     "revision_auc": 0.6606334841628959
+    },
+    "ranking_ci": {
+     "state_auc_post": [
+      0.5450554943146961,
+      0.7303581140015737
+     ],
+     "state_auc_pre": [
+      0.44207754058198084,
+      0.6320311145484651
+     ],
+     "panel_pre": [
+      0.37998275862068964,
+      0.7069324712643676
+     ],
+     "panel_post": [
+      0.5237824675324676,
+      0.85
+     ],
+     "six": [
+      0.46357615894039733,
+      0.7111742424242421
+     ],
+     "revision_auc": [
+      0.4588847088197584,
+      0.8480472516875602
+     ]
+    },
+    "best_six_correct": 68,
+    "best_first_correct": 67,
+    "pooled6_vote": 71,
+    "n_questions": 120,
+    "six_option_differs_from_first": 4
+   },
+   "out_lr[full]": {
+    "ranking": {
+     "state_auc_post": 0.7842476740455566,
+     "state_auc_pre": 0.7412181759587496,
+     "panel_pre": 0.6290322580645161,
+     "panel_post": 0.5625,
+     "six": 0.5833333333333334,
+     "revision_auc": 0.6606334841628959
+    },
+    "ranking_ci": {
+     "state_auc_post": [
+      0.7085736221631935,
+      0.8483571706080274
+     ],
+     "state_auc_pre": [
+      0.6590541551925841,
+      0.8140475534978966
+     ],
+     "panel_pre": [
+      0.4666666666666667,
+      0.7778186274509802
+     ],
+     "panel_post": [
+      0.39281832298136643,
+      0.7391521739130433
+     ],
+     "six": [
+      0.4516066273377683,
+      0.7077013422818792
+     ],
+     "revision_auc": [
+      0.44252832274108866,
+      0.8392017543859648
+     ]
+    },
+    "best_six_correct": 68,
+    "best_first_correct": 71,
+    "pooled6_vote": 71,
+    "n_questions": 120,
+    "six_option_differs_from_first": 13
+   }
+  },
+  "originals+debate": {
+   "act_across (R1)": {
+    "ranking": {
+     "state_auc_post": 0.7330766762913058,
+     "state_auc_pre": 0.6347083467611988,
+     "panel_pre": 0.5967741935483871,
+     "panel_post": 0.6666666666666666,
+     "six": 0.5992063492063492,
+     "revision_auc": 0.6968325791855203
+    },
+    "ranking_ci": {
+     "state_auc_post": [
+      0.6390115200378598,
+      0.8158662603161086
+     ],
+     "state_auc_pre": [
+      0.5391876374263556,
+      0.7176401137348113
+     ],
+     "panel_pre": [
+      0.4375,
+      0.7413793103448276
+     ],
+     "panel_post": [
+      0.4821085164835165,
+      0.84375
+     ],
+     "six": [
+      0.4789801279122887,
+      0.7071795175023651
+     ],
+     "revision_auc": [
+      0.4816471287801563,
+      0.8803818474398228
+     ]
+    },
+    "best_six_correct": 74,
+    "best_first_correct": 71,
+    "pooled6_vote": 71,
+    "n_questions": 120,
+    "six_option_differs_from_first": 5
+   },
+   "act_within_question": {
+    "ranking": {
+     "state_auc_post": 0.732595444337504,
+     "state_auc_pre": 0.6351917499194328,
+     "panel_pre": 0.6290322580645161,
+     "panel_post": 0.6666666666666666,
+     "six": 0.5793650793650794,
+     "revision_auc": 0.6561085972850679
+    },
+    "ranking_ci": {
+     "state_auc_post": [
+      0.634687638228189,
+      0.817919909440342
+     ],
+     "state_auc_pre": [
+      0.5419695567441912,
+      0.7196236378335874
+     ],
+     "panel_pre": [
+      0.4642526455026455,
+      0.7692708333333331
+     ],
+     "panel_post": [
+      0.47823616600790514,
+      0.8334677419354831
+     ],
+     "six": [
+      0.4637497885298596,
+      0.6891401000067877
+     ],
+     "revision_auc": [
+      0.4634056229724859,
+      0.8498073122529644
+     ]
+    },
+    "best_six_correct": 74,
+    "best_first_correct": 71,
+    "pooled6_vote": 71,
+    "n_questions": 120,
+    "six_option_differs_from_first": 4
+   },
+   "out_across": {
+    "ranking": {
+     "state_auc_post": 0.783766442091755,
+     "state_auc_pre": 0.7447631324524654,
+     "panel_pre": 0.532258064516129,
+     "panel_post": 0.5833333333333334,
+     "six": 0.5714285714285714,
+     "revision_auc": 0.6334841628959276
+    },
+    "ranking_ci": {
+     "state_auc_post": [
+      0.7065003650743644,
+      0.8477196566254157
+     ],
+     "state_auc_pre": [
+      0.6589723866454903,
+      0.8133774312613926
+     ],
+     "panel_pre": [
+      0.3620689655172414,
+      0.6923076923076923
+     ],
+     "panel_post": [
+      0.3927579365079365,
+      0.7692307692307693
+     ],
+     "six": [
+      0.4367112681648535,
+      0.6966896452678443
+     ],
+     "revision_auc": [
+      0.3925610179964471,
+      0.8472978056426331
+     ]
+    },
+    "best_six_correct": 70,
+    "best_first_correct": 67,
+    "pooled6_vote": 71,
+    "n_questions": 120,
+    "six_option_differs_from_first": 7
+   },
+   "out_within_question": {
+    "ranking": {
+     "state_auc_post": 0.6474173885145974,
+     "state_auc_pre": 0.529970995810506,
+     "panel_pre": 0.5483870967741935,
+     "panel_post": 0.5833333333333334,
+     "six": 0.5357142857142857,
+     "revision_auc": 0.6063348416289592
+    },
+    "ranking_ci": {
+     "state_auc_post": [
+      0.5482692098444955,
+      0.7397973870759774
+     ],
+     "state_auc_pre": [
+      0.4380380103046659,
+      0.6266004056010928
+     ],
+     "panel_pre": [
+      0.3749198717948718,
+      0.7069324712643676
+     ],
+     "panel_post": [
+      0.3999137931034483,
+      0.7501785714285705
+     ],
+     "six": [
+      0.38888052208835344,
+      0.6678873329907501
+     ],
+     "revision_auc": [
+      0.3982492513805709,
+      0.8098470809304736
+     ]
+    },
+    "best_six_correct": 66,
+    "best_first_correct": 67,
+    "pooled6_vote": 71,
+    "n_questions": 120,
+    "six_option_differs_from_first": 3
+   },
+   "out_lr[full]": {
+    "ranking": {
+     "state_auc_post": 0.7974013474494707,
+     "state_auc_pre": 0.7458910731550112,
+     "panel_pre": 0.6612903225806451,
+     "panel_post": 0.5833333333333334,
+     "six": 0.6507936507936508,
+     "revision_auc": 0.6877828054298643
+    },
+    "ranking_ci": {
+     "state_auc_post": [
+      0.723294691996784,
+      0.8566568304924413
+     ],
+     "state_auc_pre": [
+      0.6616026741586939,
+      0.8184994427901796
+     ],
+     "panel_pre": [
+      0.5151403743315508,
+      0.8
+     ],
+     "panel_post": [
+      0.39989583333333334,
+      0.7608954451345755
+     ],
+     "six": [
+      0.5176919605512262,
+      0.7692307692307693
+     ],
+     "revision_auc": [
+      0.4619611700307903,
+      0.8705890280640558
+     ]
+    },
+    "best_six_correct": 71,
+    "best_first_correct": 71,
+    "pooled6_vote": 71,
+    "n_questions": 120,
+    "six_option_differs_from_first": 4
+   }
+  },
+  "all_pilot_conditions": {
+   "act_across (R1)": {
+    "ranking": {
+     "state_auc_post": 0.7380494064805904,
+     "state_auc_pre": 0.632130196583951,
+     "panel_pre": 0.6612903225806451,
+     "panel_post": 0.7083333333333334,
+     "six": 0.626984126984127,
+     "revision_auc": 0.7194570135746606
+    },
+    "ranking_ci": {
+     "state_auc_post": [
+      0.6421751900873823,
+      0.8243845474284772
+     ],
+     "state_auc_pre": [
+      0.539584036999377,
+      0.7197181669306132
+     ],
+     "panel_pre": [
+      0.5,
+      0.8
+     ],
+     "panel_post": [
+      0.5399615384615385,
+      0.8703703703703703
+     ],
+     "six": [
+      0.5078717561997743,
+      0.7313557908780121
+     ],
+     "revision_auc": [
+      0.5275568919269706,
+      0.8981812169312168
+     ]
+    },
+    "best_six_correct": 75,
+    "best_first_correct": 73,
+    "pooled6_vote": 71,
+    "n_questions": 120,
+    "six_option_differs_from_first": 3
+   },
+   "act_within_question": {
+    "ranking": {
+     "state_auc_post": 0.737247353224254,
+     "state_auc_pre": 0.6155333548179182,
+     "panel_pre": 0.5645161290322581,
+     "panel_post": 0.7083333333333334,
+     "six": 0.5992063492063492,
+     "revision_auc": 0.7194570135746606
+    },
+    "ranking_ci": {
+     "state_auc_post": [
+      0.6428571428571429,
+      0.8220779478435345
+     ],
+     "state_auc_pre": [
+      0.5245505116811565,
+      0.6963295502938112
+     ],
+     "panel_pre": [
+      0.4117647058823529,
+      0.7068965517241379
+     ],
+     "panel_post": [
+      0.5399615384615385,
+      0.8703703703703703
+     ],
+     "six": [
+      0.4886155764966741,
+      0.7005881608904628
+     ],
+     "revision_auc": [
+      0.5304314888010541,
+      0.8984597839765099
+     ]
+    },
+    "best_six_correct": 73,
+    "best_first_correct": 70,
+    "pooled6_vote": 71,
+    "n_questions": 120,
+    "six_option_differs_from_first": 5
+   },
+   "out_across": {
+    "ranking": {
+     "state_auc_post": 0.783766442091755,
+     "state_auc_pre": 0.7333225910409281,
+     "panel_pre": 0.5483870967741935,
+     "panel_post": 0.6041666666666666,
+     "six": 0.5634920634920635,
+     "revision_auc": 0.583710407239819
+    },
+    "ranking_ci": {
+     "state_auc_post": [
+      0.7047392255986105,
+      0.8483569073398223
+     ],
+     "state_auc_pre": [
+      0.642535230337796,
+      0.8064247168589436
+     ],
+     "panel_pre": [
+      0.37492732558139535,
+      0.7083669354838709
+     ],
+     "panel_post": [
+      0.4090909090909091,
+      0.7857142857142857
+     ],
+     "six": [
+      0.4268659109553285,
+      0.6866717171717172
+     ],
+     "revision_auc": [
+      0.3588459000164989,
+      0.7969628892852242
+     ]
+    },
+    "best_six_correct": 68,
+    "best_first_correct": 67,
+    "pooled6_vote": 71,
+    "n_questions": 120,
+    "six_option_differs_from_first": 6
+   },
+   "out_within_question": {
+    "ranking": {
+     "state_auc_post": 0.7337183188963747,
+     "state_auc_pre": 0.603448275862069,
+     "panel_pre": 0.532258064516129,
+     "panel_post": 0.625,
+     "six": 0.5753968253968254,
+     "revision_auc": 0.5610859728506787
+    },
+    "ranking_ci": {
+     "state_auc_post": [
+      0.647500159816642,
+      0.8139982017021968
+     ],
+     "state_auc_pre": [
+      0.5056553936072107,
+      0.700147253143376
+     ],
+     "panel_pre": [
+      0.359375,
+      0.6964285714285714
+     ],
+     "panel_post": [
+      0.4166666666666667,
+      0.8125
+     ],
+     "six": [
+      0.4206314151102137,
+      0.7116570014777663
+     ],
+     "revision_auc": [
+      0.3217660764212488,
+      0.7880548144554934
+     ]
+    },
+    "best_six_correct": 68,
+    "best_first_correct": 68,
+    "pooled6_vote": 71,
+    "n_questions": 120,
+    "six_option_differs_from_first": 4
+   },
+   "out_lr[full]": {
+    "ranking": {
+     "state_auc_post": 0.793070259865255,
+     "state_auc_pre": 0.7521753142120529,
+     "panel_pre": 0.6774193548387096,
+     "panel_post": 0.6041666666666666,
+     "six": 0.6825396825396826,
+     "revision_auc": 0.7058823529411765
+    },
+    "ranking_ci": {
+     "state_auc_post": [
+      0.7131034510485846,
+      0.8596496488597807
+     ],
+     "state_auc_pre": [
+      0.6630344673393826,
+      0.8283407833892972
+     ],
+     "panel_pre": [
+      0.517841748768473,
+      0.8166666666666667
+     ],
+     "panel_post": [
+      0.4074074074074074,
+      0.7857142857142857
+     ],
+     "six": [
+      0.5327387660233835,
+      0.8125248015873014
+     ],
+     "revision_auc": [
+      0.46353255587949466,
+      0.894747453310696
+     ]
+    },
+    "best_six_correct": 71,
+    "best_first_correct": 71,
+    "pooled6_vote": 71,
+    "n_questions": 120,
+    "six_option_differs_from_first": 5
+   }
+  }
+ },
+ "validation": {
+  "originals": {
+   "debate": {
+    "act_across (R1)": {
+     "ranking": {
+      "state_auc_post": 0.7579398148148148,
+      "state_auc_pre": 0.7257171038295237,
+      "panel_pre": 0.6818181818181818,
+      "panel_post": 0.6447368421052632,
+      "six": 0.5768194070080862,
+      "revision_auc": 0.5742411812961444
+     },
+     "ranking_ci": {
+      "state_auc_post": [
+       0.6970753089968382,
+       0.8136126663468004
+      ],
+      "state_auc_pre": [
+       0.6634351296520872,
+       0.7841861965002669
+      ],
+      "panel_pre": [
+       0.5428273809523809,
+       0.8095357142857142
+      ],
+      "panel_post": [
+       0.5,
+       0.7894736842105263
+      ],
+      "six": [
+       0.4882073977131836,
+       0.6722617056856186
+      ],
+      "revision_auc": [
+       0.43338221928447496,
+       0.7171315586419753
+      ]
+     },
+     "best_six_correct": 124,
+     "best_first_correct": 125,
+     "pooled6_vote": 116,
+     "n_questions": 200,
+     "six_option_differs_from_first": 2
+    },
+    "act_within_question": {
+     "ranking": {
+      "state_auc_post": 0.7547916666666666,
+      "state_auc_pre": 0.7213015104769988,
+      "panel_pre": 0.7045454545454546,
+      "panel_post": 0.5263157894736842,
+      "six": 0.5525606469002695,
+      "revision_auc": 0.5902378999179655
+     },
+     "ranking_ci": {
+      "state_auc_post": [
+       0.696927836694987,
+       0.8090198980674418
+      ],
+      "state_auc_pre": [
+       0.6610449567150803,
+       0.7778964650419219
+      ],
+      "panel_pre": [
+       0.5846679349705984,
+       0.8207914046121592
+      ],
+      "panel_post": [
+       0.38459302325581396,
+       0.6744331395348836
+      ],
+      "six": [
+       0.46522664876455383,
+       0.6426288056206089
+      ],
+      "revision_auc": [
+       0.4626735145209747,
+       0.7205187665606783
+      ]
+     },
+     "best_six_correct": 128,
+     "best_first_correct": 128,
+     "pooled6_vote": 116,
+     "n_questions": 200,
+     "six_option_differs_from_first": 0
+    },
+    "out_across": {
+     "ranking": {
+      "state_auc_post": 0.6995370370370371,
+      "state_auc_pre": 0.7122524113727334,
+      "panel_pre": 0.5113636363636364,
+      "panel_post": 0.5789473684210527,
+      "six": 0.5633423180592992,
+      "revision_auc": 0.6222313371616078
+     },
+     "ranking_ci": {
+      "state_auc_post": [
+       0.632043328642715,
+       0.7602964186208975
+      ],
+      "state_auc_pre": [
+       0.6439162862819147,
+       0.7737514040060528
+      ],
+      "panel_pre": [
+       0.3720855694692904,
+       0.6571616541353382
+      ],
+      "panel_post": [
+       0.4305059523809524,
+       0.71875
+      ],
+      "six": [
+       0.44836605825958703,
+       0.6748548104707272
+      ],
+      "revision_auc": [
+       0.48302790788446526,
+       0.7580235118500425
+      ]
+     },
+     "best_six_correct": 123,
+     "best_first_correct": 119,
+     "pooled6_vote": 116,
+     "n_questions": 200,
+     "six_option_differs_from_first": 10
+    },
+    "out_within_question": {
+     "ranking": {
+      "state_auc_post": 0.6540162037037037,
+      "state_auc_pre": 0.6364533036666629,
+      "panel_pre": 0.5795454545454546,
+      "panel_post": 0.4605263157894737,
+      "six": 0.5094339622641509,
+      "revision_auc": 0.5291222313371616
+     },
+     "ranking_ci": {
+      "state_auc_post": [
+       0.5868061195536635,
+       0.7161491070388656
+      ],
+      "state_auc_pre": [
+       0.5667882794676711,
+       0.7003661661561477
+      ],
+      "panel_pre": [
+       0.4479166666666667,
+       0.7073170731707317
+      ],
+      "panel_post": [
+       0.3125,
+       0.6060606060606061
+      ],
+      "six": [
+       0.399348478276585,
+       0.6171880795623146
+      ],
+      "revision_auc": [
+       0.37439023656776266,
+       0.6793258326976859
+      ]
+     },
+     "best_six_correct": 120,
+     "best_first_correct": 121,
+     "pooled6_vote": 116,
+     "n_questions": 200,
+     "six_option_differs_from_first": 4
+    },
+    "out_lr[full]": {
+     "ranking": {
+      "state_auc_post": 0.7244791666666667,
+      "state_auc_pre": 0.7518895298826713,
+      "panel_pre": 0.5340909090909091,
+      "panel_post": 0.5789473684210527,
+      "six": 0.5768194070080862,
+      "revision_auc": 0.6004922067268252
+     },
+     "ranking_ci": {
+      "state_auc_post": [
+       0.659517530030531,
+       0.7828457248923506
+      ],
+      "state_auc_pre": [
+       0.6936716317062931,
+       0.8078802018452444
+      ],
+      "panel_pre": [
+       0.393931334622824,
+       0.6739130434782609
+      ],
+      "panel_post": [
+       0.425,
+       0.7317182055749128
+      ],
+      "six": [
+       0.4585769066498301,
+       0.6894133126934985
+      ],
+      "revision_auc": [
+       0.4494414828431373,
+       0.7435903354878425
+      ]
+     },
+     "best_six_correct": 121,
+     "best_first_correct": 120,
+     "pooled6_vote": 116,
+     "n_questions": 200,
+     "six_option_differs_from_first": 14
+    }
+   },
+   "independent": {
+    "act_across (R1)": {
+     "ranking": {
+      "state_auc_post": 0.7203933699616788,
+      "state_auc_pre": 0.7257171038295237,
+      "panel_pre": 0.6818181818181818,
+      "panel_post": 0.4803921568627451,
+      "six": 0.5813953488372093,
+      "revision_auc": 0.6061381074168798
+     },
+     "ranking_ci": {
+      "state_auc_post": [
+       0.6588014267472881,
+       0.7758998814595032
+      ],
+      "state_auc_pre": [
+       0.6634351296520872,
+       0.7841861965002669
+      ],
+      "panel_pre": [
+       0.5428273809523809,
+       0.8095357142857142
+      ],
+      "panel_post": [
+       0.35454545454545455,
+       0.6091136363636362
+      ],
+      "six": [
+       0.4883272712645236,
+       0.6735314426805791
+      ],
+      "revision_auc": [
+       0.4797251228501228,
+       0.7306408146413745
+      ]
+     },
+     "best_six_correct": 121,
+     "best_first_correct": 125,
+     "pooled6_vote": 120,
+     "n_questions": 200,
+     "six_option_differs_from_first": 33
+    },
+    "act_within_question": {
+     "ranking": {
+      "state_auc_post": 0.7236829955214922,
+      "state_auc_pre": 0.7213015104769988,
+      "panel_pre": 0.7045454545454546,
+      "panel_post": 0.5196078431372549,
+      "six": 0.5940803382663847,
+      "revision_auc": 0.644927536231884
+     },
+     "ranking_ci": {
+      "state_auc_post": [
+       0.6620784387589207,
+       0.7776524138504229
+      ],
+      "state_auc_pre": [
+       0.6610449567150803,
+       0.7778964650419219
+      ],
+      "panel_pre": [
+       0.5846679349705984,
+       0.8207914046121592
+      ],
+      "panel_post": [
+       0.40174107142857146,
+       0.6400087719298245
+      ],
+      "six": [
+       0.5149525316455695,
+       0.6726843897161767
+      ],
+      "revision_auc": [
+       0.532826361235551,
+       0.755062358696099
+      ]
+     },
+     "best_six_correct": 124,
+     "best_first_correct": 128,
+     "pooled6_vote": 120,
+     "n_questions": 200,
+     "six_option_differs_from_first": 24
+    },
+    "out_across": {
+     "ranking": {
+      "state_auc_post": 0.7131561937300891,
+      "state_auc_pre": 0.7122524113727334,
+      "panel_pre": 0.5113636363636364,
+      "panel_post": 0.49019607843137253,
+      "six": 0.5602536997885835,
+      "revision_auc": 0.5903665814151747
+     },
+     "ranking_ci": {
+      "state_auc_post": [
+       0.6483669362754517,
+       0.7734753252067674
+      ],
+      "state_auc_pre": [
+       0.6439162862819147,
+       0.7737514040060528
+      ],
+      "panel_pre": [
+       0.3720855694692904,
+       0.6571616541353382
+      ],
+      "panel_post": [
+       0.3584905660377358,
+       0.6228618421052629
+      ],
+      "six": [
+       0.4642755296034764,
+       0.6511730910089727
+      ],
+      "revision_auc": [
+       0.45434468373190856,
+       0.7128149813644465
+      ]
+     },
+     "best_six_correct": 125,
+     "best_first_correct": 119,
+     "pooled6_vote": 120,
+     "n_questions": 200,
+     "six_option_differs_from_first": 23
+    },
+    "out_within_question": {
+     "ranking": {
+      "state_auc_post": 0.6238861443279929,
+      "state_auc_pre": 0.6364533036666629,
+      "panel_pre": 0.5795454545454546,
+      "panel_post": 0.5294117647058824,
+      "six": 0.5306553911205074,
+      "revision_auc": 0.5025575447570333
+     },
+     "ranking_ci": {
+      "state_auc_post": [
+       0.555403271671456,
+       0.6869353383049788
+      ],
+      "state_auc_pre": [
+       0.5667882794676711,
+       0.7003661661561477
+      ],
+      "panel_pre": [
+       0.4479166666666667,
+       0.7073170731707317
+      ],
+      "panel_post": [
+       0.3983050847457627,
+       0.6491683217477654
+      ],
+      "six": [
+       0.4333292079207921,
+       0.6247605599214145
+      ],
+      "revision_auc": [
+       0.35931883124085584,
+       0.637040562398905
+      ]
+     },
+     "best_six_correct": 119,
+     "best_first_correct": 121,
+     "pooled6_vote": 120,
+     "n_questions": 200,
+     "six_option_differs_from_first": 20
+    },
+    "out_lr[full]": {
+     "ranking": {
+      "state_auc_post": 0.7503462763747172,
+      "state_auc_pre": 0.7518895298826713,
+      "panel_pre": 0.5340909090909091,
+      "panel_post": 0.5588235294117647,
+      "six": 0.6046511627906976,
+      "revision_auc": 0.5937766410912191
+     },
+     "ranking_ci": {
+      "state_auc_post": [
+       0.6927099910280514,
+       0.8039620824972493
+      ],
+      "state_auc_pre": [
+       0.6936716317062931,
+       0.8078802018452444
+      ],
+      "panel_pre": [
+       0.393931334622824,
+       0.6739130434782609
+      ],
+      "panel_post": [
+       0.4375,
+       0.6805629432624113
+      ],
+      "six": [
+       0.5099510274467163,
+       0.6950855425774243
+      ],
+      "revision_auc": [
+       0.4540282965478212,
+       0.7241082575703074
+      ]
+     },
+     "best_six_correct": 127,
+     "best_first_correct": 120,
+     "pooled6_vote": 120,
+     "n_questions": 200,
+     "six_option_differs_from_first": 25
+    }
+   }
+  },
+  "originals+debate": {
+   "debate": {
+    "act_across (R1)": {
+     "ranking": {
+      "state_auc_post": 0.7769444444444444,
+      "state_auc_pre": 0.7330573109609937,
+      "panel_pre": 0.6590909090909091,
+      "panel_post": 0.4868421052631579,
+      "six": 0.5202156334231806,
+      "revision_auc": 0.5844954881050041
+     },
+     "ranking_ci": {
+      "state_auc_post": [
+       0.7175774797533994,
+       0.8307604610033413
+      ],
+      "state_auc_pre": [
+       0.6719645075747336,
+       0.7899845027163598
+      ],
+      "panel_pre": [
+       0.5348639006342494,
+       0.7738392857142856
+      ],
+      "panel_post": [
+       0.34882840028188866,
+       0.6410256410256411
+      ],
+      "six": [
+       0.43931541758963,
+       0.6032626817795697
+      ],
+      "revision_auc": [
+       0.45772778652712864,
+       0.7220877100840335
+      ]
+     },
+     "best_six_correct": 127,
+     "best_first_correct": 128,
+     "pooled6_vote": 116,
+     "n_questions": 200,
+     "six_option_differs_from_first": 1
+    },
+    "act_within_question": {
+     "ranking": {
+      "state_auc_post": 0.7627546296296296,
+      "state_auc_pre": 0.7257515110504524,
+      "panel_pre": 0.6704545454545454,
+      "panel_post": 0.47368421052631576,
+      "six": 0.5336927223719676,
+      "revision_auc": 0.5639868744872847
+     },
+     "ranking_ci": {
+      "state_auc_post": [
+       0.7005065870372165,
+       0.8195989898711288
+      ],
+      "state_auc_pre": [
+       0.6659868401785055,
+       0.7835305174664665
+      ],
+      "panel_pre": [
+       0.55,
+       0.787534722222222
+      ],
+      "panel_post": [
+       0.33711240310077517,
+       0.6282142857142856
+      ],
+      "six": [
+       0.45642435538987264,
+       0.6139982952895666
+      ],
+      "revision_auc": [
+       0.4447798418288733,
+       0.6870958835721093
+      ]
+     },
+     "best_six_correct": 126,
+     "best_first_correct": 129,
+     "pooled6_vote": 116,
+     "n_questions": 200,
+     "six_option_differs_from_first": 3
+    },
+    "out_across": {
+     "ranking": {
+      "state_auc_post": 0.7093402777777778,
+      "state_auc_pre": 0.7033294720785402,
+      "panel_pre": 0.5227272727272727,
+      "panel_post": 0.4868421052631579,
+      "six": 0.5363881401617251,
+      "revision_auc": 0.623461853978671
+     },
+     "ranking_ci": {
+      "state_auc_post": [
+       0.6428520557173877,
+       0.7700571546818646
+      ],
+      "state_auc_pre": [
+       0.635177277505001,
+       0.7644047581834085
+      ],
+      "panel_pre": [
+       0.3888888888888889,
+       0.6617746422893481
+      ],
+      "panel_post": [
+       0.34781099033816426,
+       0.6375107758620688
+      ],
+      "six": [
+       0.4211949185369518,
+       0.6524537222941752
+      ],
+      "revision_auc": [
+       0.4809119738612339,
+       0.7617846606727797
+      ]
+     },
+     "best_six_correct": 122,
+     "best_first_correct": 119,
+     "pooled6_vote": 116,
+     "n_questions": 200,
+     "six_option_differs_from_first": 8
+    },
+    "out_within_question": {
+     "ranking": {
+      "state_auc_post": 0.674224537037037,
+      "state_auc_pre": 0.6291589728297645,
+      "panel_pre": 0.5227272727272727,
+      "panel_post": 0.47368421052631576,
+      "six": 0.5094339622641509,
+      "revision_auc": 0.5209187858900738
+     },
+     "ranking_ci": {
+      "state_auc_post": [
+       0.6060252034850395,
+       0.7376588138932212
+      ],
+      "state_auc_pre": [
+       0.5629700857218498,
+       0.6940046453652859
+      ],
+      "panel_pre": [
+       0.39021002710027103,
+       0.6511627906976745
+      ],
+      "panel_post": [
+       0.3181818181818182,
+       0.6162976249381493
+      ],
+      "six": [
+       0.39354380064210365,
+       0.6240836466165413
+      ],
+      "revision_auc": [
+       0.36956103489676617,
+       0.6679902245451026
+      ]
+     },
+     "best_six_correct": 119,
+     "best_first_correct": 118,
+     "pooled6_vote": 116,
+     "n_questions": 200,
+     "six_option_differs_from_first": 6
+    },
+    "out_lr[full]": {
+     "ranking": {
+      "state_auc_post": 0.7384143518518519,
+      "state_auc_pre": 0.7346400431237169,
+      "panel_pre": 0.5340909090909091,
+      "panel_post": 0.5789473684210527,
+      "six": 0.5444743935309974,
+      "revision_auc": 0.6177194421657096
+     },
+     "ranking_ci": {
+      "state_auc_post": [
+       0.6739671007021719,
+       0.7963293193421574
+      ],
+      "state_auc_pre": [
+       0.6745386985736149,
+       0.7912491487270898
+      ],
+      "panel_pre": [
+       0.3947169059011164,
+       0.6750694444444441
+      ],
+      "panel_post": [
+       0.4264705882352941,
+       0.7297297297297297
+      ],
+      "six": [
+       0.4285624325296869,
+       0.6599683121784486
+      ],
+      "revision_auc": [
+       0.4625322240981791,
+       0.7651892092869537
+      ]
+     },
+     "best_six_correct": 121,
+     "best_first_correct": 119,
+     "pooled6_vote": 116,
+     "n_questions": 200,
+     "six_option_differs_from_first": 6
+    }
+   },
+   "independent": {
+    "act_across (R1)": {
+     "ranking": {
+      "state_auc_post": 0.7304584699201255,
+      "state_auc_pre": 0.7330573109609937,
+      "panel_pre": 0.6590909090909091,
+      "panel_post": 0.4215686274509804,
+      "six": 0.5813953488372093,
+      "revision_auc": 0.6253196930946292
+     },
+     "ranking_ci": {
+      "state_auc_post": [
+       0.6718167983357024,
+       0.784168510588398
+      ],
+      "state_auc_pre": [
+       0.6719645075747336,
+       0.7899845027163598
+      ],
+      "panel_pre": [
+       0.5348639006342494,
+       0.7738392857142856
+      ],
+      "panel_post": [
+       0.2980769230769231,
+       0.5392352941176469
+      ],
+      "six": [
+       0.495448678950113,
+       0.663944457182162
+      ],
+      "revision_auc": [
+       0.4953720286357479,
+       0.7424025634053778
+      ]
+     },
+     "best_six_correct": 124,
+     "best_first_correct": 128,
+     "pooled6_vote": 120,
+     "n_questions": 200,
+     "six_option_differs_from_first": 24
+    },
+    "act_within_question": {
+     "ranking": {
+      "state_auc_post": 0.7202317743201441,
+      "state_auc_pre": 0.7257515110504524,
+      "panel_pre": 0.6704545454545454,
+      "panel_post": 0.4803921568627451,
+      "six": 0.587737843551797,
+      "revision_auc": 0.6253196930946292
+     },
+     "ranking_ci": {
+      "state_auc_post": [
+       0.6606998607195386,
+       0.775415931357238
+      ],
+      "state_auc_pre": [
+       0.6659868401785055,
+       0.7835305174664665
+      ],
+      "panel_pre": [
+       0.55,
+       0.787534722222222
+      ],
+      "panel_post": [
+       0.35845687331536386,
+       0.5978314151747656
+      ],
+      "six": [
+       0.5080883685116405,
+       0.6652553248877597
+      ],
+      "revision_auc": [
+       0.5029228290506486,
+       0.7393272481221774
+      ]
+     },
+     "best_six_correct": 123,
+     "best_first_correct": 129,
+     "pooled6_vote": 120,
+     "n_questions": 200,
+     "six_option_differs_from_first": 29
+    },
+    "out_across": {
+     "ranking": {
+      "state_auc_post": 0.7151992243409206,
+      "state_auc_pre": 0.7033294720785402,
+      "panel_pre": 0.5227272727272727,
+      "panel_post": 0.47058823529411764,
+      "six": 0.5348837209302325,
+      "revision_auc": 0.5878090366581415
+     },
+     "ranking_ci": {
+      "state_auc_post": [
+       0.6497506430574389,
+       0.7747051826941466
+      ],
+      "state_auc_pre": [
+       0.635177277505001,
+       0.7644047581834085
+      ],
+      "panel_pre": [
+       0.3888888888888889,
+       0.6617746422893481
+      ],
+      "panel_post": [
+       0.3367297880690738,
+       0.6087282608695651
+      ],
+      "six": [
+       0.4319580637453559,
+       0.6321599140121993
+      ],
+      "revision_auc": [
+       0.44924653955834476,
+       0.7118058458751394
+      ]
+     },
+     "best_six_correct": 123,
+     "best_first_correct": 119,
+     "pooled6_vote": 120,
+     "n_questions": 200,
+     "six_option_differs_from_first": 14
+    },
+    "out_within_question": {
+     "ranking": {
+      "state_auc_post": 0.6185419456115241,
+      "state_auc_pre": 0.6291589728297645,
+      "panel_pre": 0.5227272727272727,
+      "panel_post": 0.49019607843137253,
+      "six": 0.5052854122621564,
+      "revision_auc": 0.5017050298380221
+     },
+     "ranking_ci": {
+      "state_auc_post": [
+       0.5482520121152075,
+       0.6829486007306695
+      ],
+      "state_auc_pre": [
+       0.5629700857218498,
+       0.6940046453652859
+      ],
+      "panel_pre": [
+       0.39021002710027103,
+       0.6511627906976745
+      ],
+      "panel_post": [
+       0.35845687331536386,
+       0.6203783524904214
+      ],
+      "six": [
+       0.4087961732660112,
+       0.6009254598700465
+      ],
+      "revision_auc": [
+       0.36242867485739355,
+       0.6358681738867908
+      ]
+     },
+     "best_six_correct": 115,
+     "best_first_correct": 118,
+     "pooled6_vote": 120,
+     "n_questions": 200,
+     "six_option_differs_from_first": 21
+    },
+    "out_lr[full]": {
+     "ranking": {
+      "state_auc_post": 0.7477261184726903,
+      "state_auc_pre": 0.7346400431237169,
+      "panel_pre": 0.5340909090909091,
+      "panel_post": 0.5686274509803921,
+      "six": 0.5687103594080338,
+      "revision_auc": 0.5878090366581415
+     },
+     "ranking_ci": {
+      "state_auc_post": [
+       0.6907313541352315,
+       0.8025073156047
+      ],
+      "state_auc_pre": [
+       0.6745386985736149,
+       0.7912491487270898
+      ],
+      "panel_pre": [
+       0.3947169059011164,
+       0.6750694444444441
+      ],
+      "panel_post": [
+       0.44229651162790695,
+       0.6923076923076923
+      ],
+      "six": [
+       0.4659262546478163,
+       0.6632976458062226
+      ],
+      "revision_auc": [
+       0.44443684450524396,
+       0.7210510204081632
+      ]
+     },
+     "best_six_correct": 123,
+     "best_first_correct": 119,
+     "pooled6_vote": 120,
+     "n_questions": 200,
+     "six_option_differs_from_first": 15
+    }
+   }
+  },
+  "all_pilot_conditions": {
+   "debate": {
+    "act_across (R1)": {
+     "ranking": {
+      "state_auc_post": 0.7802083333333333,
+      "state_auc_pre": 0.7145691642486036,
+      "panel_pre": 0.5795454545454546,
+      "panel_post": 0.5,
+      "six": 0.49326145552560646,
+      "revision_auc": 0.5594749794913864
+     },
+     "ranking_ci": {
+      "state_auc_post": [
+       0.7235943573317508,
+       0.8322254853612303
+      ],
+      "state_auc_pre": [
+       0.6527032107249524,
+       0.7709570611930935
+      ],
+      "panel_pre": [
+       0.4431818181818182,
+       0.7100277777777776
+      ],
+      "panel_post": [
+       0.35480920535011806,
+       0.6555729166666666
+      ],
+      "six": [
+       0.4092043280726925,
+       0.5835821745281391
+      ],
+      "revision_auc": [
+       0.42798095622310495,
+       0.6966318900441532
+      ]
+     },
+     "best_six_correct": 122,
+     "best_first_correct": 122,
+     "pooled6_vote": 116,
+     "n_questions": 200,
+     "six_option_differs_from_first": 0
+    },
+    "act_within_question": {
+     "ranking": {
+      "state_auc_post": 0.773912037037037,
+      "state_auc_pre": 0.7103944214425801,
+      "panel_pre": 0.5227272727272727,
+      "panel_post": 0.4868421052631579,
+      "six": 0.46630727762803237,
+      "revision_auc": 0.5401968826907301
+     },
+     "ranking_ci": {
+      "state_auc_post": [
+       0.7163200124214538,
+       0.8269231537296773
+      ],
+      "state_auc_pre": [
+       0.6475175284857203,
+       0.7705650468176557
+      ],
+      "panel_pre": [
+       0.39090198863636366,
+       0.6538461538461539
+      ],
+      "panel_post": [
+       0.3375,
+       0.6428571428571429
+      ],
+      "six": [
+       0.3840146976873781,
+       0.5530877616747182
+      ],
+      "revision_auc": [
+       0.4115928278192429,
+       0.6726068123666163
+      ]
+     },
+     "best_six_correct": 120,
+     "best_first_correct": 120,
+     "pooled6_vote": 116,
+     "n_questions": 200,
+     "six_option_differs_from_first": 0
+    },
+    "out_across": {
+     "ranking": {
+      "state_auc_post": 0.7174305555555556,
+      "state_auc_pre": 0.7139039579773142,
+      "panel_pre": 0.5454545454545454,
+      "panel_post": 0.5921052631578947,
+      "six": 0.5579514824797843,
+      "revision_auc": 0.6443806398687448
+     },
+     "ranking_ci": {
+      "state_auc_post": [
+       0.650513483344528,
+       0.7766004016754035
+      ],
+      "state_auc_pre": [
+       0.6468835953532271,
+       0.7746175069641873
+      ],
+      "panel_pre": [
+       0.4090909090909091,
+       0.6818458980044344
+      ],
+      "panel_post": [
+       0.4486842105263158,
+       0.7428667953667953
+      ],
+      "six": [
+       0.45134890461492133,
+       0.6705147431564714
+      ],
+      "revision_auc": [
+       0.5083078281998548,
+       0.7792309322033899
+      ]
+     },
+     "best_six_correct": 122,
+     "best_first_correct": 120,
+     "pooled6_vote": 116,
+     "n_questions": 200,
+     "six_option_differs_from_first": 7
+    },
+    "out_within_question": {
+     "ranking": {
+      "state_auc_post": 0.762962962962963,
+      "state_auc_pre": 0.7501921069835189,
+      "panel_pre": 0.6363636363636364,
+      "panel_post": 0.6052631578947368,
+      "six": 0.6253369272237197,
+      "revision_auc": 0.6406890894175554
+     },
+     "ranking_ci": {
+      "state_auc_post": [
+       0.7030048218956522,
+       0.8197178465737597
+      ],
+      "state_auc_pre": [
+       0.6954296948297456,
+       0.8050016439773214
+      ],
+      "panel_pre": [
+       0.5,
+       0.768342122610415
+      ],
+      "panel_post": [
+       0.4582720588235294,
+       0.7613771645021644
+      ],
+      "six": [
+       0.5327188755937158,
+       0.7243291638746184
+      ],
+      "revision_auc": [
+       0.49967720294322576,
+       0.7815256335092176
+      ]
+     },
+     "best_six_correct": 126,
+     "best_first_correct": 121,
+     "pooled6_vote": 116,
+     "n_questions": 200,
+     "six_option_differs_from_first": 8
+    },
+    "out_lr[full]": {
+     "ranking": {
+      "state_auc_post": 0.7456828703703704,
+      "state_auc_pre": 0.7464990652704981,
+      "panel_pre": 0.5681818181818182,
+      "panel_post": 0.618421052631579,
+      "six": 0.5795148247978437,
+      "revision_auc": 0.6534044298605415
+     },
+     "ranking_ci": {
+      "state_auc_post": [
+       0.6865514281844799,
+       0.8041389789376484
+      ],
+      "state_auc_pre": [
+       0.6878859360281414,
+       0.8019702986759317
+      ],
+      "panel_pre": [
+       0.42857142857142855,
+       0.7100131578947367
+      ],
+      "panel_post": [
+       0.47056595365418896,
+       0.76390931372549
+      ],
+      "six": [
+       0.46715208413369186,
+       0.6868008948545862
+      ],
+      "revision_auc": [
+       0.4969606677237491,
+       0.8054260968285357
+      ]
+     },
+     "best_six_correct": 122,
+     "best_first_correct": 121,
+     "pooled6_vote": 116,
+     "n_questions": 200,
+     "six_option_differs_from_first": 6
+    }
+   },
+   "independent": {
+    "act_across (R1)": {
+     "ranking": {
+      "state_auc_post": 0.709704972528741,
+      "state_auc_pre": 0.7145691642486036,
+      "panel_pre": 0.5795454545454546,
+      "panel_post": 0.47058823529411764,
+      "six": 0.5602536997885835,
+      "revision_auc": 0.6057118499573743
+     },
+     "ranking_ci": {
+      "state_auc_post": [
+       0.6470504670726294,
+       0.7639941528120165
+      ],
+      "state_auc_pre": [
+       0.6527032107249524,
+       0.7709570611930935
+      ],
+      "panel_pre": [
+       0.4431818181818182,
+       0.7100277777777776
+      ],
+      "panel_post": [
+       0.33962264150943394,
+       0.5952507598784194
+      ],
+      "six": [
+       0.4774603717641692,
+       0.6408521694684235
+      ],
+      "revision_auc": [
+       0.48029329196217496,
+       0.7232859181408411
+      ]
+     },
+     "best_six_correct": 121,
+     "best_first_correct": 122,
+     "pooled6_vote": 120,
+     "n_questions": 200,
+     "six_option_differs_from_first": 31
+    },
+    "act_within_question": {
+     "ranking": {
+      "state_auc_post": 0.6965349277436631,
+      "state_auc_pre": 0.7103944214425801,
+      "panel_pre": 0.5227272727272727,
+      "panel_post": 0.49019607843137253,
+      "six": 0.53276955602537,
+      "revision_auc": 0.5788576300085252
+     },
+     "ranking_ci": {
+      "state_auc_post": [
+       0.6381471149300972,
+       0.7545719199204572
+      ],
+      "state_auc_pre": [
+       0.6475175284857203,
+       0.7705650468176557
+      ],
+      "panel_pre": [
+       0.39090198863636366,
+       0.6538461538461539
+      ],
+      "panel_post": [
+       0.36248005319148935,
+       0.6083423913043478
+      ],
+      "six": [
+       0.4472037065091148,
+       0.6139423796271358
+      ],
+      "revision_auc": [
+       0.44950586982494417,
+       0.6980503144654087
+      ]
+     },
+     "best_six_correct": 118,
+     "best_first_correct": 120,
+     "pooled6_vote": 120,
+     "n_questions": 200,
+     "six_option_differs_from_first": 32
+    },
+    "out_across": {
+     "ranking": {
+      "state_auc_post": 0.7250450159287133,
+      "state_auc_pre": 0.7139039579773142,
+      "panel_pre": 0.5454545454545454,
+      "panel_post": 0.47058823529411764,
+      "six": 0.5412262156448203,
+      "revision_auc": 0.5971867007672634
+     },
+     "ranking_ci": {
+      "state_auc_post": [
+       0.661592298685925,
+       0.7842621504629629
+      ],
+      "state_auc_pre": [
+       0.6468835953532271,
+       0.7746175069641873
+      ],
+      "panel_pre": [
+       0.4090909090909091,
+       0.6818458980044344
+      ],
+      "panel_post": [
+       0.3454388714733542,
+       0.6046664626682985
+      ],
+      "six": [
+       0.44076855316608665,
+       0.637799719887955
+      ],
+      "revision_auc": [
+       0.4516038306451613,
+       0.7273566469829172
+      ]
+     },
+     "best_six_correct": 123,
+     "best_first_correct": 120,
+     "pooled6_vote": 120,
+     "n_questions": 200,
+     "six_option_differs_from_first": 12
+    },
+    "out_within_question": {
+     "ranking": {
+      "state_auc_post": 0.752112285885775,
+      "state_auc_pre": 0.7501921069835189,
+      "panel_pre": 0.6363636363636364,
+      "panel_post": 0.5882352941176471,
+      "six": 0.5771670190274841,
+      "revision_auc": 0.5383631713554987
+     },
+     "ranking_ci": {
+      "state_auc_post": [
+       0.6978039892596855,
+       0.8074130050176686
+      ],
+      "state_auc_pre": [
+       0.6954296948297456,
+       0.8050016439773214
+      ],
+      "panel_pre": [
+       0.5,
+       0.768342122610415
+      ],
+      "panel_post": [
+       0.46423517520215635,
+       0.702414021164021
+      ],
+      "six": [
+       0.4869120520222786,
+       0.6675171130809314
+      ],
+      "revision_auc": [
+       0.4079993293591654,
+       0.6707415640209914
+      ]
+     },
+     "best_six_correct": 121,
+     "best_first_correct": 121,
+     "pooled6_vote": 120,
+     "n_questions": 200,
+     "six_option_differs_from_first": 10
+    },
+    "out_lr[full]": {
+     "ranking": {
+      "state_auc_post": 0.7587377071886975,
+      "state_auc_pre": 0.7464990652704981,
+      "panel_pre": 0.5681818181818182,
+      "panel_post": 0.6176470588235294,
+      "six": 0.572938689217759,
+      "revision_auc": 0.5869565217391305
+     },
+     "ranking_ci": {
+      "state_auc_post": [
+       0.7028551817753962,
+       0.8124636324109009
+      ],
+      "state_auc_pre": [
+       0.6878859360281414,
+       0.8019702986759317
+      ],
+      "panel_pre": [
+       0.42857142857142855,
+       0.7100131578947367
+      ],
+      "panel_post": [
+       0.5,
+       0.74
+      ],
+      "six": [
+       0.46878591997914554,
+       0.6707685519791579
+      ],
+      "revision_auc": [
+       0.4409355678763441,
+       0.7220281940806412
+      ]
+     },
+     "best_six_correct": 123,
+     "best_first_correct": 121,
+     "pooled6_vote": 120,
+     "n_questions": 200,
+     "six_option_differs_from_first": 10
+    }
+   }
+  }
+ }
+}

@@ -198,3 +198,33 @@ def test_aggregated_pair_bootstrap_equals_the_dense_computation():
     c = rng.choice([0.0, 0.5, 1.0], npairs)
     assert np.allclose(CS.pair_rate_across(c, qa, qb, W), CS.weighted_rate(c, W[:, qa] * W[:, qb]), equal_nan=True)
     assert np.allclose(CS.pair_rate_within(c, qa, W), CS.weighted_rate(c, W[:, qa]), equal_nan=True)
+
+
+def test_within_question_direction_ignores_between_question_differences():
+    """A feature that separates questions (a question-level offset correlated with how many
+    answers are correct) drives the across-question direction but not the within-question one;
+    a feature that separates answers inside each question drives both."""
+    rng = np.random.default_rng(9)
+    X, y, g = [], [], []
+    for q in range(60):
+        easy = q % 2  # easy questions: most answers correct and a high "difficulty" feature
+        for _agent in range(6):
+            c = int(rng.random() < (0.8 if easy else 0.2))
+            X.append([3.0 * easy + rng.normal(0, 0.3), 1.0 * c + rng.normal(0, 0.3)])
+            y.append(c)
+            g.append(q)
+    X, y, g = np.array(X), np.array(y), np.array(g)
+    across = X[y == 1].mean(0) - X[y == 0].mean(0)
+    within = CS.within_question_direction(X, y, g)
+    assert abs(across[0]) > abs(across[1])  # the between-question feature dominates across questions
+    assert abs(within[0]) < 0.2 and within[1] > 0.8  # within questions only the answer-level feature counts
+
+
+def test_mean_difference_tabular_and_activation_scorers_run():
+    D = synthetic()
+    train = CS.make_folds(D.groups, 4, 0) != 0
+    for model in ("meandiff", "wqmeandiff"):
+        s = CS.TabularScorer(model, ("of", "ol", "ot"), model, k_ref=3, seed=1).fit(D, train)
+        assert np.isfinite(s.score(D, ~train)[1][~train]).all()
+    a = CS.ActivationScorer("readout_last:letter:wqmeandiff:3-9", k_ref=3, seed=1).fit(D, train)
+    assert np.isfinite(a.score(D, ~train)[1][~train]).all()
