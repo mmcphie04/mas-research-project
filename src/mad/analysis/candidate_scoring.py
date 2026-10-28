@@ -782,7 +782,7 @@ def evaluate_scores(D: StateData, z: np.ndarray, folds: np.ndarray, condition: s
     """
     inq = np.isin(D.qid, questions)
     masks = population_masks(D, condition)
-    qi = np.array([qindex[q] for q in D.qid])
+    qi = np.array([qindex.get(q, -1) for q in D.qid])  # rows outside ``questions`` are masked by inq
     out, counts, raw = {}, {}, {}
 
     def within(name, mask, groups):

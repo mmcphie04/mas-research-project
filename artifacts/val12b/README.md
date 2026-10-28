@@ -13,6 +13,10 @@ collection).
 | `frozen/` | frozen-scorer application to the 200 questions (debate + independent): `states.csv` (stable state keys, answers, gold, correctness, position availability); `scores_R*.csv.gz` (raw, training-normalized and Platt scores of every frozen scorer); `decisions_R*.csv` (per question and population: every rule's answer, correctness, origin, gate counts, random-tie expectations); `source_comparison_*.csv` (debate vs independent six per question); `frozen_application.json` (ranking metrics with counts, paired differences on shared draws, paired decisions with wins/losses and IDs, development readings, calibration, shift, operational rates) |
 | `frozen_self/` | the same for the 100-question self-reconsideration child (secondary) |
 | `OPS_LOG.md` | timeline, measured resources, problems, backup locations |
+| `investigation/` | why R1 never changes its pick on debate (exploratory; docs/R1_INVESTIGATION.md) |
+| `probe_audit/` | bounded estimator comparison on fixed layers: pilot CV, validation (+ per-state scores, no activations), paired vs output-only, learning curves, refit stability (exploratory; docs/PROBE_ACTION_TRANSCRIPT_REVIEW.md §1) |
+| `action_choice/` | stop / independent / debate policies on the 200 questions (exploratory; same doc §2) |
+| `transcript_review/` | seed-2026 transcript sample (full peer text), hand coding with codebook, population counts over 600 debate revisions (same doc §3) |
 
 Reproduce: `probe_search.py cache --root runs/val12b --prefix val12b --cache runs/cache/val12b
 --conditions debate independent`, then `probe_validate.py apply --frozen

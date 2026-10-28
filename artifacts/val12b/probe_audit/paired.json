@@ -1,0 +1,4110 @@
+{
+ "n_questions": 200,
+ "n_boot": 2000,
+ "comparisons": [
+  {
+   "estimator": "meandiff",
+   "baseline": "out:lr",
+   "train_set": "originals",
+   "condition": "debate",
+   "six": {
+    "value": -0.008086253369272156,
+    "ci95": [
+     -0.14541052532123963,
+     0.1307280257393207
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": -0.03527481542247746,
+    "ci95": [
+     -0.22106664850085908,
+     0.14884256266609164
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 3.0,
+    "ci95": [
+     -5.0,
+     12.0
+    ],
+    "questions_differ": 19
+   },
+   "best_first_correct_diff": {
+    "value": 5.0,
+    "ci95": [
+     -3.0,
+     13.0
+    ],
+    "questions_differ": 15
+   }
+  },
+  {
+   "estimator": "meandiff",
+   "baseline": "out:lr",
+   "train_set": "originals",
+   "condition": "independent",
+   "six": {
+    "value": -0.031712473572938604,
+    "ci95": [
+     -0.1456733923884515,
+     0.08352020140767899
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.006820119352088705,
+    "ci95": [
+     -0.1374246031746032,
+     0.14848220415537466
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": -5.0,
+    "ci95": [
+     -15.0,
+     5.0
+    ],
+    "questions_differ": 27
+   },
+   "best_first_correct_diff": {
+    "value": 5.0,
+    "ci95": [
+     -3.0,
+     13.0
+    ],
+    "questions_differ": 15
+   }
+  },
+  {
+   "estimator": "meandiff",
+   "baseline": "out:lr",
+   "train_set": "originals+debate",
+   "condition": "debate",
+   "six": {
+    "value": -0.03504043126684642,
+    "ci95": [
+     -0.1580383428857778,
+     0.08970484857239155
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": -0.045529122231337205,
+    "ci95": [
+     -0.20065476190476197,
+     0.12500964506172835
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 6.0,
+    "ci95": [
+     -2.0,
+     14.000000000000002
+    ],
+    "questions_differ": 18
+   },
+   "best_first_correct_diff": {
+    "value": 9.0,
+    "ci95": [
+     2.0,
+     17.0
+    ],
+    "questions_differ": 15
+   }
+  },
+  {
+   "estimator": "meandiff",
+   "baseline": "out:lr",
+   "train_set": "originals+debate",
+   "condition": "independent",
+   "six": {
+    "value": 0.006342494714587699,
+    "ci95": [
+     -0.10000000000000003,
+     0.11405979738077572
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.03239556692242107,
+    "ci95": [
+     -0.10684299721346906,
+     0.16375246627206308
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 0.0,
+    "ci95": [
+     -10.0,
+     10.0
+    ],
+    "questions_differ": 26
+   },
+   "best_first_correct_diff": {
+    "value": 9.0,
+    "ci95": [
+     2.0,
+     17.0
+    ],
+    "questions_differ": 15
+   }
+  },
+  {
+   "estimator": "meandiff",
+   "baseline": "out:lr",
+   "train_set": "all_pilot_conditions",
+   "condition": "debate",
+   "six": {
+    "value": -0.07816711590296499,
+    "ci95": [
+     -0.202418995468278,
+     0.04988260952968745
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": -0.09105824446267441,
+    "ci95": [
+     -0.2614733592300556,
+     0.09310167310167296
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 4.0,
+    "ci95": [
+     -4.0,
+     13.0
+    ],
+    "questions_differ": 18
+   },
+   "best_first_correct_diff": {
+    "value": 5.0,
+    "ci95": [
+     -3.0,
+     13.0
+    ],
+    "questions_differ": 17
+   }
+  },
+  {
+   "estimator": "meandiff",
+   "baseline": "out:lr",
+   "train_set": "all_pilot_conditions",
+   "condition": "independent",
+   "six": {
+    "value": 0.0,
+    "ci95": [
+     -0.12300858594708251,
+     0.1221160944998154
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.024722932651321305,
+    "ci95": [
+     -0.13014388456585232,
+     0.17387015521888646
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 1.0,
+    "ci95": [
+     -9.0,
+     11.0
+    ],
+    "questions_differ": 27
+   },
+   "best_first_correct_diff": {
+    "value": 5.0,
+    "ci95": [
+     -3.0,
+     13.0
+    ],
+    "questions_differ": 17
+   }
+  },
+  {
+   "estimator": "lr",
+   "baseline": "out:lr",
+   "train_set": "originals",
+   "condition": "debate",
+   "six": {
+    "value": 0.03234501347708896,
+    "ci95": [
+     -0.09922353732615767,
+     0.1691098760932943
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.027071369975389725,
+    "ci95": [
+     -0.15605803929430628,
+     0.21074455337690623
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 3.0,
+    "ci95": [
+     -5.0,
+     13.0
+    ],
+    "questions_differ": 19
+   },
+   "best_first_correct_diff": {
+    "value": 4.0,
+    "ci95": [
+     -4.0,
+     12.0
+    ],
+    "questions_differ": 16
+   }
+  },
+  {
+   "estimator": "lr",
+   "baseline": "out:lr",
+   "train_set": "originals",
+   "condition": "independent",
+   "six": {
+    "value": -0.016913319238900604,
+    "ci95": [
+     -0.12860917537746805,
+     0.09977378190255215
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.05754475703324813,
+    "ci95": [
+     -0.09521991532401075,
+     0.2072244387806508
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": -5.0,
+    "ci95": [
+     -15.0,
+     5.0
+    ],
+    "questions_differ": 25
+   },
+   "best_first_correct_diff": {
+    "value": 4.0,
+    "ci95": [
+     -4.0,
+     12.0
+    ],
+    "questions_differ": 16
+   }
+  },
+  {
+   "estimator": "lr",
+   "baseline": "out:lr",
+   "train_set": "originals+debate",
+   "condition": "debate",
+   "six": {
+    "value": 0.010781671159029615,
+    "ci95": [
+     -0.10510899793666455,
+     0.13931816028798777
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.015176374077112365,
+    "ci95": [
+     -0.13591914038342606,
+     0.18960034013605426
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 5.0,
+    "ci95": [
+     -4.0,
+     14.000000000000002
+    ],
+    "questions_differ": 19
+   },
+   "best_first_correct_diff": {
+    "value": 7.0,
+    "ci95": [
+     -1.0,
+     16.0
+    ],
+    "questions_differ": 19
+   }
+  },
+  {
+   "estimator": "lr",
+   "baseline": "out:lr",
+   "train_set": "originals+debate",
+   "condition": "independent",
+   "six": {
+    "value": 0.04228329809725162,
+    "ci95": [
+     -0.07110224064925896,
+     0.16433566721921206
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.09633418584825226,
+    "ci95": [
+     -0.0441526859677014,
+     0.2343753640493942
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 1.0,
+    "ci95": [
+     -10.0,
+     12.0
+    ],
+    "questions_differ": 29
+   },
+   "best_first_correct_diff": {
+    "value": 7.0,
+    "ci95": [
+     -1.0,
+     16.0
+    ],
+    "questions_differ": 19
+   }
+  },
+  {
+   "estimator": "lr",
+   "baseline": "out:lr",
+   "train_set": "all_pilot_conditions",
+   "condition": "debate",
+   "six": {
+    "value": 0.008086253369272267,
+    "ci95": [
+     -0.11514474331638512,
+     0.14157740429172308
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.009433962264150941,
+    "ci95": [
+     -0.16746639853375417,
+     0.19433289688641142
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 4.0,
+    "ci95": [
+     -5.0,
+     13.0
+    ],
+    "questions_differ": 18
+   },
+   "best_first_correct_diff": {
+    "value": 6.0,
+    "ci95": [
+     -2.0,
+     14.024999999999865
+    ],
+    "questions_differ": 18
+   }
+  },
+  {
+   "estimator": "lr",
+   "baseline": "out:lr",
+   "train_set": "all_pilot_conditions",
+   "condition": "independent",
+   "six": {
+    "value": 0.038054968287526414,
+    "ci95": [
+     -0.09190674041159329,
+     0.16666666666666663
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.10656436487638532,
+    "ci95": [
+     -0.052783284977433946,
+     0.2643082422203528
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 0.0,
+    "ci95": [
+     -11.0,
+     10.0
+    ],
+    "questions_differ": 28
+   },
+   "best_first_correct_diff": {
+    "value": 6.0,
+    "ci95": [
+     -2.0,
+     14.024999999999865
+    ],
+    "questions_differ": 18
+   }
+  },
+  {
+   "estimator": "pca16+lr",
+   "baseline": "out:lr",
+   "train_set": "originals",
+   "condition": "debate",
+   "six": {
+    "value": -0.013477088948786964,
+    "ci95": [
+     -0.1488293670090598,
+     0.1272981459330142
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.013535684987694863,
+    "ci95": [
+     -0.1683177985820263,
+     0.1978559280855199
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 4.0,
+    "ci95": [
+     -4.0,
+     13.0
+    ],
+    "questions_differ": 18
+   },
+   "best_first_correct_diff": {
+    "value": 5.0,
+    "ci95": [
+     -3.0,
+     14.000000000000002
+    ],
+    "questions_differ": 19
+   }
+  },
+  {
+   "estimator": "pca16+lr",
+   "baseline": "out:lr",
+   "train_set": "originals",
+   "condition": "independent",
+   "six": {
+    "value": 0.0021141649048626032,
+    "ci95": [
+     -0.1075542116159965,
+     0.12109649122806992
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.05797101449275366,
+    "ci95": [
+     -0.09465450310559005,
+     0.2094919835871119
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": -7.0,
+    "ci95": [
+     -16.025,
+     3.0
+    ],
+    "questions_differ": 25
+   },
+   "best_first_correct_diff": {
+    "value": 5.0,
+    "ci95": [
+     -3.0,
+     14.000000000000002
+    ],
+    "questions_differ": 19
+   }
+  },
+  {
+   "estimator": "pca16+lr",
+   "baseline": "out:lr",
+   "train_set": "originals+debate",
+   "condition": "debate",
+   "six": {
+    "value": 0.0026954177897573484,
+    "ci95": [
+     -0.11939401622718046,
+     0.1309038835213472
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": -0.016406890894175574,
+    "ci95": [
+     -0.17569878767570538,
+     0.15771780995563306
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 6.0,
+    "ci95": [
+     -2.0,
+     15.0
+    ],
+    "questions_differ": 18
+   },
+   "best_first_correct_diff": {
+    "value": 7.0,
+    "ci95": [
+     -2.0,
+     16.0
+    ],
+    "questions_differ": 21
+   }
+  },
+  {
+   "estimator": "pca16+lr",
+   "baseline": "out:lr",
+   "train_set": "originals+debate",
+   "condition": "independent",
+   "six": {
+    "value": 0.029598308668076112,
+    "ci95": [
+     -0.08456913609513265,
+     0.14744515011547338
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.08866155157715261,
+    "ci95": [
+     -0.04944642857142853,
+     0.21389412510234812
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": -3.0,
+    "ci95": [
+     -14.000000000000002,
+     8.0
+    ],
+    "questions_differ": 29
+   },
+   "best_first_correct_diff": {
+    "value": 7.0,
+    "ci95": [
+     -2.0,
+     16.0
+    ],
+    "questions_differ": 21
+   }
+  },
+  {
+   "estimator": "pca16+lr",
+   "baseline": "out:lr",
+   "train_set": "all_pilot_conditions",
+   "condition": "debate",
+   "six": {
+    "value": -0.04582210242587603,
+    "ci95": [
+     -0.17461626782692777,
+     0.09470882225119498
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": -0.0447087776866284,
+    "ci95": [
+     -0.236624264148744,
+     0.15913590926566698
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 2.0,
+    "ci95": [
+     -7.000000000000001,
+     11.0
+    ],
+    "questions_differ": 20
+   },
+   "best_first_correct_diff": {
+    "value": 3.0,
+    "ci95": [
+     -6.0,
+     12.0
+    ],
+    "questions_differ": 19
+   }
+  },
+  {
+   "estimator": "pca16+lr",
+   "baseline": "out:lr",
+   "train_set": "all_pilot_conditions",
+   "condition": "independent",
+   "six": {
+    "value": 0.004228329809725095,
+    "ci95": [
+     -0.13627072612921673,
+     0.1487091366105787
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.05072463768115931,
+    "ci95": [
+     -0.13672913658219216,
+     0.2261762724431023
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": -1.0,
+    "ci95": [
+     -12.0,
+     10.0
+    ],
+    "questions_differ": 31
+   },
+   "best_first_correct_diff": {
+    "value": 3.0,
+    "ci95": [
+     -6.0,
+     12.0
+    ],
+    "questions_differ": 19
+   }
+  },
+  {
+   "estimator": "pca64+lr",
+   "baseline": "out:lr",
+   "train_set": "originals",
+   "condition": "debate",
+   "six": {
+    "value": 0.043126684636118684,
+    "ci95": [
+     -0.0866752313644328,
+     0.1813745256166983
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.1144380639868745,
+    "ci95": [
+     -0.0683482352595725,
+     0.2964880952380953
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 2.0,
+    "ci95": [
+     -5.0,
+     9.024999999999864
+    ],
+    "questions_differ": 14
+   },
+   "best_first_correct_diff": {
+    "value": 6.0,
+    "ci95": [
+     -2.0,
+     15.0
+    ],
+    "questions_differ": 18
+   }
+  },
+  {
+   "estimator": "pca64+lr",
+   "baseline": "out:lr",
+   "train_set": "originals",
+   "condition": "independent",
+   "six": {
+    "value": 0.016913319238900715,
+    "ci95": [
+     -0.10746904753987517,
+     0.14751343959256813
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.0831202046035806,
+    "ci95": [
+     -0.08052285571050954,
+     0.24913553143615297
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": -2.0,
+    "ci95": [
+     -13.0,
+     9.0
+    ],
+    "questions_differ": 34
+   },
+   "best_first_correct_diff": {
+    "value": 6.0,
+    "ci95": [
+     -2.0,
+     15.0
+    ],
+    "questions_differ": 18
+   }
+  },
+  {
+   "estimator": "pca64+lr",
+   "baseline": "out:lr",
+   "train_set": "originals+debate",
+   "condition": "debate",
+   "six": {
+    "value": 0.02156334231805923,
+    "ci95": [
+     -0.09524100593782744,
+     0.14330984229344904
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.0689089417555373,
+    "ci95": [
+     -0.09633554111299697,
+     0.23858590689293696
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 4.0,
+    "ci95": [
+     -5.024999999999999,
+     13.0
+    ],
+    "questions_differ": 22
+   },
+   "best_first_correct_diff": {
+    "value": 5.0,
+    "ci95": [
+     -4.0,
+     14.000000000000002
+    ],
+    "questions_differ": 21
+   }
+  },
+  {
+   "estimator": "pca64+lr",
+   "baseline": "out:lr",
+   "train_set": "originals+debate",
+   "condition": "independent",
+   "six": {
+    "value": 0.025369978858350906,
+    "ci95": [
+     -0.09148564012864639,
+     0.1521196185453206
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.12148337595907921,
+    "ci95": [
+     -0.031951925793389166,
+     0.28138107335986784
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": -3.0,
+    "ci95": [
+     -14.000000000000002,
+     8.0
+    ],
+    "questions_differ": 31
+   },
+   "best_first_correct_diff": {
+    "value": 5.0,
+    "ci95": [
+     -4.0,
+     14.000000000000002
+    ],
+    "questions_differ": 21
+   }
+  },
+  {
+   "estimator": "pca64+lr",
+   "baseline": "out:lr",
+   "train_set": "all_pilot_conditions",
+   "condition": "debate",
+   "six": {
+    "value": 0.018867924528301883,
+    "ci95": [
+     -0.09627742923450405,
+     0.14322044390032518
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.01189499589827725,
+    "ci95": [
+     -0.16532559218190448,
+     0.1952114164904862
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 4.0,
+    "ci95": [
+     -4.0,
+     12.0
+    ],
+    "questions_differ": 16
+   },
+   "best_first_correct_diff": {
+    "value": 3.0,
+    "ci95": [
+     -6.0,
+     12.0
+    ],
+    "questions_differ": 19
+   }
+  },
+  {
+   "estimator": "pca64+lr",
+   "baseline": "out:lr",
+   "train_set": "all_pilot_conditions",
+   "condition": "independent",
+   "six": {
+    "value": 0.05073995771670181,
+    "ci95": [
+     -0.07516122343924267,
+     0.17684583139264085
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.09931798806479109,
+    "ci95": [
+     -0.05542186121532387,
+     0.2653963307093387
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 0.0,
+    "ci95": [
+     -11.0,
+     10.0
+    ],
+    "questions_differ": 26
+   },
+   "best_first_correct_diff": {
+    "value": 3.0,
+    "ci95": [
+     -6.0,
+     12.0
+    ],
+    "questions_differ": 19
+   }
+  },
+  {
+   "estimator": "pca128+lr",
+   "baseline": "out:lr",
+   "train_set": "originals",
+   "condition": "debate",
+   "six": {
+    "value": 0.0242587601078168,
+    "ci95": [
+     -0.11557148031251617,
+     0.17685243149418092
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.06357670221493028,
+    "ci95": [
+     -0.1293024868997884,
+     0.27134483284173017
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 1.0,
+    "ci95": [
+     -7.000000000000001,
+     10.0
+    ],
+    "questions_differ": 19
+   },
+   "best_first_correct_diff": {
+    "value": 6.0,
+    "ci95": [
+     -3.0,
+     15.0
+    ],
+    "questions_differ": 22
+   }
+  },
+  {
+   "estimator": "pca128+lr",
+   "baseline": "out:lr",
+   "train_set": "originals",
+   "condition": "independent",
+   "six": {
+    "value": -0.008456659619450302,
+    "ci95": [
+     -0.13907119417891284,
+     0.13740421270272
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.039215686274509776,
+    "ci95": [
+     -0.1405061733070747,
+     0.23377803742506909
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 0.0,
+    "ci95": [
+     -10.0,
+     11.0
+    ],
+    "questions_differ": 32
+   },
+   "best_first_correct_diff": {
+    "value": 6.0,
+    "ci95": [
+     -3.0,
+     15.0
+    ],
+    "questions_differ": 22
+   }
+  },
+  {
+   "estimator": "pca128+lr",
+   "baseline": "out:lr",
+   "train_set": "originals+debate",
+   "condition": "debate",
+   "six": {
+    "value": 0.04851752021563338,
+    "ci95": [
+     -0.07311636327398359,
+     0.17392005610098177
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.06398687448728468,
+    "ci95": [
+     -0.10425541909482054,
+     0.24917582055088242
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 4.0,
+    "ci95": [
+     -4.0,
+     12.0
+    ],
+    "questions_differ": 16
+   },
+   "best_first_correct_diff": {
+    "value": 6.0,
+    "ci95": [
+     -1.0,
+     14.000000000000002
+    ],
+    "questions_differ": 16
+   }
+  },
+  {
+   "estimator": "pca128+lr",
+   "baseline": "out:lr",
+   "train_set": "originals+debate",
+   "condition": "independent",
+   "six": {
+    "value": 0.029598308668076112,
+    "ci95": [
+     -0.09015498652291107,
+     0.16545334017620383
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.09590792838874673,
+    "ci95": [
+     -0.0634973544973545,
+     0.2683003721588286
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": -4.0,
+    "ci95": [
+     -15.0,
+     7.000000000000001
+    ],
+    "questions_differ": 34
+   },
+   "best_first_correct_diff": {
+    "value": 6.0,
+    "ci95": [
+     -1.0,
+     14.000000000000002
+    ],
+    "questions_differ": 16
+   }
+  },
+  {
+   "estimator": "pca128+lr",
+   "baseline": "out:lr",
+   "train_set": "all_pilot_conditions",
+   "condition": "debate",
+   "six": {
+    "value": 0.05121293800539084,
+    "ci95": [
+     -0.07007034366906977,
+     0.18101174074971235
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.06357670221493017,
+    "ci95": [
+     -0.10707101571053906,
+     0.24940396210163637
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 3.0,
+    "ci95": [
+     -6.0,
+     12.0
+    ],
+    "questions_differ": 19
+   },
+   "best_first_correct_diff": {
+    "value": 2.0,
+    "ci95": [
+     -5.0,
+     10.0
+    ],
+    "questions_differ": 16
+   }
+  },
+  {
+   "estimator": "pca128+lr",
+   "baseline": "out:lr",
+   "train_set": "all_pilot_conditions",
+   "condition": "independent",
+   "six": {
+    "value": 0.012684989429175397,
+    "ci95": [
+     -0.1101914414414414,
+     0.14156701085823067
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.11125319693094626,
+    "ci95": [
+     -0.0500135756056808,
+     0.2837588278732545
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": -3.0,
+    "ci95": [
+     -14.000000000000002,
+     7.000000000000001
+    ],
+    "questions_differ": 31
+   },
+   "best_first_correct_diff": {
+    "value": 2.0,
+    "ci95": [
+     -5.0,
+     10.0
+    ],
+    "questions_differ": 16
+   }
+  },
+  {
+   "estimator": "pca64raw+lr",
+   "baseline": "out:lr",
+   "train_set": "originals",
+   "condition": "debate",
+   "six": {
+    "value": 0.037735849056603876,
+    "ci95": [
+     -0.09095779220779224,
+     0.17771394857781644
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.029942575881870437,
+    "ci95": [
+     -0.14961502217294906,
+     0.21125430500068873
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 4.0,
+    "ci95": [
+     -4.0,
+     13.0
+    ],
+    "questions_differ": 18
+   },
+   "best_first_correct_diff": {
+    "value": 5.0,
+    "ci95": [
+     -2.0,
+     13.0
+    ],
+    "questions_differ": 15
+   }
+  },
+  {
+   "estimator": "pca64raw+lr",
+   "baseline": "out:lr",
+   "train_set": "originals",
+   "condition": "independent",
+   "six": {
+    "value": -0.008456659619450302,
+    "ci95": [
+     -0.1158889588581024,
+     0.09981039924159689
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.050724637681159424,
+    "ci95": [
+     -0.09993289673247821,
+     0.19644307081807072
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": -3.0,
+    "ci95": [
+     -13.0,
+     7.000000000000001
+    ],
+    "questions_differ": 25
+   },
+   "best_first_correct_diff": {
+    "value": 5.0,
+    "ci95": [
+     -2.0,
+     13.0
+    ],
+    "questions_differ": 15
+   }
+  },
+  {
+   "estimator": "pca64raw+lr",
+   "baseline": "out:lr",
+   "train_set": "originals+debate",
+   "condition": "debate",
+   "six": {
+    "value": 0.0026954177897573484,
+    "ci95": [
+     -0.10849206349206351,
+     0.12813759895909685
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.011484823625922846,
+    "ci95": [
+     -0.13728002410694715,
+     0.19000687103594072
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 6.0,
+    "ci95": [
+     -2.0,
+     15.0
+    ],
+    "questions_differ": 20
+   },
+   "best_first_correct_diff": {
+    "value": 8.0,
+    "ci95": [
+     0.0,
+     17.0
+    ],
+    "questions_differ": 20
+   }
+  },
+  {
+   "estimator": "pca64raw+lr",
+   "baseline": "out:lr",
+   "train_set": "originals+debate",
+   "condition": "independent",
+   "six": {
+    "value": 0.038054968287526414,
+    "ci95": [
+     -0.07042797624599696,
+     0.1549977542220623
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.08866155157715261,
+    "ci95": [
+     -0.04630042565692429,
+     0.22674889573054097
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 2.0,
+    "ci95": [
+     -8.0,
+     12.0
+    ],
+    "questions_differ": 26
+   },
+   "best_first_correct_diff": {
+    "value": 8.0,
+    "ci95": [
+     0.0,
+     17.0
+    ],
+    "questions_differ": 20
+   }
+  },
+  {
+   "estimator": "pca64raw+lr",
+   "baseline": "out:lr",
+   "train_set": "all_pilot_conditions",
+   "condition": "debate",
+   "six": {
+    "value": 0.0,
+    "ci95": [
+     -0.12131839075784072,
+     0.13546147338592632
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": -0.006972928630024633,
+    "ci95": [
+     -0.18018994564511956,
+     0.17883590170762143
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 4.0,
+    "ci95": [
+     -5.0,
+     13.0
+    ],
+    "questions_differ": 18
+   },
+   "best_first_correct_diff": {
+    "value": 5.0,
+    "ci95": [
+     -4.0,
+     14.000000000000002
+    ],
+    "questions_differ": 19
+   }
+  },
+  {
+   "estimator": "pca64raw+lr",
+   "baseline": "out:lr",
+   "train_set": "all_pilot_conditions",
+   "condition": "independent",
+   "six": {
+    "value": 0.02748414376321351,
+    "ci95": [
+     -0.09644069234685228,
+     0.15755787170332836
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.08908780903665814,
+    "ci95": [
+     -0.07057952754272445,
+     0.24688324348318894
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 0.0,
+    "ci95": [
+     -11.0,
+     11.0
+    ],
+    "questions_differ": 28
+   },
+   "best_first_correct_diff": {
+    "value": 5.0,
+    "ci95": [
+     -4.0,
+     14.000000000000002
+    ],
+    "questions_differ": 19
+   }
+  },
+  {
+   "estimator": "pairwise",
+   "baseline": "out:lr",
+   "train_set": "originals",
+   "condition": "debate",
+   "six": {
+    "value": -0.059299191374662996,
+    "ci95": [
+     -0.19698135198135197,
+     0.09064130733315022
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": -0.028712059064807227,
+    "ci95": [
+     -0.2147059588862867,
+     0.16596320346320337
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 2.0,
+    "ci95": [
+     -7.000000000000001,
+     12.0
+    ],
+    "questions_differ": 24
+   },
+   "best_first_correct_diff": {
+    "value": 1.0,
+    "ci95": [
+     -8.0,
+     10.0
+    ],
+    "questions_differ": 21
+   }
+  },
+  {
+   "estimator": "pairwise",
+   "baseline": "out:lr",
+   "train_set": "originals",
+   "condition": "independent",
+   "six": {
+    "value": -0.03594080338266381,
+    "ci95": [
+     -0.15525996966558145,
+     0.08470793604224733
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.04049445865302648,
+    "ci95": [
+     -0.12768229578653167,
+     0.21641798228725445
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": -5.0,
+    "ci95": [
+     -16.0,
+     6.0
+    ],
+    "questions_differ": 31
+   },
+   "best_first_correct_diff": {
+    "value": 1.0,
+    "ci95": [
+     -8.0,
+     10.0
+    ],
+    "questions_differ": 21
+   }
+  },
+  {
+   "estimator": "pairwise",
+   "baseline": "out:lr",
+   "train_set": "originals+debate",
+   "condition": "debate",
+   "six": {
+    "value": -0.021563342318059342,
+    "ci95": [
+     -0.15962476667232312,
+     0.11504624543039209
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": -0.04634946677604601,
+    "ci95": [
+     -0.2216882011497461,
+     0.14932291666666658
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 1.0,
+    "ci95": [
+     -8.0,
+     10.0
+    ],
+    "questions_differ": 19
+   },
+   "best_first_correct_diff": {
+    "value": 2.0,
+    "ci95": [
+     -7.000000000000001,
+     11.0
+    ],
+    "questions_differ": 20
+   }
+  },
+  {
+   "estimator": "pairwise",
+   "baseline": "out:lr",
+   "train_set": "originals+debate",
+   "condition": "independent",
+   "six": {
+    "value": 0.016913319238900604,
+    "ci95": [
+     -0.09293771449720731,
+     0.13451398716109333
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.07587382779198637,
+    "ci95": [
+     -0.05362861927293264,
+     0.2133384966275765
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": -1.0,
+    "ci95": [
+     -11.0,
+     10.0
+    ],
+    "questions_differ": 27
+   },
+   "best_first_correct_diff": {
+    "value": 2.0,
+    "ci95": [
+     -7.000000000000001,
+     11.0
+    ],
+    "questions_differ": 20
+   }
+  },
+  {
+   "estimator": "pairwise",
+   "baseline": "out:lr",
+   "train_set": "all_pilot_conditions",
+   "condition": "debate",
+   "six": {
+    "value": -0.029649595687331498,
+    "ci95": [
+     -0.14485062674094712,
+     0.0923980684024491
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": -0.03568498769483186,
+    "ci95": [
+     -0.20437257045675417,
+     0.14230839518668467
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 3.0,
+    "ci95": [
+     -6.0,
+     11.0
+    ],
+    "questions_differ": 17
+   },
+   "best_first_correct_diff": {
+    "value": -2.0,
+    "ci95": [
+     -10.0,
+     5.0
+    ],
+    "questions_differ": 16
+   }
+  },
+  {
+   "estimator": "pairwise",
+   "baseline": "out:lr",
+   "train_set": "all_pilot_conditions",
+   "condition": "independent",
+   "six": {
+    "value": -0.0021141649048626032,
+    "ci95": [
+     -0.11627048162859978,
+     0.11090013915522584
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.04901960784313719,
+    "ci95": [
+     -0.09808729304609964,
+     0.19467449077716587
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": -1.0,
+    "ci95": [
+     -11.0,
+     9.0
+    ],
+    "questions_differ": 27
+   },
+   "best_first_correct_diff": {
+    "value": -2.0,
+    "ci95": [
+     -10.0,
+     5.0
+    ],
+    "questions_differ": 16
+   }
+  },
+  {
+   "estimator": "pca64+pairwise",
+   "baseline": "out:lr",
+   "train_set": "originals",
+   "condition": "debate",
+   "six": {
+    "value": -0.06738544474393526,
+    "ci95": [
+     -0.2020976484655241,
+     0.06757956181033095
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.03814602132895817,
+    "ci95": [
+     -0.15321946074834922,
+     0.23046947545631757
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": -1.0,
+    "ci95": [
+     -10.0,
+     8.0
+    ],
+    "questions_differ": 23
+   },
+   "best_first_correct_diff": {
+    "value": 0.0,
+    "ci95": [
+     -8.0,
+     9.0
+    ],
+    "questions_differ": 20
+   }
+  },
+  {
+   "estimator": "pca64+pairwise",
+   "baseline": "out:lr",
+   "train_set": "originals",
+   "condition": "independent",
+   "six": {
+    "value": -0.06342494714587732,
+    "ci95": [
+     -0.19295138048206248,
+     0.06726689746508976
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": -0.008951406649616356,
+    "ci95": [
+     -0.18884572045635947,
+     0.18443961644735413
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": -12.0,
+    "ci95": [
+     -24.0,
+     -1.0
+    ],
+    "questions_differ": 36
+   },
+   "best_first_correct_diff": {
+    "value": 0.0,
+    "ci95": [
+     -8.0,
+     9.0
+    ],
+    "questions_differ": 20
+   }
+  },
+  {
+   "estimator": "pca64+pairwise",
+   "baseline": "out:lr",
+   "train_set": "originals+debate",
+   "condition": "debate",
+   "six": {
+    "value": 0.008086253369272156,
+    "ci95": [
+     -0.1246822377111146,
+     0.15160008779631243
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": -0.05168170631665303,
+    "ci95": [
+     -0.2306830254753508,
+     0.154209867855188
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 6.0,
+    "ci95": [
+     -3.0,
+     16.0
+    ],
+    "questions_differ": 20
+   },
+   "best_first_correct_diff": {
+    "value": 7.0,
+    "ci95": [
+     -1.0,
+     16.0
+    ],
+    "questions_differ": 21
+   }
+  },
+  {
+   "estimator": "pca64+pairwise",
+   "baseline": "out:lr",
+   "train_set": "originals+debate",
+   "condition": "independent",
+   "six": {
+    "value": -0.006342494714587699,
+    "ci95": [
+     -0.12302344779767135,
+     0.12237170966929999
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.01534526854219942,
+    "ci95": [
+     -0.14463696192762812,
+     0.17781582817429253
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": -4.0,
+    "ci95": [
+     -15.0,
+     7.000000000000001
+    ],
+    "questions_differ": 30
+   },
+   "best_first_correct_diff": {
+    "value": 7.0,
+    "ci95": [
+     -1.0,
+     16.0
+    ],
+    "questions_differ": 21
+   }
+  },
+  {
+   "estimator": "pca64+pairwise",
+   "baseline": "out:lr",
+   "train_set": "all_pilot_conditions",
+   "condition": "debate",
+   "six": {
+    "value": 0.010781671159029615,
+    "ci95": [
+     -0.11616029272898966,
+     0.14717261167533624
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.0024610336341263084,
+    "ci95": [
+     -0.1672642361111111,
+     0.18766034327009934
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 3.0,
+    "ci95": [
+     -6.0,
+     12.0
+    ],
+    "questions_differ": 21
+   },
+   "best_first_correct_diff": {
+    "value": 0.0,
+    "ci95": [
+     -10.0,
+     9.024999999999864
+    ],
+    "questions_differ": 24
+   }
+  },
+  {
+   "estimator": "pca64+pairwise",
+   "baseline": "out:lr",
+   "train_set": "all_pilot_conditions",
+   "condition": "independent",
+   "six": {
+    "value": 0.017970401691331905,
+    "ci95": [
+     -0.10634842519685042,
+     0.15047735403365206
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.09462915601023014,
+    "ci95": [
+     -0.07028706538503449,
+     0.27318807302622067
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": -2.0,
+    "ci95": [
+     -14.000000000000002,
+     10.0
+    ],
+    "questions_differ": 38
+   },
+   "best_first_correct_diff": {
+    "value": 0.0,
+    "ci95": [
+     -10.0,
+     9.024999999999864
+    ],
+    "questions_differ": 24
+   }
+  },
+  {
+   "estimator": "wq_avgdiff",
+   "baseline": "out:lr",
+   "train_set": "originals",
+   "condition": "debate",
+   "six": {
+    "value": -0.016172506738544423,
+    "ci95": [
+     -0.14740313516711034,
+     0.1233776508301824
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": -0.03322395406070544,
+    "ci95": [
+     -0.19913584415584418,
+     0.13891587885154041
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 7.0,
+    "ci95": [
+     -1.0,
+     16.0
+    ],
+    "questions_differ": 17
+   },
+   "best_first_correct_diff": {
+    "value": 8.0,
+    "ci95": [
+     1.0,
+     16.0
+    ],
+    "questions_differ": 16
+   }
+  },
+  {
+   "estimator": "wq_avgdiff",
+   "baseline": "out:lr",
+   "train_set": "originals",
+   "condition": "independent",
+   "six": {
+    "value": -0.02114164904862581,
+    "ci95": [
+     -0.12100350350350353,
+     0.0819418103899914
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.04006820119352095,
+    "ci95": [
+     -0.09858716385240769,
+     0.1759554189804705
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": -5.0,
+    "ci95": [
+     -16.0,
+     5.0
+    ],
+    "questions_differ": 29
+   },
+   "best_first_correct_diff": {
+    "value": 8.0,
+    "ci95": [
+     1.0,
+     16.0
+    ],
+    "questions_differ": 16
+   }
+  },
+  {
+   "estimator": "wq_avgdiff",
+   "baseline": "out:lr",
+   "train_set": "originals+debate",
+   "condition": "debate",
+   "six": {
+    "value": -0.0242587601078168,
+    "ci95": [
+     -0.14518722882475008,
+     0.09756447995514433
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": -0.07424118129614443,
+    "ci95": [
+     -0.22781905289238158,
+     0.0961157407407407
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 4.0,
+    "ci95": [
+     -4.0,
+     13.0
+    ],
+    "questions_differ": 18
+   },
+   "best_first_correct_diff": {
+    "value": 8.0,
+    "ci95": [
+     0.0,
+     17.0
+    ],
+    "questions_differ": 18
+   }
+  },
+  {
+   "estimator": "wq_avgdiff",
+   "baseline": "out:lr",
+   "train_set": "originals+debate",
+   "condition": "independent",
+   "six": {
+    "value": 0.006342494714587699,
+    "ci95": [
+     -0.09216336771675496,
+     0.10791845685642665
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.02983802216538789,
+    "ci95": [
+     -0.10350765721733456,
+     0.1497204678362573
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": -2.0,
+    "ci95": [
+     -11.0,
+     7.000000000000001
+    ],
+    "questions_differ": 24
+   },
+   "best_first_correct_diff": {
+    "value": 8.0,
+    "ci95": [
+     0.0,
+     17.0
+    ],
+    "questions_differ": 18
+   }
+  },
+  {
+   "estimator": "wq_avgdiff",
+   "baseline": "out:lr",
+   "train_set": "all_pilot_conditions",
+   "condition": "debate",
+   "six": {
+    "value": -0.09973045822102428,
+    "ci95": [
+     -0.2253593355001806,
+     0.037856384648735905
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": -0.11607875307629212,
+    "ci95": [
+     -0.281063782632975,
+     0.06650031455671691
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 0.0,
+    "ci95": [
+     -9.0,
+     9.0
+    ],
+    "questions_differ": 20
+   },
+   "best_first_correct_diff": {
+    "value": 1.0,
+    "ci95": [
+     -8.0,
+     10.0
+    ],
+    "questions_differ": 19
+   }
+  },
+  {
+   "estimator": "wq_avgdiff",
+   "baseline": "out:lr",
+   "train_set": "all_pilot_conditions",
+   "condition": "independent",
+   "six": {
+    "value": -0.02748414376321362,
+    "ci95": [
+     -0.15353884052102312,
+     0.09659635236838174
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.011082693947144007,
+    "ci95": [
+     -0.144057486631016,
+     0.15526362448674882
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 0.0,
+    "ci95": [
+     -10.0,
+     10.0
+    ],
+    "questions_differ": 26
+   },
+   "best_first_correct_diff": {
+    "value": 1.0,
+    "ci95": [
+     -8.0,
+     10.0
+    ],
+    "questions_differ": 19
+   }
+  },
+  {
+   "estimator": "meandiff",
+   "baseline": "out:pairwise",
+   "train_set": "originals",
+   "condition": "debate",
+   "six": {
+    "value": 0.06738544474393537,
+    "ci95": [
+     -0.06166700304575979,
+     0.19945898954840197
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.06275635767022147,
+    "ci95": [
+     -0.11042090781722118,
+     0.23586977173271872
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 3.0,
+    "ci95": [
+     -5.0,
+     11.0
+    ],
+    "questions_differ": 17
+   },
+   "best_first_correct_diff": {
+    "value": 5.0,
+    "ci95": [
+     -2.0,
+     13.0
+    ],
+    "questions_differ": 15
+   }
+  },
+  {
+   "estimator": "meandiff",
+   "baseline": "out:pairwise",
+   "train_set": "originals",
+   "condition": "independent",
+   "six": {
+    "value": 0.06131078224101483,
+    "ci95": [
+     -0.056232532469057545,
+     0.17312492206658622
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.10315430520034102,
+    "ci95": [
+     -0.06136940500157373,
+     0.24938446010069315
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 5.0,
+    "ci95": [
+     -4.0,
+     15.0
+    ],
+    "questions_differ": 25
+   },
+   "best_first_correct_diff": {
+    "value": 5.0,
+    "ci95": [
+     -2.0,
+     13.0
+    ],
+    "questions_differ": 15
+   }
+  },
+  {
+   "estimator": "meandiff",
+   "baseline": "out:pairwise",
+   "train_set": "originals+debate",
+   "condition": "debate",
+   "six": {
+    "value": -0.0026954177897574594,
+    "ci95": [
+     -0.14633470807051593,
+     0.14205149131166456
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.04101722723543888,
+    "ci95": [
+     -0.1269007034632034,
+     0.22500824780058637
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 8.0,
+    "ci95": [
+     0.0,
+     16.0
+    ],
+    "questions_differ": 18
+   },
+   "best_first_correct_diff": {
+    "value": 10.0,
+    "ci95": [
+     2.0,
+     18.0
+    ],
+    "questions_differ": 18
+   }
+  },
+  {
+   "estimator": "meandiff",
+   "baseline": "out:pairwise",
+   "train_set": "originals+debate",
+   "condition": "independent",
+   "six": {
+    "value": 0.046511627906976716,
+    "ci95": [
+     -0.058461562134547986,
+     0.15355641670157788
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.09121909633418579,
+    "ci95": [
+     -0.05742378216238656,
+     0.23720490959541704
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 4.0,
+    "ci95": [
+     -5.0,
+     13.0
+    ],
+    "questions_differ": 24
+   },
+   "best_first_correct_diff": {
+    "value": 10.0,
+    "ci95": [
+     2.0,
+     18.0
+    ],
+    "questions_differ": 18
+   }
+  },
+  {
+   "estimator": "meandiff",
+   "baseline": "out:pairwise",
+   "train_set": "all_pilot_conditions",
+   "condition": "debate",
+   "six": {
+    "value": -0.09433962264150941,
+    "ci95": [
+     -0.21716053242426062,
+     0.023633849557521933
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": -0.056193601312551356,
+    "ci95": [
+     -0.20648968880976223,
+     0.09196676592520883
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 1.0,
+    "ci95": [
+     -5.0,
+     7.0249999999998645
+    ],
+    "questions_differ": 11
+   },
+   "best_first_correct_diff": {
+    "value": 2.0,
+    "ci95": [
+     -5.0,
+     9.0
+    ],
+    "questions_differ": 12
+   }
+  },
+  {
+   "estimator": "meandiff",
+   "baseline": "out:pairwise",
+   "train_set": "all_pilot_conditions",
+   "condition": "independent",
+   "six": {
+    "value": -0.004228329809725095,
+    "ci95": [
+     -0.11025180817329963,
+     0.1013827175197662
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.054560954816709306,
+    "ci95": [
+     -0.08733209483482948,
+     0.19152078061498348
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 1.0,
+    "ci95": [
+     -8.0,
+     10.0
+    ],
+    "questions_differ": 21
+   },
+   "best_first_correct_diff": {
+    "value": 2.0,
+    "ci95": [
+     -5.0,
+     9.0
+    ],
+    "questions_differ": 12
+   }
+  },
+  {
+   "estimator": "lr",
+   "baseline": "out:pairwise",
+   "train_set": "originals",
+   "condition": "debate",
+   "six": {
+    "value": 0.10781671159029649,
+    "ci95": [
+     -0.008506158391527893,
+     0.23209692040469598
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.12510254306808866,
+    "ci95": [
+     -0.03771376209653951,
+     0.28566259749142786
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 3.0,
+    "ci95": [
+     -5.0,
+     11.0
+    ],
+    "questions_differ": 17
+   },
+   "best_first_correct_diff": {
+    "value": 4.0,
+    "ci95": [
+     -4.0,
+     12.0
+    ],
+    "questions_differ": 16
+   }
+  },
+  {
+   "estimator": "lr",
+   "baseline": "out:pairwise",
+   "train_set": "originals",
+   "condition": "independent",
+   "six": {
+    "value": 0.07610993657505283,
+    "ci95": [
+     -0.037979970393643675,
+     0.18868016298362816
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.15387894288150045,
+    "ci95": [
+     -0.0007008807042051626,
+     0.3046951438090418
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 5.0,
+    "ci95": [
+     -4.0,
+     14.000000000000002
+    ],
+    "questions_differ": 23
+   },
+   "best_first_correct_diff": {
+    "value": 4.0,
+    "ci95": [
+     -4.0,
+     12.0
+    ],
+    "questions_differ": 16
+   }
+  },
+  {
+   "estimator": "lr",
+   "baseline": "out:pairwise",
+   "train_set": "originals+debate",
+   "condition": "debate",
+   "six": {
+    "value": 0.04312668463611857,
+    "ci95": [
+     -0.09151727357609706,
+     0.18842363144852428
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.10172272354388845,
+    "ci95": [
+     -0.048690277933273615,
+     0.274531383771443
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 7.0,
+    "ci95": [
+     0.0,
+     15.0
+    ],
+    "questions_differ": 15
+   },
+   "best_first_correct_diff": {
+    "value": 8.0,
+    "ci95": [
+     1.0,
+     16.0
+    ],
+    "questions_differ": 16
+   }
+  },
+  {
+   "estimator": "lr",
+   "baseline": "out:pairwise",
+   "train_set": "originals+debate",
+   "condition": "independent",
+   "six": {
+    "value": 0.08245243128964064,
+    "ci95": [
+     -0.021403393163465997,
+     0.19482142857142848
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.15515771526001698,
+    "ci95": [
+     0.012350001733582952,
+     0.2927046859573173
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 5.0,
+    "ci95": [
+     -5.0,
+     15.0
+    ],
+    "questions_differ": 25
+   },
+   "best_first_correct_diff": {
+    "value": 8.0,
+    "ci95": [
+     1.0,
+     16.0
+    ],
+    "questions_differ": 16
+   }
+  },
+  {
+   "estimator": "lr",
+   "baseline": "out:pairwise",
+   "train_set": "all_pilot_conditions",
+   "condition": "debate",
+   "six": {
+    "value": -0.008086253369272156,
+    "ci95": [
+     -0.11697300346209204,
+     0.10466070428985794
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.044298605414273995,
+    "ci95": [
+     -0.09165941475404395,
+     0.18939994456762746
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 1.0,
+    "ci95": [
+     -5.0,
+     7.000000000000001
+    ],
+    "questions_differ": 9
+   },
+   "best_first_correct_diff": {
+    "value": 3.0,
+    "ci95": [
+     -4.0,
+     10.0
+    ],
+    "questions_differ": 11
+   }
+  },
+  {
+   "estimator": "lr",
+   "baseline": "out:pairwise",
+   "train_set": "all_pilot_conditions",
+   "condition": "independent",
+   "six": {
+    "value": 0.03382663847780132,
+    "ci95": [
+     -0.07512115704982582,
+     0.1428571428571429
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.13640238704177332,
+    "ci95": [
+     0.0003748558246828326,
+     0.27113708585357044
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 0.0,
+    "ci95": [
+     -9.0,
+     9.0
+    ],
+    "questions_differ": 22
+   },
+   "best_first_correct_diff": {
+    "value": 3.0,
+    "ci95": [
+     -4.0,
+     10.0
+    ],
+    "questions_differ": 11
+   }
+  },
+  {
+   "estimator": "pca16+lr",
+   "baseline": "out:pairwise",
+   "train_set": "originals",
+   "condition": "debate",
+   "six": {
+    "value": 0.06199460916442057,
+    "ci95": [
+     -0.04455277554007591,
+     0.17742251326539202
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.1115668580803938,
+    "ci95": [
+     -0.054105979767184016,
+     0.2773444207032068
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 4.0,
+    "ci95": [
+     -3.0,
+     12.0
+    ],
+    "questions_differ": 16
+   },
+   "best_first_correct_diff": {
+    "value": 5.0,
+    "ci95": [
+     -2.0,
+     13.0
+    ],
+    "questions_differ": 15
+   }
+  },
+  {
+   "estimator": "pca16+lr",
+   "baseline": "out:pairwise",
+   "train_set": "originals",
+   "condition": "independent",
+   "six": {
+    "value": 0.09513742071881603,
+    "ci95": [
+     -0.0170258522077327,
+     0.20421052631578945
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.15430520034100598,
+    "ci95": [
+     -0.01288192419825077,
+     0.3099676096986636
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 3.0,
+    "ci95": [
+     -5.0,
+     12.0
+    ],
+    "questions_differ": 19
+   },
+   "best_first_correct_diff": {
+    "value": 5.0,
+    "ci95": [
+     -2.0,
+     13.0
+    ],
+    "questions_differ": 15
+   }
+  },
+  {
+   "estimator": "pca16+lr",
+   "baseline": "out:pairwise",
+   "train_set": "originals+debate",
+   "condition": "debate",
+   "six": {
+    "value": 0.035040431266846306,
+    "ci95": [
+     -0.09843741039169586,
+     0.18749999999999994
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.07013945857260051,
+    "ci95": [
+     -0.10211224583890449,
+     0.262593936515374
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 8.0,
+    "ci95": [
+     0.0,
+     17.0
+    ],
+    "questions_differ": 18
+   },
+   "best_first_correct_diff": {
+    "value": 8.0,
+    "ci95": [
+     0.0,
+     16.0
+    ],
+    "questions_differ": 18
+   }
+  },
+  {
+   "estimator": "pca16+lr",
+   "baseline": "out:pairwise",
+   "train_set": "originals+debate",
+   "condition": "independent",
+   "six": {
+    "value": 0.06976744186046513,
+    "ci95": [
+     -0.0481348407696324,
+     0.19048201187565486
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.14748508098891733,
+    "ci95": [
+     -0.0061391843971631945,
+     0.29426254228392235
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 1.0,
+    "ci95": [
+     -9.0,
+     12.0
+    ],
+    "questions_differ": 29
+   },
+   "best_first_correct_diff": {
+    "value": 8.0,
+    "ci95": [
+     0.0,
+     16.0
+    ],
+    "questions_differ": 18
+   }
+  },
+  {
+   "estimator": "pca16+lr",
+   "baseline": "out:pairwise",
+   "train_set": "all_pilot_conditions",
+   "condition": "debate",
+   "six": {
+    "value": -0.061994609164420456,
+    "ci95": [
+     -0.17944264990216846,
+     0.06053388104817388
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": -0.009844134536505345,
+    "ci95": [
+     -0.17255878424509083,
+     0.15744164019215298
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": -1.0,
+    "ci95": [
+     -8.0,
+     5.0
+    ],
+    "questions_differ": 11
+   },
+   "best_first_correct_diff": {
+    "value": 0.0,
+    "ci95": [
+     -8.0,
+     7.000000000000001
+    ],
+    "questions_differ": 14
+   }
+  },
+  {
+   "estimator": "pca16+lr",
+   "baseline": "out:pairwise",
+   "train_set": "all_pilot_conditions",
+   "condition": "independent",
+   "six": {
+    "value": 0.0,
+    "ci95": [
+     -0.11626310553906398,
+     0.11929131731351017
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.08056265984654731,
+    "ci95": [
+     -0.07596213621786632,
+     0.23194552263930956
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": -1.0,
+    "ci95": [
+     -11.0,
+     9.0
+    ],
+    "questions_differ": 25
+   },
+   "best_first_correct_diff": {
+    "value": 0.0,
+    "ci95": [
+     -8.0,
+     7.000000000000001
+    ],
+    "questions_differ": 14
+   }
+  },
+  {
+   "estimator": "pca64+lr",
+   "baseline": "out:pairwise",
+   "train_set": "originals",
+   "condition": "debate",
+   "six": {
+    "value": 0.11859838274932621,
+    "ci95": [
+     0.0024153599712402806,
+     0.2345686326136563
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.21246923707957344,
+    "ci95": [
+     0.05663704716336293,
+     0.36584376528491064
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 2.0,
+    "ci95": [
+     -5.0,
+     10.0
+    ],
+    "questions_differ": 14
+   },
+   "best_first_correct_diff": {
+    "value": 6.0,
+    "ci95": [
+     -2.0,
+     14.000000000000002
+    ],
+    "questions_differ": 16
+   }
+  },
+  {
+   "estimator": "pca64+lr",
+   "baseline": "out:pairwise",
+   "train_set": "originals",
+   "condition": "independent",
+   "six": {
+    "value": 0.10993657505285415,
+    "ci95": [
+     -0.005716761657826288,
+     0.2325581395348837
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.17945439045183292,
+    "ci95": [
+     0.022900430161943347,
+     0.33673560354374277
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 8.0,
+    "ci95": [
+     -2.0,
+     18.0
+    ],
+    "questions_differ": 28
+   },
+   "best_first_correct_diff": {
+    "value": 6.0,
+    "ci95": [
+     -2.0,
+     14.000000000000002
+    ],
+    "questions_differ": 16
+   }
+  },
+  {
+   "estimator": "pca64+lr",
+   "baseline": "out:pairwise",
+   "train_set": "originals+debate",
+   "condition": "debate",
+   "six": {
+    "value": 0.05390835579514819,
+    "ci95": [
+     -0.08263888888888886,
+     0.19633741585639486
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.15545529122231339,
+    "ci95": [
+     -0.007522083898270321,
+     0.321914824341599
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 6.0,
+    "ci95": [
+     -3.0,
+     15.0
+    ],
+    "questions_differ": 22
+   },
+   "best_first_correct_diff": {
+    "value": 6.0,
+    "ci95": [
+     -3.0,
+     15.0
+    ],
+    "questions_differ": 20
+   }
+  },
+  {
+   "estimator": "pca64+lr",
+   "baseline": "out:pairwise",
+   "train_set": "originals+debate",
+   "condition": "independent",
+   "six": {
+    "value": 0.06553911205073992,
+    "ci95": [
+     -0.049703588424205865,
+     0.18359461421460177
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.18030690537084393,
+    "ci95": [
+     0.027206287920573665,
+     0.3385286470095505
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 1.0,
+    "ci95": [
+     -9.0,
+     12.0
+    ],
+    "questions_differ": 27
+   },
+   "best_first_correct_diff": {
+    "value": 6.0,
+    "ci95": [
+     -3.0,
+     15.0
+    ],
+    "questions_differ": 20
+   }
+  },
+  {
+   "estimator": "pca64+lr",
+   "baseline": "out:pairwise",
+   "train_set": "all_pilot_conditions",
+   "condition": "debate",
+   "six": {
+    "value": 0.0026954177897574594,
+    "ci95": [
+     -0.10077624992079079,
+     0.1058642337074933
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.0467596390484003,
+    "ci95": [
+     -0.10039500321357671,
+     0.1946953245279961
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 1.0,
+    "ci95": [
+     -6.0,
+     7.000000000000001
+    ],
+    "questions_differ": 11
+   },
+   "best_first_correct_diff": {
+    "value": 0.0,
+    "ci95": [
+     -8.0,
+     8.0
+    ],
+    "questions_differ": 14
+   }
+  },
+  {
+   "estimator": "pca64+lr",
+   "baseline": "out:pairwise",
+   "train_set": "all_pilot_conditions",
+   "condition": "independent",
+   "six": {
+    "value": 0.046511627906976716,
+    "ci95": [
+     -0.06011934055118111,
+     0.1507851197936033
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.12915601023017909,
+    "ci95": [
+     -0.007493279569892446,
+     0.27362704029502166
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 0.0,
+    "ci95": [
+     -9.0,
+     9.0
+    ],
+    "questions_differ": 22
+   },
+   "best_first_correct_diff": {
+    "value": 0.0,
+    "ci95": [
+     -8.0,
+     8.0
+    ],
+    "questions_differ": 14
+   }
+  },
+  {
+   "estimator": "pca128+lr",
+   "baseline": "out:pairwise",
+   "train_set": "originals",
+   "condition": "debate",
+   "six": {
+    "value": 0.09973045822102433,
+    "ci95": [
+     -0.02394752205500778,
+     0.21984714231871477
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.1616078753076292,
+    "ci95": [
+     -0.009117596313887843,
+     0.3388985693323549
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 1.0,
+    "ci95": [
+     -7.000000000000001,
+     10.0
+    ],
+    "questions_differ": 19
+   },
+   "best_first_correct_diff": {
+    "value": 6.0,
+    "ci95": [
+     -2.0,
+     13.0
+    ],
+    "questions_differ": 16
+   }
+  },
+  {
+   "estimator": "pca128+lr",
+   "baseline": "out:pairwise",
+   "train_set": "originals",
+   "condition": "independent",
+   "six": {
+    "value": 0.08456659619450313,
+    "ci95": [
+     -0.04503212488395962,
+     0.21649050288918115
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.1355498721227621,
+    "ci95": [
+     -0.03772324860657321,
+     0.30657623626373615
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 10.0,
+    "ci95": [
+     0.0,
+     21.0
+    ],
+    "questions_differ": 32
+   },
+   "best_first_correct_diff": {
+    "value": 6.0,
+    "ci95": [
+     -2.0,
+     13.0
+    ],
+    "questions_differ": 16
+   }
+  },
+  {
+   "estimator": "pca128+lr",
+   "baseline": "out:pairwise",
+   "train_set": "originals+debate",
+   "condition": "debate",
+   "six": {
+    "value": 0.08086253369272234,
+    "ci95": [
+     -0.048055306061348384,
+     0.2125975576936014
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.15053322395406077,
+    "ci95": [
+     0.012272031539888734,
+     0.2993303229700288
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 6.0,
+    "ci95": [
+     -2.0,
+     14.024999999999865
+    ],
+    "questions_differ": 18
+   },
+   "best_first_correct_diff": {
+    "value": 7.0,
+    "ci95": [
+     -1.0,
+     15.0
+    ],
+    "questions_differ": 17
+   }
+  },
+  {
+   "estimator": "pca128+lr",
+   "baseline": "out:pairwise",
+   "train_set": "originals+debate",
+   "condition": "independent",
+   "six": {
+    "value": 0.06976744186046513,
+    "ci95": [
+     -0.04811085538933643,
+     0.19474046829672603
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.15473145780051145,
+    "ci95": [
+     -0.009396301122694514,
+     0.3190124548338423
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 0.0,
+    "ci95": [
+     -10.0,
+     10.0
+    ],
+    "questions_differ": 26
+   },
+   "best_first_correct_diff": {
+    "value": 7.0,
+    "ci95": [
+     -1.0,
+     15.0
+    ],
+    "questions_differ": 17
+   }
+  },
+  {
+   "estimator": "pca128+lr",
+   "baseline": "out:pairwise",
+   "train_set": "all_pilot_conditions",
+   "condition": "debate",
+   "six": {
+    "value": 0.03504043126684642,
+    "ci95": [
+     -0.06721169354838714,
+     0.13393401567944244
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.09844134536505322,
+    "ci95": [
+     -0.024184674492656034,
+     0.22779761904761897
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 0.0,
+    "ci95": [
+     -7.000000000000001,
+     7.000000000000001
+    ],
+    "questions_differ": 12
+   },
+   "best_first_correct_diff": {
+    "value": -1.0,
+    "ci95": [
+     -9.0,
+     7.000000000000001
+    ],
+    "questions_differ": 15
+   }
+  },
+  {
+   "estimator": "pca128+lr",
+   "baseline": "out:pairwise",
+   "train_set": "all_pilot_conditions",
+   "condition": "independent",
+   "six": {
+    "value": 0.008456659619450302,
+    "ci95": [
+     -0.09644451207141409,
+     0.12446160664101337
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.14109121909633426,
+    "ci95": [
+     -0.010513688439220277,
+     0.2976325286212045
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": -3.0,
+    "ci95": [
+     -13.0,
+     7.000000000000001
+    ],
+    "questions_differ": 29
+   },
+   "best_first_correct_diff": {
+    "value": -1.0,
+    "ci95": [
+     -9.0,
+     7.000000000000001
+    ],
+    "questions_differ": 15
+   }
+  },
+  {
+   "estimator": "pca64raw+lr",
+   "baseline": "out:pairwise",
+   "train_set": "originals",
+   "condition": "debate",
+   "six": {
+    "value": 0.1132075471698114,
+    "ci95": [
+     -0.005014769065520943,
+     0.2392103663107394
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.12797374897456937,
+    "ci95": [
+     -0.03236735073433172,
+     0.2863111218833122
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 4.0,
+    "ci95": [
+     -4.0,
+     12.0
+    ],
+    "questions_differ": 18
+   },
+   "best_first_correct_diff": {
+    "value": 5.0,
+    "ci95": [
+     -3.0,
+     13.0
+    ],
+    "questions_differ": 17
+   }
+  },
+  {
+   "estimator": "pca64raw+lr",
+   "baseline": "out:pairwise",
+   "train_set": "originals",
+   "condition": "independent",
+   "six": {
+    "value": 0.08456659619450313,
+    "ci95": [
+     -0.02340367625507683,
+     0.19145945585947902
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.14705882352941174,
+    "ci95": [
+     -0.006028432914046136,
+     0.29471962032116383
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 7.0,
+    "ci95": [
+     -2.0,
+     15.0
+    ],
+    "questions_differ": 21
+   },
+   "best_first_correct_diff": {
+    "value": 5.0,
+    "ci95": [
+     -3.0,
+     13.0
+    ],
+    "questions_differ": 17
+   }
+  },
+  {
+   "estimator": "pca64raw+lr",
+   "baseline": "out:pairwise",
+   "train_set": "originals+debate",
+   "condition": "debate",
+   "six": {
+    "value": 0.035040431266846306,
+    "ci95": [
+     -0.10134073496948445,
+     0.18183733401430022
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.09803117309269893,
+    "ci95": [
+     -0.05843066993981624,
+     0.2791678959985248
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 8.0,
+    "ci95": [
+     0.0,
+     16.0
+    ],
+    "questions_differ": 18
+   },
+   "best_first_correct_diff": {
+    "value": 9.0,
+    "ci95": [
+     1.0,
+     17.0
+    ],
+    "questions_differ": 19
+   }
+  },
+  {
+   "estimator": "pca64raw+lr",
+   "baseline": "out:pairwise",
+   "train_set": "originals+debate",
+   "condition": "independent",
+   "six": {
+    "value": 0.07822410147991543,
+    "ci95": [
+     -0.02354828787766199,
+     0.18737891328241027
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.14748508098891733,
+    "ci95": [
+     0.003665073430921754,
+     0.2850398668661481
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 6.0,
+    "ci95": [
+     -3.0,
+     15.0
+    ],
+    "questions_differ": 22
+   },
+   "best_first_correct_diff": {
+    "value": 9.0,
+    "ci95": [
+     1.0,
+     17.0
+    ],
+    "questions_differ": 19
+   }
+  },
+  {
+   "estimator": "pca64raw+lr",
+   "baseline": "out:pairwise",
+   "train_set": "all_pilot_conditions",
+   "condition": "debate",
+   "six": {
+    "value": -0.016172506738544423,
+    "ci95": [
+     -0.12324929971988785,
+     0.09670018229463363
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.02789171452009842,
+    "ci95": [
+     -0.1142242921013413,
+     0.17169135600676397
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 1.0,
+    "ci95": [
+     -5.0,
+     7.000000000000001
+    ],
+    "questions_differ": 9
+   },
+   "best_first_correct_diff": {
+    "value": 2.0,
+    "ci95": [
+     -5.0,
+     9.0
+    ],
+    "questions_differ": 12
+   }
+  },
+  {
+   "estimator": "pca64raw+lr",
+   "baseline": "out:pairwise",
+   "train_set": "all_pilot_conditions",
+   "condition": "independent",
+   "six": {
+    "value": 0.023255813953488413,
+    "ci95": [
+     -0.08495649086361128,
+     0.1297951042118975
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.11892583120204614,
+    "ci95": [
+     -0.017857142857142797,
+     0.2524745254745254
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 0.0,
+    "ci95": [
+     -9.0,
+     9.0
+    ],
+    "questions_differ": 22
+   },
+   "best_first_correct_diff": {
+    "value": 2.0,
+    "ci95": [
+     -5.0,
+     9.0
+    ],
+    "questions_differ": 12
+   }
+  },
+  {
+   "estimator": "pairwise",
+   "baseline": "out:pairwise",
+   "train_set": "originals",
+   "condition": "debate",
+   "six": {
+    "value": 0.016172506738544534,
+    "ci95": [
+     -0.09719276150072918,
+     0.13515079649185607
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.0693191140278917,
+    "ci95": [
+     -0.08628611184733628,
+     0.22501906779661004
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 2.0,
+    "ci95": [
+     -6.0,
+     11.0
+    ],
+    "questions_differ": 20
+   },
+   "best_first_correct_diff": {
+    "value": 1.0,
+    "ci95": [
+     -7.000000000000001,
+     9.0
+    ],
+    "questions_differ": 17
+   }
+  },
+  {
+   "estimator": "pairwise",
+   "baseline": "out:pairwise",
+   "train_set": "originals",
+   "condition": "independent",
+   "six": {
+    "value": 0.05708245243128962,
+    "ci95": [
+     -0.04484376796596535,
+     0.16122508408439007
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.1368286445012788,
+    "ci95": [
+     0.004162041120472025,
+     0.27187599695698056
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 5.0,
+    "ci95": [
+     -3.0,
+     13.0
+    ],
+    "questions_differ": 19
+   },
+   "best_first_correct_diff": {
+    "value": 1.0,
+    "ci95": [
+     -7.000000000000001,
+     9.0
+    ],
+    "questions_differ": 17
+   }
+  },
+  {
+   "estimator": "pairwise",
+   "baseline": "out:pairwise",
+   "train_set": "originals+debate",
+   "condition": "debate",
+   "six": {
+    "value": 0.010781671159029615,
+    "ci95": [
+     -0.14815980968373915,
+     0.18259076901615637
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.040196882690730074,
+    "ci95": [
+     -0.13535511363636363,
+     0.23222085245581484
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 3.0,
+    "ci95": [
+     -6.0,
+     12.0
+    ],
+    "questions_differ": 21
+   },
+   "best_first_correct_diff": {
+    "value": 3.0,
+    "ci95": [
+     -6.0,
+     12.024999999999864
+    ],
+    "questions_differ": 21
+   }
+  },
+  {
+   "estimator": "pairwise",
+   "baseline": "out:pairwise",
+   "train_set": "originals+debate",
+   "condition": "independent",
+   "six": {
+    "value": 0.05708245243128962,
+    "ci95": [
+     -0.0603946665464031,
+     0.17700973105641582
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.1346973572037511,
+    "ci95": [
+     -0.008941206199460885,
+     0.2734535405071117
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 3.0,
+    "ci95": [
+     -6.0,
+     12.0
+    ],
+    "questions_differ": 23
+   },
+   "best_first_correct_diff": {
+    "value": 3.0,
+    "ci95": [
+     -6.0,
+     12.024999999999864
+    ],
+    "questions_differ": 21
+   }
+  },
+  {
+   "estimator": "pairwise",
+   "baseline": "out:pairwise",
+   "train_set": "all_pilot_conditions",
+   "condition": "debate",
+   "six": {
+    "value": -0.04582210242587592,
+    "ci95": [
+     -0.168071153695123,
+     0.0731043905575457
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": -0.0008203445447088065,
+    "ci95": [
+     -0.13786276189350977,
+     0.14445214229559739
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 0.0,
+    "ci95": [
+     -7.000000000000001,
+     7.000000000000001
+    ],
+    "questions_differ": 12
+   },
+   "best_first_correct_diff": {
+    "value": -5.0,
+    "ci95": [
+     -13.0,
+     2.0
+    ],
+    "questions_differ": 15
+   }
+  },
+  {
+   "estimator": "pairwise",
+   "baseline": "out:pairwise",
+   "train_set": "all_pilot_conditions",
+   "condition": "independent",
+   "six": {
+    "value": -0.006342494714587699,
+    "ci95": [
+     -0.11037912912912923,
+     0.10257847533632276
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.07885763000852519,
+    "ci95": [
+     -0.059985902255639,
+     0.218549891651887
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": -1.0,
+    "ci95": [
+     -10.0,
+     8.0
+    ],
+    "questions_differ": 23
+   },
+   "best_first_correct_diff": {
+    "value": -5.0,
+    "ci95": [
+     -13.0,
+     2.0
+    ],
+    "questions_differ": 15
+   }
+  },
+  {
+   "estimator": "pca64+pairwise",
+   "baseline": "out:pairwise",
+   "train_set": "originals",
+   "condition": "debate",
+   "six": {
+    "value": 0.008086253369272267,
+    "ci95": [
+     -0.09963365972242398,
+     0.11727837550313112
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.1361771944216571,
+    "ci95": [
+     -0.016215909090909083,
+     0.2850880851489772
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": -1.0,
+    "ci95": [
+     -9.0,
+     8.0
+    ],
+    "questions_differ": 19
+   },
+   "best_first_correct_diff": {
+    "value": 0.0,
+    "ci95": [
+     -8.0,
+     8.0
+    ],
+    "questions_differ": 16
+   }
+  },
+  {
+   "estimator": "pca64+pairwise",
+   "baseline": "out:pairwise",
+   "train_set": "originals",
+   "condition": "independent",
+   "six": {
+    "value": 0.029598308668076112,
+    "ci95": [
+     -0.08369519402172486,
+     0.14926946065923302
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.08738277919863596,
+    "ci95": [
+     -0.0720268800966475,
+     0.250012098335269
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": -2.0,
+    "ci95": [
+     -11.0,
+     8.0
+    ],
+    "questions_differ": 24
+   },
+   "best_first_correct_diff": {
+    "value": 0.0,
+    "ci95": [
+     -8.0,
+     8.0
+    ],
+    "questions_differ": 16
+   }
+  },
+  {
+   "estimator": "pca64+pairwise",
+   "baseline": "out:pairwise",
+   "train_set": "originals+debate",
+   "condition": "debate",
+   "six": {
+    "value": 0.040431266846361114,
+    "ci95": [
+     -0.12629600026099444,
+     0.22159090909090906
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.034864643150123054,
+    "ci95": [
+     -0.14821651530417737,
+     0.24284578696343398
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 8.0,
+    "ci95": [
+     -1.0,
+     18.0
+    ],
+    "questions_differ": 24
+   },
+   "best_first_correct_diff": {
+    "value": 8.0,
+    "ci95": [
+     0.0,
+     17.0
+    ],
+    "questions_differ": 20
+   }
+  },
+  {
+   "estimator": "pca64+pairwise",
+   "baseline": "out:pairwise",
+   "train_set": "originals+debate",
+   "condition": "independent",
+   "six": {
+    "value": 0.03382663847780132,
+    "ci95": [
+     -0.09166171509434701,
+     0.16333464566929132
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.07416879795396414,
+    "ci95": [
+     -0.09406867649347472,
+     0.2447921237384816
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 0.0,
+    "ci95": [
+     -11.0,
+     11.0
+    ],
+    "questions_differ": 30
+   },
+   "best_first_correct_diff": {
+    "value": 8.0,
+    "ci95": [
+     0.0,
+     17.0
+    ],
+    "questions_differ": 20
+   }
+  },
+  {
+   "estimator": "pca64+pairwise",
+   "baseline": "out:pairwise",
+   "train_set": "all_pilot_conditions",
+   "condition": "debate",
+   "six": {
+    "value": -0.005390835579514808,
+    "ci95": [
+     -0.14406904287138578,
+     0.13113707526817261
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.03732567678424936,
+    "ci95": [
+     -0.09988240812629398,
+     0.18367759224902078
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 0.0,
+    "ci95": [
+     -9.0,
+     8.0
+    ],
+    "questions_differ": 18
+   },
+   "best_first_correct_diff": {
+    "value": -3.0,
+    "ci95": [
+     -12.0,
+     6.0
+    ],
+    "questions_differ": 21
+   }
+  },
+  {
+   "estimator": "pca64+pairwise",
+   "baseline": "out:pairwise",
+   "train_set": "all_pilot_conditions",
+   "condition": "independent",
+   "six": {
+    "value": 0.01374207188160681,
+    "ci95": [
+     -0.10355813616260234,
+     0.13708521870286577
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.12446717817561814,
+    "ci95": [
+     -0.03401238925802887,
+     0.29318296316031656
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": -2.0,
+    "ci95": [
+     -14.000000000000002,
+     10.0
+    ],
+    "questions_differ": 36
+   },
+   "best_first_correct_diff": {
+    "value": -3.0,
+    "ci95": [
+     -12.0,
+     6.0
+    ],
+    "questions_differ": 21
+   }
+  },
+  {
+   "estimator": "wq_avgdiff",
+   "baseline": "out:pairwise",
+   "train_set": "originals",
+   "condition": "debate",
+   "six": {
+    "value": 0.05929919137466311,
+    "ci95": [
+     -0.0636962985831275,
+     0.19137601078167116
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.06480721903199349,
+    "ci95": [
+     -0.10239829510900487,
+     0.23602579852579844
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 7.0,
+    "ci95": [
+     -1.0,
+     16.0
+    ],
+    "questions_differ": 19
+   },
+   "best_first_correct_diff": {
+    "value": 8.0,
+    "ci95": [
+     0.0,
+     16.0
+    ],
+    "questions_differ": 18
+   }
+  },
+  {
+   "estimator": "wq_avgdiff",
+   "baseline": "out:pairwise",
+   "train_set": "originals",
+   "condition": "independent",
+   "six": {
+    "value": 0.07188160676532762,
+    "ci95": [
+     -0.03574134199134198,
+     0.17625993428939293
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.13640238704177327,
+    "ci95": [
+     -0.010961098275788292,
+     0.27328153307410175
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 5.0,
+    "ci95": [
+     -5.0,
+     14.000000000000002
+    ],
+    "questions_differ": 25
+   },
+   "best_first_correct_diff": {
+    "value": 8.0,
+    "ci95": [
+     0.0,
+     16.0
+    ],
+    "questions_differ": 18
+   }
+  },
+  {
+   "estimator": "wq_avgdiff",
+   "baseline": "out:pairwise",
+   "train_set": "originals+debate",
+   "condition": "debate",
+   "six": {
+    "value": 0.008086253369272156,
+    "ci95": [
+     -0.13976757671506845,
+     0.15608774840099868
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.012305168170631653,
+    "ci95": [
+     -0.16145519042005213,
+     0.19813980122680314
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 6.0,
+    "ci95": [
+     -2.0,
+     14.000000000000002
+    ],
+    "questions_differ": 18
+   },
+   "best_first_correct_diff": {
+    "value": 9.0,
+    "ci95": [
+     0.0,
+     17.0
+    ],
+    "questions_differ": 19
+   }
+  },
+  {
+   "estimator": "wq_avgdiff",
+   "baseline": "out:pairwise",
+   "train_set": "originals+debate",
+   "condition": "independent",
+   "six": {
+    "value": 0.046511627906976716,
+    "ci95": [
+     -0.05466984178237005,
+     0.15370865035257172
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.08866155157715261,
+    "ci95": [
+     -0.0531288562923824,
+     0.2281641414141414
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 2.0,
+    "ci95": [
+     -7.000000000000001,
+     11.0
+    ],
+    "questions_differ": 24
+   },
+   "best_first_correct_diff": {
+    "value": 9.0,
+    "ci95": [
+     0.0,
+     17.0
+    ],
+    "questions_differ": 19
+   }
+  },
+  {
+   "estimator": "wq_avgdiff",
+   "baseline": "out:pairwise",
+   "train_set": "all_pilot_conditions",
+   "condition": "debate",
+   "six": {
+    "value": -0.1159029649595687,
+    "ci95": [
+     -0.2427703445696647,
+     0.004965417224453157
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": -0.08121410992616906,
+    "ci95": [
+     -0.2250841346153846,
+     0.07072719757216542
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": -3.0,
+    "ci95": [
+     -10.0,
+     4.0
+    ],
+    "questions_differ": 13
+   },
+   "best_first_correct_diff": {
+    "value": -2.0,
+    "ci95": [
+     -9.0,
+     5.0
+    ],
+    "questions_differ": 14
+   }
+  },
+  {
+   "estimator": "wq_avgdiff",
+   "baseline": "out:pairwise",
+   "train_set": "all_pilot_conditions",
+   "condition": "independent",
+   "six": {
+    "value": -0.031712473572938715,
+    "ci95": [
+     -0.1402441801057355,
+     0.07658015158015155
+    ],
+    "n_finite_draws": 2000
+   },
+   "revision_auc": {
+    "value": 0.04092071611253201,
+    "ci95": [
+     -0.10448021830919473,
+     0.1769754330679934
+    ],
+    "n_finite_draws": 2000
+   },
+   "best_six_correct_diff": {
+    "value": 0.0,
+    "ci95": [
+     -9.0,
+     9.0
+    ],
+    "questions_differ": 20
+   },
+   "best_first_correct_diff": {
+    "value": -2.0,
+    "ci95": [
+     -9.0,
+     5.0
+    ],
+    "questions_differ": 14
+   }
+  }
+ ]
+}

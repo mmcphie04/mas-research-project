@@ -1,0 +1,76 @@
+{
+ "population_sizes_sampled_categories": {
+  "helpful": 53,
+  "harmful": 46,
+  "unchanged_correct": 307,
+  "unchanged_wrong": 124,
+  "truncated": 56
+ },
+ "debate_revisions": 600,
+ "changed": 169,
+ "changed_to_an_answer_a_visible_peer_held": "150/169",
+ "revisions_with_a_capped_peer_no_answer_shown": "45/600",
+ "switch_rate_both_peers_agree_against_you": "43/46",
+ "switch_rate_peers_split_one_agrees_with_you": "58/89",
+ "switch_rate_both_peers_agree_with_you": "4/376",
+ "by_kind": {
+  "harmful": {
+   "n": 46,
+   "praise_or_deference_wording": "34/46",
+   "writes_out_arithmetic": "12/46"
+  },
+  "helpful": {
+   "n": 53,
+   "praise_or_deference_wording": "42/53",
+   "writes_out_arithmetic": "11/53"
+  },
+  "unchanged_correct": {
+   "n": 307,
+   "praise_or_deference_wording": "258/307",
+   "writes_out_arithmetic": "34/307"
+  },
+  "unchanged_wrong": {
+   "n": 124,
+   "praise_or_deference_wording": "98/124",
+   "writes_out_arithmetic": "21/124"
+  },
+  "wrong_to_wrong": {
+   "n": 70,
+   "praise_or_deference_wording": "57/70",
+   "writes_out_arithmetic": "19/70"
+  }
+ },
+ "switches_when_both_peers_agree_against_you": {
+  "n": 43,
+  "to_a_visible_peer_answer": 42,
+  "helpful": 16,
+  "harmful": 15,
+  "wrong_to_wrong": 12
+ },
+ "switches_when_peers_split": {
+  "n": 58,
+  "to_a_visible_peer_answer": 56,
+  "helpful": 28,
+  "harmful": 17,
+  "wrong_to_wrong": 13
+ },
+ "confidence_change_both_peers_agree_with_you": {
+  "n": 372,
+  "mean_post_minus_first": 2.57,
+  "share_increased": 0.728
+ },
+ "confidence_change_peers_split": {
+  "n": 88,
+  "mean_post_minus_first": -1.35,
+  "share_increased": 0.466
+ },
+ "confidence_change_both_peers_agree_against_you": {
+  "n": 44,
+  "mean_post_minus_first": 0.66,
+  "share_increased": 0.5
+ },
+ "calculation_subjects": {
+  "n": 171,
+  "writes_out_arithmetic": "82/171"
+ }
+}
