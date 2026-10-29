@@ -29,6 +29,13 @@ Decisions (docs/NEXT_PHASE_PLAN.md, review decisions 1-4):
   (``variant="retokenized"``) for comparison.
 * **Eligibility**: the response's own answer and the answer it revised (for revisions) must be
   stated answers. Hitting the token cap is not itself a reason for exclusion.
+* **Forced opening** (``prefill``, e.g. "Decisive issue:"): the stored generation prompt ends
+  with the prefill, but the saved exposure readout was taken BEFORE it. Both contexts are built
+  explicitly: the f = 0 bridge on the pre-opening context (``bridge_pre_opening``, comparable to
+  the saved exposure readout), and every other input after the opening, labelled
+  ``standard_after_opening`` -- the fractions are of the agent's own continuation, the prefill
+  being part of the prompt it was given. Curves after an opening are never pooled with
+  ordinary ``standard`` curves.
 """
 
 from __future__ import annotations
@@ -138,7 +145,7 @@ class Built:
 def build_items(*, tokenizer, prompt: str, text: str, gen_ids: list[int] | None, n_options: int,
                 stated_letter_id: int | None = None, revision: bool = True,
                 variants: tuple[str, ...] = ("standard", "bridge", "exact_replay"),
-                stop_ids: set[int] | None = None) -> Built:
+                stop_ids: set[int] | None = None, prefill: str = "") -> Built:
     """Readout inputs for one saved response.
 
     ``prompt`` is the exact templated string the response was generated from (including any
@@ -154,7 +161,11 @@ def build_items(*, tokenizer, prompt: str, text: str, gen_ids: list[int] | None,
     out = Built(reasoning_chars=end)
     p = parse_answer_field(text, n_options)
     out.mentions_final_letter = mentions_letter(reasoning, "ABCDEFGHIJ"[p.index])
+    if prefill and not prompt.endswith(prefill):
+        return Built(status="prefill_not_at_prompt_end")
     prompt_ids = tok.encode(prompt, add_special_tokens=False)
+    std_name = "standard_after_opening" if prefill else "standard"
+    bridge_name = "bridge_after_opening" if prefill else "bridge"
     if gen_ids is None:  # no saved ids: fall back to encoding the response (recorded)
         gen, out.replay_exact = tok.encode(text, add_special_tokens=False), None
     else:
@@ -183,11 +194,14 @@ def build_items(*, tokenizer, prompt: str, text: str, gen_ids: list[int] | None,
         for f in FRACS:
             c, k, exact, note = body(f)
             ids = prompt_ids + (gen[:k] + std if k > 0 else std0)
-            out.items.append(Item("standard", f, ids, k, c, exact, note))
+            out.items.append(Item(std_name, f, ids, k, c, exact, note))
     if "bridge" in variants:
         for f in BRIDGE_FRACS:
             c, k, exact, note = body(f)
-            out.items.append(Item("bridge", f, prompt_ids + gen[:k] + bridge, k, c, exact, note))
+            out.items.append(Item(bridge_name, f, prompt_ids + gen[:k] + bridge, k, c, exact, note))
+        if prefill:  # the saved exposure context: before the forced opening
+            pre = tok.encode(prompt[: len(prompt) - len(prefill)], add_special_tokens=False)
+            out.items.append(Item("bridge_pre_opening", 0.0, pre + bridge, 0, 0, True, "before the forced opening"))
     if "retokenized" in variants:  # the paper's construction: encode the concatenated text
         for f in FRACS:
             c = cut_chars(reasoning, f)

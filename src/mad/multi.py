@@ -30,8 +30,14 @@ Conditions differ only in what the agent is shown before it revises:
                       the same, with the assistant turn prefilled "Decisive issue:" (forced opening)
   self_structured     no peers, the structured instruction (structured reconsideration control)
 
-Peer order is randomised per (condition, question, agent) from a stable seed and recorded, so
-"panel member 1" is not systematically the lower-numbered agent or the fabricated one.
+Peer order is randomised per (question, agent) from a stable seed and recorded, so "panel member
+1" is not systematically the lower-numbered agent or the fabricated one. Every DEBATE-FAMILY
+condition (debate, the second debate sample, structured debate, the forced opening) shares ONE
+order stream -- the ordinary debate's -- so each question-agent pair sees identical peer texts in
+identical order across those conditions (the archives show a strong last-shown-peer effect, so an
+order difference would confound the prompt comparison). A child job can also pass the archived
+order explicitly (``peer_orders``), which is then verified against the peers available. Order is
+never derived from the generation seed, which stays keyed on the condition name.
 """
 
 from __future__ import annotations
@@ -77,6 +83,12 @@ KINDS = ("self_reconsider", "debate", "debate_conf", "debate_answer_only", "adve
          "self_structured")
 STRUCTURED_KINDS = ("debate_structured", "debate_structured_open", "self_structured")
 PREFILL_KINDS = {"debate_structured_open": P.OPENING_PREFILL}
+# conditions whose peer order is the ordinary debate's (same texts, same order)
+ORDER_STREAM = {"debate_structured": "debate", "debate_structured_open": "debate"}
+
+
+class PeerOrderMismatch(RuntimeError):
+    """A supplied peer order does not name exactly the peers this condition would show."""
 
 
 def derive_seed(*parts) -> int:
@@ -290,7 +302,7 @@ def load_round0(out_dir: Path, identity: dict) -> Round0 | None:
 # ----------------------------------------------------------------------------- round 1
 
 
-def _peer_view(cfg, kind, cond, q, a, r0_ans, r0_stated, own_text, perms, gold):
+def _peer_view(cfg, kind, cond, q, a, r0_ans, r0_stated, own_text, perms, gold, order_override=None):
     """What agent ``a`` is shown, in display order, with a record of where each entry came from.
 
     Missingness policy: a real peer's shown answer is what that peer STATED (-1 if its response
@@ -329,14 +341,20 @@ def _peer_view(cfg, kind, cond, q, a, r0_ans, r0_stated, own_text, perms, gold):
         keep_conf = bool(cond.get("peer_confidence"))
         entries = [(own_text[(qid, b)] if keep_conf else P.strip_confidence(own_text[(qid, b)]),
                     r0_stated[(qid, b)], f"agent{b}") for b in others]
-    order = stable_rng(cfg.seed, kind, "order", qid, a).permutation(len(entries))
-    entries = [entries[i] for i in order]
+    if order_override is not None:
+        labels = [e[2] for e in entries]
+        if sorted(labels) != sorted(order_override):
+            raise PeerOrderMismatch(f"{qid} agent {a}: supplied order {order_override} does not match peers {labels}")
+        entries = [entries[labels.index(s)] for s in order_override]
+    else:
+        order = stable_rng(cfg.seed, ORDER_STREAM.get(kind, kind), "order", qid, a).permutation(len(entries))
+        entries = [entries[i] for i in order]
     return [e[0] for e in entries], [e[1] for e in entries], [e[2] for e in entries], target
 
 
 def run_condition(cfg, questions, cond, r0: Round0, backend, perms, gold, final_dir: Path,
                   job="dev", chunk="c000", extra_manifest: dict | None = None,
-                  round0_dir: Path | None = None) -> RunResult:
+                  round0_dir: Path | None = None, peer_orders: dict | None = None) -> RunResult:
     """One condition's round 1 for one chunk, written atomically to ``final_dir``.
 
     With ``round0_dir`` (a saved, verified round 0 next to ``final_dir``), the round-0 states are
@@ -361,6 +379,8 @@ def run_condition(cfg, questions, cond, r0: Round0, backend, perms, gold, final_
         "round0_seed": r0.seed, "round0_reloaded": r0.loaded, "round1_seed": seed1,
         "peer_shows_confidence": bool(cond.get("peer_confidence", False)),
         "backend_n_layers": backend.n_layers, "backend_d_model": backend.d_model,
+        "peer_order_source": ("supplied (archived)" if peer_orders and kind in ("debate", *ORDER_STREAM)
+                              else f"derived: stream {ORDER_STREAM.get(kind, kind)!r}"),
         "chunk": chunk, "job": job, **(extra_manifest or {}),
     })
     writer = ActivationWriter(tmp, backend.n_layers, backend.d_model, cfg.activations.shard_size)
@@ -400,8 +420,9 @@ def run_condition(cfg, questions, cond, r0: Round0, backend, perms, gold, final_
         for a in range(n_agents):
             pre = r0_ans[(qid, a)]
             panel = [r0_ans[(qid, b)] for b in range(n_agents) if b != a]
+            override = (peer_orders or {}).get((qid, a)) if kind in ("debate", *ORDER_STREAM) else None
             texts, shown_ans, sources, target = _peer_view(cfg, kind, cond, q, a, r0_ans,
-                                                           r0_stated, own_text, perms, gold)
+                                                           r0_stated, own_text, perms, gold, override)
             stated_shown = [x for x in shown_ans if x >= 0]  # missing answers do not vote
             maj = peer_majority(stated_shown) if stated_shown else None
             if kind == "independent":
@@ -482,7 +503,10 @@ def run_condition(cfg, questions, cond, r0: Round0, backend, perms, gold, final_
         rows.append(row)
         transcripts.append({**{k: v for k, v in m.items() if k != "planned_answer"},
                             "messages": msgs1[i], "prompt": gen_prompts1[i], "text": gen.text,
-                            "prefill": prefill, "token_ids": gen.token_ids, "stop_reason": gen.stop_reason})
+                            # the exposure readout's context is prompt[:exposure_prompt_end]; with a
+                            # forced opening the generation context continues with the prefill
+                            "prefill": prefill, "exposure_prompt_end": len(prompts1[i]),
+                            "token_ids": gen.token_ids, "stop_reason": gen.stop_reason})
         add_states(m, read)
 
     index = writer.close()
@@ -547,13 +571,16 @@ def run_chunk(
     run_dirs: dict[str, Path] | None = None,
     extra_manifest: dict | None = None,
     parent_round0: dict | None = None,
+    peer_orders: dict | None = None,
 ) -> tuple[dict[str, RunResult], Round0]:
     """Round 0 once (reloaded from ``round0_dir`` if already saved), then every condition whose
     output directory is not already complete. Returns results for ALL requested conditions.
 
     ``parent_round0`` -- {"dir", "job", "question_ids"} -- makes this a CHILD chunk: round 0 is
     taken from the parent job's saved cache (verified against the parent's identity) and
-    restricted to this chunk's questions. It is never regenerated.
+    restricted to this chunk's questions. It is never regenerated. ``peer_orders`` --
+    {(question_id, agent_id): ["agent2", "agent0"]} -- fixes the peer order of debate-family
+    conditions (a child passes its parent's archived debate order).
     """
     perms, gold, backend = _setup(cfg, questions, backend)
     if parent_round0 is not None:
@@ -585,5 +612,6 @@ def run_chunk(
             continue
         results[cond["name"]] = run_condition(cfg, questions, cond, r0, backend, perms, gold, final,
                                               job=job, chunk=chunk, extra_manifest=extra_manifest,
-                                              round0_dir=Path(round0_dir) if round0_dir else None)
+                                              round0_dir=Path(round0_dir) if round0_dir else None,
+                                              peer_orders=peer_orders)
     return results, r0

@@ -89,6 +89,13 @@ def audit_view(view: Path, tok) -> dict:
     for key, r in by.items():
         row = S.loc[key]
         c["states"] += 1
+        epe = r.get("exposure_prompt_end")
+        has_end = epe is not None and not (isinstance(epe, float) and np.isnan(epe))
+        if key[2] == "post" and (r.get("prefill") or has_end):  # explicit exposure vs generation context
+            c["opening_contexts_checked"] += 1
+            end = int(epe) if has_end else len(r["prompt"]) - len(r.get("prefill") or "")
+            if r["prompt"][:end] + r.get("prefill", "") != r["prompt"] or r.get("gen_start_char") != len(r["prompt"]):
+                flag("opening_contexts_inconsistent", key)
         c["prompt_rerender_checked"] += 1
         if _render(tok, r["messages"]) + r.get("prefill", "") != r["prompt"]:
             flag("prompt_not_rerendered", key)

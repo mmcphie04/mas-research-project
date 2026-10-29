@@ -193,3 +193,19 @@ def test_hf_exact_replay_and_bridge_reproduce_the_original_readout():
     # batched with a much shorter sequence (left padding) gives the same answer
     lp_b = backend.letter_logprobs_ids([items[("standard", 0.0)].ids, ex.ids], [4, 4], batch_size=2)
     np.testing.assert_allclose(lp_b[1], lp[0], atol=2e-4)
+
+
+def test_forced_opening_builds_pre_and_post_opening_contexts_separately():
+    tok = CharTok()
+    prefill = "Decisive issue:"
+    prompt = PROMPT + prefill
+    text = " the torque units. Recomputed it.\n\nAnswer: (B)\nConfidence: 60"
+    b = C.build_items(tokenizer=tok, prompt=prompt, text=text, gen_ids=tok.encode(text), n_options=4, prefill=prefill)
+    v = {(it.variant, it.fraction): it for it in b.items}
+    pre = v[("bridge_pre_opening", 0.0)]
+    assert pre.ids == tok.encode(PROMPT) + tok.encode("\nFinal answer: (")  # the saved exposure context
+    assert ("bridge", 0.0) not in v and ("standard", 0.0) not in v  # never pooled with ordinary curves
+    assert v[("standard_after_opening", 0.0)].ids == tok.encode(prompt) + tok.encode("Answer: (")
+    assert v[("bridge_after_opening", 0.0)].ids == tok.encode(prompt) + tok.encode("\nFinal answer: (")
+    bad = C.build_items(tokenizer=tok, prompt=PROMPT, text=text, gen_ids=tok.encode(text), n_options=4, prefill=prefill)
+    assert bad.status == "prefill_not_at_prompt_end"

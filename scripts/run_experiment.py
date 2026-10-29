@@ -679,12 +679,13 @@ def main(argv=None) -> int:
         try:
             parent_r0 = ({"dir": out_root / f"{args.parent}-round0-{tag}", "job": args.parent,
                           "question_ids": parent["chunks"][i]} if parent else None)
+            orders = archived_peer_orders(out_root, args.parent, tag) if parent else None
             res, r0 = run_chunk(cfg, part, conds, backend=backend, job=name, chunk=tag,
                                 round0_dir=out_root / f"{name}-round0-{tag}", run_dirs=dirs,
                                 extra_manifest={"job_identity_sha256": job["identity_sha256"],
                                                 "split_assignment_sha256":
                                                     (job["identity"].get("split") or {}).get("assignment_sha256")},
-                                parent_round0=parent_r0)
+                                parent_round0=parent_r0, peer_orders=orders)
         except Exception as exc:
             consecutive += 1
             failures.append({"chunk": tag, "time": time.strftime("%Y-%m-%dT%H:%M:%S"),
@@ -746,6 +747,21 @@ def _archive_split(src: Path, dst: Path) -> None:
         return
     if dst.resolve() != src.resolve():
         dst.write_bytes(data)
+
+
+def archived_peer_orders(out_root: Path, parent: str, tag: str) -> dict | None:
+    """The parent's ordinary-debate peer order for one chunk, {(qid, agent): [sources]}, read from
+    its archived (complete, hash-recorded) debate chunk; None when the parent has no debate
+    chunk there, in which case the shared debate order stream is derived (and is identical)."""
+    d = Path(out_root) / f"{parent}-debate-{tag}"
+    if not is_complete(d):
+        return None
+    out = {}
+    for line in open(d / "transcripts.jsonl"):
+        r = json.loads(line)
+        if r["phase"] == "post" and r.get("shown_peer_sources"):
+            out[(str(r["question_id"]), int(r["agent_id"]))] = r["shown_peer_sources"].split(",")
+    return out
 
 
 def template_changes(parent: dict, child: dict) -> list[str]:

@@ -81,6 +81,7 @@ def test_structured_child_job_reuses_round0_and_records_prefill(driver, tmp_path
     for r in post["debate_structured_open"]:
         assert r["prefill"] == "Decisive issue:" and r["prompt"].endswith("Decisive issue:")
         assert r["gen_start_char"] == len(r["prompt"])
+        assert r["prompt"][: int(r["exposure_prompt_end"])] + r["prefill"] == r["prompt"]  # exposure context precedes it
     assert all(r["prefill"] == "" for r in post["debate_structured"])
     st = pd.read_parquet(tmp_path / "dev-debate_structured_open" / "agent_states.parquet").query("phase == 'post'")
     assert (st.freetext_parse_ok == 1).all()
@@ -101,3 +102,90 @@ def test_subset_ids_must_belong_to_the_parent(driver, tmp_path):
     with pytest.raises(SystemExit, match="not in the parent job"):
         driver.main(["--config", *STUB, "--out-root", str(tmp_path), "--name", "dev", "--parent", "t",
                      "--subset-ids", str(ids), "--conditions", "debate_structured"])
+
+
+DEBATE_FAMILY = ["debate_s2", "debate_structured", "debate_structured_open"]
+
+
+def _peer_block(content: str) -> str:
+    """The peer section of a revision prompt: identical text whatever instruction follows it."""
+    head = "Here are the responses from the other members of your panel:\n\n"
+    body = content[content.index(head) + len(head):]
+    for stop in ("\n\nReconsider the question in light", "\n\nBefore giving your answer again"):
+        if stop in body:
+            return body[: body.index(stop)]
+    raise AssertionError("no instruction after the peers")
+
+
+def _posts(out, name):
+    return {(str(r["question_id"]), r["agent_id"]): r for r in map(json.loads, open(out / name / "transcripts.jsonl"))
+            if r["phase"] == "post"}
+
+
+@pytest.mark.parametrize("parent_conditions", [["debate"], ["debate_answer_only"]])
+def test_peer_order_and_text_are_identical_across_debate_conditions(driver, tmp_path, parent_conditions):
+    """With the parent's archived debate order (first case) and with no archived debate (second
+    case: the shared order stream is derived), every debate-family condition shows each
+    question-agent pair the same peers, in the same order, with the same text."""
+    assert driver.main(["--config", *STUB, "--out-root", str(tmp_path), "--name", "t", "--dataset", "synthetic",
+                        "--n-questions", "6", "--chunk", "2", "--conditions", *parent_conditions]) == 0
+    assert driver.main(["--config", *STUB, "--out-root", str(tmp_path), "--name", "dev", "--parent", "t",
+                        "--conditions", *DEBATE_FAMILY]) == 0
+    posts = {c: _posts(tmp_path, f"dev-{c}") for c in DEBATE_FAMILY}
+    if "debate" in parent_conditions:
+        posts["parent_debate"] = _posts(tmp_path, "t-debate")
+    keys = set(posts["debate_s2"])
+    assert keys and all(set(p) == keys for p in posts.values())
+    flips = 0
+    for k in keys:
+        srcs = {c: p[k]["shown_peer_sources"] for c, p in posts.items()}
+        assert len(set(srcs.values())) == 1, (k, srcs)
+        blocks = {c: _peer_block(p[k]["messages"][-1]["content"]) for c, p in posts.items()}
+        assert len(set(blocks.values())) == 1, k
+        flips += srcs["debate_s2"].split(",") != sorted(srcs["debate_s2"].split(","))
+    assert flips > 0  # the order is genuinely randomised, not just sorted everywhere
+    man = json.loads((tmp_path / "dev-debate_structured-c000" / "manifest.json").read_text())
+    expect = "supplied (archived)" if "debate" in parent_conditions else "derived: stream 'debate'"
+    assert man["peer_order_source"] == expect
+    seeds = {c: json.loads((tmp_path / f"dev-{c}-c000" / "manifest.json").read_text())["round1_seed"] for c in DEBATE_FAMILY}
+    assert len(set(seeds.values())) == len(DEBATE_FAMILY)  # generation seeds stay separate from order
+
+
+def test_a_supplied_order_naming_other_peers_is_refused():
+    import mad.multi as M
+
+    cfg = type("Cfg", (), {"seed": 1, "debate": type("D", (), {"n_agents": 3})()})()
+    q = type("Q", (), {"question_id": "q", "options": ("a", "b", "c", "d"), "n_options": 4})()
+    perm = type("P", (), {"display_options": lambda self, o: list(o)})()
+    args = (cfg, "debate", {}, q, 0, {("q", 0): 0, ("q", 1): 1, ("q", 2): 2}, {("q", 1): 1, ("q", 2): 2},
+            {("q", 1): "x", ("q", 2): "y"}, {"q": perm}, {"q": 0})
+    texts, _, sources, _ = M._peer_view(*args, order_override=["agent2", "agent1"])
+    assert sources == ["agent2", "agent1"] and texts == ["y", "x"]
+    with pytest.raises(M.PeerOrderMismatch):
+        M._peer_view(*args, order_override=["agent2", "agent0"])  # agent 0 is the reader itself
+
+
+def test_forced_opening_transcripts_build_both_contexts(driver, tmp_path):
+    from mad import curve_runner as CR
+
+    _parent(driver, tmp_path)
+    assert driver.main(["--config", *STUB, "--out-root", str(tmp_path), "--name", "dev", "--parent", "t",
+                        "--conditions", "debate_structured_open"]) == 0
+    recs = []
+    for k, r in _posts(tmp_path, "dev-debate_structured_open").items():
+        recs.append({"pool": "dev", "condition": "open", "question_id": k[0], "agent_id": k[1], "n_options": 4,
+                     "answer": "ABCDEFGHIJ".index(r["text"].split("Answer: (")[1][0]), "eligibility": "eligible",
+                     "prompt": r["prompt"], "text": r["text"], "token_ids": None, "prefill": r["prefill"]})
+
+    class Tok:
+        all_special_ids: list[int] = []
+
+        def encode(self, s, add_special_tokens=False):
+            return [ord(c) for c in s]
+
+        def decode(self, ids, skip_special_tokens=True):
+            return "".join(map(chr, ids))
+
+    R, M, _, _ = CR.build_tables(recs, Tok(), [ord(c) for c in "ABCDEFGHIJ"], ("standard", "bridge", "exact_replay"))
+    assert (R.status == "ok").all()
+    assert set(M.variant) == {"standard_after_opening", "bridge_after_opening", "bridge_pre_opening", "exact_replay"}

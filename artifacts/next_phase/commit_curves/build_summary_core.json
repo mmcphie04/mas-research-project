@@ -1,0 +1,81 @@
+{
+ "build_id": "216216d7316fbb99466297822bc798981cc674ae99e213121bbd81e91b140db2",
+ "params": {
+  "source_sets": [
+   "core"
+  ],
+  "extra_sources": [],
+  "sources": [
+   "pilot/debate:runs/colab/pilot12b-debate",
+   "pilot/self_reconsider:runs/colab/pilot12b-self_reconsider",
+   "val/debate:runs/val12b/val12b-debate",
+   "val/self_reconsider:runs/val12b/val12b-self-self_reconsider"
+  ],
+  "variants": [
+   "standard",
+   "bridge",
+   "exact_replay",
+   "retokenized"
+  ],
+  "tokenizer": {
+   "repo_id": "google/gemma-3-12b-it",
+   "revision": "96b6f1eccf38110c56df3a15bffe176da04bfd80"
+  }
+ },
+ "responses": {
+  "pilot/debate": 360,
+  "pilot/self_reconsider": 360,
+  "val/debate": 600,
+  "val/self_reconsider": 300
+ },
+ "exclusions_by_condition_and_reason": {
+  "pilot/debate": {
+   "eligible": 342,
+   "previous_answer_readout_fallback": 18
+  },
+  "pilot/self_reconsider": {
+   "eligible": 341,
+   "previous_answer_readout_fallback": 16,
+   "own_answer_readout_fallback": 3
+  },
+  "val/debate": {
+   "eligible": 571,
+   "previous_answer_readout_fallback": 27,
+   "own_answer_readout_fallback": 2
+  },
+  "val/self_reconsider": {
+   "eligible": 285,
+   "previous_answer_readout_fallback": 13,
+   "own_answer_readout_fallback": 2
+  }
+ },
+ "eligible_build_status": {
+  "ok": 1539
+ },
+ "capped_but_stated_kept": 0,
+ "replay_exact": {
+  "True": 1539
+ },
+ "standard_f1_identical_to_exact_replay": {
+  "True": 1539
+ },
+ "reasoning_names_final_option": {
+  "False": 775,
+  "True": 764
+ },
+ "items_by_variant": {
+  "standard": 9234,
+  "retokenized": 9234,
+  "bridge": 3078,
+  "exact_replay": 1539
+ },
+ "boundary_notes": {
+  "": 13850,
+  "text re-encoded": 9234,
+  "short_by_whitespace": 1
+ },
+ "retokenized_inputs_differing_from_saved_ids": 6,
+ "core_unique_inputs": 12312,
+ "core_tokens_unique": 10963904,
+ "max_input_tokens": 3143
+}

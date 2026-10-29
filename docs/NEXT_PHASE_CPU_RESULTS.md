@@ -101,8 +101,9 @@ This does not block CPU work.
 | `scripts/commit_curves.py` | `build` / `run` / `analyze` |
 | `HFBackend.letter_logprobs_ids` | letter-only readout, no hidden states |
 
-**Build summary** (`artifacts/next_phase/commit_curves/build_summary.json` and
-`responses.csv.gz`), covering the core sets (pilot and validation debate and reconsideration)
+**Build summary** (first round: one combined build; since §9.3 split into
+`build_summary_core.json` / `build_summary_extras.json` and `responses_{core,extras}.csv.gz` in
+`artifacts/next_phase/commit_curves/`, with identical totals), covering the core sets (pilot and validation debate and reconsideration)
 and the extras (pilot answer-only and misleading, validation independent):
 
 - **Eligibility:** 2,784 eligible revisions. Exclusions by condition and reason are in the
@@ -369,3 +370,328 @@ python scripts/commit_curves.py build --sources --source val:debate_s2:OUT/dev12
   agreement ≥ 39/40 and median |Δ log p| of the top letter ≤ 0.05;
 - batched = single within 0.02;
 - peak memory below 38 GB on the 3,143-token longest input.
+
+## 9. Second review (2026-10-29, afternoon): fixes before any GPU session
+
+Earlier sections are unchanged. Still no GPU session.
+
+### 9.1 Peer order matched across prompt conditions
+
+**The problem.** Order was derived from each condition's *kind*, so structured debate would have
+shown peers in a different order from ordinary debate.
+
+**The fix.**
+
+- Every debate-family condition (`debate`, `debate_s2`, `debate_structured`,
+  `debate_structured_open`) now uses one shared order stream: the ordinary debate's.
+- A child job reuses the parent's **archived** debate order explicitly. It is read from the
+  parent's hash-recorded debate chunk and verified to name exactly the peers available
+  (`PeerOrderMismatch` otherwise).
+- Each chunk's manifest records whether order was supplied (archived) or derived.
+- Generation seeds remain keyed on the condition name.
+
+**Checked on the archives.** The derived stream reproduces the stored order for all 600
+validation and 360 pilot debate revisions, so both routes agree.
+
+**Tests** (`tests/test_structured.py`), parametrized with and without an archived parent debate:
+
+- identical peer sources, identical peer text blocks and identical order across all
+  debate-family conditions and the parent;
+- order really is randomized;
+- distinct generation seeds;
+- refusal of an order naming the wrong peers.
+
+### 9.2 Curve readouts bound to their inputs and model; safe resume and stopping
+
+All in `src/mad/curve_runner.py`, tested in `tests/test_curve_runner.py`.
+
+**Binding.**
+
+- **Build identity.** A build directory has a `build_id`, the hash of its four files plus its
+  parameters. The files are re-hashed on every load, and an altered build is refused.
+- **Output binding.** Each output directory's `run_manifest.json` binds it to the `build_id`,
+  the backend identity (backend, repo, model commit, chat template, dtype) and a purpose
+  (`run:all`, `smoke`).
+- **Refusal.** Any mismatch is refused: a rebuilt input set, a different model, or stub outputs
+  resumed into a model run or analyzed as results.
+
+**Row validation.** Every stored row carries its item's sequence hash and option count. On every
+load each row is checked against the build: known item, matching hash and option count,
+correct length, finite and normalized.
+
+**Stopping.**
+
+- There is one deadline for the whole command (`--max-minutes`), across all modes and batch
+  sizes.
+- Completed rows are flushed atomically every 25 batches and on any exit: time limit, keyboard
+  interrupt, or out-of-memory.
+- `run_status.json` records the state, plus expected, done and missing items per mode with a
+  sample of missing item ids.
+- Byte-identical inputs are read once and copied, with a flag on the copy. For example, the
+  standardized f = 1 input equals the exact replay.
+
+**Coverage.**
+
+- `analyze` refuses when any expected item is missing.
+- `--partial-smoke` produces an explicitly labelled `PARTIAL_SMOKE` analysis, in separate files,
+  restricted to responses complete at all six fractions. The response population is therefore
+  the same at every fraction.
+
+**Tests** (11):
+
+- complete run with deduplication;
+- time limit → persisted partial output → resume that matches an uninterrupted run;
+- interruption keeps completed batches;
+- changed inputs refused;
+- changed backend refused, including stub;
+- tampered rows refused (hash, option count);
+- altered build refused;
+- core run refuses a build with other sources;
+- final analysis refuses incomplete coverage, while the labelled partial analysis drops exactly
+  the incomplete response;
+- smoke time limit stops every remaining mode;
+- smoke report passes only when reproduction holds.
+
+### 9.3 Bounded smoke procedure
+
+**Separate builds.** Core and extras now have separate builds and output directories, and
+`run --expect-sources core` refuses any other build:
+
+| build | responses | unique inputs | tokens | longest input | `build_id` |
+|---|---|---|---|---|---|
+| `runs/next_commit/build_core` | 1,539 | 12,312 | 10.96 M | 3,143 | `216216d7…` |
+| `runs/next_commit/build_extras` | 1,245 | 9,180 | 5.93 M | | `9d95a61e…` |
+
+**`commit_curves.py smoke` reads one fixed set:**
+
+- 40 stratified responses (5 changed + 5 unchanged per pool × condition cell), all their inputs;
+- the 20 longest inputs;
+- every re-tokenized input that differs from the saved-id construction (6 in the core build),
+  with its counterpart.
+
+On the core build that is 392 items, 347 unique inputs and 332k tokens.
+
+**Modes.** Each input is read once singly (batch 1), then the same inputs at batch sizes 4, 8
+and 16. Each mode's readings are stored separately.
+
+**Report** (`smoke_report.json`). Each check carries its value, threshold and pass flag:
+
+| check | pass rule |
+|---|---|
+| completeness | every mode complete |
+| rows | finite and normalized |
+| bridge f = 0 vs saved exposure | argmax agreement ≥ 0.975 and median \|Δ log p\| of the top letter ≤ 0.05 |
+| exact replay vs saved `before_stated_answer` | same as above |
+| each batch size vs single | argmax agreement ≥ 0.99, median \|Δ\| ≤ 0.02, max \|Δ\| ≤ 0.10 |
+| memory per batch size | no OOM, peak ≤ 38 GB |
+| re-tokenized vs saved ids | reported, not gated |
+| projected core run | ≤ 78 min (core tokens ÷ measured tokens per second at the fastest batch size that passed agreement and memory; setup excluded) |
+
+**CPU dry run** on the real core build with the stub backend:
+
+- all modes complete;
+- the two reproduction checks FAIL, as they must with stub outputs;
+- every other check passes.
+
+So the selection, the modes and the report work end to end on the real inputs. The stub numbers
+are meaningless and were not kept.
+
+### 9.4 Forced opening: both contexts explicit
+
+- **Transcripts.** New transcripts record `prefill` and `exposure_prompt_end`. The exposure
+  context is `prompt[:exposure_prompt_end]`; the generation context is that plus the prefill.
+- **Readout inputs.** For prefill responses the build makes `bridge_pre_opening` (the
+  pre-opening context + `\nFinal answer: (`, compared with the saved exposure readout). All other
+  inputs are labelled `standard_after_opening` / `bridge_after_opening`.
+- **Separation.** These are never pooled with ordinary `standard` curves. The analysis reports
+  each family separately.
+- **Archive audit.** It checks the split (`prompt[:end] + prefill == prompt` and generation
+  starting after the prefill). It is unchanged on the existing archives, which have no forced
+  openings.
+- **Tests:** unit (`tests/test_curves.py`) and end to end from a stub child run
+  (`tests/test_structured.py`).
+- **Decision.** The forced opening stays in scope as an optional condition; the added
+  complexity was modest.
+
+### 9.5 Backups
+
+**Re-verified copies.** The copies in `C:\Users\mmcph\mas_backup\` were re-verified in place with
+`verify_archive.py`:
+
+| copy | chunk directories | time |
+|---|---|---|
+| val12b | 20 | 447 s |
+| val12b-self | 5 | 110 s |
+| pilot12b | 24 | 563 s |
+| frozen scorers | SHA-256 `8e5785fe…`, matches the primary copy | |
+
+**These do not protect against hardware failure.** The primary archive (WSL disk image) and
+`mas_backup` (`C:`) are on the **same physical SSD**. A disk failure, theft or loss of the laptop
+loses both.
+
+**What an off-device copy needs:**
+
+| option | requirement | size |
+|---|---|---|
+| **(a)** OneDrive | confirm in Windows that `C:\Users\mmcph\OneDrive` is signed in to an account with ≥ 15 GB free and shows "Up to date"; confirm that storing these data there is acceptable | ≈ 7.7 GB now, + ≈ 3 GB after Stage 3 |
+| **(b)** external USB drive | appears in WSL as `/mnt/<letter>`; ≥ 16 GB | |
+| **(c)** an institutional store | — | |
+
+**Procedure for (a) or (b):**
+
+- `scripts/verify_archive.py --copy-to <dest>/<job>` for each job (it copies, verifies the copy
+  and test-loads it);
+- `sha256sum` of the frozen scorers;
+- a dated `BACKUP_LOG` line.
+
+Nothing has been copied off the laptop.
+
+### 9.6 Optional peer-order diagnostic (scoped, not implemented or run)
+
+**Aim.** Test the last-shown-peer effect (§3) causally: the same peer arguments shown in opposite
+orders, everything else fixed.
+
+**Sample.** About 25 **pilot** disputed questions, keeping the validation questions for the
+Stage 3 development set. The contexts are revisions whose two shown peers stated *different*
+answers: 87 such revisions exist in the pilot, on about 40 questions. That gives about 60–75
+contexts.
+
+**Readout-only version (no generation).**
+
+- **Inputs.** For each context, the exposure input (f = 0) under the archived order and under
+  the reversed order, each with `Answer: (` and `\nFinal answer: (`. Plus the agent's existing
+  revision teacher-forced under the reversed order at the six fractions; the archived-order
+  curve comes from Stage 2.
+- **Size:** about 10 passes per context, about 750 passes in all.
+- **Cost:** about 2–4 minutes of GPU. About 0.05 A100-h (≈ 0.3 units) if appended to the Stage 2
+  session; about 0.4 h (≈ 2 units) alone, dominated by setup.
+- **Measure.** For a context with peer answers X (first) and Y (last), the recency preference is
+  m = log p(last-shown) − log p(first-shown). It is averaged over both orders, so the answers'
+  own content cancels. Report:
+  - the paired change in p(previous answer) and p(eventual answer) between orders;
+  - argmax flips;
+  - each with question-cluster bootstrap intervals.
+
+**Generation version.**
+
+- **Inputs.** New revisions under the reversed order **and** fresh revisions under the archived
+  order, 2 samples each. Sampling noise is then measured by the same-order pair.
+- **Size and cost:** 25 questions × 3 agents × 2 orders × 2 samples = 300 generations, about
+  18 min of generation plus readouts. About 0.35 h (≈ 1.9 units) inside a Stage 3 session, or
+  about 0.7 h (≈ 3.7 units) alone.
+- **Code needed.** A `debate_reversed` condition: a reversed `peer_orders` override. It is small,
+  because the override now exists. Not written.
+- **Measures:**
+  - **final answers:** the share matching the last-shown peer in each order, and the paired flip
+    rate against the same-order resample rate;
+  - **correctness:** per-agent accuracy and fractional panel-vote accuracy, reversed minus
+    archived, paired by question, with intervals.
+
+**Recommendation.** Run the readout-only version inside the Stage 2 session if you approve the
+marginal ~0.3 units. Defer the generation version.
+
+### 9.7 Proposed GPU launch (for review; not run)
+
+**Stage 1 only: the curve smoke.**
+
+**Hard cap:** **1.0 A100-hour = 5.3 units for the whole session**, including setup and model
+loading. Stop at a balance of (start − 5.3). The smoke itself carries `--max-minutes 25`.
+
+**Expected cost:**
+
+| step | minutes |
+|---|---|
+| create the session and setup | 10–15 |
+| model download and load (24 GB) | 8–12 |
+| smoke | 4–10 |
+| download and stop | 5 |
+| **total** | **27–42 min ≈ 2.4–3.7 units** |
+
+The smoke estimate is 4 modes × 332k tokens at an assumed 4.6–9k tokens/s, with the batch-1 mode
+slower.
+
+**Before the session** (laptop):
+
+```
+COMMIT=$(git rev-parse HEAD)            # the reviewed commit, pushed
+git bundle create /tmp/repo.bundle review-9e45160-fixes
+tar -C runs/next_commit -czf /tmp/build_core.tgz build_core
+sha256sum /tmp/build_core.tgz           # -> BUILD_SHA256
+# /tmp/curves_env.json: {"COMMIT": "<COMMIT>", "NAME": "smoke", "BUILD_TGZ": "/content/build_core.tgz",
+#   "BUILD_SHA256": "<hash>", "CURVE_ARGS": ["--batch-sizes", "4", "8", "16", "--max-minutes", "25"]}
+colab usage                              # record the balance; abort if < 20 units
+```
+
+**Session** (official Colab CLI, `--auth=adc`, the same route as the validation session):
+
+```
+colab new -s curves --gpu A100
+colab upload -s curves /tmp/repo.bundle /content/repo.bundle
+colab upload -s curves /tmp/build_core.tgz /content/build_core.tgz
+colab upload -s curves /tmp/curves_env.json /content/curves_env.json
+colab upload -s curves <hf token file> /content/hf_token.tmp        # never printed
+colab exec -s curves -f artifacts/next_phase/ops/setup.py          # pinned commit, packages, GPU report
+colab exec -s curves -f artifacts/next_phase/ops/curves_launch.py  # verifies BUILD_SHA256, starts the smoke detached
+colab exec -s curves -f artifacts/next_phase/ops/curves_status.py  # poll every ~5 min (no curve results printed)
+# when state is final: tar -C /content/next_commit -czf /content/smoke_out.tgz smoke smoke.log; sha256sum
+colab download -s curves /content/smoke_out.tgz runs/next_commit/smoke_out.tgz
+colab stop -s curves
+```
+
+**After the session** (laptop):
+
+- check the sha256;
+- extract to `runs/next_commit/smoke/`;
+- copy to `mas_backup/next_commit/`;
+- record a dated `OPS_LOG` entry with usage.
+
+**Stop rules.**
+
+- Stop the runtime at the cap, whatever its state.
+- If setup or the model load passes 30 min, stop and report.
+- If `smoke_report.json` is FAIL, stop and report the failing checks. Do not start the core
+  run.
+
+**Afterwards: the core run, as a separate approval.** Proposed with
+`commit_curves.py run --build .../build_core --expect-sources core --batch-size <smoke's best> --max-minutes 75`.
+
+- **Projected cost:** 10.96 M tokens at 4.6–9k tokens/s is 20–40 min, plus 20–30 min of
+  overhead = **0.7–1.2 A100-h (3.7–6.4 units)**. **Cap: 8 units.**
+- **Alternative to save ≈ 2 units of overhead:** run it in the same session as the smoke, only
+  if the smoke reports PASS and its projection is ≤ 78 min. Combined cap: 11 units. Proposed
+  only if you prefer to skip the review between the two.
+
+### 9.8 Updated GPU estimates (estimates)
+
+| stage | A100-h | units | cap |
+|---|---|---|---|
+| 1 curve smoke (as §9.7) | 0.45–0.7 | 2.4–3.7 | 5.3 (session) |
+| 2 core curves | 0.7–1.2 | 3.7–6.4 | 8 |
+| 2+ extras (separate build) | +0.3–0.6 | +1.6–3.2 | +4 |
+| 2+ optional peer-order readout diagnostic | +0.05 | +0.3 | +1 |
+| 3 structured dev run (incl. new-response curves) | 1.5–2.4 | 8–13 | 15 |
+| 3+ forced opening (+ curves) | +0.4–0.6 | +2.1–3.2 | +5 |
+| 3+ optional peer-order generation diagnostic | +0.35 | +1.9 | +3 |
+| **total** | minimum (1 + 2) 1.15–1.9 / with Stage 3 2.65–4.3 / everything 3.4–5.9 | 6–10 / 14–23 / 18–31 | 41 |
+
+### 9.9 Tests and remaining limitations
+
+**Tests:**
+
+| suite | result |
+|---|---|
+| `tests/test_curve_runner.py` (new) | 11 passed |
+| `tests/test_structured.py` | 8 passed |
+| `tests/test_curves.py` | 13 passed |
+| full suite and ruff | 289 passed; ruff clean |
+
+**Remaining limitations:**
+
+- **Throughput and memory are unmeasured** for the letter-only readout. The smoke measures
+  them; every GPU time above is an estimate.
+- **The Stage 3 runbook is not yet written to the same level** as §9.7. That will be done after
+  the curve smoke, with its measured throughput.
+- **Colab CLI environment passing.** The ops scripts read `/content/curves_env.json`, so they do
+  not depend on how `colab exec` passes environment variables. The upload paths follow
+  docs/COLAB.md but have not been exercised for this procedure.
+- **No off-device backup** (§9.5).

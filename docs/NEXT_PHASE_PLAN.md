@@ -82,6 +82,55 @@ projections, given with the assumptions behind them.
     analysis. The 85-discordant-question estimate and the 20% threshold are provisional planning
     assumptions, not universal requirements.
 
+### Second review (2026-10-29, afternoon): fixes before any GPU session
+
+These are binding in addition to the decisions above. Implementation and tests:
+docs/NEXT_PHASE_CPU_RESULTS.md §9.
+
+1. **Peer order is matched across prompt conditions.**
+   - Ordinary debate, `debate_s2`, structured debate and the forced opening show each
+     question–agent pair identical peer texts in identical order.
+   - A child job reuses the parent's archived ordinary-debate order. Every debate-family
+     condition otherwise derives order from one shared stream; for the archives this reproduces
+     the stored order exactly (960/960).
+   - Generation seeds stay keyed on the condition name, separate from order.
+2. **Curve readouts are bound and validated.**
+   - Inputs carry a `build_id`.
+   - Each output directory is bound to that build and to the backend and model identity, and
+     refuses anything else, including stub outputs.
+   - Every stored row is checked by sequence hash, option count and normalization.
+3. **Stopping and coverage.**
+   - One deadline per command (all modes and batch sizes).
+   - Atomic flushes on time limit, interrupt or OOM.
+   - A status file with the missing items.
+   - Final analysis requires complete coverage. A partial run is analyzable only as an
+     explicitly labelled smoke analysis, restricted to responses complete at every fraction.
+4. **Smoke procedure.**
+   - Separate core and extras builds; `run --expect-sources core`.
+   - The smoke covers 40 stratified responses, the 20 longest inputs and every re-tokenized
+     difference.
+   - Each smoke input is read singly and at batch sizes 4/8/16, and those readings are kept
+     separately.
+   - An explicit pass/fail report covers: completeness, finite and normalized rows, numerical
+     reproduction of both saved readouts, batched vs single, memory, measured throughput, and
+     the projected core time.
+5. **Forced opening: both contexts are explicit.**
+   - The saved exposure readout precedes `Decisive issue:`; it is compared with
+     `bridge_pre_opening`.
+   - Everything after the opening is labelled `standard_after_opening` / `bridge_after_opening`,
+     never pooled with ordinary curves.
+   - Transcripts record `exposure_prompt_end`, and the archive audit checks the split.
+6. **The agreed experiment is unchanged:**
+   - structured reconsideration control;
+   - identical initial answers;
+   - matched hand-coding cases;
+   - fractional final-panel voting;
+   - prediction curves for the new responses;
+   - disputed and unanimous questions reported separately;
+   - later-round controller training deferred.
+7. **Optional peer-order diagnostic.** Scoped in docs/NEXT_PHASE_CPU_RESULTS.md §9.6; not
+   implemented or run, and it does not block the core work.
+
 ### Amended Stage 3 design and gate (replaces the corresponding parts of §C and §Gates)
 
 **Conditions.** All on the 90 development questions, reusing the archived round-0 answers:
