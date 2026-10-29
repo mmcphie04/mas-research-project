@@ -167,10 +167,68 @@ def audit_backend(backend) -> dict:
     return out
 
 
+RULE = "0 of 20 targets with max |dp| > 0.05 under fp32_head, D2-D4 vs D1 (default attention)"
+THRESHOLD = 0.05
+D2_D4 = ("D2_equal_length_x4", "D3_original_batch4", "D4_partner_shorter", "D4_partner_pad50",
+         "D4_partner_pad300", "D4_partner_pad1500")
+
+
+def verdict(D: pd.DataFrame, targets: list[str]) -> dict:
+    """The fixed G1 decision (docs/NEXT_PHASE_CPU_RESULTS.md s13.1), from diagnostic rows with
+    columns attn, head, cond, rep, target, p (probability vector).
+
+    PASS        every target has D1 (rep 0) and all of D2-D4 under fp32_head / default attention,
+                single reads repeat within THRESHOLD, and 0 of the targets exceed THRESHOLD.
+    UNRESOLVED  coverage incomplete; or every exceedance disappears under explicit positions (D5)
+                or eager attention (D6) -- a localized cause awaiting review.
+    FAIL        any other exceedance, or single reads that do not repeat within THRESHOLD.
+    """
+    F = D[(D["head"] == "fp32_head") & (D.attn == "default")]
+    d1 = F[(F.cond == "D1_single") & (F.rep == 0)].set_index("target").p
+    missing = [t for t in targets if t not in d1.index
+               or any(((F.cond == c) & (F.target == t)).sum() == 0 for c in D2_D4)]
+    rep_dev = max([float(np.abs(r.p - d1[r.target]).max()) for r in F[(F.cond == "D1_single") & (F.rep > 0)].itertuples()
+                   if r.target in d1.index] or [0.0])
+    exceed = {}
+    for r in F[F.cond.isin(D2_D4)].itertuples():
+        if r.target in d1.index:
+            dev = float(np.abs(r.p - d1[r.target]).max())
+            if dev > THRESHOLD:
+                exceed.setdefault(r.target, []).append((r.cond, round(dev, 4)))
+
+    def gone(t, cond):  # does the same comparison stay within THRESHOLD under D5 or D6?
+        k = cond.replace("D4_partner_", "")
+        alts = []
+        pos = D[(D["head"] == "fp32_head") & (D.attn == "default") & (D.cond == f"D5_positions_{k}") & (D.target == t)]
+        eag = D[(D["head"] == "fp32_head") & (D.attn == "eager") & (D.cond == cond) & (D.target == t)]
+        eag1 = D[(D["head"] == "fp32_head") & (D.attn == "eager") & (D.cond == "D1_single") & (D.rep == 0) & (D.target == t)]
+        for r in pos.itertuples():
+            alts.append(float(np.abs(r.p - d1[t]).max()) <= THRESHOLD)
+        if len(eag) and len(eag1):
+            alts.append(float(np.abs(eag.p.iloc[0] - eag1.p.iloc[0]).max()) <= THRESHOLD)
+        return any(alts)
+
+    explained = bool(exceed) and all(gone(t, c) for t, lst in exceed.items() for c, _ in lst if c.startswith("D4"))
+    if missing:
+        v = "UNRESOLVED"
+    elif rep_dev > THRESHOLD:
+        v = "FAIL"
+    elif not exceed:
+        v = "PASS"
+    elif explained and all(c.startswith("D4") for lst in exceed.values() for c, _ in lst):
+        v = "UNRESOLVED"
+    else:
+        v = "FAIL"
+    return {"rule": RULE, "verdict": v, "targets": len(targets), "targets_exceeding": len(exceed),
+            "exceedances": {t[:12]: lst for t, lst in exceed.items()}, "missing_targets": [t[:12] for t in missing],
+            "single_read_repeat_max_abs_dp": rep_dev}
+
+
 def report(args) -> int:
     out = Path(args.out)
     D = pd.read_parquet(out / "diag_rows.parquet")
     D["p"] = [np.exp(np.asarray(v)) for v in D.logprobs]
+    D["rep"] = D["rep"].fillna(-1).astype(int) if "rep" in D else -1
     P = json.loads(PLAN.read_text())
     group = {h: "worst" for h in P["targets"]["worst"]} | {h: "stable" for h in P["targets"]["stable"]}
     base = D[(D.cond == "D1_single") & (D.rep == 0)].set_index(["attn", "head", "target"]).p
@@ -192,12 +250,17 @@ def report(args) -> int:
     # head vs head at the same read
     hh = D.pivot_table(index=["attn", "cond", "target", "rep"], columns="head", values="p", aggfunc="first").dropna()
     head_gap = [float(np.abs(a - b).max()) for a, b in zip(hh["bf16_logits"], hh["fp32_head"], strict=True)] if len(hh) else []
-    rep = {"summary": summ.round(6).to_dict("records"),
+    P_targets = P["targets"]["worst"] + P["targets"]["stable"]
+    ver = verdict(D, P_targets)
+    rep = {"verdict": ver, "summary": summ.round(6).to_dict("records"),
            "bf16_vs_fp32_head_same_read_max_abs_dp": {"median": float(np.median(head_gap)) if head_gap else None,
                                                       "max": float(np.max(head_gap)) if head_gap else None},
            "audit": json.loads((out / "audit.json").read_text())}
     (out / "diag_report.json").write_text(json.dumps(rep, indent=1, default=str))
     print(summ.to_string(index=False))
+    print(f"\nRULE: {ver['rule']}\nVERDICT: {ver['verdict']}  ({ver['targets_exceeding']} of {ver['targets']} "
+          f"targets exceed; single-read repeat max |dp| {ver['single_read_repeat_max_abs_dp']:.2e}; "
+          f"missing {len(ver['missing_targets'])})")
     return 0
 
 
