@@ -244,6 +244,7 @@ ROW_META_KEYS = (
     "shown_peer_majority", "n_shown_agree_pre", "n_shown_missing", "panel_peer_answers",
     "panel_peer_majority",
     "n_panel_agree_pre", "misleading_target",
+    "round", "previous_round_answer",  # further rounds: which round, and the answer it revised
 )
 
 

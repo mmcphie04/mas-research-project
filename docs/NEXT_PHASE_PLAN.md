@@ -82,6 +82,105 @@ projections, given with the assumptions behind them.
     analysis. The 85-discordant-question estimate and the 20% threshold are provisional planning
     assumptions, not universal requirements.
 
+### Third review (2026-10-29, evening): main collection, readout precision, pilot
+
+**Status.** Binding in addition to the above. The large collection is **not** approved. The
+next GPU steps are a targeted readout diagnostic and a development timing pilot, each after
+review. CPU findings are in docs/NEXT_PHASE_CPU_RESULTS.md §11–§13.
+
+#### M1. Main collection (proposal)
+
+**Protocol (versioned).**
+
+- About **250 words** of guidance and a **1,280-token** cap for every response: independent
+  answers, ordinary and structured debate, and the reconsideration controls. These are
+  allowances, not minimums.
+- Config `configs/main_250.yaml` (`debate.brevity_words: 250`, template `brevity_250`).
+- The legacy 150-word / 768-token archives keep their identities and are never pooled with the
+  new samples. The protocol is recorded in every job identity and manifest.
+
+**Questions.** **200 fresh questions** (main pool, positions 321–520). Development questions
+(the validation pool) stay separate.
+
+**Per question: 26 generated responses**, 5,200 in total:
+
+| responses | what |
+|---|---|
+| 10 | a shared **pool of independent responses** (agents 0–9) |
+| 3 + 3 | ordinary and structured debate with the **3-agent panel** (agents 0–2) |
+| 5 + 5 | ordinary and structured debate with the **5-agent panel** (agents 0–4) |
+
+The panels are nested, prespecified prefixes of the pool. Each panel-size × prompt combination
+gets one debate round. There is no forced-opening condition.
+
+**Matching.**
+
+- Initial answers, peer texts and peer order are identical between ordinary and structured debate
+  at each panel size (one shared order stream; tested).
+- Panel votes use only each agent's latest answer, scored by exact expected accuracy under
+  uniformly random tie-breaking.
+
+**Separately selectable extensions,** never silently in the base budget:
+
+| extension | content |
+|---|---|
+| **E1** | a second round for both prompts × both panel sizes on a **prespecified 50-question subset** (a child job taking the parent's round-1 outputs; `*_r2` conditions) |
+| **E2** | structured reconsideration without peers (`self_structured5`) on a matched subset (the same 50 questions) |
+| **E3** | prediction curves for the new debate responses, **full** (all 3,200 revisions) or **subset** (the 50 questions) |
+
+**History policy** (`prompts.HISTORY_POLICY`, recorded in every round-2 manifest).
+
+- Each agent keeps its own full transcript. It sees the panel peers' responses from the
+  immediately preceding round only, in the same order as round 1.
+- Every row records the peers shown, their sources, the round, and the answer revised.
+- Rounds are saved as separate outputs, so a run resumes at round boundaries.
+
+#### M2. Aims and analysis (`src/mad/analysis/panels.py`)
+
+**Primary aim.** Quantify the gains and costs of more independent answers versus more discussion,
+whether or not any learned controller succeeds.
+
+**Measures:**
+
+- independent-vote accuracy at panel sizes 3–10, using nested prefixes of the pool;
+- ordinary vs structured debate at each panel size;
+- debate vs the response-count-matched independent baseline (3 → 6, 5 → 10);
+- helpful changes, harmful changes, and net expected accuracy;
+- per panel: correct minority recovered, correct decision preserved or lost, correct answer
+  absent from the start but found;
+- measured input and output tokens, and generation time kept separate from activation extraction
+  and diagnostic readouts.
+
+**Statistics.**
+
+- All comparisons are question-level paired, with bootstrap intervals.
+- Subgroups and predictor training are exploratory. 200 questions cannot establish small accuracy
+  differences or a reliable learned controller.
+- Later-round controller training remains deferred.
+
+#### M3. Readout precision (replaces the batch-size framing of §10)
+
+- **Finding.** The curve readout's letter logits were bf16-quantized (diagnosis in §11 of the
+  results).
+- **Head.** Readouts now default to `fp32_head` (the final hidden state projected onto the letter
+  rows in float32). The head is part of the bound identity.
+- **Batch size.** Batch size 1 is the chosen mode for the curve readouts. This applies to
+  diagnostic readouts only, not to generation.
+- **Diagnostic.** A targeted GPU diagnostic (`scripts/readout_diagnostic.py`) separates
+  quantization, batch shape, padding, positions and the attention implementation, one change at
+  a time.
+- **No retroactive pass.** The original smoke is not re-marked as passing.
+
+#### M4. GPU sequence (each step needs approval; caps at the observed 6.73 units/h, rate re-checked per session)
+
+| step | what | estimate | hard cap |
+|---|---|---|---|
+| G1 | readout diagnostic (§13.1 of the results) | 0.3–0.45 h, 2–3 units | 4 units |
+| G2 | development timing pilot, 12 validation-pool questions, new protocol, including second rounds and the control on 4 (§13.2) | 1.1–1.6 h, 7.5–11 units | 12 units |
+| G3 | core curves re-read with `fp32_head` (if G1 confirms) | ~0.6–0.8 h, 4–5.5 units | 6 units |
+| G4 | main collection base (200 fresh questions) | §13.3; to be re-estimated from G2 | set after G2 |
+| E1–E3 | extensions | §13.3 | set after G2 |
+
 ### Second review (2026-10-29, afternoon): fixes before any GPU session
 
 These are binding in addition to the decisions above. Implementation and tests:

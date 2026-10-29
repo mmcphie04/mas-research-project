@@ -20,6 +20,13 @@ Message = dict[str, str]
 # 73% of first answers, and a truncated response has no stated answer. Raising the budget
 # multiplies cost; asking for concise reasoning fixes the cause.
 BREVITY = "Keep your reasoning concise: at most about 150 words."
+# The longer-response protocol (main collection, max_new_tokens 1280): an allowance, not a
+# minimum. A separate template, so the legacy one -- and every archive's hashes -- are unchanged.
+BREVITY_250 = "Keep your reasoning concise: at most about 250 words."
+
+
+def brevity_text(words: int = 150) -> str:
+    return {150: BREVITY, 250: BREVITY_250}[words]
 
 SYSTEM = """{persona} You are answering a multiple-choice question that may require several steps of reasoning.
 
@@ -112,8 +119,12 @@ ENDORSEMENT = 'A panel member comments: "I am confident the answer is ({letter})
 
 # Every string that can reach a prompt. tests/test_prompts.py fails if a module-level template
 # is missing here, because an unhashed template is an unrecorded protocol change.
+HISTORY_POLICY = ("own full transcript (round-0 prompt, own answers of every earlier round, every "
+                  "earlier instruction) + the peers' responses from the immediately preceding round only")
+
 TEMPLATES = {
     "brevity": BREVITY,
+    "brevity_250": BREVITY_250,
     "system": SYSTEM,
     "system_no_conf": SYSTEM_NO_CONF,
     "question": QUESTION,
@@ -130,6 +141,7 @@ TEMPLATES = {
     "structured_peer_block": STRUCTURED_PEER_BLOCK,
     "structured_self_block": STRUCTURED_SELF_BLOCK,
     "opening_prefill": OPENING_PREFILL,
+    "history_policy": HISTORY_POLICY,
     "candidate_system": CANDIDATE_SYSTEM,
     "candidate_block": CANDIDATE_BLOCK,
     "endorsement": ENDORSEMENT,
@@ -149,8 +161,9 @@ def round0_messages(
     options: list[str],
     perm: Permutation,
     ask_confidence: bool = True,
+    brevity: str = BREVITY,
 ) -> list[Message]:
-    system = (SYSTEM if ask_confidence else SYSTEM_NO_CONF).format(persona=persona, brevity=BREVITY)
+    system = (SYSTEM if ask_confidence else SYSTEM_NO_CONF).format(persona=persona, brevity=brevity)
     user = QUESTION.format(
         subject=subject, question=question, options=format_options(options, perm)
     )
@@ -164,6 +177,7 @@ def round1_messages(
     peer_responses: list[str] | None,
     ask_confidence: bool = True,
     structured: bool = False,
+    brevity: str = BREVITY,
 ) -> list[Message]:
     """Round-1 turn. ``peer_responses=None`` produces the self-reconsideration control;
     ``structured`` swaps in the decisive-issue -> check -> decision instruction.
@@ -173,18 +187,35 @@ def round1_messages(
     """
     ending = ENDING_CONF if ask_confidence else ENDING_NO_CONF
     if peer_responses is None:
-        block = (STRUCTURED_SELF_BLOCK if structured else SELF_BLOCK).format(brevity=BREVITY, ending=ending)
+        block = (STRUCTURED_SELF_BLOCK if structured else SELF_BLOCK).format(brevity=brevity, ending=ending)
     else:
         peers = "\n\n".join(
             PEER_ENTRY.format(idx=i + 1, text=r.strip()) for i, r in enumerate(peer_responses)
         )
         block = (STRUCTURED_PEER_BLOCK if structured else PEER_BLOCK).format(
-            peers=peers, brevity=BREVITY, ending=ending)
+            peers=peers, brevity=brevity, ending=ending)
     return [
         *base,
         {"role": "assistant", "content": own_response.strip()},
         {"role": "user", "content": block},
     ]
+
+
+def next_round_messages(
+    *,
+    previous: list[Message],
+    own_previous_response: str,
+    peer_responses: list[str] | None,
+    ask_confidence: bool = True,
+    structured: bool = False,
+    brevity: str = BREVITY,
+) -> list[Message]:
+    """A further revision round (HISTORY_POLICY): the agent's previous-round messages, its own
+    previous-round response as an assistant turn, then the same instruction block as round 1
+    with the peers' previous-round responses (``None``: reconsideration without peers)."""
+    nxt = round1_messages(base=[], own_response="", peer_responses=peer_responses,
+                          ask_confidence=ask_confidence, structured=structured, brevity=brevity)[-1]
+    return [*previous, {"role": "assistant", "content": own_previous_response.strip()}, nxt]
 
 
 CONF_LINE = re.compile(r"^\s*Confidence:\s*\d{1,3}\s*$", re.IGNORECASE | re.MULTILINE)

@@ -229,10 +229,18 @@ def _is_oom(exc: BaseException) -> bool:
 
 
 def read_items(backend, B: Build, items: pd.DataFrame, batch_size: int, mode: str, out: Path,
-               deadline: float | None, stats: list, flush_every: int = 25) -> str:
+               deadline: float | None, stats: list, flush_every: int = 25, head: str = "fp32_head",
+               on_flush=None) -> str:
     """Read ``items`` (longest first) in batches; returns 'complete', 'time_limit', 'interrupted'
-    or 'out_of_memory'. Completed rows are always flushed before returning."""
+    or 'out_of_memory'. Completed rows are always flushed before returning; ``on_flush`` (e.g.
+    a status writer) runs after every flush. Each row records its batch, its left padding and
+    the lengths of its batch-mates."""
     w = PartWriter(out, mode)
+
+    def flush():
+        w.flush()
+        if on_flush is not None:
+            on_flush()
     torch = getattr(backend, "torch", None)
     cuda = torch is not None and torch.cuda.is_available()
     items = items.sort_values("n_tokens", ascending=False)
@@ -248,7 +256,7 @@ def read_items(backend, B: Build, items: pd.DataFrame, batch_size: int, mode: st
                 torch.cuda.reset_peak_memory_stats()
             t = time.time()
             try:
-                lp = backend.letter_logprobs_ids(seqs, chunk.n_options.tolist(), batch_size=batch_size)
+                lp = backend.letter_logprobs_ids(seqs, chunk.n_options.tolist(), batch_size=batch_size, head=head)
             except RuntimeError as exc:
                 if _is_oom(exc):
                     state = "out_of_memory"
@@ -260,15 +268,17 @@ def read_items(backend, B: Build, items: pd.DataFrame, batch_size: int, mode: st
             stats.append({"mode": mode, "batch_size": batch_size, "n": len(seqs), "tokens": int(sum(map(len, seqs))),
                           "max_len": int(max(map(len, seqs))), "seconds": round(dt, 4),
                           "peak_gb": round(torch.cuda.max_memory_allocated() / 1e9, 2) if cuda else None})
+            width, lens = max(map(len, seqs)), ",".join(str(len(x)) for x in seqs)
             w.add([{"item": int(i), "mode": mode, "seq_hash": h, "n_options": int(n), "logprobs": v.tolist(),
-                    "batch_size": batch_size}
-                   for i, h, n, v in zip(chunk.item, chunk.seq_hash, chunk.n_options, lp, strict=True)])
+                    "batch_size": batch_size, "batch_index": bi, "pad": width - len(sq), "batch_lens": lens,
+                    "head": head}
+                   for i, h, n, v, sq in zip(chunk.item, chunk.seq_hash, chunk.n_options, lp, seqs, strict=True)])
             if (bi + 1) % flush_every == 0:
-                w.flush()
+                flush()
     except KeyboardInterrupt:
         state = "interrupted"
     finally:
-        w.flush()
+        flush()
     return state
 
 
@@ -361,24 +371,28 @@ def smoke_selection(B: Build, seed: int = 2026, per_cell: tuple[int, int] = (5, 
 
 
 def run(B: Build, out: Path, backend, identity: dict, *, how: str = "all", batch_size: int = 8,
-        max_minutes: float | None = None, expect_sources: list[str] | None = None) -> dict:
+        max_minutes: float | None = None, expect_sources: list[str] | None = None,
+        head: str = "fp32_head") -> dict:
     if expect_sources is not None and sorted(B.manifest["params"].get("source_sets", [])) != sorted(expect_sources):
         raise RunMismatch(f"build {B.dir} holds source sets {B.manifest['params'].get('source_sets')}, "
                           f"not {expect_sources}")
+    identity = {**identity, "readout_head": head}
     bind_output(out, B, identity, f"run:{how}")
     t0 = time.time()
     deadline = t0 + 60 * max_minutes if max_minutes else None
     wanted = select(B, how)
     stats: list = []
-    state = read_items(backend, B, _pending(out, B, wanted, "run"), batch_size, "run", out, deadline, stats)
+    state = read_items(backend, B, _pending(out, B, wanted, "run"), batch_size, "run", out, deadline, stats,
+                       head=head, on_flush=lambda: _status(out, B, {"run": wanted}, "running", t0, stats))
     fanned = _fan_out(out, B, wanted, "run")
     return _status(out, B, {"run": wanted}, state, t0, stats, {"copied_from_identical_inputs": fanned})
 
 
 def smoke(B: Build, out: Path, backend, identity: dict, *, batch_sizes=(4, 8, 16), max_minutes: float | None = None,
-          seed: int = 2026, gates: dict | None = None) -> dict:
+          seed: int = 2026, gates: dict | None = None, head: str = "fp32_head") -> dict:
     """Single-item reads of the smoke set, then the same inputs batched at each batch size; one
     deadline across all of it; then an explicit pass/fail report (``smoke_report``)."""
+    identity = {**identity, "readout_head": head}
     bind_output(out, B, identity, "smoke")
     t0 = time.time()
     deadline = t0 + 60 * max_minutes if max_minutes else None
@@ -387,7 +401,8 @@ def smoke(B: Build, out: Path, backend, identity: dict, *, batch_sizes=(4, 8, 16
     wanted = {"single": S, **{f"batch{bs}": S for bs in batch_sizes}}
     stats, state = [], "complete"
     for mode, bs in [("single", 1), *[(f"batch{b}", b) for b in batch_sizes]]:
-        state = read_items(backend, B, _pending(out, B, S, mode), bs, mode, out, deadline, stats)
+        state = read_items(backend, B, _pending(out, B, S, mode), bs, mode, out, deadline, stats, head=head,
+                           on_flush=lambda: _status(out, B, wanted, "running", t0, stats))
         _fan_out(out, B, S, mode)
         if state != "complete":
             break  # time limit, interruption or OOM stops the WHOLE smoke run

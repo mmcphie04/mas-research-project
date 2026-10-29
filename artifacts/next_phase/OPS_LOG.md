@@ -14,3 +14,16 @@
 | 16:47 | report: **FAIL**. Per the stop rule, no core run |
 | 16:47 | outputs packed (`smoke_out.tgz`, SHA-256 `ff6a9fa7…`), downloaded, hash matched, copied to `mas_backup/next_commit/` |
 | 16:48 | session stopped; balance **257.75** (this session: **1.11 units**, ~12 min) |
+
+## 2026-10-29: core curve run, batch size 1 (approved: "go ahead")
+
+| time | event |
+|---|---|
+| 16:53 | balance 257.75; hard stop at 251.75 (6 units); session `core` (A100) created; code at `0f4e29e` (no code change since `d7a251b`) |
+| 16:53 | setup verified (torch 2.11.0+cu130, transformers 5.17.0, A100-SXM4-40GB); build hash verified; `run --expect-sources core --batch-size 1 --max-minutes 45` launched detached |
+| 16:56–17:26 | polled every 4 min with balance checks (cap never approached). The runtime's code wrote status only at the end; fixed since (status at every flush) |
+| ~17:26 | complete: 13,851 / 13,851 items, 1,778 s of reading (**measured 29.6 min**, smoke projection 30.3) |
+| 17:30 | `core_out.tgz` (SHA-256 `4093f163…`) downloaded, hash matched, copied to `mas_backup/next_commit/`; session stopped; balance **254.05** (this session **3.70 units**, ~37 min) |
+
+Readout path: the model's bf16 logits (`bf16_logits`). Quantized to 0.0625–0.125 logit steps,
+deterministic at batch size 1 (§11 of the results). The default is now `fp32_head` (G3).

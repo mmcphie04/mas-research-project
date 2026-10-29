@@ -246,6 +246,15 @@ def check_chunk_dir(run_dir: Path, job: dict, i: int) -> None:
 VIEW_FILE = "view.json"
 
 
+def states_per_question(job: dict, cond: str) -> int:
+    """Rows a complete question has in a condition's view: one round-0 state per agent for the
+    independent ``pool``; otherwise round 0, exposure and revision for each PANEL agent."""
+    n = int(job["identity"]["config"]["debate"]["n_agents"])
+    spec = job["identity"].get("conditions", {}).get(cond) or {}
+    k = int(spec.get("panel", n))
+    return n if spec.get("kind") == "pool" else 3 * k
+
+
 def build_view(out_root: Path, job: dict, cond: str, *, verify_hashes: bool = True,
                force: bool = False, out: Path | None = None) -> Path | None:
     """A validated, read-only view over one condition's complete chunks. Copies no arrays.
@@ -262,7 +271,6 @@ def build_view(out_root: Path, job: dict, cond: str, *, verify_hashes: bool = Tr
     """
     out_root = Path(out_root)
     name = job["identity"]["name"]
-    n_agents = job["identity"]["config"]["debate"]["n_agents"]
     parts = []
     for i in range(len(job["chunks"])):
         d = out_root / f"{name}-{cond}-{chunk_tag(i)}"
@@ -298,9 +306,10 @@ def build_view(out_root: Path, job: dict, cond: str, *, verify_hashes: bool = Tr
     if idx.duplicated(["question_id", "agent_id", "phase", "position"]).any():
         raise JobMismatch(f"{cond}: duplicate activation keys across chunks")
     per_q = rows.groupby("question_id").size()
-    if (per_q != n_agents * 3).any():
+    want = states_per_question(job, cond)
+    if (per_q != want).any():
         raise JobMismatch(f"{cond}: questions with the wrong number of states: "
-                          f"{per_q[per_q != n_agents * 3].index[:5].tolist()}")
+                          f"{per_q[per_q != want].index[:5].tolist()}")
     shapes = {(int(m.iloc[0]["n_layers"]), int(m.iloc[0]["d_model"])) for m in metas}
     if len(shapes) != 1:
         raise JobMismatch(f"{cond}: chunks with different activation shapes {shapes}")
@@ -403,7 +412,6 @@ def verify_archive(out_root: Path, name: str) -> dict:
                 check_chunk_dir(d, job, i)
                 _check_hashes(d)
                 report["chunks"][d.name] = "ok"
-    n_agents = job["identity"]["config"]["debate"]["n_agents"]
     for cond, d in view_dirs(out_root, name).items():
         _compare_with_rebuild(out_root, job, cond, d)
         rows = pd.read_parquet(d / ROWS_FILE)
@@ -411,7 +419,7 @@ def verify_archive(out_root: Path, name: str) -> dict:
         ix = store.index
         if ix.duplicated(["question_id", "agent_id", "phase", "position"]).any():
             raise JobMismatch(f"{cond}: duplicate activation keys")
-        if (rows.groupby("question_id").size() != n_agents * 3).any():
+        if (rows.groupby("question_id").size() != states_per_question(job, cond)).any():
             raise JobMismatch(f"{cond}: a question has the wrong number of states")
         missing_rows = set(map(tuple, rows[["question_id", "agent_id", "phase"]].values)) - set(
             map(tuple, ix[ix.position == "readout_last"][["question_id", "agent_id", "phase"]].values))

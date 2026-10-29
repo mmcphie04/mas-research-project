@@ -453,15 +453,28 @@ class HFBackend(Backend):
             prev = cur
         return None
 
-    def letter_logprobs_ids(self, seqs: list[list[int]], n_options: list[int],
-                            batch_size: int | None = None) -> list[np.ndarray]:
-        """Option-letter log-probabilities at the LAST token of each id sequence: a prefill-only
-        pass with no hidden states returned (``mad.curves`` readouts store no activations).
+    HEADS = ("fp32_head", "bf16_logits")
 
-        Inputs are token ids built by the caller, never re-tokenised here. Left padding, as in
-        ``readout``; ``logits_to_keep=1`` for the same memory reason. Sequences are processed in
-        the order given; callers sort by length for throughput.
+    def letter_logprobs_ids(self, seqs: list[list[int]], n_options: list[int],
+                            batch_size: int | None = None, head: str = "fp32_head",
+                            position_ids_from_mask: bool = False) -> list[np.ndarray]:
+        """Option-letter log-probabilities at the LAST token of each id sequence (prefill only).
+
+        ``head``:
+          fp32_head    the final-layer hidden state at the last position, projected onto the
+                       option-letter rows in float32 with Gemma's soft-capping
+                       (``letter_logprobs_from_hidden``). The model's own logits tensor is
+                       bfloat16, whose spacing at Gemma's soft-capped logit scale (|z| ~ 16-30)
+                       is 0.0625-0.125: a one-step rounding difference moves a close two-letter
+                       contest by 0.15-0.4 in probability (docs/NEXT_PHASE_CPU_RESULTS.md s11).
+          bf16_logits  ``logits_to_keep=1`` logits as the model returns them -- the path of the
+                       saved peer_exposure readouts, kept for bridging to them.
+        Inputs are token ids built by the caller, never re-tokenised. Left padding, as in
+        ``readout``. ``position_ids_from_mask`` passes explicit positions (0 at the first real
+        token) instead of the model's default; diagnostics only.
         """
+        if head not in self.HEADS:
+            raise ValueError(f"unknown head {head!r}; expected one of {self.HEADS}")
         torch, mc = self.torch, self.cfg.model
         bs = batch_size or mc.readout_batch_size or mc.batch_size
         pad_id = self.tokenizer.pad_token_id
@@ -471,15 +484,20 @@ class HFBackend(Backend):
             width = max(len(x) for x in chunk)
             ids = torch.tensor([[pad_id] * (width - len(x)) + list(x) for x in chunk])
             mask = torch.tensor([[0] * (width - len(x)) + [1] * len(x) for x in chunk])
+            kw = {"input_ids": ids.to(self.device), "attention_mask": mask.to(self.device),
+                  "logits_to_keep": 1, "use_cache": False}
+            if position_ids_from_mask:
+                kw["position_ids"] = (mask.cumsum(-1) - 1).clamp(min=0).to(self.device)
             with torch.no_grad():
-                res = self.model(input_ids=ids.to(self.device), attention_mask=mask.to(self.device),
-                                 logits_to_keep=1, use_cache=False)
-            logits = res.logits[:, -1, :].float()
+                res = self.model(**kw, output_hidden_states=head == "fp32_head")
             for i in range(len(chunk)):
                 n = n_options[start + i]
-                lp = torch.log_softmax(logits[i, self._letter_ids[:n]], dim=-1)
-                out.append(lp.cpu().numpy().astype(np.float32))
-            del res, logits, ids, mask
+                if head == "fp32_head":
+                    out.append(self.letter_logprobs_from_hidden(res.hidden_states[-1][i, -1, :], n))
+                else:
+                    lp = torch.log_softmax(res.logits[i, -1, self._letter_ids[:n]].float(), dim=-1)
+                    out.append(lp.cpu().numpy().astype(np.float32))
+            del res, ids, mask
         return out
 
     def letter_logprobs_from_hidden(self, h_final, n: int) -> np.ndarray:

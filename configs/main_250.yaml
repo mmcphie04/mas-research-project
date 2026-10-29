@@ -1,0 +1,16 @@
+# Longer-response protocol (docs/NEXT_PHASE_PLAN.md, 2026-10-29 evening). Layer over
+# configs/base.yaml + configs/colab_12b.yaml. Versioned: debate.brevity_words=250 selects the
+# "about 250 words" template (prompts.BREVITY_250); the legacy 150-word archives are untouched and
+# never pooled with these samples.
+#   pool of 10 independent first answers per question (agents 0..9; panels 0-2 and 0-4 nested)
+#   max_new_tokens 1280 (proportional to 768 for 150 words); an allowance, not a minimum
+# Readout memory: a 5-agent round-1 readout can reach ~600 + 6 x 1280 tokens (~8.3k) and a
+# round-2 readout ~14k, each holding every layer's states; the readout batch is therefore 2 until
+# the pilot's stress pass shows more room.
+debate:
+  n_agents: 10
+  brevity_words: 250
+model:
+  max_new_tokens: 1280
+  batch_size: 8
+  readout_batch_size: 2

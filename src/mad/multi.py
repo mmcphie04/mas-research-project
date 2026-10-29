@@ -29,6 +29,15 @@ Conditions differ only in what the agent is shown before it revises:
   debate_structured_open
                       the same, with the assistant turn prefilled "Decisive issue:" (forced opening)
   self_structured     no peers, the structured instruction (structured reconsideration control)
+  pool                no revision: records the job's round-0 answers of EVERY agent (the shared
+                      pool of independent responses; n_agents may be 10)
+
+Panels. A revision condition may name ``panel: k``: it uses agents 0..k-1 of the round-0 pool,
+so a 3-agent panel is nested in a 5-agent panel, which is nested in the pool. Each agent sees the
+other k-1 panel members. A condition with ``round: 2`` and ``after: <round-1 condition>`` is a
+further synchronized round (P.HISTORY_POLICY): every agent sees its own full transcript and the
+panel peers' round-1 responses, in the same peer order as round 1; it is saved as its own
+output, so a run resumes at round boundaries.
 
 Peer order is randomised per (question, agent) from a stable seed and recorded, so "panel member
 1" is not systematically the lower-numbered agent or the fabricated one. Every DEBATE-FAMILY
@@ -80,7 +89,7 @@ class _NullGen:
 
 KINDS = ("self_reconsider", "debate", "debate_conf", "debate_answer_only", "adversarial",
          "misleading_one", "independent", "debate_structured", "debate_structured_open",
-         "self_structured")
+         "self_structured", "pool")
 STRUCTURED_KINDS = ("debate_structured", "debate_structured_open", "self_structured")
 PREFILL_KINDS = {"debate_structured_open": P.OPENING_PREFILL}
 # conditions whose peer order is the ordinary debate's (same texts, same order)
@@ -199,6 +208,7 @@ def generate_round0(cfg, questions, backend, perms, job="dev", chunk="c000") -> 
                 persona=cfg.debate.personas[a % len(cfg.debate.personas)],
                 subject=q.subject, question=q.question, options=list(q.options),
                 perm=perms[q.question_id], ask_confidence=cfg.debate.ask_verbalized_confidence,
+                brevity=P.brevity_text(cfg.debate.brevity_words),
             )
             prompt = backend.render(msgs)
             m0 = {"question_id": q.question_id, "agent_id": a, "phase": "pre", "condition": "shared",
@@ -302,7 +312,8 @@ def load_round0(out_dir: Path, identity: dict) -> Round0 | None:
 # ----------------------------------------------------------------------------- round 1
 
 
-def _peer_view(cfg, kind, cond, q, a, r0_ans, r0_stated, own_text, perms, gold, order_override=None):
+def _peer_view(cfg, kind, cond, q, a, r0_ans, r0_stated, own_text, perms, gold, order_override=None,
+               n_panel: int | None = None):
     """What agent ``a`` is shown, in display order, with a record of where each entry came from.
 
     Missingness policy: a real peer's shown answer is what that peer STATED (-1 if its response
@@ -310,12 +321,12 @@ def _peer_view(cfg, kind, cond, q, a, r0_ans, r0_stated, own_text, perms, gold, 
     text; answer-only peers with no stated answer show PEER_NO_ANSWER. The fallback is used only
     where it is labelled as such: the agent's own canonical answer and the panel vote.
     """
-    qid, n_agents = q.question_id, cfg.debate.n_agents
+    qid, n_agents = q.question_id, n_panel or cfg.debate.n_agents
     others = [b for b in range(n_agents) if b != a]
     pre = r0_ans[(qid, a)]
     shown = perms[qid].display_options(list(q.options))
     target = -1
-    if kind in ("self_reconsider", "independent", "self_structured"):
+    if kind in ("self_reconsider", "independent", "self_structured", "pool"):
         return None, [], [], target
     if kind == "misleading_one":
         # One dissenting peer, restrained wording, plus one genuine peer chosen at random. Two
@@ -354,7 +365,8 @@ def _peer_view(cfg, kind, cond, q, a, r0_ans, r0_stated, own_text, perms, gold, 
 
 def run_condition(cfg, questions, cond, r0: Round0, backend, perms, gold, final_dir: Path,
                   job="dev", chunk="c000", extra_manifest: dict | None = None,
-                  round0_dir: Path | None = None, peer_orders: dict | None = None) -> RunResult:
+                  round0_dir: Path | None = None, peer_orders: dict | None = None,
+                  prev_dir: Path | None = None) -> RunResult:
     """One condition's round 1 for one chunk, written atomically to ``final_dir``.
 
     With ``round0_dir`` (a saved, verified round 0 next to ``final_dir``), the round-0 states are
@@ -365,6 +377,12 @@ def run_condition(cfg, questions, cond, r0: Round0, backend, perms, gold, final_
     if kind not in KINDS:
         raise ValueError(f"unknown condition kind {kind!r}; expected one of {KINDS}")
     n_agents = cfg.debate.n_agents
+    k_panel = n_agents if kind == "pool" else int(cond.get("panel", n_agents))
+    if not 1 <= k_panel <= n_agents:
+        raise ValueError(f"{name}: panel {k_panel} outside 1..{n_agents}")
+    rnd = int(cond.get("round", 1))
+    brevity = P.brevity_text(cfg.debate.brevity_words)
+    prev = _load_previous_round(prev_dir, cond, questions, k_panel) if rnd > 1 else None
     n_opts = {q.question_id: q.n_options for q in questions}
     cfg.run_id = cond["run_id"]
     final_dir = Path(final_dir)
@@ -381,6 +399,8 @@ def run_condition(cfg, questions, cond, r0: Round0, backend, perms, gold, final_
         "backend_n_layers": backend.n_layers, "backend_d_model": backend.d_model,
         "peer_order_source": ("supplied (archived)" if peer_orders and kind in ("debate", *ORDER_STREAM)
                               else f"derived: stream {ORDER_STREAM.get(kind, kind)!r}"),
+        "panel": k_panel, "round": rnd, "history_policy": P.HISTORY_POLICY if rnd > 1 else "round 1",
+        "brevity_words": cfg.debate.brevity_words, "max_new_tokens": cfg.model.max_new_tokens,
         "chunk": chunk, "job": job, **(extra_manifest or {}),
     })
     writer = ActivationWriter(tmp, backend.n_layers, backend.d_model, cfg.activations.shard_size)
@@ -399,10 +419,12 @@ def run_condition(cfg, questions, cond, r0: Round0, backend, perms, gold, final_
     for i, (meta, gen, read) in enumerate(zip(r0.metas, r0.gens, r0.reads, strict=True)):
         m = {**meta, "condition": name}
         row = _row(cfg, m, gen, read, n_opts[m["question_id"]], gold, perms)
-        rows.append(row)
         r0_ans[r0.key(i)] = row["answer"]
         r0_stated[r0.key(i)] = row["freetext_answer"]
         own_text[r0.key(i)] = gen.text
+        if meta["agent_id"] >= k_panel:
+            continue  # not in this condition's panel
+        rows.append(row)
         transcripts.append({**m, "messages": r0.messages[i], "prompt": r0.prompts[i],
                             "text": gen.text, "token_ids": gen.token_ids,
                             "stop_reason": gen.stop_reason})
@@ -415,23 +437,34 @@ def run_condition(cfg, questions, cond, r0: Round0, backend, perms, gold, final_
     base_msgs = {r0.key(i): r0.messages[i] for i in range(len(r0.metas))}
 
     msgs1, prompts1, metas1 = [], [], []
-    for q in questions:
+    for q in questions if kind != "pool" else []:
         qid = q.question_id
-        for a in range(n_agents):
+        for a in range(k_panel):
             pre = r0_ans[(qid, a)]
-            panel = [r0_ans[(qid, b)] for b in range(n_agents) if b != a]
-            override = (peer_orders or {}).get((qid, a)) if kind in ("debate", *ORDER_STREAM) else None
-            texts, shown_ans, sources, target = _peer_view(cfg, kind, cond, q, a, r0_ans,
-                                                           r0_stated, own_text, perms, gold, override)
+            panel = [r0_ans[(qid, b)] for b in range(k_panel) if b != a]
+            if prev is not None:  # a further round: the panel peers' previous-round responses
+                pr = prev[(qid, a)]
+                sources = pr["sources"]
+                texts = [P.strip_confidence(prev[(qid, int(s.replace("agent", "")))]["text"]) for s in sources]
+                shown_ans = [prev[(qid, int(s.replace("agent", "")))]["stated"] for s in sources]
+                target, pre = -1, pr["answer"]
+                msgs = P.next_round_messages(previous=pr["messages"], own_previous_response=pr["text"],
+                                             peer_responses=texts if kind not in ("self_reconsider", "self_structured") else None,
+                                             ask_confidence=cfg.debate.ask_verbalized_confidence,
+                                             structured=kind in STRUCTURED_KINDS, brevity=brevity)
+            else:
+                override = (peer_orders or {}).get((qid, a)) if kind in ("debate", *ORDER_STREAM) else None
+                texts, shown_ans, sources, target = _peer_view(cfg, kind, cond, q, a, r0_ans, r0_stated, own_text,
+                                                               perms, gold, override, n_panel=k_panel)
+                if kind == "independent":
+                    msgs = base_msgs[(qid, a)]  # the round-0 prompt again, sampled afresh
+                else:
+                    msgs = P.round1_messages(base=base_msgs[(qid, a)], own_response=own_text[(qid, a)],
+                                             peer_responses=texts,
+                                             ask_confidence=cfg.debate.ask_verbalized_confidence,
+                                             structured=kind in STRUCTURED_KINDS, brevity=brevity)
             stated_shown = [x for x in shown_ans if x >= 0]  # missing answers do not vote
             maj = peer_majority(stated_shown) if stated_shown else None
-            if kind == "independent":
-                msgs = base_msgs[(qid, a)]  # the round-0 prompt again, sampled afresh
-            else:
-                msgs = P.round1_messages(base=base_msgs[(qid, a)], own_response=own_text[(qid, a)],
-                                         peer_responses=texts,
-                                         ask_confidence=cfg.debate.ask_verbalized_confidence,
-                                         structured=kind in STRUCTURED_KINDS)
             prompt = backend.render(msgs)
             planned = backend.plan_answer(phase="post", question_id=qid, agent_id=a, pre=pre,
                                           peer_majority=maj, condition=kind)
@@ -458,6 +491,7 @@ def run_condition(cfg, questions, cond, r0: Round0, backend, perms, gold, final_
                 "panel_peer_answers": ",".join(map(str, panel)),
                 "panel_peer_majority": -1 if pmaj is None else pmaj,
                 "n_panel_agree_pre": sum(1 for p in panel if p == pre),
+                "round": rnd, "previous_round_answer": pre if rnd > 1 else -1,
             })
             msgs1.append(msgs)
             prompts1.append(prompt)
@@ -465,12 +499,13 @@ def run_condition(cfg, questions, cond, r0: Round0, backend, perms, gold, final_
     # Third state: after the agent has seen the intervention but BEFORE it commits to a
     # revision. The post state exists only once the answer is decided, so it may be reading a
     # decision rather than predicting one.
-    metas_pe = [{**m, "phase": "peer_exposure", "pre_answer": r0_ans[(m["question_id"], m["agent_id"])],
+    metas_pe = [{**m, "phase": "peer_exposure",
+                 "pre_answer": (m["previous_round_answer"] if rnd > 1 else r0_ans[(m["question_id"], m["agent_id"])]),
                  "request_id": m["request_id"].replace("/post/", "/peer_exposure/"),
                  "gen_start_char": None}
                 for m in metas1]
     t_stage = time.time()
-    reads_pe = backend.readout(prompts1, [n_opts[m["question_id"]] for m in metas1], meta=metas_pe)
+    reads_pe = backend.readout(prompts1, [n_opts[m["question_id"]] for m in metas1], meta=metas_pe) if metas1 else []
     timings["exposure_readout_s"] = round(time.time() - t_stage, 2)
     validate_reads(reads_pe, metas_pe, f"{name} exposure")
     for m, read in zip(metas_pe, reads_pe, strict=True):
@@ -486,13 +521,15 @@ def run_condition(cfg, questions, cond, r0: Round0, backend, perms, gold, final_
     prefill = PREFILL_KINDS.get(kind, "")
     gen_prompts1 = [p + prefill for p in prompts1]
     t_stage = time.time()
-    gens1 = backend.generate(gen_prompts1, seed=seed1, meta=metas1)
+    gens1 = backend.generate(gen_prompts1, seed=seed1, meta=metas1) if metas1 else []
     timings["generation_s"] = round(time.time() - t_stage, 2)
     timings["generated_tokens"] = int(sum(g.n_completion_tokens for g in gens1))
+    timings["prompt_tokens"] = int(sum(g.n_prompt_tokens for g in gens1))
+    timings["capped_responses"] = int(sum(g.stop_reason == "length" for g in gens1))
     texts1 = [p + g.text for p, g in zip(gen_prompts1, gens1, strict=True)]
     ro_meta1 = [{**m, "gen_token_ids": g.token_ids} for m, g in zip(metas1, gens1, strict=True)]
     t_stage = time.time()
-    reads1 = backend.readout(texts1, [n_opts[m["question_id"]] for m in metas1], meta=ro_meta1)
+    reads1 = backend.readout(texts1, [n_opts[m["question_id"]] for m in metas1], meta=ro_meta1) if metas1 else []
     timings["readout_s"] = round(time.time() - t_stage, 2)
     validate_reads(reads1, metas1, f"{name} post")
     t_stage = time.time()
@@ -534,6 +571,35 @@ def run_condition(cfg, questions, cond, r0: Round0, backend, perms, gold, final_
     return RunResult(run_dir=final_dir, rows=frame, n_states=len(index), timings=timings)
 
 
+def _load_previous_round(prev_dir: Path | None, cond: dict, questions, k_panel: int) -> dict:
+    """The previous round's revisions of this chunk: {(qid, agent): {messages, text, answer, stated,
+    sources}}. Refuses an incomplete or mismatched directory."""
+    if prev_dir is None or not is_complete(Path(prev_dir)):
+        raise RuntimeError(f"{cond['name']}: previous round {cond.get('after')!r} is missing or incomplete")
+    man = json.loads((Path(prev_dir) / "manifest.json").read_text())
+    # the previous round may come from a parent job (a second round on a prespecified subset):
+    # its chunk must hold every question of this chunk
+    if man.get("condition") != cond.get("after") or not {q.question_id for q in questions} <= set(man.get("question_ids", [])):
+        raise RuntimeError(f"{prev_dir} is not {cond.get('after')!r} for these questions")
+    if int(man.get("panel", 0)) != k_panel or int(man.get("round", 1)) != int(cond.get("round", 2)) - 1:
+        raise RuntimeError(f"{prev_dir}: panel/round do not match {cond['name']}")
+    rows = pd.read_parquet(Path(prev_dir) / ROWS_FILE)
+    post = rows[rows.phase == "post"].set_index(["question_id", "agent_id"])
+    out = {}
+    for line in open(Path(prev_dir) / TRANSCRIPTS_FILE):
+        r = json.loads(line)
+        if r["phase"] != "post":
+            continue
+        k = (str(r["question_id"]), int(r["agent_id"]))
+        if k[0] not in {q.question_id for q in questions}:
+            continue
+        row = post.loc[k]
+        out[k] = {"messages": r["messages"], "text": r["text"], "answer": int(row.answer),
+                  "stated": int(row.freetext_answer),
+                  "sources": [s for s in (r.get("shown_peer_sources") or "").split(",") if s]}
+    return out
+
+
 def _combine_index(run_dir: Path, own: pd.DataFrame, refs: list[dict]) -> pd.DataFrame:
     """Referenced round-0 rows first (as if they were the first shards), then this directory's
     own shards; every row names its file and layout explicitly."""
@@ -542,10 +608,13 @@ def _combine_index(run_dir: Path, own: pd.DataFrame, refs: list[dict]) -> pd.Dat
     ref["shard"] = ref["shard_path"].map({f: i for i, f in enumerate(files)})
     ref["layout"] = "row_major"
     own = own.copy()
-    own["shard_path"] = [f"acts_{int(x):04d}.npy" for x in own["shard"]]
-    own["shard"] = own["shard"] + len(files)
-    own["layout"] = "layer_major"
-    index = pd.concat([ref, own], ignore_index=True)
+    if len(own):
+        own["shard_path"] = [f"acts_{int(x):04d}.npy" for x in own["shard"]]
+        own["shard"] = own["shard"] + len(files)
+        own["layout"] = "layer_major"
+        index = pd.concat([ref, own], ignore_index=True)
+    else:  # e.g. the independent pool: every state is a referenced round-0 state
+        index = ref.copy()
     index.to_parquet(run_dir / "activation_index.parquet", index=False)
     meta = pd.read_parquet(run_dir / "activation_meta.parquet")
     meta["n_states"] = len(index)
@@ -604,8 +673,12 @@ def run_chunk(
         if round0_dir:
             save_round0(r0, Path(round0_dir), ident)
     results: dict[str, RunResult] = {}
+    by_name = {c["name"]: c for c in conditions}
     for cond in conditions:
         final = (run_dirs or {}).get(cond["name"]) or Path(cfg.out_dir) / cond["run_id"]
+        after = cond.get("after")
+        prev_dir = (((run_dirs or {}).get(after) or Path(cfg.out_dir) / by_name[after]["run_id"])
+                    if after else None)
         if is_complete(final):
             results[cond["name"]] = RunResult(final, pd.read_parquet(final / ROWS_FILE),
                                               len(pd.read_parquet(final / "activation_index.parquet")))
@@ -613,5 +686,5 @@ def run_chunk(
         results[cond["name"]] = run_condition(cfg, questions, cond, r0, backend, perms, gold, final,
                                               job=job, chunk=chunk, extra_manifest=extra_manifest,
                                               round0_dir=Path(round0_dir) if round0_dir else None,
-                                              peer_orders=peer_orders)
+                                              peer_orders=peer_orders, prev_dir=prev_dir)
     return results, r0

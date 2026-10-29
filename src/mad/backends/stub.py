@@ -213,7 +213,8 @@ class StubBackend(Backend):
         return out
 
     def letter_logprobs_ids(self, seqs: list[list[int]], n_options: list[int],
-                            batch_size: int | None = None) -> list[np.ndarray]:
+                            batch_size: int | None = None, head: str = "fp32_head",
+                            position_ids_from_mask: bool = False) -> list[np.ndarray]:
         """A deterministic function of the id sequence (no model): equal sequences give equal
         distributions, which is all the curve plumbing tests need."""
         out = []

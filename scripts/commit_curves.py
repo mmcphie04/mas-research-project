@@ -130,7 +130,7 @@ def run(args) -> int:
     B = CR.load_build(Path(args.build))
     backend, ident = _backend(args)
     st = CR.run(B, Path(args.out), backend, ident, how=args.select, batch_size=args.batch_size,
-                max_minutes=args.max_minutes, expect_sources=args.expect_sources)
+                max_minutes=args.max_minutes, expect_sources=args.expect_sources, head=args.head)
     print(json.dumps({k: v for k, v in st.items() if k != "batches"}, indent=1, default=str))
     return 0 if st["state"] == "complete" else 2
 
@@ -138,7 +138,8 @@ def run(args) -> int:
 def smoke(args) -> int:
     B = CR.load_build(Path(args.build))
     backend, ident = _backend(args)
-    rep = CR.smoke(B, Path(args.out), backend, ident, batch_sizes=tuple(args.batch_sizes), max_minutes=args.max_minutes)
+    rep = CR.smoke(B, Path(args.out), backend, ident, batch_sizes=tuple(args.batch_sizes), max_minutes=args.max_minutes,
+                   head=args.head)
     print(json.dumps(rep, indent=1, default=str))
     return 0 if rep["overall"] == "PASS" else 1
 
@@ -165,6 +166,8 @@ def main(argv=None) -> int:
         r.add_argument("--backend", choices=["hf", "stub"], default="hf")
         r.add_argument("--config", default="configs/colab_12b.yaml")
         r.add_argument("--max-minutes", type=float, default=None)
+        r.add_argument("--head", choices=["fp32_head", "bf16_logits"], default="fp32_head",
+                       help="letter readout precision (part of the bound identity)")
         if name == "run":
             r.add_argument("--select", choices=["all", "retokenized"], default="all")
             r.add_argument("--batch-size", type=int, default=8)

@@ -209,3 +209,43 @@ def test_forced_opening_builds_pre_and_post_opening_contexts_separately():
     assert v[("bridge_after_opening", 0.0)].ids == tok.encode(prompt) + tok.encode("\nFinal answer: (")
     bad = C.build_items(tokenizer=tok, prompt=PROMPT, text=text, gen_ids=tok.encode(text), n_options=4, prefill=prefill)
     assert bad.status == "prefill_not_at_prompt_end"
+
+
+@pytest.mark.skipif(not HF, reason="transformers not installed (uv sync --extra hf)")
+def test_hf_fp32_head_matches_the_logits_path_in_float32_and_options_are_respected():
+    from mad.backends.base import build_backend
+    from mad.config import load_config
+
+    backend = build_backend(load_config("configs/base.yaml", "configs/smoke_tiny.yaml",
+                                        **{"activations.positions": ["readout_last", "before_stated_answer"]}))
+    tok = backend.tokenizer
+    prompt = backend.render([{"role": "user", "content": "Pick one: (A) x (B) y (C) z (D) w"}])
+    seqs = [tok.encode(prompt + "I think it is the third.\n\nAnswer: (", add_special_tokens=False),
+            tok.encode(prompt + "Answer: (", add_special_tokens=False)]
+    a = backend.letter_logprobs_ids(seqs, [4, 4], batch_size=2, head="fp32_head")
+    b = backend.letter_logprobs_ids(seqs, [4, 4], batch_size=2, head="bf16_logits")  # fp32 model on CPU
+    for x, y in zip(a, b, strict=True):
+        np.testing.assert_allclose(x, y, atol=1e-4)
+        assert x.shape == (4,) and abs(np.exp(x).sum() - 1) < 1e-5
+    c = backend.letter_logprobs_ids(seqs, [4, 4], batch_size=2, position_ids_from_mask=True)
+    np.testing.assert_allclose(c[1], a[1], atol=1e-4)  # the unpadded (longest) sequence is unaffected
+    with pytest.raises(ValueError):
+        backend.letter_logprobs_ids(seqs, [4, 4], head="nope")
+
+
+def test_option_letters_are_single_tokens_after_both_answer_prefixes():
+    """With the cached Gemma-3-12B tokenizer: after "\\n\\nAnswer: (" and "\\nFinal answer: (" every
+    option letter is exactly one token, the one the readout scores (no merge with "(")."""
+    pytest.importorskip("transformers")
+    from transformers import AutoTokenizer
+
+    try:
+        tok = AutoTokenizer.from_pretrained("google/gemma-3-12b-it", revision="96b6f1eccf38110c56df3a15bffe176da04bfd80",
+                                            local_files_only=True)
+    except Exception:
+        pytest.skip("Gemma-3-12B tokenizer not cached")
+    ids = [tok.encode(x, add_special_tokens=False)[0] for x in "ABCDEFGHIJ"]
+    for prefix in ("Some reasoning.\n\nAnswer: (", "Some reasoning.\nFinal answer: (", "<start_of_turn>model\nAnswer: ("):
+        base = tok.encode(prefix, add_special_tokens=False)
+        for letter, tid in zip("ABCDEFGHIJ", ids, strict=True):
+            assert tok.encode(prefix + letter, add_special_tokens=False) == [*base, tid], (prefix, letter)

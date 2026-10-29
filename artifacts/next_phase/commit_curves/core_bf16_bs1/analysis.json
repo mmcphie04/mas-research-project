@@ -1,0 +1,90 @@
+{
+ "label": "FINAL",
+ "build_id": "216216d7316fbb99466297822bc798981cc674ae99e213121bbd81e91b140db2",
+ "identity": {
+  "backend": "hf",
+  "repo_id": "google/gemma-3-12b-it",
+  "model_commit": "96b6f1eccf38110c56df3a15bffe176da04bfd80",
+  "chat_template_sha256": "7de1c58e208eda46e9c7f86397df37ec49883aeece39fb961e0a6b24088dd3c4",
+  "dtype": "torch.bfloat16"
+ },
+ "responses": 1539,
+ "missing_items": 0,
+ "paired_debate_minus_self_changed_is_eventual": {
+  "0.0": {
+   "questions": 71,
+   "mean_diff": 0.6291079812206573,
+   "lo": 0.5352112676056338,
+   "hi": 0.7183098591549296,
+   "favour_a": 60,
+   "favour_b": 2,
+   "ties": 9,
+   "sign_test_p": 8.474124180146703e-16
+  },
+  "0.1": {
+   "questions": 71,
+   "mean_diff": 0.4131455399061033,
+   "lo": 0.3098591549295775,
+   "hi": 0.5093896713615023,
+   "favour_a": 50,
+   "favour_b": 4,
+   "ties": 17,
+   "sign_test_p": 3.8029690507812575e-11
+  },
+  "0.25": {
+   "questions": 71,
+   "mean_diff": 0.29577464788732394,
+   "lo": 0.19014084507042253,
+   "hi": 0.3990610328638498,
+   "favour_a": 42,
+   "favour_b": 7,
+   "ties": 22,
+   "sign_test_p": 3.6245783263666453e-07
+  },
+  "0.5": {
+   "questions": 71,
+   "mean_diff": 0.2746478873239437,
+   "lo": 0.18544600938967137,
+   "hi": 0.3685446009389671,
+   "favour_a": 30,
+   "favour_b": 1,
+   "ties": 40,
+   "sign_test_p": 2.9802322387695312e-08
+  },
+  "0.75": {
+   "questions": 71,
+   "mean_diff": 0.20892018779342728,
+   "lo": 0.11261737089201876,
+   "hi": 0.30516431924882625,
+   "favour_a": 25,
+   "favour_b": 2,
+   "ties": 44,
+   "sign_test_p": 5.647540092468262e-06
+  },
+  "1.0": {
+   "questions": 71,
+   "mean_diff": 0.0,
+   "lo": 0.0,
+   "hi": 0.0,
+   "favour_a": 0,
+   "favour_b": 0,
+   "ties": 71,
+   "sign_test_p": null
+  }
+ },
+ "reproduction": {
+  "bridge_f0_vs_saved_exposure": {
+   "n": 1539,
+   "argmax_agreement": 0.9915529564652371,
+   "median_abs_dlogp_top": 2.0952915698289843e-05,
+   "max_abs_dlogp_any": 2.466493445663452
+  },
+  "exact_replay_vs_saved_before_stated_answer": {
+   "n": 1539,
+   "argmax_agreement": 0.9993502274204028,
+   "median_abs_dlogp_top": 0.0,
+   "max_abs_dlogp_any": 1.9757263211059568
+  },
+  "standard_f1_argmax_equals_stated": 0.9987004548408057
+ }
+}

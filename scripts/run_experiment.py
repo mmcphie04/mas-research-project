@@ -76,6 +76,19 @@ CONDITION_SPECS = {
     "debate_structured": {"kind": "debate_structured", "peer_confidence": False},
     "debate_structured_open": {"kind": "debate_structured_open", "peer_confidence": False},
     "self_structured": {"kind": "self_structured"},
+    # main collection (docs/NEXT_PHASE_PLAN.md, 2026-10-29 evening): a pool of n_agents (10)
+    # independent answers; nested 3- and 5-agent panels; ordinary and structured debate matched
+    # in initial answers, peer texts and peer order; optional second rounds and controls.
+    "pool": {"kind": "pool"},
+    "debate3": {"kind": "debate", "panel": 3, "peer_confidence": False},
+    "structured3": {"kind": "debate_structured", "panel": 3, "peer_confidence": False},
+    "debate5": {"kind": "debate", "panel": 5, "peer_confidence": False},
+    "structured5": {"kind": "debate_structured", "panel": 5, "peer_confidence": False},
+    "debate3_r2": {"kind": "debate", "panel": 3, "round": 2, "after": "debate3", "peer_confidence": False},
+    "structured3_r2": {"kind": "debate_structured", "panel": 3, "round": 2, "after": "structured3", "peer_confidence": False},
+    "debate5_r2": {"kind": "debate", "panel": 5, "round": 2, "after": "debate5", "peer_confidence": False},
+    "structured5_r2": {"kind": "debate_structured", "panel": 5, "round": 2, "after": "structured5", "peer_confidence": False},
+    "self_structured5": {"kind": "self_structured", "panel": 5},
 }
 DATASETS = {
     "mmlu-pro": ("TIGER-Lab/MMLU-Pro", "test"),
@@ -171,8 +184,11 @@ def smoke_checks(res: dict, r0, backend, cfg, n_q: int) -> dict:
     report = {}
     for cond, r in res.items():
         rows = r.rows
-        assert set(rows.phase) == {"pre", "peer_exposure", "post"}, f"{cond}: phases {set(rows.phase)}"
-        assert len(rows) == n_q * n_agents * 3, f"{cond}: {len(rows)} rows"
+        spec = CONDITION_SPECS.get(cond, {})
+        k = n_agents if spec.get("kind") == "pool" else int(spec.get("panel", n_agents))
+        phases, per = ({"pre"}, k) if spec.get("kind") == "pool" else ({"pre", "peer_exposure", "post"}, 3 * k)
+        assert set(rows.phase) == phases, f"{cond}: phases {set(rows.phase)}"
+        assert len(rows) == n_q * per, f"{cond}: {len(rows)} rows"
         store = ActivationStore(r.run_dir)
         assert store.n_layers == n_layers, f"{cond}: {store.n_layers} layers, expected {n_layers}"
         for layer in store.layer_range():  # every stored layer, not a sample
@@ -313,7 +329,7 @@ def position_fixture(backend, cfg, tol: float = 0.02) -> dict:
     return out
 
 
-def coverage(cfg, backend, questions) -> dict:
+def coverage(cfg, backend, questions, conditions: list[dict] | None = None) -> dict:
     """Token lengths over the WHOLE intended question set, from actually rendered prompts.
 
     Round-0 prompt lengths are measured for every question. The round-1 template's fixed
@@ -331,15 +347,31 @@ def coverage(cfg, backend, questions) -> dict:
     def r0(q):
         return P.round0_messages(persona=cfg.debate.personas[0], subject=q.subject, question=q.question,
                                  options=list(q.options), perm=make_permutation(q.n_options, q.question_id, 0),
-                                 ask_confidence=cfg.debate.ask_verbalized_confidence)
+                                 ask_confidence=cfg.debate.ask_verbalized_confidence,
+                                 brevity=P.brevity_text(cfg.debate.brevity_words))
 
     lens = [count(backend.render(r0(q))) for q in questions]
     base = r0(questions[int(np.argmax(lens))])
-    r1 = P.round1_messages(base=base, own_response="", peer_responses=["", ""],
-                           ask_confidence=cfg.debate.ask_verbalized_confidence)
-    overhead = count(backend.render(r1)) - count(backend.render(base))
-    worst_prompt = max(lens) + overhead + 3 * m
+    # the largest panel and the latest round requested set the worst case: a round-R prompt holds
+    # the agent's own R earlier responses and its k-1 peers' previous-round responses
+    rev = [c for c in (conditions or [{"kind": "debate"}]) if c.get("kind") != "pool"]
+    k = max([int(c.get("panel", cfg.debate.n_agents)) for c in rev] or [1])
+    rounds = max([int(c.get("round", 1)) for c in rev] or [0])
+    structured = any(c.get("kind", "").startswith(("debate_structured", "self_structured")) for c in rev)
+    brev = P.brevity_text(cfg.debate.brevity_words)
+    msgs = base
+    if rounds:
+        msgs = P.round1_messages(base=base, own_response="", peer_responses=[""] * (k - 1) if k > 1 else None,
+                                 ask_confidence=cfg.debate.ask_verbalized_confidence, structured=structured, brevity=brev)
+        for _ in range(rounds - 1):
+            msgs = P.next_round_messages(previous=msgs, own_previous_response="",
+                                         peer_responses=[""] * (k - 1) if k > 1 else None,
+                                         ask_confidence=cfg.debate.ask_verbalized_confidence, structured=structured,
+                                         brevity=brev)
+    overhead = count(backend.render(msgs)) - count(backend.render(base))
+    worst_prompt = max(lens) + overhead + ((rounds + k - 1) * m if rounds else 0)
     return {
+        "panel_max": k, "rounds_max": rounds,
         "exact_tokens": exact, "n_questions": len(questions), "token_cap": m,
         "round0_prompt_tokens": {"p50": int(np.percentile(lens, 50)), "p95": int(np.percentile(lens, 95)),
                                  "max": int(max(lens))},
@@ -563,6 +595,13 @@ def main(argv=None) -> int:
         desc = {"backend": "stub", "n_layers": cfg.stub.n_layers, "d_model": cfg.stub.d_model}
 
     conds_all = [{"name": c, **CONDITION_SPECS[c]} for c in args.conditions]
+    for i, c in enumerate(conds_all):  # a further round needs its previous round, listed earlier
+        if c.get("after") and c["after"] not in args.conditions[:i] and not (
+                parent and c["after"] in parent["identity"]["conditions"]):
+            raise SystemExit(f"{c['name']} needs {c['after']} listed before it in --conditions "
+                             "(or present in the parent job)")
+        if int(c.get("panel", 0)) > cfg.debate.n_agents:
+            raise SystemExit(f"{c['name']}: panel {c['panel']} exceeds debate.n_agents={cfg.debate.n_agents}")
     if parent:
         identity = {**parent["identity"], "name": name,
                     "conditions": {c["name"]: CONDITION_SPECS[c["name"]] for c in conds_all},
@@ -601,7 +640,7 @@ def main(argv=None) -> int:
     log(f"  job {name}: {sum(1 for c in job['chunks'] if c)} chunks; history: "
         f"{[h['event'] for h in job['history']]}")
 
-    cov = coverage(cfg, backend or _StubRender(cfg), intended)
+    cov = coverage(cfg, backend or _StubRender(cfg), intended, conds_all)
     log(f"  token coverage over all {len(intended)} intended questions: {cov}")
     stress_path = out_root / f"{name}-stress.json"
     if backend is not None and hasattr(backend, "stress") and not args.skip_stress:
@@ -663,6 +702,9 @@ def main(argv=None) -> int:
             continue
         tag = chunk_tag(i)
         dirs = {c: out_root / f"{name}-{c}-{tag}" for c in args.conditions}
+        # a further round whose previous round is not in this job comes from the parent's output
+        prev_dirs = {c["after"]: out_root / f"{args.parent}-{c['after']}-{tag}" for c in conds_all
+                     if c.get("after") and c["after"] not in args.conditions and parent}
         if all(is_complete(d) for d in dirs.values()):
             for d in dirs.values():
                 check_chunk_dir(d, job, i)
@@ -681,7 +723,7 @@ def main(argv=None) -> int:
                           "question_ids": parent["chunks"][i]} if parent else None)
             orders = archived_peer_orders(out_root, args.parent, tag) if parent else None
             res, r0 = run_chunk(cfg, part, conds, backend=backend, job=name, chunk=tag,
-                                round0_dir=out_root / f"{name}-round0-{tag}", run_dirs=dirs,
+                                round0_dir=out_root / f"{name}-round0-{tag}", run_dirs={**prev_dirs, **dirs},
                                 extra_manifest={"job_identity_sha256": job["identity_sha256"],
                                                 "split_assignment_sha256":
                                                     (job["identity"].get("split") or {}).get("assignment_sha256")},

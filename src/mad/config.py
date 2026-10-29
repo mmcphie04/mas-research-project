@@ -79,6 +79,11 @@ class DebateConfig:
     personas: list[str] = field(default_factory=lambda: ["You are a careful, methodical reasoner."])
     peer_shows_confidence: bool = False
     ask_verbalized_confidence: bool = True
+    # Response-length protocol (versioned): the word guidance in every prompt. 150 is the legacy
+    # protocol (pilot, validation; with max_new_tokens 768); 250 is the longer-response protocol
+    # of the main collection (with max_new_tokens 1280). The legacy value is omitted from the
+    # serialized config so that every existing job identity is unchanged.
+    brevity_words: int = 150
 
 
 @dataclass
@@ -121,7 +126,10 @@ class RunConfig:
         return Path(self.out_dir) / self.run_id
 
     def to_dict(self) -> dict[str, Any]:
-        return asdict(self)
+        d = asdict(self)
+        if d["debate"].get("brevity_words") == LEGACY_BREVITY_WORDS:
+            del d["debate"]["brevity_words"]  # legacy protocol: identical to pre-versioning identities
+        return d
 
     def hash(self) -> str:
         return config_hash(self.to_dict())
@@ -199,6 +207,8 @@ def config_from_dict(data: dict[str, Any]) -> RunConfig:
 
 
 CANONICAL_ANSWERS = ("stated", "readout")
+LEGACY_BREVITY_WORDS = 150
+BREVITY_WORDS = (150, 250)
 
 
 def validate(cfg: RunConfig) -> None:
@@ -210,6 +220,8 @@ def validate(cfg: RunConfig) -> None:
     if cfg.debate.canonical_answer not in CANONICAL_ANSWERS:
         raise ValueError(f"debate.canonical_answer={cfg.debate.canonical_answer!r}; "
                          f"expected one of {CANONICAL_ANSWERS}")
+    if cfg.debate.brevity_words not in BREVITY_WORDS:
+        raise ValueError(f"debate.brevity_words={cfg.debate.brevity_words}; expected one of {BREVITY_WORDS}")
     if cfg.debate.n_rounds != 1:
         raise ValueError("only one revision round is implemented (debate.n_rounds must be 1)")
     unknown = set(cfg.activations.positions) - set(POSITIONS)

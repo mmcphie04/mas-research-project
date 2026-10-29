@@ -1,0 +1,13 @@
+{
+ "build_id": "216216d7316fbb99466297822bc798981cc674ae99e213121bbd81e91b140db2",
+ "build_dir": "/content/next_commit/build_core",
+ "identity": {
+  "backend": "hf",
+  "repo_id": "google/gemma-3-12b-it",
+  "model_commit": "96b6f1eccf38110c56df3a15bffe176da04bfd80",
+  "chat_template_sha256": "7de1c58e208eda46e9c7f86397df37ec49883aeece39fb961e0a6b24088dd3c4",
+  "dtype": "torch.bfloat16"
+ },
+ "purpose": "run:all",
+ "created": "2026-10-29T20:55:28+0000"
+}

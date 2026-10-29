@@ -764,3 +764,312 @@ a measured cost of about +3 minutes on the core run.
 - **Updated core estimate** at the measured rate of 6.73 units/h: setup and model about 3 min,
   run about 30 min, packing and download about 3 min, so about 0.6 h ≈ **4–4.5 units**.
   Proposed cap 6 units, with `--max-minutes 45` on the run.
+
+## 11. The smoke's batched-vs-single discrepancies: diagnosis from the downloaded rows (CPU)
+
+This **corrects §10**. It is based on `scripts/smoke_discrepancy.py`, with outputs in
+`artifacts/next_phase/smoke/`:
+
+- `discrepancy_by_sequence.csv.gz`: one row per unique input sequence, giving every mode's full
+  probability vector and the metrics below;
+- `discrepancy_worst_and_controls.csv`: the 15 worst sequences plus 15 stable controls;
+- `discrepancy_summary.json`.
+
+**Reconstructing the batches.** The smoke rows did not record batch composition. It was
+reconstructed exactly as the runner formed it, and verified against every logged batch (sizes,
+token sums, maximum lengths), so each input's left-padding and batch-mates are exact.
+
+### 11.1 What §10 overstated
+
+- **Some tail differences are irrelevant, but not all.** The largest log-probability difference
+  falls on a letter with p < 10⁻³ in about 90% of sequences, and such differences are
+  practically unimportant. But:
+
+  | | batch 4 | batch 8 | batch 16 |
+  |---|---|---|---|
+  | unique sequences (347) with some letter's probability changed by > 0.05 | 4.6% | 3.8% | 3.5% |
+  | same, by > 0.10 | 2.6% | 1.4% | 1.2% |
+  | largest change | 0.40 | 0.34 | 0.36 |
+
+  Item-level shares are similar (> 0.05: 4.1% / 3.3% / 3.1%). These changes are not negligible.
+  They fall on the eventual answer and the correct answer in the worst cases, and the argmax flips
+  on 3 / 3 / 1 sequences.
+- **"Near-tie" was wrong.** A 0.62 vs 0.37 distribution is not a near-tie. One input with a 0.83
+  top margin (0.915 → 0.651) is among the worst.
+- **"Harmless bf16 rounding" was not established by §10.**
+
+### 11.2 Diagnosis: the readout's letter logits are bf16-quantized
+
+- **The pattern.** The changes take recurring discrete values across unrelated inputs:
+  0.776/0.223 ↔ 0.623/0.378, 0.915/0.085 ↔ 0.651/0.349, 0.559/0.436 ↔ 0.833/0.164. Their log-odds
+  are exact multiples of 0.125 (1.25 vs 0.50; 2.375 vs 0.625; 0.25 vs 1.625).
+- **The test.** In every smoke row, the gaps between the top letter and the next three lie on a
+  0.0625 grid (100%; 97.7% on a 0.125 grid).
+
+  | readout | gaps on the 0.0625 grid |
+  |---|---|
+  | archived `peer_exposure` readouts (same path: the model's own logits) | 100% |
+  | archived `before_stated_answer` readouts (fp32 projection of the final hidden state) | 1.5% (chance) |
+  | new curve readout (model logits) | 100% |
+
+- **The mechanism.** The model returns logits in bfloat16. At Gemma's soft-capped logit scale
+  (|z| ≈ 16–30) bf16 can only represent steps of 0.0625–0.125. Any tiny difference in the final
+  hidden state, such as a different kernel path for a batch, can move a letter's logit by one or
+  more whole steps. In a two-letter contest that moves the probability by 0.15–0.4.
+- **Not padding.** Several of the worst cases have **zero or one** padding token. Their shift is
+  *identical* at batch sizes 4, 8 and 16, so neither the padding amount nor the batch-mates
+  explains them. A batch-shape-dependent change in the final hidden state is the leading
+  explanation; G1 tests this directly.
+- **Every path is affected.** On the 85 inputs with archived references, the single, batch-4,
+  batch-8 and batch-16 reads each match the archive with about equal fidelity (worst |Δp|
+  0.04–0.08). Single reads are not uniquely correct; all paths carry the quantization.
+- **Not run-to-run variability.** Batched modes also disagree with each other (> 0.05 on 2–4%).
+  Single-read repeat variability has not been measured; G1 measures it.
+
+### 11.3 What this means and what changes
+
+- **Argmax metrics.** Curve metrics based on the argmax are affected only where two letters'
+  quantized logits are close. There were no exact ties among the 392 single reads.
+- **On the 40 smoke responses,** the six-point `is_eventual` curve under single and batch-4 reads
+  differs at one fraction by one response (0.775 vs 0.800 at f = 0.1). Probability-level summaries
+  differ by ≤ 0.007. This is not extrapolated to the full set.
+- **Fix implemented:** `HFBackend.letter_logprobs_ids(head="fp32_head")`, now the default. It
+  projects the final hidden state onto the option-letter rows in float32 with Gemma's
+  soft-capping. This is the path whose archived outputs are not quantized, and the 270m-model test
+  shows it equals the logits path when the model itself is float32. The head is part of the
+  output binding, so `bf16_logits` and `fp32_head` rows cannot be mixed.
+- **Also implemented:**
+  - rows record batch index, left padding and batch-mate lengths;
+  - the status file is written at every flush;
+  - an optional explicit-position path for the diagnostic.
+- **What remains unresolved without GPU:** whether batch shape changes the fp32-head readout
+  materially once quantization is removed, and how large single-read repeat variability is.
+  G1 answers both. The original smoke stays **FAIL**; no threshold was loosened.
+
+## 13. Proposed GPU steps (for review; none launched)
+
+All units are at the **observed 6.73 units/h** and must be re-checked per session. Measured and
+estimated quantities are labelled.
+
+### 13.1 G1: targeted readout diagnostic (`scripts/readout_diagnostic.py`)
+
+**Plan.** Fixed on CPU in `artifacts/next_phase/diagnostic/plan.json`:
+
+- 12 worst sequences + 8 stable controls, with exact token ids from the core build;
+- each target's original batch-of-4 composition;
+- partners giving pad 0 and pads of about 50, 300 and 1,500 tokens.
+
+**Conditions,** each read under both heads (`bf16_logits`, `fp32_head`); each changes one thing:
+
+| | condition | isolates |
+|---|---|---|
+| D1 | single read ×3 | run-to-run repeatability |
+| D2 | [target ×4], no padding | batch shape alone |
+| D3 | the original composition | reproduction of the smoke |
+| D4 | partner co-batches | padding amount and batch-mates |
+| D5 | D4 with explicit position ids | position handling |
+| D6 | D1 + D4 under `attn_implementation="eager"` | attention implementation, if switchable at runtime |
+
+**Audit.** Eval mode, attention implementation, sliding window, soft-cap, logits dtype,
+pad/mask conventions, letter ids and their decoding, and the bf16-vs-fp32 head gap. The
+option-letter tokenization after both answer prefixes is already verified on CPU
+(`tests/test_curves.py`). A full float32 12B model (~48 GB) is not attempted.
+
+**Estimated cost:**
+
+| item | estimate |
+|---|---|
+| work | ≈ 1,000 planned passes (≈ 2 M tokens, ≈ 6 min at the measured 6,000 tok/s; the fp32 head's hidden-state output may add ≤ 50%) + eager subset |
+| setup, model and packing | ≈ 10 min |
+| **total** | **0.3–0.45 h ≈ 2–3 units. Hard cap 4 units; `--max-minutes 20`** |
+
+**Commands** (same CLI route and checks as §9.7; `/content/session_env.json` carries the
+parameters):
+
+```
+# session_env.json: {"NAME": "diag", "CMD": ["scripts/readout_diagnostic.py", "run", "--build",
+#   "/content/next_commit/build_core", "--out", "/content/diag", "--max-minutes", "20"],
+#   "REQUIRE": {"/content/build_core.tgz": "4fb26825646e978ced65d236ea81a58bc8d525a5a6b3ef734b027a17f871d951"},
+#   "EXTRACT": {"/content/build_core.tgz": "/content/next_commit"}}
+colab new -s diag --gpu A100;  upload repo.bundle, build_core.tgz, session_env.json, curves_env.json, hf token
+colab exec -f artifacts/next_phase/ops/setup.py          # pinned commit (reads COMMIT from curves_env.json)
+colab exec -f artifacts/next_phase/ops/launch_cmd.py     # verifies REQUIRE, unpacks the build, starts detached
+colab exec -f artifacts/next_phase/ops/job_status.py     # poll
+# pack /content/diag, download, sha256, copy to mas_backup/next_commit/, colab stop
+python scripts/readout_diagnostic.py report --out runs/next_commit/diag    # CPU
+```
+
+**Decision rule** (fixed now):
+
+- **Quantization confirmed** if, under `fp32_head`, D2–D4 vs D1 shows at most 1% of targets
+  with max |Δp| > 0.05, while `bf16_logits` reproduces the smoke's jumps.
+- **Unresolved** if `fp32_head` still shows such jumps that track padding (D4) or positions (D5),
+  or that disappear under eager attention (D6). G3 would then stay at batch size 1 with
+  `fp32_head`, and the issue would be reported.
+
+### 13.2 G2: development timing pilot (new protocol)
+
+**Questions.** 12 validation-pool questions (positions 121–132:
+`artifacts/next_phase/pilot_questions.json`). They are development questions, never part of the
+fresh collection; 7 overlap the Stage 3 development set.
+
+**Parent job.**
+
+```
+python scripts/run_experiment.py --config configs/base.yaml configs/colab_12b.yaml configs/main_250.yaml \
+  --out-root /content/pilot --name pilot250 --dataset mmlu-pro --pool validation --pilot-size 120 \
+  --validation-size 200 --n-questions 12 --chunk 4 --set data.dataset_revision=b189ec765aa7ed75c8acfea42df31fdae71f97be \
+  --conditions pool debate3 structured3 debate5 structured5 --max-hours 1.2
+```
+
+It covers the 10-response pool, both panels and both prompts. A memory stress pass runs at the
+worst 5-agent readout length (≈ 8.3 k tokens) before chunk 1.
+
+**Second rounds and control** on 4 of the 12 (`pilot_r2_subset.json`), as a child job that
+reuses round 1:
+
+```
+python scripts/run_experiment.py --config configs/base.yaml configs/colab_12b.yaml configs/main_250.yaml \
+  --out-root /content/pilot --name pilot250_r2 --parent pilot250 \
+  --subset-ids artifacts/next_phase/pilot_r2_subset.json \
+  --conditions debate3_r2 structured3_r2 debate5_r2 structured5_r2 self_structured5 --max-hours 0.4
+```
+
+Its stress pass runs at the round-2 worst case (≈ 14 k tokens).
+
+**Measured outputs:**
+
+- per-condition generation time;
+- input and output tokens;
+- capped responses and parse rates (chunk completion `timings`, rows);
+- peak memory at the configured batches;
+- activation bytes;
+- laptop backup time (`colab_backup.py watch`) and the off-device copy size.
+
+**Estimate** (scaling the measured validation per-response times by 1.4–2.0 for the longer
+protocol):
+
+| item | minutes |
+|---|---|
+| pool | 17–24 |
+| debate | 18–27 |
+| second rounds | 7–11 |
+| control | 2–3 |
+| two stress passes | ≈ 10 |
+| setup and dataset | ≈ 7 |
+| backup | 5–10 |
+| **total** | **1.1–1.6 h ≈ 7.5–11 units. Hard cap 12 units** |
+
+`--max-hours` is set per job.
+
+### 13.3 Main collection and extensions (estimates; G2 replaces them with measurements)
+
+**Measured base** (validation run, A100, 150 words / 768 cap, generation batch 8, readout batch 4):
+
+| step | measured |
+|---|---|
+| first answers (with readout) | 6.05 s per response |
+| independent re-answers | 5.66 s |
+| debate revisions | 3.51 s, + 0.46 s for their two readouts with activations |
+| response lengths | median 161 tokens (first answers), 142 (revisions); 4.8% of first answers hit the cap |
+| peak memory reserved | 41.6 of 42.4 GB |
+
+**Assumptions for 250 words / 1,280 cap:**
+
+- generation ×1.4–2.0 per response;
+- debate readouts ×1.5–3.0 (longer 5-agent contexts, readout batch 2);
+- second-round generation ×1.8–2.6.
+
+| item | content | inference (generation) | extraction (readouts + activations) | storage (all 49 layers / R1 band only) | units at 6.73/h |
+|---|---|---|---|---|---|
+| **Base G4** | 200 q × 26 responses | 8.3–11.9 h | 1.0–1.6 h | 11.5 GB / 2.1 GB | 63–91 (+ sessions 5–7) = **68–98** |
+| E1 second round | 50 q × 16 | 1.4–2.0 h | 0.2–0.4 h | 2.2 GB / 0.4 GB | **11–16** |
+| E2 structured reconsideration control | 50 q × 5 | 0.34–0.49 h | 0.05–0.1 h | 0.7 GB / 0.1 GB | **2.7–4** |
+| E3 curves, full | 3,200 revisions × 8 passes, ≈ 61 M tokens | — | 2.8–4.2 h (diagnostic readouts, bs 1, no activations) | < 0.1 GB | **19–28** |
+| E3 curves, subset | 50 q | — | 0.7–1.05 h | < 0.1 GB | **4.7–7** |
+| session overhead | per session: setup + model ≈ 5 min, dataset ≈ 2 min, final verification/backup 10–20 min | | | | ≈ 1.5–3 per session |
+
+**Feasibility.** Balance after this session ≈ 254 units. Base + E1 + E2 + E3-subset ≈ 86–125
+units, which fits. E3-full adds 19–28.
+
+**Recommendation.** Decide E3 full vs subset after G2 measures readout throughput on the new
+contexts.
+
+**Storage and backup.** Raw archives go to the laptop by the acknowledged backup tool, with a
+verified second copy. **An off-device copy is still not configured** (§9.5); for an ~15 GB
+collection it should exist before G4.
+
+**Activation retention.** Keeping all 49 layers is the agreed default. Keeping only R1's band
+(layers 15–39, step 3) would cut storage by about 82%. Decision for review.
+
+## 12. Core prediction curves (GPU run 2026-10-29, batch size 1, `bf16_logits` head)
+
+**Run.** Approved ("go ahead") before the evening review arrived. It ran at batch size 1, as the
+review also asked. Session log: `artifacts/next_phase/OPS_LOG.md`.
+
+- **Measured:** 29.6 min of reading for 13,851 inputs; 3.70 units for the session.
+- **Coverage:** complete (13,851 / 13,851), so this is the **FINAL** analysis
+  (`artifacts/next_phase/commit_curves/core_bf16_bs1/`).
+- **Caveat:** these readouts use the quantized bf16-logits head (§11). They are deterministic at
+  batch size 1, but every letter logit is rounded to 0.0625–0.125. Argmax-based curves are
+  affected only where two letters' rounded logits are close. G3 would re-read the same inputs
+  with `fp32_head` (estimate 4–5.5 units).
+
+**Reproduction against the archives** (same inputs, different prefix-free contexts):
+
+| comparison | argmax agreement | median \|Δ log p\| (top) |
+|---|---|---|
+| bridge f = 0 vs saved exposure | 99.2% | 2×10⁻⁵ |
+| exact replay vs saved `before_stated_answer` | 99.9% | 0 |
+
+At f = 1 the standardized readout's argmax equals the stated answer in 99.87% of responses (a
+measurement, not an assumption).
+
+**Curves.** Exploratory: the pilot and validation questions were seen. The standardized prefix
+is `Answer: (`. Pooled; question-cluster bootstrap 95% intervals in `curves.csv`.
+
+*Argmax equals the eventual answer:*
+
+| responses | 0% | 10% | 25% | 50% | 75% | 100% |
+|---|---|---|---|---|---|---|
+| debate, changed (n = 251) | **0.77** [0.71, 0.82] | 0.76 | 0.81 | 0.90 | 0.95 | 1.00 |
+| reconsideration, changed (n = 308) | **0.15** [0.10, 0.20] | 0.37 | 0.53 | 0.71 | 0.84 | 1.00 |
+| debate, unchanged | 0.97 | 0.98 | 0.98 | 0.99 | 0.99 | 1.00 |
+| reconsideration, unchanged | 0.95 | 0.87 | 0.89 | 0.88 | 0.93 | 1.00 |
+
+**Paired gap** (debate − reconsideration, changed answers, per question; 71 questions):
+
+| fraction | gap [95% CI] | questions favouring debate / reconsideration | sign test |
+|---|---|---|---|
+| 0% | +0.63 [0.54, 0.72] | 60 / 2 | p < 0.001 |
+| 25% | +0.30 | | |
+| 50% | +0.28 | | |
+| 75% | +0.21 | | |
+
+**Correctness** (argmax equals the answer key, changed answers):
+
+- Debate is flat at about 0.30–0.35 across fractions.
+- Reconsideration falls from 0.43 at 0% to 0.21 at 100%.
+- For **harmful** reconsideration changes, the readout before the agent writes anything still
+  picks the correct answer 86% of the time. It falls to 0% as the agent writes its way off it.
+- For harmful debate changes the 0% readout is already off the correct answer (0.23 correct).
+
+**Comparison with the paper (Figure 1).** The direction is the same as the paper's: Qwen 65 vs
+22, Llama 52 vs 35, Gemma-4 48.5 vs 13 at f = 0. Our gap is larger, and kept answers sit at
+95–97% at f = 0, close to the paper's 97–99%.
+
+**The prefix matters for reconsideration.** The saved-exposure preview (§3), which used
+`\nFinal answer: (`, put reconsideration's f = 0 at 0.41 (changed) and 0.79 (unchanged). Under the
+agents' own `Answer: (` format these are 0.15 and 0.95. Debate is much less prefix-sensitive
+(0.82 vs 0.77).
+
+**Not shown here:** the extra conditions and the paper's filler and cross-item controls (not run).
+
+## 14. Tests for §11–§13
+
+| suite | result |
+|---|---|
+| `tests/test_panels.py` (new, 11) | pool and nested panels with identical initial answers; 5-agent panels showing 4 peers, matched across prompts; second-round history policy, order and previous answers; versioned 250-word protocol applied everywhere; per-condition archive verification; legacy identity unchanged; round ordering; worst-case lengths; second round on a subset from the parent's round 1; panel-event categories; nested independent prefixes |
+| `tests/test_curve_runner.py` (13) | adds the readout head as bound identity, batch composition in rows, status while running |
+| `tests/test_curves.py` (15) | adds fp32 head = logits path on a float32 model, explicit positions, and option letters as single tokens after both prefixes (cached 12B tokenizer) |
+| full suite | 304 passed; ruff clean |

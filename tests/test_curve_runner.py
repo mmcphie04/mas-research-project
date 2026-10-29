@@ -41,7 +41,7 @@ class Fake:
     def describe(self):
         return {"backend": self.name, "repo_id": "test", "model_commit": "x", "chat_template_sha256": "y", "dtype": "f32"}
 
-    def letter_logprobs_ids(self, seqs, n_options, batch_size=None):
+    def letter_logprobs_ids(self, seqs, n_options, batch_size=None, head="fp32_head", **kw):
         self.calls += 1
         if self.interrupt_on is not None and self.calls == self.interrupt_on:
             raise KeyboardInterrupt
@@ -230,3 +230,34 @@ def test_smoke_report_passes_only_when_reproduction_holds(tmp_path):
                                                     "exact_replay_vs_saved_before_stated_answer"}
     sel = pd.read_csv(tmp_path / "s1" / "smoke_selection.csv")
     assert {"stratified_response", "longest_input"} <= set(sel.why)
+
+
+def test_readout_head_is_part_of_the_bound_identity_and_rows_record_batches(tmp_path):
+    B = _build(tmp_path / "b")
+    f = Fake()
+    CR.run(B, tmp_path / "o", f, _ident(f), batch_size=4, head="bf16_logits")
+    with pytest.raises(CR.RunMismatch, match="identity"):
+        CR.run(B, tmp_path / "o", f, _ident(f), batch_size=4, head="fp32_head")
+    rows = CR.load_rows(tmp_path / "o", B)
+    read = rows[rows.copied_from_identical_input.isna()]
+    assert {"batch_index", "pad", "batch_lens", "head"} <= set(rows.columns)
+    assert (read.pad >= 0).all() and (read["head"] == "bf16_logits").all()
+    for _, g in read.groupby("batch_index"):  # pads are relative to the longest batch-mate
+        lens = [int(x) for x in g.batch_lens.iloc[0].split(",")]
+        assert g.pad.min() == 0 and g.pad.max() == max(lens) - min(lens)
+
+
+def test_status_is_written_while_running(tmp_path):
+    B = _build(tmp_path / "b")
+    seen = []
+
+    class Watch(Fake):
+        def letter_logprobs_ids(self, seqs, n_options, batch_size=None, head="fp32_head", **kw):
+            p = tmp_path / "o" / "run_status.json"
+            if p.exists():
+                seen.append(json.loads(p.read_text())["state"])
+            return super().letter_logprobs_ids(seqs, n_options, batch_size)
+
+    w = Watch()
+    st = CR.run(B, tmp_path / "o", w, _ident(w), batch_size=1)
+    assert "running" in seen and st["state"] == "complete"
