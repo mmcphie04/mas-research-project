@@ -1,8 +1,9 @@
 # Next-phase plan (2026-10-29): commitment curves, structured debate, next-action prediction
 
-**Status: PLAN ONLY. Nothing below has been run.** No GPU work has been launched, and none of
-the substantive analyses has started. Each stage needs explicit approval. Completed findings stay
-in their own documents; this file holds only intentions, estimates and decision rules.
+**Status (amended 2026-10-29 after review).** The decisions in the next section are binding
+and supersede any conflicting text further down. **Stage 0 (implementation and CPU work) is
+approved.** No GPU session may start until the implementation and CPU findings have been reviewed.
+CPU results are reported in docs/NEXT_PHASE_CPU_RESULTS.md, not here.
 
 **Exploratory status.** Any analysis that reuses the pilot (master positions 1–120) or the
 validation tranche (121–320) is exploratory: those questions have already been examined.
@@ -10,6 +11,147 @@ Positions 321 and later stay reserved for fresh final evaluation (docs/preregist
 
 **Labels used throughout.** "Measured" marks numbers taken from logs or archives. "Estimate" marks
 projections, given with the assumptions behind them.
+
+## Review decisions (2026-10-29)
+
+1. **Prediction-curve prefix.**
+   - Primary standardized prefix: `Answer: (`. At f > 0 it follows a blank-line separator
+     (`reasoning + "\n\n" + "Answer: ("`); at f = 0 it comes directly after the generation
+     prompt.
+   - Two bridge readouts keep our existing suffix `\nFinal answer: (` at f = 0 and f = 1.
+   - The CPU preview uses the saved exposure probabilities.
+2. **Exact replay and the standardized measurement are kept separate.**
+   - **Exact replay** reproduces the saved `before_stated_answer` letter probabilities from the
+     original token sequence (stored prompt ids + generated ids), ending immediately before the
+     answer letter.
+   - The **standardized 100% readout** (reasoning + `\n\nAnswer: (`) is computed separately.
+     The two need not be identical, because formatting and tokenization can differ.
+   - A readout that has already seen the answer is never the 100% point.
+   - Sampled answers need not equal the most probable letter, so "argmax = stated answer" is a
+     measured rate, not an assumption.
+3. **Token construction.**
+   - Saved generated token ids are preserved, and every truncation boundary is validated (logged
+     when decode(ids[:k]) differs from the character cut).
+   - The paper's re-tokenization variant is implemented for comparison. Running it on the GPU
+     awaits review.
+4. **Coverage.**
+   - Eligibility stays as proposed: the revision's own and previous answers must be *stated*.
+   - All eligible unchanged responses are read.
+   - Exclusions are reported by condition and reason.
+   - A capped response is **not** excluded merely for hitting the cap if it still contains a
+     valid stated answer.
+5. **Action selection: final-panel voting.**
+   - stop = the 3 initial answers;
+   - debate = the 3 revised answers;
+   - additional sampling = the 6 independent answers.
+
+   Exact expected accuracy is computed under uniformly random tie-breaking. Fractional outcomes
+   are supported throughout training and reporting: classifiers accept fractional labels, nothing
+   is cast to integers, and fix/harm is reported as expected gains and losses. Focused tests are
+   added. The old pooled-vote analysis is preserved separately.
+6. **Development set:** the seeded 70 disputed + 20 unanimous validation questions are approved.
+   The two groups are reported separately. Raw accuracy on this enriched sample is not benchmark
+   accuracy. Fresh evaluation questions (positions 321+) stay untouched.
+7. **Structured prompt.** The order stays decisive issue → check → decision, with the same
+   150-word guidance. "Change only if you identify an error" is replaced by: *"Choose the answer
+   best supported by your check. Explain the specific evidence or reasoning supporting your
+   decision; agreement alone is insufficient."* The optional forced opening is `Decisive issue:`.
+8. **Controls and curves.**
+   - Structured reconsideration *without peers* is a priority control.
+   - Six-point prediction curves are budgeted for the newly generated structured responses and
+     the matched current-debate controls, not just for existing responses.
+   - Measured tokens and time are reported: equal generation counts are not equal computational
+     cost.
+9. **Actual checking.**
+   - The same ~40 question–agent cases are coded in every condition, selected before any new
+     output is viewed. Any extra changed-answer sample is analyzed separately.
+   - A 20% subset is prepared for independent second coding. It is not assumed that anyone will
+     do it, and nothing is blocked on it.
+   - "Beat the better of two baseline samples" is replaced by a prespecified paired comparison
+     with uncertainty (§C.4 as amended below).
+10. **Storage.**
+    - No activation arrays for the intermediate curve readouts.
+    - The existing activation collection is kept for new debate responses.
+    - Archives are verified and the pilot's second copy is created.
+    - An off-device backup destination is identified; if none is configured, that is reported
+      without blocking CPU work.
+11. **Stage 4 stays deferred.** Its sample requirement is re-estimated after the corrected voting
+    analysis. The 85-discordant-question estimate and the 20% threshold are provisional planning
+    assumptions, not universal requirements.
+
+### Amended Stage 3 design and gate (replaces the corresponding parts of §C and §Gates)
+
+**Conditions.** All on the 90 development questions, reusing the archived round-0 answers:
+
+| condition | source |
+|---|---|
+| current debate, sample 1 | existing val12b revisions |
+| current debate, sample 2 | same-session re-run |
+| **structured debate** | new |
+| **structured reconsideration without peers** | new; priority control |
+| plain reconsideration | existing val12b-self for the first 100 questions; generated for the rest |
+| independent answers | existing |
+| *optional:* forced opening `Decisive issue:` | new |
+
+**Curves.** Six-point prediction curves (and the bridge readouts) for:
+
+- current-debate sample 2;
+- structured debate;
+- structured reconsideration;
+- the forced opening, if it is run.
+
+Existing sample-1 and reconsideration responses are covered by Stage 2.
+
+**Prespecified paired comparison.** Primary contrast: structured debate − current debate
+sample 2 (same session).
+
+| outcome | unit and method |
+|---|---|
+| **checking** | on the preselected ~40 question–agent cases: the paired difference in the share of revisions coded "decisive point engaged and actually checked" (codebook of the transcript review), with a case-cluster bootstrap 95% interval |
+| **accuracy** | the per-question paired difference in mean per-agent revised accuracy, reported separately for the 70 disputed and 20 unanimous questions, with a question-bootstrap 95% interval. Also the final-panel vote accuracy (exact random-tie expectation) |
+| **revisions** | expected helpful and harmful counts per question, paired, with intervals |
+| **cost and failure** | truncation share, parse failures, generated tokens and GPU seconds per revision (measured) |
+
+Secondary contrasts:
+
+- structured reconsideration − plain reconsideration (does structure help without peers?);
+- structured debate − structured reconsideration (does peer exposure add anything once
+  structured?);
+- current sample 2 − sample 1 (run-to-run noise).
+
+**Gate to a fresh-question confirmation** (separate approval). All four must hold:
+
+- (i) the checking difference is positive and its 95% interval excludes 0;
+- (ii) the disputed-question accuracy difference is ≥ 0, with a lower 95% bound ≥ −0.05
+  (non-inferiority margin, fixed now);
+- (iii) truncation ≤ 5% of structured revisions;
+- (iv) measured tokens per revision are reported. There is no fixed cost ceiling, but a cost
+  above 1.5× current must be justified.
+
+Otherwise the result is reported as a negative or inconclusive development result.
+
+### Amended GPU estimates (estimates; Stage 3 now includes new conditions and their curves)
+
+| stage | A100-h | units at 5.30/h | cap |
+|---|---|---|---|
+| 1 stress test | 0.4–0.7 | 2.1–3.7 | 6 |
+| 2 curves on existing responses (core) | 0.6–1.1 | 3.2–5.8 | 8 |
+| 2+ extra conditions / paper controls / re-tokenization comparison | +0.3–0.6 | +1.6–3.2 | +4 |
+| 3 development run | 1.5–2.4 | 8–13 | **15** |
+| 3+ forced opening (+ curves), 2-round subset | +0.5–0.9 | +2.7–4.8 | +5 |
+| **phase total** (minimum / with Stage 3 / everything) | **1.0–1.8 / 2.5–4.2 / 3.3–5.7** | **5–10 / 13–22 / 17–30** | **38** |
+
+**Stage 3 breakdown** (90 questions):
+
+| item | estimate |
+|---|---|
+| current-debate re-run | ≈ 16 min (measured 10.5 s/question) |
+| structured debate | 16–24 min |
+| structured reconsideration | 12–20 min |
+| plain reconsideration for ≈ 44 questions | ≈ 11 min (measured 14.8 s/question) |
+| post and exposure readouts with activations | 5–8 min |
+| curves: 3 new conditions × 270 responses × 8 passes ≈ 6,500 passes | 12–24 min (at 4.6–9 passes/s) |
+| overhead and backup | 20–30 min |
 
 ## Goals
 
@@ -342,9 +484,8 @@ Before giving your answer again, do three things.
 2. Check: Redo that step yourself. For a calculation, recompute it and state the number you get.
    For a fact or definition, state what you know and how sure you are. Another panel member's
    statement that something is correct is not a check.
-3. Decision: Say whether you keep or change your answer, citing the result of your check. Change
-   your answer only if your check shows an error in your earlier reasoning; other members
-   agreeing with each other is not by itself a reason to change.
+3. Decision: Choose the answer best supported by your check. Explain the specific evidence or
+   reasoning supporting your decision; agreement alone is insufficient.
 {brevity} {ending}
 ```
 
