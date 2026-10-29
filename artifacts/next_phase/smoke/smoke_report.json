@@ -1,0 +1,149 @@
+{
+ "overall": "FAIL",
+ "identity": {
+  "backend": "hf",
+  "repo_id": "google/gemma-3-12b-it",
+  "model_commit": "96b6f1eccf38110c56df3a15bffe176da04bfd80",
+  "chat_template_sha256": "7de1c58e208eda46e9c7f86397df37ec49883aeece39fb961e0a6b24088dd3c4",
+  "dtype": "torch.bfloat16"
+ },
+ "build_id": "216216d7316fbb99466297822bc798981cc674ae99e213121bbd81e91b140db2",
+ "gates": {
+  "reproduction_argmax_min": 0.975,
+  "reproduction_median_dlogp_max": 0.05,
+  "batched_argmax_min": 0.99,
+  "batched_median_dlogp_max": 0.02,
+  "batched_max_dlogp_max": 0.1,
+  "peak_gb_max": 38.0,
+  "projected_core_minutes_max": 78.0
+ },
+ "checks": {
+  "smoke_complete": {
+   "value": {
+    "single": 0,
+    "batch4": 0,
+    "batch8": 0,
+    "batch16": 0
+   },
+   "pass": true,
+   "gated": true
+  },
+  "finite_and_normalised": {
+   "value": 1568,
+   "pass": true,
+   "gated": true,
+   "note": "every stored row passed validation on load"
+  },
+  "bridge_f0_vs_saved_exposure": {
+   "value": {
+    "n": 40,
+    "argmax_agreement": 1.0,
+    "median_abs_dlogp_top": 6.741472235415128e-05,
+    "max_abs_dlogp_any": 1.6195931903076168
+   },
+   "pass": true,
+   "gated": true
+  },
+  "exact_replay_vs_saved_before_stated_answer": {
+   "value": {
+    "n": 45,
+    "argmax_agreement": 1.0,
+    "median_abs_dlogp_top": 1.1920928244535389e-07,
+    "max_abs_dlogp_any": 0.5172860714721672
+   },
+   "pass": true,
+   "gated": true
+  },
+  "retokenized_vs_saved_ids": {
+   "value": {
+    "n": 6,
+    "argmax_agreement": 1.0,
+    "median_abs_dlogp_top": 8.581620932091027e-06,
+    "max_abs_dlogp_any": 0.6755086183547974
+   },
+   "pass": null,
+   "gated": false,
+   "note": "reported, not gated: the paper's construction differs from ours on these inputs"
+  },
+  "batch4_vs_single": {
+   "value": {
+    "n": 392,
+    "argmax_agreement": 0.9923469387755102,
+    "median_abs_dlogp_top": 2.0264196791686118e-06,
+    "max_abs_dlogp_any": 1.9272189140319824
+   },
+   "pass": false,
+   "gated": true
+  },
+  "batch4_memory": {
+   "value": {
+    "peak_gb": 26.13,
+    "out_of_memory": false
+   },
+   "pass": true,
+   "gated": true
+  },
+  "batch8_vs_single": {
+   "value": {
+    "n": 392,
+    "argmax_agreement": 0.9923469387755102,
+    "median_abs_dlogp_top": 2.085805135720875e-06,
+    "max_abs_dlogp_any": 1.4890151023864746
+   },
+   "pass": false,
+   "gated": true
+  },
+  "batch8_memory": {
+   "value": {
+    "peak_gb": 27.75,
+    "out_of_memory": false
+   },
+   "pass": true,
+   "gated": true
+  },
+  "batch16_vs_single": {
+   "value": {
+    "n": 392,
+    "argmax_agreement": 0.9974489795918368,
+    "median_abs_dlogp_top": 2.2050171537557617e-06,
+    "max_abs_dlogp_any": 1.4102323055267334
+   },
+   "pass": false,
+   "gated": true
+  },
+  "batch16_memory": {
+   "value": {
+    "peak_gb": 31.0,
+    "out_of_memory": false
+   },
+   "pass": true,
+   "gated": true
+  },
+  "projected_core_run_minutes": {
+   "value": {
+    "batch_mode": null,
+    "minutes": null,
+    "core_unique_inputs": 12312,
+    "core_tokens": 10963904,
+    "throughput": {
+     "batch4": {
+      "passes_per_s": 6.837775259865016,
+      "tokens_per_s": 6533.129710823192
+     },
+     "batch8": {
+      "passes_per_s": 6.96864111498258,
+      "tokens_per_s": 6658.165058389984
+     },
+     "batch16": {
+      "passes_per_s": 6.907135847636942,
+      "tokens_per_s": 6599.400054540495
+     }
+    }
+   },
+   "pass": false,
+   "gated": true,
+   "note": "tokens / measured tokens-per-second at the fastest batch size that passed; excludes setup"
+  }
+ },
+ "state": "complete"
+}

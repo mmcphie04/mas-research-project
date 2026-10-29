@@ -695,3 +695,72 @@ colab stop -s curves
   not depend on how `colab exec` passes environment variables. The upload paths follow
   docs/COLAB.md but have not been exercised for this procedure.
 - **No off-device backup** (§9.5).
+
+## 10. Stage 1 GPU curve smoke (run 2026-10-29): FAIL on one gate
+
+**Session.** Approved by you ("run smoke") and run at `d7a251b` on a Colab A100 (log:
+`artifacts/next_phase/OPS_LOG.md`).
+
+- **Duration:** 12 minutes in all; the smoke itself took 207 s.
+- **Cost:** **1.11 units**. The attached rate was 6.73 units/h, not the 5.30/h assumed in the
+  estimates.
+
+**Outputs.** The report, status and selection are in `artifacts/next_phase/smoke/`. Raw rows are
+in `runs/next_commit/smoke/` and in `mas_backup/next_commit/smoke_out.tgz` (hash-checked). The
+outputs are bound to the local core build (same `build_id`) and to the model identity: commit
+`96b6f1ec…`, chat template `7de1c58e…`, bf16.
+
+**Report: overall FAIL.** By the stop rule no core run was started.
+
+| check | result | pass |
+|---|---|---|
+| completeness | all 4 modes × 392 items | ✓ |
+| finite, normalized rows | 1,568 | ✓ |
+| bridge f = 0 vs saved exposure | argmax 40/40; median \|Δ log p\| of the top letter 7×10⁻⁵ | ✓ |
+| exact replay vs saved `before_stated_answer` | argmax 45/45; median 1×10⁻⁷ | ✓ |
+| re-tokenized vs saved ids (not gated) | argmax 6/6; median 9×10⁻⁶ | — |
+| memory, peak at batch 4 / 8 / 16 | 26.1 / 27.8 / 31.0 GB, no OOM | ✓ |
+| batch 4 / 8 / 16 vs single | argmax 0.992 / 0.992 / 0.997; median \|Δ\| 2×10⁻⁶; **max \|Δ log p\| over any letter 1.93 / 1.49 / 1.41** (gate 0.10) | ✗ |
+| projected core time | not computed, because no batch size passed the gate above | ✗ |
+
+**Measured throughput.** Unlike the earlier estimates, these are measurements.
+
+| batch size | passes/s | tokens/s | projected core run (10.96 M tokens) |
+|---|---|---|---|
+| 1 | 6.30 | 6,022 | 30.3 min |
+| 4 | 6.84 | 6,533 | 28.0 min |
+| 8 | 6.97 | 6,658 | 27.4 min |
+| 16 | 6.91 | 6,599 | 27.7 min |
+
+**Diagnosis of the failed gate** (CPU, from the downloaded rows).
+
+- **Most letter differences are in the tail.** The largest per-letter difference falls on a letter
+  with p < 10⁻³ in about 90% of inputs, which the any-letter gate does not distinguish.
+- **But some differences are substantive.** Between a batched and the single reading, the
+  probability of some letter changes by:
+  - > 0.05 on 12–16 of 392 inputs (3–4%);
+  - > 0.10 on 4–9 (1–2%);
+  - at most 0.40.
+- **The argmax changes** on 3 of 392 inputs at batch 4 and 8, and 1 at batch 16. Each is a
+  near-tie between the top two letters (0.55/0.43, 0.56/0.44, 0.62/0.37).
+- **The batched modes also differ from each other** (13 inputs above 0.05 between batch 4 and 8).
+  So this is batch-composition-dependent bf16 numerics with left padding, not a construction
+  error.
+- **Single reads reproduce the archived readouts near-exactly.** Those were themselves read in
+  batches of 4.
+
+**What this means for the replication.** The planned metric is argmax agreement, which moved on
+≤ 0.8% of inputs, and only at near-ties. Probability-level summaries such as p(eventual) carry a
+small batch-dependent noise term. Reading at **batch size 1** removes the dependence entirely, at
+a measured cost of about +3 minutes on the core run.
+
+**Recommendation (for your decision; not acted on):**
+
+- Run the core at `--batch-size 1`. That makes the failed batched-vs-single gate moot, because
+  no padding is used.
+- Restate the batched-vs-single gate for any future batched use in probability terms, e.g.
+  share of inputs with max |Δp| > 0.05 at most 5%, plus argmax agreement at least 0.99. Its
+  any-letter log-probability form was over-sensitive to tail letters.
+- **Updated core estimate** at the measured rate of 6.73 units/h: setup and model about 3 min,
+  run about 30 min, packing and download about 3 min, so about 0.6 h ≈ **4–4.5 units**.
+  Proposed cap 6 units, with `--max-minutes 45` on the run.
