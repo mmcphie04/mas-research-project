@@ -77,6 +77,31 @@ The reasoning is straightforward once you see it, and I am confident this is rig
 
 READOUT_SUFFIX = "\nFinal answer: ("
 
+# Structured revision (docs/NEXT_PHASE_PLAN.md, review decision 7): decisive issue -> check ->
+# decision, with the same brevity line and ending as the current prompt. Peer presentation is
+# unchanged; only the instruction after the peers differs. The no-peer version (structured
+# reconsideration) keeps step 3 verbatim so the two differ only in what the agent is shown.
+STRUCTURED_PEER_BLOCK = """Here are the responses from the other members of your panel:
+
+{peers}
+
+Before giving your answer again, do three things.
+1. Decisive issue: If the answers above (including yours) differ, name the single step, fact or calculation that decides between them. If they all agree, write "No substantive disagreement" and name the step most likely to be wrong.
+2. Check: Redo that step yourself. For a calculation, recompute it and state the number you get. For a fact or definition, state what you know and how sure you are. Another panel member's statement that something is correct is not a check.
+3. Decision: Choose the answer best supported by your check. Explain the specific evidence or reasoning supporting your decision; agreement alone is insufficient.
+{brevity} {ending}"""
+
+STRUCTURED_SELF_BLOCK = """Reconsider the question carefully on your own. Before giving your answer again, do three things.
+1. Decisive issue: Name the single step, fact or calculation in your reasoning that decides the answer, or the step most likely to be wrong.
+2. Check: Redo that step yourself. For a calculation, recompute it and state the number you get. For a fact or definition, state what you know and how sure you are. Restating your earlier conclusion is not a check.
+3. Decision: Choose the answer best supported by your check. Explain the specific evidence or reasoning supporting your decision; agreement alone is insufficient.
+{brevity} {ending}"""
+
+# The forced opening (condition debate_structured_open): the assistant turn is prefilled with
+# this text and generation continues from it. It is part of the prompt, not of the agent's own
+# response, for parsing and for the within-response curves.
+OPENING_PREFILL = "Decisive issue:"
+
 # Candidate evaluation (mad.candidates): the model sees a question with one proposed answer,
 # optionally with an unsupported endorsement, and is read out without generating.
 CANDIDATE_SYSTEM = """{persona} You will see a multiple-choice question and a proposed answer to it. The proposed answer may be right or wrong. Decide which option is correct."""
@@ -102,6 +127,9 @@ TEMPLATES = {
     "mild_peer": MILD_PEER,
     "adversarial_peer": ADVERSARIAL_PEER,
     "readout_suffix": READOUT_SUFFIX,
+    "structured_peer_block": STRUCTURED_PEER_BLOCK,
+    "structured_self_block": STRUCTURED_SELF_BLOCK,
+    "opening_prefill": OPENING_PREFILL,
     "candidate_system": CANDIDATE_SYSTEM,
     "candidate_block": CANDIDATE_BLOCK,
     "endorsement": ENDORSEMENT,
@@ -135,20 +163,23 @@ def round1_messages(
     own_response: str,
     peer_responses: list[str] | None,
     ask_confidence: bool = True,
+    structured: bool = False,
 ) -> list[Message]:
-    """Round-1 turn. ``peer_responses=None`` produces the self-reconsideration control.
+    """Round-1 turn. ``peer_responses=None`` produces the self-reconsideration control;
+    ``structured`` swaps in the decisive-issue -> check -> decision instruction.
 
     Shape: [...round-0 turns..., assistant(own round-0 response), user(reconsider prompt)].
     ``peer_responses`` are shown in the order given; the caller decides (and records) that order.
     """
     ending = ENDING_CONF if ask_confidence else ENDING_NO_CONF
     if peer_responses is None:
-        block = SELF_BLOCK.format(brevity=BREVITY, ending=ending)
+        block = (STRUCTURED_SELF_BLOCK if structured else SELF_BLOCK).format(brevity=BREVITY, ending=ending)
     else:
         peers = "\n\n".join(
             PEER_ENTRY.format(idx=i + 1, text=r.strip()) for i, r in enumerate(peer_responses)
         )
-        block = PEER_BLOCK.format(peers=peers, brevity=BREVITY, ending=ending)
+        block = (STRUCTURED_PEER_BLOCK if structured else PEER_BLOCK).format(
+            peers=peers, brevity=BREVITY, ending=ending)
     return [
         *base,
         {"role": "assistant", "content": own_response.strip()},

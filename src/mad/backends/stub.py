@@ -80,7 +80,7 @@ class StubBackend(Backend):
         rng = _seed("post", question_id, agent_id, condition, self.run_seed)
         pre_correct = pre == gold
         rate = self.s.revision_rate_correct if pre_correct else self.s.revision_rate_incorrect
-        if condition == "self_reconsider":
+        if condition in ("self_reconsider", "self_structured"):
             rate *= self.s.control_revision_scale
         if rng.random() >= rate:
             return pre
@@ -210,6 +210,16 @@ class StubBackend(Backend):
                     **self._extra(text, m, n, hidden, logprobs, rng),
                 )
             )
+        return out
+
+    def letter_logprobs_ids(self, seqs: list[list[int]], n_options: list[int],
+                            batch_size: int | None = None) -> list[np.ndarray]:
+        """A deterministic function of the id sequence (no model): equal sequences give equal
+        distributions, which is all the curve plumbing tests need."""
+        out = []
+        for seq, n in zip(seqs, n_options, strict=True):
+            z = _seed("ids", ",".join(map(str, seq)), self.run_seed).normal(size=n)
+            out.append((z - np.log(np.exp(z).sum())).astype(np.float32))
         return out
 
     def _extra(self, text, m, n, hidden, logprobs, rng) -> dict:

@@ -70,6 +70,12 @@ CONDITION_SPECS = {
     "misleading_one": {"kind": "misleading_one"},
     "adversarial": {"kind": "adversarial"},
     "independent": {"kind": "independent"},
+    # a second sample of current debate in a later child job: same kind, distinct name, so its
+    # round-1 seed differs from the parent's debate condition (seeds derive from the name)
+    "debate_s2": {"kind": "debate", "peer_confidence": False},
+    "debate_structured": {"kind": "debate_structured", "peer_confidence": False},
+    "debate_structured_open": {"kind": "debate_structured_open", "peer_confidence": False},
+    "self_structured": {"kind": "self_structured"},
 }
 DATASETS = {
     "mmlu-pro": ("TIGER-Lab/MMLU-Pro", "test"),
@@ -456,6 +462,8 @@ def main(argv=None) -> int:
                          "notebook passes this for main-pool collection")
     ap.add_argument("--parent", help="child job: take round 0 from this job's saved caches")
     ap.add_argument("--subset-n", type=int, help="child job: the first N questions of the parent")
+    ap.add_argument("--subset-ids", help="child job: a JSON file with the parent questions to use "
+                                         "(a list, or an object with 'question_ids'); parent order is kept")
     args = ap.parse_args(argv)
     t_process = time.time()
 
@@ -496,7 +504,8 @@ def main(argv=None) -> int:
         args.pilot_size = parent["identity"]["pool"]["pilot_size"]
         args.validation_size = parent["identity"]["pool"].get("validation_size", 0)
         cfg.data.dataset, cfg.data.split = DATASETS[args.dataset]
-        intended, chunk = _child_questions(out_root, parent, args.subset_n), parent["identity"]["chunk_size"]
+        intended, chunk = (_child_questions(out_root, parent, args.subset_n, args.subset_ids),
+                           parent["identity"]["chunk_size"])
         n_total = len(intended)
     else:
         pool = load_pool(args.dataset, cfg)
@@ -557,15 +566,22 @@ def main(argv=None) -> int:
     if parent:
         identity = {**parent["identity"], "name": name,
                     "conditions": {c["name"]: CONDITION_SPECS[c["name"]] for c in conds_all},
+                    "prompt_template_hashes": prompt_hashes(P.TEMPLATES),
                     "parent": {"name": args.parent, "identity_sha256": parent["identity_sha256"],
-                               "subset_n": n_total}}
+                               "subset_n": n_total,
+                               **({"subset_ids_sha256": hashlib.sha256(",".join(
+                                   q.question_id for q in intended).encode()).hexdigest()}
+                                  if args.subset_ids else {})}}
         mine = build_identity(name=name, cfg=cfg, dataset_key=args.dataset, pool=args.pool,
                               pilot_size=args.pilot_size, chunk_size=chunk, conditions={},
                               templates_hash=prompt_hashes(P.TEMPLATES), backend_desc=desc,
                               master_ids_sha="", validation_size=args.validation_size)
-        for k in ("config", "prompt_template_hashes", "backend"):
+        for k in ("config", "backend"):
             if mine[k] != parent["identity"][k]:
                 raise SystemExit(f"a child job must use its parent's {k}; it differs")
+        changed = template_changes(parent["identity"]["prompt_template_hashes"], mine["prompt_template_hashes"])
+        if changed:
+            raise SystemExit(f"a child job must keep every template its parent used; changed or removed: {changed}")
         keep = {x.question_id for x in intended}
         chunks = [[q for q in members if q in keep] for members in parent["chunks"]]
     else:
@@ -732,8 +748,15 @@ def _archive_split(src: Path, dst: Path) -> None:
         dst.write_bytes(data)
 
 
-def _child_questions(out_root: Path, parent: dict, subset_n: int | None) -> list:
-    """The first ``subset_n`` questions of a parent job, from its verified local snapshot."""
+def template_changes(parent: dict, child: dict) -> list[str]:
+    """Templates the parent recorded that the child changed or dropped. New templates (for new
+    condition kinds) are allowed: they cannot have influenced the parent's round 0."""
+    return sorted(k for k, h in parent.items() if child.get(k) != h)
+
+
+def _child_questions(out_root: Path, parent: dict, subset_n: int | None, subset_ids: str | None = None) -> list:
+    """The first ``subset_n`` questions of a parent job -- or the listed ``subset_ids``, in the
+    parent's order -- from its verified local snapshot."""
     from mad.data import Question
     from mad.job import question_sha256
 
@@ -747,6 +770,16 @@ def _child_questions(out_root: Path, parent: dict, subset_n: int | None) -> list
             raise SystemExit(f"{name}-questions.jsonl does not match the parent job's hashes")
     order = [q["id"] for q in parent["questions"]]
     by_id = {q.question_id: q for q in qs}
+    if subset_ids:
+        if subset_n:
+            raise SystemExit("--subset-n and --subset-ids cannot be combined")
+        raw = json.loads(Path(subset_ids).read_text())
+        want = [str(x) for x in (raw["question_ids"] if isinstance(raw, dict) else raw)]
+        missing = sorted(set(want) - set(order))
+        if missing:
+            raise SystemExit(f"{len(missing)} requested questions are not in the parent job: {missing[:5]}")
+        keep = set(want)
+        return [by_id[i] for i in order if i in keep]
     return [by_id[i] for i in order[: subset_n or len(order)]]
 
 

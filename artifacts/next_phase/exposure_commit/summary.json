@@ -1,0 +1,195 @@
+{
+ "what": "saved peer_exposure readout (prompt + '\\nFinal answer: (') vs the eventual stated answer; exploratory (pilot and validation questions were seen before)",
+ "eligible_responses": {
+  "pilot/debate": 342,
+  "pilot/debate_answer_only": 342,
+  "pilot/misleading_one": 342,
+  "pilot/self_reconsider": 341,
+  "val/debate": 571,
+  "val/independent": 561,
+  "val/self_reconsider": 285
+ },
+ "exclusions_by_condition_and_reason": {
+  "pilot/debate": {
+   "revisions": 360,
+   "eligible": 342,
+   "previous_answer_readout_fallback": 18,
+   "capped_but_stated_kept": 0
+  },
+  "pilot/debate_answer_only": {
+   "revisions": 360,
+   "eligible": 342,
+   "previous_answer_readout_fallback": 18,
+   "capped_but_stated_kept": 0
+  },
+  "pilot/misleading_one": {
+   "revisions": 360,
+   "eligible": 342,
+   "previous_answer_readout_fallback": 18,
+   "capped_but_stated_kept": 0
+  },
+  "pilot/self_reconsider": {
+   "revisions": 360,
+   "eligible": 341,
+   "previous_answer_readout_fallback": 16,
+   "own_answer_readout_fallback": 3,
+   "capped_but_stated_kept": 0
+  },
+  "val/debate": {
+   "revisions": 600,
+   "eligible": 571,
+   "previous_answer_readout_fallback": 27,
+   "own_answer_readout_fallback": 2,
+   "capped_but_stated_kept": 0
+  },
+  "val/independent": {
+   "revisions": 600,
+   "eligible": 561,
+   "own_answer_readout_fallback": 25,
+   "previous_answer_readout_fallback": 14,
+   "capped_but_stated_kept": 0
+  },
+  "val/self_reconsider": {
+   "revisions": 300,
+   "eligible": 285,
+   "previous_answer_readout_fallback": 13,
+   "own_answer_readout_fallback": 2,
+   "capped_but_stated_kept": 0
+  }
+ },
+ "paired_debate_minus_self_reconsider_changed_only": {
+  "pilot": {
+   "exp_is_eventual": {
+    "questions": 41,
+    "mean_diff": 0.3861788617886179,
+    "lo": 0.2601626016260163,
+    "hi": 0.5040650406504066,
+    "favour_a": 27,
+    "favour_b": 2,
+    "ties": 12,
+    "sign_test_p": 1.6242265701293945e-06
+   },
+   "exp_is_previous": {
+    "questions": 41,
+    "mean_diff": -0.12195121951219512,
+    "lo": -0.22764227642276424,
+    "hi": -0.028353658536585915,
+    "favour_a": 4,
+    "favour_b": 13,
+    "ties": 24,
+    "sign_test_p": 0.049041748046875
+   }
+  },
+  "val_first100": {
+   "exp_is_eventual": {
+    "questions": 30,
+    "mean_diff": 0.42777777777777776,
+    "lo": 0.25,
+    "hi": 0.6,
+    "favour_a": 19,
+    "favour_b": 4,
+    "ties": 7,
+    "sign_test_p": 0.002599477767944336
+   },
+   "exp_is_previous": {
+    "questions": 30,
+    "mean_diff": -0.21666666666666667,
+    "lo": -0.38333333333333336,
+    "hi": -0.05,
+    "favour_a": 5,
+    "favour_b": 15,
+    "ties": 10,
+    "sign_test_p": 0.04138946533203125
+   }
+  },
+  "pooled": {
+   "exp_is_eventual": {
+    "questions": 71,
+    "mean_diff": 0.403755868544601,
+    "lo": 0.30510563380281686,
+    "hi": 0.5023474178403755,
+    "favour_a": 46,
+    "favour_b": 6,
+    "ties": 19,
+    "sign_test_p": 1.0325821975243343e-08
+   },
+   "exp_is_previous": {
+    "questions": 71,
+    "mean_diff": -0.16197183098591553,
+    "lo": -0.25117370892018775,
+    "hi": -0.0751173708920188,
+    "favour_a": 9,
+    "favour_b": 28,
+    "ties": 34,
+    "sign_test_p": 0.0025632079923525453
+   }
+  }
+ },
+ "echo_check": {
+  "pilot": {
+   "revisions_with_two_different_peer_answers": 87,
+   "exposure_argmax_is_first_shown_peer": 22,
+   "exposure_argmax_is_last_shown_peer": 63,
+   "final_stated_answer_is_first_shown_peer": 29,
+   "final_stated_answer_is_last_shown_peer": 52
+  },
+  "val": {
+   "revisions_with_two_different_peer_answers": 130,
+   "exposure_argmax_is_first_shown_peer": 33,
+   "exposure_argmax_is_last_shown_peer": 95,
+   "final_stated_answer_is_first_shown_peer": 34,
+   "final_stated_answer_is_last_shown_peer": 91
+  }
+ },
+ "anchor_letter_argmax_equals_stated": {
+  "pilot/debate": {
+   "n": 342,
+   "questions": 118,
+   "est": 1.0,
+   "lo": 1.0,
+   "hi": 1.0
+  },
+  "pilot/debate_answer_only": {
+   "n": 342,
+   "questions": 118,
+   "est": 1.0,
+   "lo": 1.0,
+   "hi": 1.0
+  },
+  "pilot/misleading_one": {
+   "n": 342,
+   "questions": 118,
+   "est": 0.9970760233918129,
+   "lo": 0.9910714285714286,
+   "hi": 1.0
+  },
+  "pilot/self_reconsider": {
+   "n": 341,
+   "questions": 118,
+   "est": 0.9970674486803519,
+   "lo": 0.9910172897448346,
+   "hi": 1.0
+  },
+  "val/debate": {
+   "n": 571,
+   "questions": 198,
+   "est": 0.9982486865148862,
+   "lo": 0.9946521676852559,
+   "hi": 1.0
+  },
+  "val/independent": {
+   "n": 561,
+   "questions": 194,
+   "est": 0.9964349376114082,
+   "lo": 0.9910233393177738,
+   "hi": 1.0
+  },
+  "val/self_reconsider": {
+   "n": 285,
+   "questions": 97,
+   "est": 0.9964912280701754,
+   "lo": 0.9893238434163701,
+   "hi": 1.0
+  }
+ }
+}

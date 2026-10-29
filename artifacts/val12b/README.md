@@ -15,7 +15,7 @@ collection).
 | `OPS_LOG.md` | timeline, measured resources, problems, backup locations |
 | `investigation/` | why R1 never changes its pick on debate (exploratory; docs/R1_INVESTIGATION.md) |
 | `probe_audit/` | bounded estimator comparison on fixed layers: pilot CV, validation (+ per-state scores, no activations), paired vs output-only, learning curves, refit stability (exploratory; docs/PROBE_ACTION_TRANSCRIPT_REVIEW.md §1) |
-| `action_choice/` | stop / independent / debate policies on the 200 questions (exploratory; same doc §2) |
+| `action_choice/` | stop / independent / debate policies on the 200 questions (exploratory): `final_panel/` (current rule, fractional outcomes; docs/NEXT_PHASE_CPU_RESULTS.md §4) and `pooled_vote_2026-10-28/` (superseded rule, kept for the record) |
 | `transcript_review/` | seed-2026 transcript sample (full peer text), hand coding with codebook, population counts over 600 debate revisions (same doc §3) |
 
 Reproduce: `probe_search.py cache --root runs/val12b --prefix val12b --cache runs/cache/val12b

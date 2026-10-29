@@ -25,6 +25,10 @@ Conditions differ only in what the agent is shown before it revises:
   independent         not a revision: a FRESH round-0 answer with a new seed (the agent sees
                       nothing of its first answer) -- extra independent samples for comparing
                       debate with simply sampling more answers
+  debate_structured   the debate peers, with the decisive issue -> check -> decision instruction
+  debate_structured_open
+                      the same, with the assistant turn prefilled "Decisive issue:" (forced opening)
+  self_structured     no peers, the structured instruction (structured reconsideration control)
 
 Peer order is randomised per (condition, question, agent) from a stable seed and recorded, so
 "panel member 1" is not systematically the lower-numbered agent or the fabricated one.
@@ -69,7 +73,10 @@ class _NullGen:
 
 
 KINDS = ("self_reconsider", "debate", "debate_conf", "debate_answer_only", "adversarial",
-         "misleading_one", "independent")
+         "misleading_one", "independent", "debate_structured", "debate_structured_open",
+         "self_structured")
+STRUCTURED_KINDS = ("debate_structured", "debate_structured_open", "self_structured")
+PREFILL_KINDS = {"debate_structured_open": P.OPENING_PREFILL}
 
 
 def derive_seed(*parts) -> int:
@@ -296,7 +303,7 @@ def _peer_view(cfg, kind, cond, q, a, r0_ans, r0_stated, own_text, perms, gold):
     pre = r0_ans[(qid, a)]
     shown = perms[qid].display_options(list(q.options))
     target = -1
-    if kind in ("self_reconsider", "independent"):
+    if kind in ("self_reconsider", "independent", "self_structured"):
         return None, [], [], target
     if kind == "misleading_one":
         # One dissenting peer, restrained wording, plus one genuine peer chosen at random. Two
@@ -318,7 +325,7 @@ def _peer_view(cfg, kind, cond, q, a, r0_ans, r0_stated, own_text, perms, gold):
             text = (P.PEER_ANSWER_ONLY.format(letter=LETTERS[ans], option=shown[ans]) if ans >= 0
                     else P.PEER_NO_ANSWER)
             entries.append((text, ans, f"agent{b}"))
-    else:  # debate, debate_conf
+    else:  # debate, debate_conf, debate_structured, debate_structured_open
         keep_conf = bool(cond.get("peer_confidence"))
         entries = [(own_text[(qid, b)] if keep_conf else P.strip_confidence(own_text[(qid, b)]),
                     r0_stated[(qid, b)], f"agent{b}") for b in others]
@@ -402,7 +409,8 @@ def run_condition(cfg, questions, cond, r0: Round0, backend, perms, gold, final_
             else:
                 msgs = P.round1_messages(base=base_msgs[(qid, a)], own_response=own_text[(qid, a)],
                                          peer_responses=texts,
-                                         ask_confidence=cfg.debate.ask_verbalized_confidence)
+                                         ask_confidence=cfg.debate.ask_verbalized_confidence,
+                                         structured=kind in STRUCTURED_KINDS)
             prompt = backend.render(msgs)
             planned = backend.plan_answer(phase="post", question_id=qid, agent_id=a, pre=pre,
                                           peer_majority=maj, condition=kind)
@@ -410,7 +418,7 @@ def run_condition(cfg, questions, cond, r0: Round0, backend, perms, gold, final_
             metas1.append({
                 "question_id": qid, "agent_id": a, "phase": "post", "condition": name,
                 "request_id": request_id(job, chunk, "post", name, qid, a), "chunk": chunk,
-                "gen_seed": seed1, "gen_start_char": len(prompt),
+                "gen_seed": seed1, "gen_start_char": len(prompt) + len(PREFILL_KINDS.get(kind, "")),
                 **({"planned_answer": planned} if planned is not None else {}),
                 # what the agent was SHOWN (the legacy column names keep this meaning)
                 "peer_majority": -1 if maj is None else maj,
@@ -451,10 +459,16 @@ def run_condition(cfg, questions, cond, r0: Round0, backend, perms, gold, final_
         rows.append(row)
         add_states(m, read)
 
+    # The exposure readout above used the prompt WITHOUT any prefill (nothing written yet). A
+    # forced opening is appended to the generation prompt; it belongs to the prompt for parsing
+    # and readout (gen_start_char points after it), and is recorded separately.
+    prefill = PREFILL_KINDS.get(kind, "")
+    gen_prompts1 = [p + prefill for p in prompts1]
     t_stage = time.time()
-    gens1 = backend.generate(prompts1, seed=seed1, meta=metas1)
+    gens1 = backend.generate(gen_prompts1, seed=seed1, meta=metas1)
     timings["generation_s"] = round(time.time() - t_stage, 2)
-    texts1 = [p + g.text for p, g in zip(prompts1, gens1, strict=True)]
+    timings["generated_tokens"] = int(sum(g.n_completion_tokens for g in gens1))
+    texts1 = [p + g.text for p, g in zip(gen_prompts1, gens1, strict=True)]
     ro_meta1 = [{**m, "gen_token_ids": g.token_ids} for m, g in zip(metas1, gens1, strict=True)]
     t_stage = time.time()
     reads1 = backend.readout(texts1, [n_opts[m["question_id"]] for m in metas1], meta=ro_meta1)
@@ -467,8 +481,8 @@ def run_condition(cfg, questions, cond, r0: Round0, backend, perms, gold, final_
         row["peers_agree_each_other"] = m["peers_agree_each_other"]
         rows.append(row)
         transcripts.append({**{k: v for k, v in m.items() if k != "planned_answer"},
-                            "messages": msgs1[i], "prompt": prompts1[i], "text": gen.text,
-                            "token_ids": gen.token_ids, "stop_reason": gen.stop_reason})
+                            "messages": msgs1[i], "prompt": gen_prompts1[i], "text": gen.text,
+                            "prefill": prefill, "token_ids": gen.token_ids, "stop_reason": gen.stop_reason})
         add_states(m, read)
 
     index = writer.close()

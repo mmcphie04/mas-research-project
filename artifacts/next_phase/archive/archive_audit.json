@@ -1,0 +1,357 @@
+{
+ "identities": {
+  "jobs": {
+   "pilot12b": {
+    "model_commit": "96b6f1eccf38110c56df3a15bffe176da04bfd80",
+    "chat_template_sha256": "7de1c58e208eda46e9c7f86397df37ec49883aeece39fb961e0a6b24088dd3c4",
+    "transformers": "5.17.0",
+    "torch": "2.11.0+cu130",
+    "code_git_sha": "5ff52b38e332546106c18463317f07a21b8b0ae1",
+    "identity_sha256": "58148a2fb833c57546748a6aba657bb3f230f6953c598ed9a95f66c7aacf045d",
+    "dataset_revision": null
+   },
+   "val12b": {
+    "model_commit": "96b6f1eccf38110c56df3a15bffe176da04bfd80",
+    "chat_template_sha256": "7de1c58e208eda46e9c7f86397df37ec49883aeece39fb961e0a6b24088dd3c4",
+    "transformers": "5.17.0",
+    "torch": "2.11.0+cu130",
+    "code_git_sha": "2621a96be21dec98d9460e082c90a445991a0d72",
+    "identity_sha256": "a519ec279f74a93f88c51b2672c1cefbf0a29945b7c449997d9c449de7febb41",
+    "dataset_revision": "b189ec765aa7ed75c8acfea42df31fdae71f97be"
+   },
+   "val12b-self": {
+    "model_commit": "96b6f1eccf38110c56df3a15bffe176da04bfd80",
+    "chat_template_sha256": "7de1c58e208eda46e9c7f86397df37ec49883aeece39fb961e0a6b24088dd3c4",
+    "transformers": "5.17.0",
+    "torch": "2.11.0+cu130",
+    "code_git_sha": "2621a96be21dec98d9460e082c90a445991a0d72",
+    "identity_sha256": "1ec72377002d8d8d251678f4b0547ba311dfc4518b5b8f413f059a8aee42b11a",
+    "dataset_revision": "b189ec765aa7ed75c8acfea42df31fdae71f97be"
+   }
+  },
+  "local_tokenizer_commit": "96b6f1eccf38110c56df3a15bffe176da04bfd80",
+  "local_chat_template_sha256": "7de1c58e208eda46e9c7f86397df37ec49883aeece39fb961e0a6b24088dd3c4",
+  "model_commit_identical": true,
+  "chat_template_identical": true,
+  "local_tokenizer_matches_archives": true
+ },
+ "views": {
+  "pilot12b/self_reconsider": {
+   "counts": {
+    "states": 720,
+    "prompt_rerender_checked": 720,
+    "prompt_token_count_checked": 720,
+    "replay_checked": 720,
+    "answer_reparse_checked": 720,
+    "capped": 21,
+    "capped_with_stated_answer": 0,
+    "peer_messages_checked": 360,
+    "exposure_states": 360,
+    "post_states": 360,
+    "readout_logprobs_checked": 1080,
+    "pos_before_stated_answer_logprobs_checked": 699
+   },
+   "examples": {}
+  },
+  "pilot12b/debate": {
+   "counts": {
+    "states": 720,
+    "prompt_rerender_checked": 720,
+    "prompt_token_count_checked": 720,
+    "replay_checked": 720,
+    "answer_reparse_checked": 720,
+    "capped": 18,
+    "capped_with_stated_answer": 0,
+    "peer_messages_checked": 360,
+    "exposure_states": 360,
+    "post_states": 360,
+    "readout_logprobs_checked": 1080,
+    "pos_before_stated_answer_logprobs_checked": 702
+   },
+   "examples": {}
+  },
+  "pilot12b/debate_answer_only": {
+   "counts": {
+    "states": 720,
+    "prompt_rerender_checked": 720,
+    "prompt_token_count_checked": 720,
+    "replay_checked": 720,
+    "answer_reparse_checked": 720,
+    "capped": 18,
+    "capped_with_stated_answer": 0,
+    "exposure_states": 360,
+    "post_states": 360,
+    "readout_logprobs_checked": 1080,
+    "pos_before_stated_answer_logprobs_checked": 702
+   },
+   "examples": {}
+  },
+  "pilot12b/misleading_one": {
+   "counts": {
+    "states": 720,
+    "prompt_rerender_checked": 720,
+    "prompt_token_count_checked": 720,
+    "replay_checked": 720,
+    "answer_reparse_checked": 720,
+    "capped": 18,
+    "capped_with_stated_answer": 0,
+    "exposure_states": 360,
+    "post_states": 360,
+    "readout_logprobs_checked": 1080,
+    "pos_before_stated_answer_logprobs_checked": 702
+   },
+   "examples": {}
+  },
+  "val12b/debate": {
+   "counts": {
+    "states": 1200,
+    "prompt_rerender_checked": 1200,
+    "prompt_token_count_checked": 1200,
+    "replay_checked": 1200,
+    "answer_reparse_checked": 1200,
+    "capped": 31,
+    "capped_with_stated_answer": 0,
+    "peer_messages_checked": 600,
+    "exposure_states": 600,
+    "post_states": 600,
+    "readout_logprobs_checked": 1800,
+    "pos_before_stated_answer_logprobs_checked": 1169
+   },
+   "examples": {}
+  },
+  "val12b/independent": {
+   "counts": {
+    "states": 1200,
+    "prompt_rerender_checked": 1200,
+    "prompt_token_count_checked": 1200,
+    "replay_checked": 1200,
+    "answer_reparse_checked": 1200,
+    "capped": 54,
+    "capped_with_stated_answer": 0,
+    "exposure_states": 600,
+    "post_states": 600,
+    "readout_logprobs_checked": 1800,
+    "pos_before_stated_answer_logprobs_checked": 1146
+   },
+   "examples": {}
+  },
+  "val12b-self/self_reconsider": {
+   "counts": {
+    "states": 600,
+    "prompt_rerender_checked": 600,
+    "prompt_token_count_checked": 600,
+    "replay_checked": 600,
+    "answer_reparse_checked": 600,
+    "capped": 15,
+    "capped_with_stated_answer": 0,
+    "peer_messages_checked": 300,
+    "exposure_states": 300,
+    "post_states": 300,
+    "readout_logprobs_checked": 900,
+    "pos_before_stated_answer_logprobs_checked": 585
+   },
+   "examples": {}
+  }
+ },
+ "verify_reports": {
+  "pilot12b": {
+   "chunks_ok": 24,
+   "views": {
+    "self_reconsider": {
+     "questions": 120,
+     "states": 3558,
+     "layers": 49,
+     "d_model": 3840
+    },
+    "debate": {
+     "questions": 120,
+     "states": 3564,
+     "layers": 49,
+     "d_model": 3840
+    },
+    "debate_answer_only": {
+     "questions": 120,
+     "states": 3564,
+     "layers": 49,
+     "d_model": 3840
+    },
+    "misleading_one": {
+     "questions": 120,
+     "states": 3564,
+     "layers": 49,
+     "d_model": 3840
+    }
+   },
+   "copy": {
+    "job": "pilot12b",
+    "identity_sha256": "58148a2fb833c57546748a6aba657bb3f230f6953c598ed9a95f66c7aacf045d",
+    "chunks": {
+     "pilot12b-self_reconsider-c000": "ok",
+     "pilot12b-debate-c000": "ok",
+     "pilot12b-debate_answer_only-c000": "ok",
+     "pilot12b-misleading_one-c000": "ok",
+     "pilot12b-self_reconsider-c001": "ok",
+     "pilot12b-debate-c001": "ok",
+     "pilot12b-debate_answer_only-c001": "ok",
+     "pilot12b-misleading_one-c001": "ok",
+     "pilot12b-self_reconsider-c002": "ok",
+     "pilot12b-debate-c002": "ok",
+     "pilot12b-debate_answer_only-c002": "ok",
+     "pilot12b-misleading_one-c002": "ok",
+     "pilot12b-self_reconsider-c003": "ok",
+     "pilot12b-debate-c003": "ok",
+     "pilot12b-debate_answer_only-c003": "ok",
+     "pilot12b-misleading_one-c003": "ok",
+     "pilot12b-self_reconsider-c004": "ok",
+     "pilot12b-debate-c004": "ok",
+     "pilot12b-debate_answer_only-c004": "ok",
+     "pilot12b-misleading_one-c004": "ok",
+     "pilot12b-self_reconsider-c005": "ok",
+     "pilot12b-debate-c005": "ok",
+     "pilot12b-debate_answer_only-c005": "ok",
+     "pilot12b-misleading_one-c005": "ok"
+    },
+    "views": {
+     "self_reconsider": {
+      "questions": 120,
+      "states": 3558,
+      "layers": 49,
+      "d_model": 3840,
+      "by_phase_and_position": {
+       "peer_exposure/generation_last": 360,
+       "peer_exposure/readout_last": 360,
+       "post/before_stated_answer": 357,
+       "post/generation_last": 360,
+       "post/readout_last": 360,
+       "post/stated_answer": 357,
+       "pre/before_stated_answer": 342,
+       "pre/generation_last": 360,
+       "pre/readout_last": 360,
+       "pre/stated_answer": 342
+      }
+     },
+     "debate": {
+      "questions": 120,
+      "states": 3564,
+      "layers": 49,
+      "d_model": 3840,
+      "by_phase_and_position": {
+       "peer_exposure/generation_last": 360,
+       "peer_exposure/readout_last": 360,
+       "post/before_stated_answer": 360,
+       "post/generation_last": 360,
+       "post/readout_last": 360,
+       "post/stated_answer": 360,
+       "pre/before_stated_answer": 342,
+       "pre/generation_last": 360,
+       "pre/readout_last": 360,
+       "pre/stated_answer": 342
+      }
+     },
+     "debate_answer_only": {
+      "questions": 120,
+      "states": 3564,
+      "layers": 49,
+      "d_model": 3840,
+      "by_phase_and_position": {
+       "peer_exposure/generation_last": 360,
+       "peer_exposure/readout_last": 360,
+       "post/before_stated_answer": 360,
+       "post/generation_last": 360,
+       "post/readout_last": 360,
+       "post/stated_answer": 360,
+       "pre/before_stated_answer": 342,
+       "pre/generation_last": 360,
+       "pre/readout_last": 360,
+       "pre/stated_answer": 342
+      }
+     },
+     "misleading_one": {
+      "questions": 120,
+      "states": 3564,
+      "layers": 49,
+      "d_model": 3840,
+      "by_phase_and_position": {
+       "peer_exposure/generation_last": 360,
+       "peer_exposure/readout_last": 360,
+       "post/before_stated_answer": 360,
+       "post/generation_last": 360,
+       "post/readout_last": 360,
+       "post/stated_answer": 360,
+       "pre/before_stated_answer": 342,
+       "pre/generation_last": 360,
+       "pre/readout_last": 360,
+       "pre/stated_answer": 342
+      }
+     }
+    }
+   }
+  },
+  "val12b": {
+   "chunks_ok": 20,
+   "views": {
+    "debate": {
+     "questions": 200,
+     "states": 5938,
+     "layers": 49,
+     "d_model": 3840
+    },
+    "independent": {
+     "questions": 200,
+     "states": 5892,
+     "layers": 49,
+     "d_model": 3840
+    }
+   },
+   "copy": null
+  },
+  "val12b-self": {
+   "chunks_ok": 5,
+   "views": {
+    "self_reconsider": {
+     "questions": 100,
+     "states": 2970,
+     "layers": 49,
+     "d_model": 3840
+    }
+   },
+   "copy": null
+  }
+ },
+ "backups": {
+  "second_copy_root": "/mnt/c/Users/mmcph/mas_backup",
+  "second_copy_contents": {
+   "frozen": 1,
+   "pilot12b": 42,
+   "val12b": 50
+  },
+  "same_physical_disk_as_primary": true,
+  "off_device_candidates": {
+   "windows_drives_visible": [
+    "c"
+   ],
+   "onedrive_folder": {
+    "path": "/mnt/c/Users/mmcph/OneDrive",
+    "exists": true,
+    "entries": 8,
+    "sync_state": "unknown: cannot be verified from WSL; nothing copied there"
+   },
+   "google_drive_mount": "not available (Colab CLI mount failed twice)"
+  },
+  "conclusion": "No off-device destination is confirmed as configured. A OneDrive folder exists on C:, but whether it syncs, and whether copying research data there is acceptable, needs the owner's confirmation; external drives: none visible."
+ },
+ "totals": {
+  "states": 5880,
+  "prompt_rerender_checked": 5880,
+  "prompt_token_count_checked": 5880,
+  "replay_checked": 5880,
+  "answer_reparse_checked": 5880,
+  "capped": 175,
+  "capped_with_stated_answer": 0,
+  "peer_messages_checked": 1620,
+  "exposure_states": 2940,
+  "post_states": 2940,
+  "readout_logprobs_checked": 8820,
+  "pos_before_stated_answer_logprobs_checked": 5705
+ }
+}

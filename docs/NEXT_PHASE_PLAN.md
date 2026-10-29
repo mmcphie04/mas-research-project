@@ -4,6 +4,9 @@
 and supersede any conflicting text further down. **Stage 0 (implementation and CPU work) is
 approved.** No GPU session may start until the implementation and CPU findings have been reviewed.
 CPU results are reported in docs/NEXT_PHASE_CPU_RESULTS.md, not here.
+That document's §8 updates the GPU estimates below with the measured workload (12,312 core
+passes; only 14 re-tokenized inputs differ from the saved-id construction) and the Stage 4
+re-estimate under final-panel voting.
 
 **Exploratory status.** Any analysis that reuses the pilot (master positions 1–120) or the
 validation tranche (121–320) is exploratory: those questions have already been examined.

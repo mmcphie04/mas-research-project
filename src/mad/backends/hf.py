@@ -453,6 +453,35 @@ class HFBackend(Backend):
             prev = cur
         return None
 
+    def letter_logprobs_ids(self, seqs: list[list[int]], n_options: list[int],
+                            batch_size: int | None = None) -> list[np.ndarray]:
+        """Option-letter log-probabilities at the LAST token of each id sequence: a prefill-only
+        pass with no hidden states returned (``mad.curves`` readouts store no activations).
+
+        Inputs are token ids built by the caller, never re-tokenised here. Left padding, as in
+        ``readout``; ``logits_to_keep=1`` for the same memory reason. Sequences are processed in
+        the order given; callers sort by length for throughput.
+        """
+        torch, mc = self.torch, self.cfg.model
+        bs = batch_size or mc.readout_batch_size or mc.batch_size
+        pad_id = self.tokenizer.pad_token_id
+        out: list[np.ndarray] = []
+        for start in range(0, len(seqs), bs):
+            chunk = seqs[start: start + bs]
+            width = max(len(x) for x in chunk)
+            ids = torch.tensor([[pad_id] * (width - len(x)) + list(x) for x in chunk])
+            mask = torch.tensor([[0] * (width - len(x)) + [1] * len(x) for x in chunk])
+            with torch.no_grad():
+                res = self.model(input_ids=ids.to(self.device), attention_mask=mask.to(self.device),
+                                 logits_to_keep=1, use_cache=False)
+            logits = res.logits[:, -1, :].float()
+            for i in range(len(chunk)):
+                n = n_options[start + i]
+                lp = torch.log_softmax(logits[i, self._letter_ids[:n]], dim=-1)
+                out.append(lp.cpu().numpy().astype(np.float32))
+            del res, logits, ids, mask
+        return out
+
     def letter_logprobs_from_hidden(self, h_final, n: int) -> np.ndarray:
         """Option-letter log-probabilities at any position, from that position's FINAL hidden
         state, without computing full-vocabulary logits: only the n letter rows of the output

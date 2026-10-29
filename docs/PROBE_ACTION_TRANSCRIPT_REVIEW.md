@@ -292,6 +292,11 @@ test of that needs new questions and one estimator fixed in advance.
 
 ## 2. Choosing the next action (200 validation questions)
 
+> **Superseded rule (note added 2026-10-29).** This section used a pooled vote whose tie-break
+> mechanically prevented unanimous initial panels from ever changing. The corrected final-panel
+> analysis, with exact random-tie expectations, is in docs/NEXT_PHASE_CPU_RESULTS.md §4. These
+> numbers are kept (and reproduced exactly by `--rule pooled`) for the record.
+
 ### 2.1 Setup
 
 **Actions after the three first answers.**
