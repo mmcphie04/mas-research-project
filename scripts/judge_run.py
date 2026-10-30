@@ -104,7 +104,6 @@ def think_then(backend, prompts_ids, cap, seed, batch):
 
 
 def run_judge(backend, name, events, out_dir, think_cap, batch, log):
-    tok = backend.tokenizer
     choice = [ids_of(backend, c)[0] for c in J.CHOICES]
     prefill = ids_of(backend, J.JUDGE_PREFILL)
     thinking = MODELS[name]["thinking"]
