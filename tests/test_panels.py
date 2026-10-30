@@ -210,3 +210,16 @@ def test_second_round_events_use_round_one_as_baseline_and_rows_carry_round_one_
     for (q, a), r in rows2.iterrows():
         want = [rows1.loc[(q, b)].answer for b in range(3) if b != a]
         assert r.panel_peer_answers == ",".join(map(str, want))
+
+
+def test_child_runs_on_subset_questions_whose_parent_chunks_are_complete(tmp_path):
+    spec = importlib.util.spec_from_file_location("pilot_g2", ROOT / "scripts" / "pilot_g2.py")
+    pg = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(pg)
+    assert pg.main(["--out-root", str(tmp_path), "--stub"]) == 0
+    job = json.loads((tmp_path / "pilot250-job.json").read_text())
+    want = [job["chunks"][0][0], job["chunks"][1][0]]
+    assert pg.runnable_subset(tmp_path, job, want) == want
+    # a time-capped parent that never completed chunk c001 in one condition: only chunk 0's question runs
+    (tmp_path / "pilot250-structured5-c001" / "completion.json").unlink()
+    assert pg.runnable_subset(tmp_path, job, want) == [want[0]]

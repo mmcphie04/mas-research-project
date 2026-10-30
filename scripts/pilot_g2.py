@@ -4,8 +4,10 @@ control child job (docs/NEXT_PHASE_CPU_RESULTS.md s13.2). One process, so one de
     python scripts/pilot_g2.py --out-root /content/pilot            # on the GPU runtime
     python scripts/pilot_g2.py --out-root /tmp/x --stub             # CPU dry run (tier-0 stub)
 
-The parent's exit code is 0 for both "finished" and "stopped_time_cap", so the child is gated on
-the parent's status file (state == "finished", every chunk done), never on the exit code.
+The child (second rounds + no-peer control) runs on the PRESPECIFIED subset questions whose
+parent chunks are complete in every parent condition -- so a time-capped parent still yields
+round-2 timing for the subset questions it finished. Completeness is read from the chunk
+directories' completion records, never from the parent's exit code (0 also for a time cap).
 Writes <out-root>/pilot_g2-sequence.json with each step's state and wall time.
 """
 
@@ -19,6 +21,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
+sys.path.insert(0, str(ROOT / "src"))
 
 PARENT_CONDS = ["pool", "debate3", "structured3", "debate5", "structured5"]
 CHILD_CONDS = ["debate3_r2", "structured3_r2", "debate5_r2", "structured5_r2", "self_structured5"]
@@ -55,13 +58,16 @@ def main(argv=None) -> int:
     seq.append({"step": "parent", "exit": rc, "state": st.get("state"), "chunks_done": st.get("chunks_done"),
                 "chunks_total": st.get("chunks_total"), "seconds": round(time.time() - t0, 1)})
     finished = st.get("state") == "finished" and st.get("chunks_done") == st.get("chunks_total")
-    if finished:
-        if a.stub:  # synthetic ids: the first question of each parent chunk
-            job = json.loads((out / "pilot250-job.json").read_text())
-            ids = out / "pilot_r2_subset_stub.json"
-            ids.write_text(json.dumps({"question_ids": [c[0] for c in job["chunks"] if c][:2]}))
-        else:
-            ids = ROOT / "artifacts/next_phase/pilot_r2_subset.json"
+    job = json.loads((out / "pilot250-job.json").read_text()) if (out / "pilot250-job.json").exists() else None
+    if a.stub:  # synthetic ids: the first question of each parent chunk
+        want = [c[0] for c in job["chunks"] if c][:2] if job else []
+    else:
+        want = json.loads((ROOT / "artifacts/next_phase/pilot_r2_subset.json").read_text())["question_ids"]
+    runnable = runnable_subset(out, job, want) if job else []
+    seq[-1].update({"subset_prespecified": want, "subset_runnable": runnable})
+    if runnable:
+        ids = out / "pilot_r2_subset_runnable.json"
+        ids.write_text(json.dumps({"question_ids": runnable}))
         t1 = time.time()
         child = [*(STUB if a.stub else REAL), "--out-root", str(out), "--name", "pilot250_r2", "--parent", "pilot250",
                  "--subset-ids", str(ids), "--conditions", *CHILD_CONDS, "--max-hours", str(a.child_hours)]
@@ -71,11 +77,22 @@ def main(argv=None) -> int:
         seq.append({"step": "child", "exit": rc2, "state": st2.get("state"), "chunks_done": st2.get("chunks_done"),
                     "chunks_total": st2.get("chunks_total"), "seconds": round(time.time() - t1, 1)})
     else:
-        seq.append({"step": "child", "skipped": f"parent state {st.get('state')!r}"})
+        seq.append({"step": "child", "skipped": f"no prespecified subset question has complete parent chunks "
+                                                f"(parent state {st.get('state')!r})"})
     (out / "pilot_g2-sequence.json").write_text(json.dumps(seq, indent=1))
     print(json.dumps(seq))
     ok = finished and seq[-1].get("state") == "finished"
     return 0 if ok else 1
+
+
+def runnable_subset(out: Path, job: dict, want: list[str]) -> list[str]:
+    """Prespecified subset questions whose parent chunk is complete in every parent condition."""
+    from mad.job import chunk_tag
+    from mad.provenance import is_complete
+
+    done = {q for i, members in enumerate(job["chunks"]) if members
+            and all(is_complete(out / f"pilot250-{c}-{chunk_tag(i)}") for c in PARENT_CONDS) for q in members}
+    return [q for q in want if q in done]
 
 
 if __name__ == "__main__":

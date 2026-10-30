@@ -52,3 +52,15 @@ def test_hf_generate_under_a_budget_returns_every_prompt_in_order():
     assert sum(e - s for s, e in plan) == 5 and len(plan) > 2  # the budget split the batches
     out = b.generate(prompts, seed=0)
     assert len(out) == 5 and all(g.n_prompt_tokens == n for g, n in zip(out, lens, strict=True))
+
+
+def test_budget_filling_stress_shapes():
+    spec = importlib.util.spec_from_file_location("run_experiment", ROOT / "scripts" / "run_experiment.py")
+    re = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(re)
+    new = load_config("configs/base.yaml", "configs/colab_12b.yaml", "configs/main_250.yaml")
+    shapes = re.budget_stress_shapes(new, {"worst_round1_prompt_tokens": 7119})
+    assert shapes == [(3, 24000 // 3 - 1280), (8, 24000 // 8 - 1280)]  # 3 x 6,720 and 8 x 1,720
+    assert all(k * (p + 1280) <= 24000 and k * (p + 1280) > 24000 - k for k, p in shapes)
+    legacy = load_config("configs/base.yaml", "configs/colab_12b.yaml")
+    assert re.budget_stress_shapes(legacy, {"worst_round1_prompt_tokens": 7119}) == []

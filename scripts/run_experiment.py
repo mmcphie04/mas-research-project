@@ -659,10 +659,17 @@ def main(argv=None) -> int:
             t = time.time()
             rep = backend.stress(cov["worst_round1_prompt_tokens"], cfg.model.max_new_tokens,
                                  cov["worst_readout_tokens"], gen_b, ro_b)
+            # with a token budget, also batches that FILL the budget (not only the worst-length one)
+            shapes = []
+            for k, plen in budget_stress_shapes(cfg, cov):
+                r = backend.stress(plen, cfg.model.max_new_tokens, 0, [k], [])
+                shapes.append({"batch": k, "prompt_tokens": plen, **r["generation"][0]})
+            rep["budget_shapes"] = shapes
             # the CONFIGURED sizes must themselves pass; a bigger passing size is not enough
             passed = (any(r["ok"] and r["batch"] == gen_cfg_b for r in rep["generation"])
                       and any(r["ok"] and r.get("finite_all_layers") and r.get("likelihood_computed")
-                              and r["batch"] == rb for r in rep["readout"]))
+                              and r["batch"] == rb for r in rep["readout"])
+                      and all(x["ok"] for x in shapes))
             rec = {**now, "configured": {"batch_size": cfg.model.batch_size, "readout_batch_size": rb,
                                          "gen_batch_tokens": cfg.model.gen_batch_tokens,
                                          "worst_case_generation_batch": gen_cfg_b},
@@ -817,6 +824,24 @@ def worst_case_generation_batch(cfg, cov: dict) -> int:
     b = cfg.model.batch_size
     worst = int(cov["worst_round1_prompt_tokens"])
     return plan_generation_batches([worst] * b, b, cfg.model.max_new_tokens, cfg.model.gen_batch_tokens)[0][1]
+
+
+def budget_stress_shapes(cfg, cov: dict) -> list[tuple[int, int]]:
+    """Generation batches that FILL the token budget, bracketing its range: the fewest sequences
+    above the worst-length batch (longest prompts at full budget) and batch_size sequences (most
+    sequences at full budget). Each prompt length is budget // k - max_new_tokens, never longer
+    than the worst case. Empty without a budget."""
+    budget, m, b = cfg.model.gen_batch_tokens, cfg.model.max_new_tokens, cfg.model.batch_size
+    if not budget:
+        return []
+    worst = int(cov["worst_round1_prompt_tokens"])
+    k0 = worst_case_generation_batch(cfg, cov)
+    out = []
+    for k in sorted({k0 + 1, b}):
+        plen = min(budget // k - m, worst)
+        if k0 < k <= b and plen >= 1:
+            out.append((k, plen))
+    return out
 
 
 def template_changes(parent: dict, child: dict) -> list[str]:

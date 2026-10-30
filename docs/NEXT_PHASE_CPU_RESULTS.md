@@ -1263,3 +1263,19 @@ verified, and a test covers the gating.
 - **Cost estimates change.** Revision generation will run at smaller effective batches than the
   estimates assumed (batch 8), so G4 throughput for 5-agent conditions will be lower. G2
   measures it.
+
+**Before attempt 2 (review of `a523640`):**
+
+1. **The stress test now also runs batches that fill the 24k budget**, bracketing its range:
+   - 3 × 6,720-token prompts (the longest at full budget);
+   - 8 × 1,720-token prompts (the most sequences at full budget);
+   - plus the worst-length batch of 2 (7,119 tokens).
+
+   All must pass (`budget_stress_shapes`; test in `tests/test_batching.py`).
+2. **The second-round child runs on the prespecified subset questions whose parent chunks are
+   complete** in every parent condition, not only when the whole parent finishes. A time-capped
+   parent still yields round-2 timing for the subset questions it completed. The sequence
+   record lists the prespecified and runnable subsets. The current subset (pilot positions 1, 4,
+   7, 10) spans all three chunks, so a parent capped after chunk 1 would leave 2 of the 4.
+
+Full suite 318 passed; ruff clean.
