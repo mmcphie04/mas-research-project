@@ -27,6 +27,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 from matplotlib.lines import Line2D  # noqa: E402
+from matplotlib.transforms import Bbox  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 A = ROOT / "artifacts"
@@ -135,19 +136,24 @@ def ci3(d: dict) -> str:
     return f"{d['mean']:.3f} [{d['lo']:.3f}, {d['hi']:.3f}]"
 
 
-def save(fig, out: Path, name: str, width: float) -> None:
+def save(fig, out: Path, name: str, width: float, right_pad: float = 0.0) -> None:
     """Save with a tight crop whose width is exactly `width` inches, so fonts print at their set size.
 
     The overhang of labels outside the axes is (nearly) fixed in inches, so a few resizes converge.
+    `right_pad` (inches) adds blank margin on the right, inside that width.
     """
+    pad = 0.02
     for _ in range(6):
         bb = fig.get_tightbbox(fig.canvas.get_renderer())
-        if abs(bb.width - width) < 0.005:
+        miss = width - (bb.width + 2 * pad + right_pad)
+        if abs(miss) < 0.005:
             break
-        fig.set_size_inches(fig.get_figwidth() + width - bb.width, fig.get_figheight())
-    fig.savefig(out / f"{name}.pdf", bbox_inches="tight", pad_inches=0.02,
+        fig.set_size_inches(fig.get_figwidth() + miss, fig.get_figheight())
+    bb = fig.get_tightbbox(fig.canvas.get_renderer())
+    crop = Bbox.from_extents(bb.x0 - pad, bb.y0 - pad, bb.x1 + pad + right_pad, bb.y1 + pad)
+    fig.savefig(out / f"{name}.pdf", bbox_inches=crop,
                 metadata={"CreationDate": None})  # no timestamp, so reruns give identical files
-    fig.savefig(out / f"{name}.png", bbox_inches="tight", pad_inches=0.02, dpi=200)
+    fig.savefig(out / f"{name}.png", bbox_inches=crop, dpi=200)
     plt.close(fig)
 
 
@@ -313,7 +319,7 @@ def fig4(out: Path, chk: Checks, md: list[str]) -> None:
                 color=C["independent"], ecolor=tint(C["independent"], 0.45), marker="o", ms=5, lw=1.6,
                 elinewidth=1.0, capsize=0, zorder=3)
     # Where each arm's label goes: (anchor y, dx points, dy points, ha, va), placed clear of other marks.
-    place = {"debate3": ("hi", 2, 3, "right", "bottom"), "structured3": ("lo", 3, -3, "left", "top"),
+    place = {"debate3": ("hi", -5, 0, "right", "bottom"), "structured3": ("lo", 3, -3, "left", "top"),
              "debate5": ("lo", 0, -3, "center", "top"), "structured5": ("hi", 0, 3, "center", "bottom")}
     for cond, concept, lab, k, sec, m, lo, hi, *_ in arms:
         ax.errorbar([sec], [m], yerr=[[m - lo], [hi - m]], color=C[concept], marker="o" if k == 3 else "s",
@@ -394,10 +400,12 @@ def fig5(out: Path, chk: Checks, md: list[str]) -> None:
         a2.errorbar([i + 0.18], [af["mean"]], yerr=[[af["mean"] - af["lo"]], [af["hi"] - af["mean"]]],
                     color=C[concept], marker="o", mec="white", mew=1.0, ms=6.5, elinewidth=0.9, capsize=0, zorder=3)
         if ch["lo"] > 0 or ch["hi"] < 0:  # label only the paired changes whose interval excludes 0
-            a2.text(i + 0.18, af["hi"] + 0.006, f"Δ {ch['mean']:+.3f}\n[{ch['lo']:+.3f}, {ch['hi']:+.3f}]",
+            # centred over the pair, well above both intervals; in percentage points
+            a2.text(i, max(b["hi"], af["hi"]) + 0.06,
+                    f"Δ {100 * ch['mean']:+.1f} pts\n[{100 * ch['lo']:+.1f}, {100 * ch['hi']:+.1f}]",
                     ha="center", va="bottom", fontsize=9, color=C["ink2"], linespacing=1.05)
     a2.set_xlim(-0.6, 4.1)
-    a2.set_ylim(0, 0.32)
+    a2.set_ylim(0, 0.34)
     a2.set_yticks([0, 0.05, 0.10, 0.15, 0.20, 0.25])
     a2.set_ylabel("Questions where every agent\ngives the same wrong answer")
     a2.text(-0.27, 1.02, "(b)", transform=a2.transAxes, fontsize=9, fontweight="bold", va="bottom")
@@ -480,7 +488,7 @@ def fig6(out: Path, chk: Checks, md: list[str]) -> None:
                Line2D([], [], color=C["ink2"], marker="o", ls="none", ms=5.5,
                       label="within-question AUROC")]
     fig.legend(handles=handles, loc="lower center", bbox_to_anchor=(0.55, 0.98), ncol=2, borderaxespad=0)
-    save(fig, out, "fig6_signal_auroc", WIDE)
+    save(fig, out, "fig6_signal_auroc", WIDE, right_pad=0.12)
     md.append("")
 
 

@@ -24,22 +24,22 @@
 
   % Round 0
   \foreach \i/\y in {1/1.1, 2/0, 3/-1.1}
-    \node[box=19mm] (a\i) at (2.9,\y) {Agent \i\\answers};
+    \node[box=17mm] (a\i) at (2.6,\y) {Agent \i\\answers};
   \node[head, above=1mm of a1] {Round 0:\\independent};
   \foreach \i in {1,2,3} \draw[flow] (q.east) -- (a\i.west);
 
   % Read peers
   \foreach \i/\p/\y in {1/{2 and 3}/1.1, 2/{1 and 3}/0, 3/{1 and 2}/-1.1}
-    \node[box=23mm] (r\i) at (6.6,\y) {Agent \i\ reads\\agents \p};
+    \node[box=23mm] (r\i) at (5.95,\y) {Agent \i\ reads\\agents \p};
   \node[head, above=1mm of r1] {Read the two\\peers' responses};
 
   % Revise
   \foreach \i/\y in {1/1.1, 2/0, 3/-1.1}
-    \node[box=19mm] (v\i) at (10.2,\y) {Agent \i\\revises once};
+    \node[box=20mm] (v\i) at (9.3,\y) {Agent \i\\revises once};
   \node[head, above=1mm of v1] {Revision};
 
   % Vote
-  \node[box=17mm, minimum height=30mm] (vote) at (13.5,0) {Plurality\\vote\\(panel\\answer)};
+  \node[box=16mm, minimum height=30mm] (vote) at (12.4,0) {Plurality\\vote\\(panel\\answer)};
 
   % Main (debate) path with the three snapshot points
   \foreach \i in {1,2,3} {
@@ -52,30 +52,29 @@
   }
 
   % The three actions compared
-  \coordinate (lane1) at (0,-2.45);
-  \coordinate (lane2) at (0,-3.25);
-  \coordinate (lane3) at (0,-4.05);
+  \coordinate (lane1) at (0,-2.2);
+  \coordinate (lane2) at (0,-2.85);
+  \coordinate (lane3) at (0,-3.5);
+  \node[anchor=east, head] at ($(a3.south |- lane2) + (-0.25,0)$) {Actions\\compared};
   \draw[->, draw=neutral, line width=0.9pt]
     (a3.south |- lane1) -- (vote.south |- lane1)
-    node[pos=0.5, fill=white, inner sep=2pt, text=ink2]
-      {\textbf{Stop:} vote over the three round-0 answers};
+    node[pos=0.5, above=-0.5mm, text=ink2, font=\footnotesize]
+      {\textbf{Stop:} vote over the round-0 answers};
   \draw[->, draw=debate, line width=0.9pt]
     (a3.south |- lane2) -- (vote.south |- lane2)
-    node[pos=0.5, fill=white, inner sep=2pt, text=ink2]
-      {\textbf{Debate:} read peers, revise once, vote over the revised answers};
+    node[pos=0.5, above=-0.5mm, text=ink2, font=\footnotesize]
+      {\textbf{Debate:} revise once, vote over the revised answers};
   \draw[->, draw=independent, line width=0.9pt]
     (a3.south |- lane3) -- (vote.south |- lane3)
-    node[pos=0.5, fill=white, inner sep=2pt, text=ink2]
-      {\textbf{Add independent answers:} more fresh round-0 answers, vote over all};
+    node[pos=0.5, above=-0.5mm, text=ink2, font=\footnotesize]
+      {\textbf{Add answers:} sample more independent answers, vote over all};
   \draw[draw=ink2, line width=0.4pt] (a3.south) -- (a3.south |- lane3);
   \draw[draw=ink2, line width=0.4pt] (vote.south) -- (vote.south |- lane3);
 
-  % Snapshot key
-  \node[anchor=west, text=ink2, font=\footnotesize] (k0) at ($(a3.south |- lane3) + (-1.2,-0.7)$) {Snapshots:};
-  \node[snap, right=1.5mm of k0] (k1) {1};
-  \node[right=0.5mm of k1, text=ink2, font=\footnotesize] (t1) {after the original answer};
-  \node[snap, right=3mm of t1] (k2) {2};
-  \node[right=0.5mm of k2, text=ink2, font=\footnotesize] (t2) {after reading peers, before writing};
-  \node[snap, right=3mm of t2] (k3) {3};
-  \node[right=0.5mm of k3, text=ink2, font=\footnotesize] {after the revision};
+  % Snapshot key (centred under the diagram)
+  \node[text=ink2, font=\footnotesize, anchor=north] at ($(a3.south |- lane3)!0.5!(vote.south |- lane3) + (0,-0.3)$) {%
+    \textbf{Snapshots:}\quad
+    \tikz[baseline=(s.base)]\node[snap](s){1}; after the original answer\quad
+    \tikz[baseline=(s.base)]\node[snap](s){2}; after reading peers, before writing\quad
+    \tikz[baseline=(s.base)]\node[snap](s){3}; after the revision};
 \end{tikzpicture}

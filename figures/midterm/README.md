@@ -33,7 +33,8 @@ Exploratory analyses are marked in the captions. "Primary" means pre-specified i
 
 Needs `\usepackage{tikz}` and `\usetikzlibrary{positioning,arrows.meta,calc}`; use it with
 `\input{figures/midterm/fig1_pipeline.tex}`. `fig1_pipeline_preview.tex` is a standalone wrapper for
-compiling it on its own. **Not compile-tested:** no TeX installation is available in this environment.
+compiling it on its own. The current version was supplied by the author, who compile-checked it
+(fits 6.5 in); it has not been compiled in this environment, which has no TeX installation.
 
 Draft caption: *Protocol. Round 0: three copies of Gemma-3-12B answer independently. In debate, each
 agent then reads its two peers' responses and revises once, and the panel answer is the plurality of the
@@ -134,8 +135,9 @@ against `primary.md` and `exploratory.md`.
 | debate5 | 1,000 | 272 | 84 | 79 | 0.090 → 0.125 | +0.035 [+0.010, +0.060] |
 | structured5 | 1,000 | 206 | 59 | 59 | 0.090 → 0.170 | +0.080 [+0.045, +0.120] |
 
-Before/after intervals are in `plotted_values.md`. In panel (b), Δ is printed only where the paired
-interval excludes 0.
+Before/after intervals are in `plotted_values.md`. In panel (b), Δ (after − before, paired) is printed in
+percentage points above each pair, only where its interval excludes 0: debate5 +3.5 pts [+1.0, +6.0],
+structured5 +8.0 pts [+4.5, +12.0].
 
 Draft caption: *What one round of debate does (200 main250 questions). (a) Revised answers that went from
 wrong to right (up) and from right to wrong (down), per arm; counts are agents, out of 600 (3 agents) or
