@@ -27,3 +27,13 @@
 
 Readout path: the model's bf16 logits (`bf16_logits`). Quantized to 0.0625–0.125 logit steps,
 deterministic at batch size 1 (§11 of the results). The default is now `fp32_head` (G3).
+
+## 2026-10-29: G1 readout diagnostic (approved; cap 4 units)
+
+| time | event |
+|---|---|
+| 19:49 | balance 254.05; hard stop at 250.05; session `diag` (A100); code `18969e0` (verdict logic committed before the run) |
+| 19:51 | setup verified; build hash verified and unpacked; `readout_diagnostic.py run --max-minutes 20` launched detached |
+| 19:58 | one status call returned no output (CLI connection); later calls fine |
+| ~20:02 | complete: 680 reads (default and eager attention, both heads), 378 s of reading |
+| 20:04 | `diag_out.tgz` (SHA-256 `ae771979…`) downloaded, hash matched, copied to `mas_backup/next_commit/`; session stopped; balance **252.71** (this session **1.34 units**, ~15 min) |

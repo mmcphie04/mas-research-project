@@ -72,6 +72,9 @@ def main(argv=None) -> int:
     ap.add_argument("--pilot-size", type=int, default=120)
     ap.add_argument("--n-questions", type=int)
     ap.add_argument("--order-seed", type=int, default=7, help="data.sample_seed (master-order seed)")
+    ap.add_argument("--dataset-revision", default=None, help="pinned dataset revision (recorded in the manifest)")
+    ap.add_argument("--expect-master-sha256", default=None,
+                    help="refuse unless the master order hashes to this (e.g. the value a parent job recorded)")
     ap.add_argument("--fracs", type=float, nargs=3, default=[0.375, 0.125, 0.5])
     ap.add_argument("--seed", type=int, required=True)
     ap.add_argument("--out", required=True)
@@ -92,15 +95,23 @@ def main(argv=None) -> int:
         from run_experiment import DATASETS, load_pool
 
         from mad.config import DataConfig
-        from mad.job import master_order, select
+        from mad.job import master_order, question_sha256, select
 
-        data = DataConfig(sample_seed=args.order_seed)
+        data = DataConfig(sample_seed=args.order_seed, dataset_revision=args.dataset_revision)
         data.dataset, data.split = DATASETS[args.dataset]
         pool = load_pool(args.dataset, SimpleNamespace(data=data))
-        qs = select(master_order(pool, args.order_seed), args.pool, args.n_questions, args.pilot_size,
-                    args.validation_size)
-        made_for = {"selection": {"dataset": args.dataset, "pool": args.pool, "pilot_size": args.pilot_size,
+        master = master_order(pool, args.order_seed)
+        master_sha = hashlib.sha256(",".join(q.question_id for q in master).encode()).hexdigest()
+        if args.expect_master_sha256 and master_sha != args.expect_master_sha256:
+            raise SystemExit(f"master order {master_sha} != expected {args.expect_master_sha256}")
+        qs = select(master, args.pool, args.n_questions, args.pilot_size, args.validation_size)
+        start = {"pilot": 0, "validation": args.pilot_size, "main": args.pilot_size + args.validation_size}[args.pool]
+        made_for = {"selection": {"dataset": args.dataset, "dataset_revision": args.dataset_revision,
+                                  "pool": args.pool, "pilot_size": args.pilot_size,
                                   "n_questions": args.n_questions, "order_seed": args.order_seed,
+                                  "master_order_sha256": master_sha,
+                                  "positions_1_based": [start + 1, start + len(qs)],
+                                  "question_content_sha256": {q.question_id: question_sha256(q) for q in qs},
                                   **({"validation_size": args.validation_size} if args.validation_size else {})}}
     raw = make_splits(qs, tuple(args.fracs), seed=args.seed)
     assignment = {q: ("validation" if s == "val" else s) for q, s in raw.items()}

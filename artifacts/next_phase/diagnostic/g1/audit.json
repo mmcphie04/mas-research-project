@@ -1,0 +1,41 @@
+{
+ "training": false,
+ "attn_implementation": "sdpa",
+ "text_attn_implementation": "sdpa",
+ "sliding_window": 1024,
+ "final_logit_softcapping": null,
+ "torch_dtype": "torch.bfloat16",
+ "padding_side_for_readout": "left (explicit in code)",
+ "pad_token_id": 0,
+ "letter_ids": [
+  236776,
+  236799,
+  236780,
+  236796,
+  236788,
+  236811,
+  236823,
+  236814,
+  236777,
+  236863
+ ],
+ "letters_decode": [
+  "A",
+  "B",
+  "C",
+  "D",
+  "E",
+  "F",
+  "G",
+  "H",
+  "I",
+  "J"
+ ],
+ "can_switch_attention": true,
+ "logits_dtype": "torch.bfloat16",
+ "letter_logit_scale": [
+  8.6875,
+  13.5625
+ ],
+ "bf16_logits_vs_fp32_head_max_abs_dlogp_on_probe": 0.04856300354003906
+}

@@ -322,8 +322,11 @@ class HFBackend(Backend):
             for i, (seq, info) in enumerate(zip(seqs, infos, strict=True)):
                 n = n_options[start + i]
                 pad = width - len(seq)
-                letter_logits = logits[i, self._letter_ids[:n]]
-                logprobs = torch.log_softmax(letter_logits, dim=-1).cpu().numpy()
+                if mc.readout_head == "fp32_head":  # the last position is the readout "(" (left padding)
+                    logprobs = self.letter_logprobs_from_hidden(hs[-1][i, -1, :], n)
+                else:
+                    letter_logits = logits[i, self._letter_ids[:n]]
+                    logprobs = torch.log_softmax(letter_logits, dim=-1).cpu().numpy()
                 extra, extra_lp = {}, {}
                 for name, j in info["found"].items():
                     extra[name] = torch.stack([h[i, pad + j, :] for h in hs], dim=0).float().cpu().numpy()
@@ -462,11 +465,12 @@ class HFBackend(Backend):
 
         ``head``:
           fp32_head    the final-layer hidden state at the last position, projected onto the
-                       option-letter rows in float32 with Gemma's soft-capping
-                       (``letter_logprobs_from_hidden``). The model's own logits tensor is
-                       bfloat16, whose spacing at Gemma's soft-capped logit scale (|z| ~ 16-30)
-                       is 0.0625-0.125: a one-step rounding difference moves a close two-letter
-                       contest by 0.15-0.4 in probability (docs/NEXT_PHASE_CPU_RESULTS.md s11).
+                       option-letter rows in float32 (soft-capping applied only if the config
+                       sets it; Gemma-3-12B does not) via ``letter_logprobs_from_hidden``. The
+                       model's own logits tensor is bfloat16; at the letter logits' scale here
+                       (about 8-16) its spacing is 0.0625. This removes that rounding, but G1
+                       showed the larger batch-composition effect lives in the hidden state
+                       itself (docs/NEXT_PHASE_CPU_RESULTS.md s16): read at batch size 1.
           bf16_logits  ``logits_to_keep=1`` logits as the model returns them -- the path of the
                        saved peer_exposure readouts, kept for bridging to them.
         Inputs are token ids built by the caller, never re-tokenised. Left padding, as in

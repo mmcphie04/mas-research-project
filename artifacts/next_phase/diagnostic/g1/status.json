@@ -1,0 +1,8 @@
+{
+ "rows": 680,
+ "complete": true,
+ "attn_modes": [
+  "default",
+  "eager"
+ ]
+}

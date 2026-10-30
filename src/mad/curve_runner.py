@@ -527,10 +527,13 @@ def analyze(B: Build, rows_dir: Path, out: Path, *, partial_smoke: bool = False,
     X = X.merge(R[KEY + ["answer", "prev_answer", "gold", "kind", "changed", "reasoning_names_final_option",
                          "lp_exposure", "lp_before_stated"]], on=KEY)
     X["cluster"] = X.pool + ":" + X.question_id.astype(str)
-    am = np.array([int(np.argmax(v)) for v in X.logprobs])
-    X["is_eventual"] = (am == X.answer).astype(float)
-    X["is_previous"] = (am == X.prev_answer).astype(float)
-    X["is_gold"] = (am == X.gold).astype(float)
+    # an exact tie between top letters (possible with quantized logits) is scored fractionally:
+    # each tied letter gets 1/k, never the lowest index by default
+    top = [set(np.flatnonzero(np.isclose(np.asarray(v), np.max(v), rtol=0, atol=1e-7))) for v in X.logprobs]
+    X["is_eventual"] = [float(a in t) / len(t) for a, t in zip(X.answer, top, strict=True)]
+    X["is_previous"] = [float(a in t) / len(t) for a, t in zip(X.prev_answer, top, strict=True)]
+    X["is_gold"] = [float(a in t) / len(t) for a, t in zip(X.gold, top, strict=True)]
+    X["top_tied"] = [len(t) > 1 for t in top]
     X["p_eventual"] = [float(np.exp(v[a])) for v, a in zip(X.logprobs, X.answer, strict=True)]
     curves = []
     for fam in STANDARD_FAMILIES:
@@ -557,6 +560,7 @@ def analyze(B: Build, rows_dir: Path, out: Path, *, partial_smoke: bool = False,
     pd.DataFrame(curves, columns=cols).to_csv(out / f"curves{tag}.csv", index=False)
     res = {"label": label or "FINAL", "build_id": B.build_id, "identity": man["identity"],
            "responses": int(X.drop_duplicates(KEY).shape[0]), "missing_items": len(missing),
+           "exact_top_ties_scored_fractionally": int(X.top_tied.sum()),
            "paired_debate_minus_self_changed_is_eventual": paired, "reproduction": rep}
     CM.to_json(res, out / f"analysis{tag}.json")
     return res

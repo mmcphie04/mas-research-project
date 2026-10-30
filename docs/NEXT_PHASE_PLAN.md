@@ -176,10 +176,33 @@ whether or not any learned controller succeeds.
 | step | what | estimate | hard cap |
 |---|---|---|---|
 | G1 | readout diagnostic (§13.1 of the results) | 0.3–0.45 h, 2–3 units | 4 units |
-| G2 | development timing pilot, 12 validation-pool questions, new protocol, including second rounds and the control on 4 (§13.2) | 1.1–1.6 h, 7.5–11 units | 12 units |
-| G3 | core curves re-read with `fp32_head` (if G1 confirms) | ~0.6–0.8 h, 4–5.5 units | 6 units |
+| G2 | development timing pilot, 12 validation-pool questions, new protocol, including second rounds and the control on 4 (§13.2); job limits 1.1 h + 0.35 h | 1.1–1.6 h, 7.5–11 units | 13 units |
+| G3 | **on hold**: core curves re-read with `fp32_head`. A CPU count found that at most 18 curve inputs are affected (results §15) | ~0.6–0.8 h, 4–5.5 units | 6 units |
 | G4 | main collection base (200 fresh questions) | §13.3; to be re-estimated from G2 | set after G2 |
 | E1–E3 | extensions | §13.3 | set after G2 |
+
+### Fourth review (2026-10-29, night): decisions
+
+- **G1:** approved (cap 4 units). The report prints the fixed rule: "0 of 20 targets > 0.05
+  under fp32_head, D2–D4 vs D1" → PASS / UNRESOLVED / FAIL.
+- **Before G2:**
+  - the stored readout letter distribution switches to the fp32 projection of the final hidden
+    state (`model.readout_head: fp32_head`). It is versioned like `brevity_words`, so legacy
+    hashes are unchanged; set in `configs/main_250.yaml`;
+  - G2 job limits are 1.1 h + 0.35 h, with a session cap of 13 units;
+  - an off-device copy (rclone to Google Drive + `rclone check`) must exist. It is required
+    before G4.
+- **G3:** on hold. The CPU count of core readouts whose top-two log-odds gap is ≤ 0.125 is in
+  results §15.
+- **Activations:** all 49 layers are kept.
+- **Fresh set:** positions 321–520 confirmed. Split manifest committed:
+  `artifacts/main250/plan/main250-split.json`, with IDs, the dataset revision, the master-order
+  hash and per-question content hashes.
+- **Noted for later (not yet changed):**
+  - round-2 rows still carry round-0 panel metadata (`panel_peer_answers`, `n_panel_agree_pre`)
+    rather than round-1;
+  - `panels.compare` uses the original answers as the "before" baseline, where round-2 events
+    should be measured against round 1.
 
 ### Second review (2026-10-29, afternoon): fixes before any GPU session
 

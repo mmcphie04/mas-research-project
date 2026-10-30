@@ -249,3 +249,31 @@ def test_option_letters_are_single_tokens_after_both_answer_prefixes():
         base = tok.encode(prefix, add_special_tokens=False)
         for letter, tid in zip("ABCDEFGHIJ", ids, strict=True):
             assert tok.encode(prefix + letter, add_special_tokens=False) == [*base, tid], (prefix, letter)
+
+
+def test_readout_head_is_versioned_and_legacy_identities_unchanged():
+    from mad.config import load_config
+
+    legacy = load_config("configs/base.yaml", "configs/colab_12b.yaml")
+    assert "readout_head" not in legacy.to_dict()["model"]  # every existing identity unchanged
+    new = load_config("configs/base.yaml", "configs/colab_12b.yaml", "configs/main_250.yaml")
+    assert new.to_dict()["model"]["readout_head"] == "fp32_head"
+    with pytest.raises(ValueError, match="readout_head"):
+        load_config("configs/base.yaml", **{"model.readout_head": "fp16"})
+
+
+@pytest.mark.skipif(not HF, reason="transformers not installed (uv sync --extra hf)")
+def test_hf_readout_fp32_head_matches_the_logits_path_on_a_float32_model():
+    from mad.backends.base import build_backend
+    from mad.config import load_config
+
+    kw = {"activations.positions": ["readout_last"]}
+    a = build_backend(load_config("configs/base.yaml", "configs/smoke_tiny.yaml", **kw))
+    b = build_backend(load_config("configs/base.yaml", "configs/smoke_tiny.yaml", **kw, **{"model.readout_head": "fp32_head"}))
+    prompt = a.render([{"role": "user", "content": "Pick: (A) x (B) y (C) z (D) w"}])
+    texts = [prompt + "It is the second one.\nAnswer: (B)", prompt]
+    ra = a.readout(texts, [4, 4], meta=[{"gen_start_char": len(prompt)}, {"gen_start_char": None}])
+    rb = b.readout(texts, [4, 4], meta=[{"gen_start_char": len(prompt)}, {"gen_start_char": None}])
+    for x, y in zip(ra, rb, strict=True):
+        np.testing.assert_allclose(x.letter_logprobs, y.letter_logprobs, atol=1e-4)
+        assert x.answer_index == y.answer_index

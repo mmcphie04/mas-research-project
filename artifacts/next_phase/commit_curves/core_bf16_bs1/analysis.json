@@ -10,6 +10,7 @@
  },
  "responses": 1539,
  "missing_items": 0,
+ "exact_top_ties_scored_fractionally": 25,
  "paired_debate_minus_self_changed_is_eventual": {
   "0.0": {
    "questions": 71,
@@ -43,9 +44,9 @@
   },
   "0.5": {
    "questions": 71,
-   "mean_diff": 0.2746478873239437,
-   "lo": 0.18544600938967137,
-   "hi": 0.3685446009389671,
+   "mean_diff": 0.2769953051643192,
+   "lo": 0.18779342723004694,
+   "hi": 0.3708920187793427,
    "favour_a": 30,
    "favour_b": 1,
    "ties": 40,
@@ -85,6 +86,6 @@
    "median_abs_dlogp_top": 0.0,
    "max_abs_dlogp_any": 1.9757263211059568
   },
-  "standard_f1_argmax_equals_stated": 0.9987004548408057
+  "standard_f1_argmax_equals_stated": 0.9990253411306043
  }
 }

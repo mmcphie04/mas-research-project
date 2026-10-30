@@ -32,6 +32,12 @@ class ModelConfig:
     # Readout holds hidden states for every layer and position, so its safe batch differs from
     # generation's. None means "same as batch_size".
     readout_batch_size: int | None = None
+    # How the stored forced-choice letter distribution is computed (versioned like
+    # debate.brevity_words): "bf16_logits" -- the model's own logits tensor, bfloat16 on GPU and so
+    # quantized to 0.0625 steps at this model's letter-logit scale (the legacy path, omitted from the
+    # serialized config so every existing identity is unchanged); "fp32_head" -- the final hidden
+    # state at the readout position projected onto the option-letter rows in float32.
+    readout_head: str = "bf16_logits"
 
 
 @dataclass
@@ -129,6 +135,8 @@ class RunConfig:
         d = asdict(self)
         if d["debate"].get("brevity_words") == LEGACY_BREVITY_WORDS:
             del d["debate"]["brevity_words"]  # legacy protocol: identical to pre-versioning identities
+        if d["model"].get("readout_head") == LEGACY_READOUT_HEAD:
+            del d["model"]["readout_head"]
         return d
 
     def hash(self) -> str:
@@ -208,6 +216,8 @@ def config_from_dict(data: dict[str, Any]) -> RunConfig:
 
 CANONICAL_ANSWERS = ("stated", "readout")
 LEGACY_BREVITY_WORDS = 150
+LEGACY_READOUT_HEAD = "bf16_logits"
+READOUT_HEADS = ("bf16_logits", "fp32_head")
 BREVITY_WORDS = (150, 250)
 
 
@@ -220,6 +230,8 @@ def validate(cfg: RunConfig) -> None:
     if cfg.debate.canonical_answer not in CANONICAL_ANSWERS:
         raise ValueError(f"debate.canonical_answer={cfg.debate.canonical_answer!r}; "
                          f"expected one of {CANONICAL_ANSWERS}")
+    if cfg.model.readout_head not in READOUT_HEADS:
+        raise ValueError(f"model.readout_head={cfg.model.readout_head!r}; expected one of {READOUT_HEADS}")
     if cfg.debate.brevity_words not in BREVITY_WORDS:
         raise ValueError(f"debate.brevity_words={cfg.debate.brevity_words}; expected one of {BREVITY_WORDS}")
     if cfg.debate.n_rounds != 1:

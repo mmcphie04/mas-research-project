@@ -812,8 +812,9 @@ token sums, maximum lengths), so each input's left-padding and batch-mates are e
   | archived `before_stated_answer` readouts (fp32 projection of the final hidden state) | 1.5% (chance) |
   | new curve readout (model logits) | 100% |
 
-- **The mechanism.** The model returns logits in bfloat16. At Gemma's soft-capped logit scale
-  (|z| ≈ 16–30) bf16 can only represent steps of 0.0625–0.125. Any tiny difference in the final
+- **The mechanism.** The model returns logits in bfloat16. *(Corrected after G1: this model has no
+  final-logit soft-capping, and its letter logits lie around 8–16, where bf16 can only represent
+  steps of 0.0625.)* Any tiny difference in the final
   hidden state, such as a different kernel path for a batch, can move a letter's logit by one or
   more whole steps. In a two-letter contest that moves the probability by 0.15–0.4.
 - **Not padding.** Several of the worst cases have **zero or one** padding token. Their shift is
@@ -835,7 +836,7 @@ token sums, maximum lengths), so each input's left-padding and batch-mates are e
   differ by ≤ 0.007. This is not extrapolated to the full set.
 - **Fix implemented:** `HFBackend.letter_logprobs_ids(head="fp32_head")`, now the default. It
   projects the final hidden state onto the option-letter rows in float32 with Gemma's
-  soft-capping. This is the path whose archived outputs are not quantized, and the 270m-model test
+  soft-capping (none configured for this model). This is the path whose archived outputs are not quantized, and the 270m-model test
   shows it equals the logits path when the model itself is float32. The head is part of the
   output binding, so `bf16_logits` and `fp32_head` rows cannot be mixed.
 - **Also implemented:**
@@ -919,7 +920,7 @@ fresh collection; 7 overlap the Stage 3 development set.
 python scripts/run_experiment.py --config configs/base.yaml configs/colab_12b.yaml configs/main_250.yaml \
   --out-root /content/pilot --name pilot250 --dataset mmlu-pro --pool validation --pilot-size 120 \
   --validation-size 200 --n-questions 12 --chunk 4 --set data.dataset_revision=b189ec765aa7ed75c8acfea42df31fdae71f97be \
-  --conditions pool debate3 structured3 debate5 structured5 --max-hours 1.2
+  --conditions pool debate3 structured3 debate5 structured5 --max-hours 1.1
 ```
 
 It covers the 10-response pool, both panels and both prompts. A memory stress pass runs at the
@@ -932,7 +933,7 @@ reuses round 1:
 python scripts/run_experiment.py --config configs/base.yaml configs/colab_12b.yaml configs/main_250.yaml \
   --out-root /content/pilot --name pilot250_r2 --parent pilot250 \
   --subset-ids artifacts/next_phase/pilot_r2_subset.json \
-  --conditions debate3_r2 structured3_r2 debate5_r2 structured5_r2 self_structured5 --max-hours 0.4
+  --conditions debate3_r2 structured3_r2 debate5_r2 structured5_r2 self_structured5 --max-hours 0.35
 ```
 
 Its stress pass runs at the round-2 worst case (≈ 14 k tokens).
@@ -958,9 +959,10 @@ protocol):
 | two stress passes | ≈ 10 |
 | setup and dataset | ≈ 7 |
 | backup | 5–10 |
-| **total** | **1.1–1.6 h ≈ 7.5–11 units. Hard cap 12 units** |
+| **total** | **1.1–1.6 h ≈ 7.5–11 units** |
 
-`--max-hours` is set per job.
+**Job limits:** `--max-hours 1.1` (parent) + `0.35` (child) = 1.45 h of job time. With setup and backup the
+**session hard cap is 13 units** (1.93 h at 6.73/h).
 
 ### 13.3 Main collection and extensions (estimates; G2 replaces them with measurements)
 
@@ -1011,7 +1013,7 @@ review also asked. Session log: `artifacts/next_phase/OPS_LOG.md`.
 - **Coverage:** complete (13,851 / 13,851), so this is the **FINAL** analysis
   (`artifacts/next_phase/commit_curves/core_bf16_bs1/`).
 - **Caveat:** these readouts use the quantized bf16-logits head (§11). They are deterministic at
-  batch size 1, but every letter logit is rounded to 0.0625–0.125. Argmax-based curves are
+  batch size 1, but every letter logit is rounded to bf16 precision (0.0625 at this scale). Argmax-based curves are
   affected only where two letters' rounded logits are close. G3 would re-read the same inputs
   with `fp32_head` (estimate 4–5.5 units).
 
@@ -1073,3 +1075,131 @@ agents' own `Answer: (` format these are 0.15 and 0.95. Debate is much less pref
 | `tests/test_curve_runner.py` (13) | adds the readout head as bound identity, batch composition in rows, status while running |
 | `tests/test_curves.py` (15) | adds fp32 head = logits path on a float32 model, explicit positions, and option letters as single tokens after both prefixes (cached 12B tokenizer) |
 | full suite | 304 passed; ruff clean |
+
+## 15. Fourth review: CPU items (2026-10-29, night)
+
+### 15.1 G3 count: core readouts close enough for quantization to matter
+
+From `artifacts/next_phase/commit_curves/core_bf16_bs1/close_contests.json`:
+
+- **Grid:** every one of the 13,851 core readouts has its top-two log-odds gap on the 0.0625 grid
+  (in practice, 0.125 steps).
+- **Gap ≤ 0.125:** **26 readouts (0.19%)**. **25 of them are exact ties** (gap 0) between two
+  letters' rounded logits, where argmax silently takes the lower letter. One has a gap of 0.125.
+  For comparison, 88 have a gap ≤ 0.25.
+- **On the curve inputs** (standardized fractions): 18 of 9,234 (0.19%):
+  - by fraction 0 / 0.1 / 0.25 / 0.5 / 0.75 / 1: 4 / 4 / 5 / 3 / 1 / 1;
+  - 14 of 3,354 on changed responses, 4 of 5,880 on unchanged ones.
+- **Bound on the effect.** A full-precision re-read (G3) can move the argmax-based curves only
+  through these inputs. Per condition and fraction among changed responses, at most 2 of 251
+  (debate) and 4 of 308 (reconsideration, at 25%). That is at most 1.3% of any cell, and ≤ 0.8% in
+  debate. - **Fractional tie scoring is now applied** in `curve_runner.analyze`: an exact tie between top
+  letters gives each tied letter 1/k, instead of argmax taking the lowest index. The core FINAL
+  analysis was re-run: 25 tied readouts. The §12 values move by ≤ 0.002 (unchanged at two
+  decimals), and the paired f = 0 gap is still +0.629.
+
+### 15.2 Stored readout distributions: versioned fp32 head
+
+- **Config.** `model.readout_head` takes `bf16_logits` (the legacy default, omitted from the
+  serialized config so every existing job identity is unchanged) or `fp32_head`.
+- **What it changes.** With `fp32_head`, `HFBackend.readout` stores the letter distribution
+  computed from the final hidden state at the readout position (float32 projection with
+  soft-capping where configured; none for this model), the same path as the archived pre-letter readouts.
+- **Where it is set.** `configs/main_250.yaml` sets it.
+- **Not in the backend identity.** It is kept out of `describe()`, so children of the existing
+  jobs still validate.
+- **Tests:**
+  - legacy serialization unchanged;
+  - the new config records it;
+  - an invalid value refused;
+  - on the float32 270m model the two heads agree to 1×10⁻⁴.
+
+### 15.3 Fresh-set split manifest
+
+`artifacts/main250/plan/main250-split.json`, made with `scripts/make_split.py`, which now takes
+`--dataset-revision` and `--expect-master-sha256`:
+
+- 200 questions, positions **321–520** of the fixed master order;
+- dataset revision `b189ec76…`, read from the local cache at exactly that revision;
+- master order SHA-256 `c4c67294…`, checked equal to the validation job's recorded value;
+- per-question content hashes;
+- a seeded split (seed 20261029; train 74 / validation 28 / test 98), stratified by subject;
+- **0 overlap** with the 320 pilot and validation questions.
+
+### 15.4 Off-device copy: prepared, needs your Google sign-in
+
+- **Installed.** rclone v1.68.2, into `~/.local/bin`, verified against the release's SHA256SUMS.
+- **Script.** `scripts/offdevice_backup.py`:
+  - copies the pilot archive (only `pilot12b-*`), the validation archive, the frozen scorers and
+    the next-phase curve outputs to `gdrive:mas_research_backup/<set>`;
+  - runs `rclone copy --checksum` then `rclone check --one-way` (size + MD5 for every file);
+  - records each run in `artifacts/next_phase/backup/offdevice_log.jsonl`;
+  - never deletes remotely;
+  - refuses to run while the remote is not configured. That is the current state.
+- **Blocking step (interactive).** `rclone config create gdrive drive scope=drive.file` opens a
+  browser sign-in. `drive.file` limits rclone to the files it creates. After that,
+  `python scripts/offdevice_backup.py` runs and verifies about 8 GB.
+
+## 16. G1 readout diagnostic (GPU run 2026-10-29): FAIL under the fixed rule
+
+**Session.** Approved; 15 min, **1.34 units** (`artifacts/next_phase/OPS_LOG.md`). Outputs:
+`artifacts/next_phase/diagnostic/g1/` (report, audit, all 680 reads).
+
+**Rule** (fixed before the run): 0 of 20 targets with max |Δp| > 0.05 under `fp32_head`, D2–D4
+vs D1 (default attention). **Verdict: FAIL.** 12 of 20 targets exceed, which is every one of the
+12 sequences selected as worst in the smoke. None of the 8 stable controls exceeds; their maximum
+is 0.0008. No threshold was changed.
+
+| comparison (fp32_head, the 12 worst targets) | targets > 0.05 | largest \|Δp\| | argmax flips |
+|---|---|---|---|
+| D1 single read, repeated ×3 | — | **0** (exactly reproducible) | 0 |
+| D2 [target ×4], no padding | 2 of 12 | 0.07 | 0 |
+| D3 original smoke batch | 11 of 12 | 0.39 | 2 |
+| D4 partner shorter (target unpadded) | 6 of 12 | 0.50 | 2 |
+| D4 pad ~50 / ~300 / ~1,500 | 6 / 7 / 6 of 12 | 0.50 / 0.42 / 0.51 | 2 / 3 / 2 |
+| D5 explicit position ids (pad 50/300/1,500) | 5 / 4 / 4 of 12 | 0.31 / 0.18 / 0.47 | 3 / 1 / 2 |
+| D6 eager attention, D4 conditions | 6–9 of 12 | 0.30–0.43 | 1–3 |
+
+**Diagnosis** (supported by the comparisons):
+
+1. **Single-item reads are deterministic.** Three repeats are identical to the last bit. There is
+   no run-to-run variability at batch size 1.
+2. **The large shifts come from the batch, not from quantization.**
+   - On identical reads the fp32 head and the bf16 logits differ by a median of 0.002 and at most
+     0.05. Rounding of the logits is a small, secondary effect.
+   - The 0.3–0.5 shifts persist under the fp32 head. The **final hidden state itself** changes
+     when the same sequence is computed in a different batch.
+   - §11.2's attribution of the large jumps to logit quantization is therefore **withdrawn**.
+3. **It is not padding, positions or the attention kernel.**
+   - It occurs with the target unpadded (only its partner padded): 0.50.
+   - It occurs with four identical copies and no padding at all: 0.07.
+   - It persists with explicit position ids (D5) and under eager attention (D6).
+   - The audit is clean: eval mode; sdpa; sliding window 1,024; no final-logit soft-capping;
+     bf16 weights; letter logits around 8.7–13.6; correct letter ids.
+   - What remains is **batch-dependent bf16 numerics** in the forward pass: different reduction
+     and kernel choices for different batch shapes. Some inputs (the 12 here, about 3–5% of smoke
+     inputs) are sensitive enough that this moves their letter distribution substantially. The
+     exact kernel-level mechanism is **unresolved**; batch-invariant kernels or full fp32 compute
+     would be needed to isolate it.
+
+**Consequences.**
+
+- **Curve readouts.** Batch size 1 is the right mode: deterministic and batch-invariant. The core
+  curves (§12) were read this way. Their remaining issue is only the 0.0625 rounding of logits,
+  which affects ≤ 18 curve inputs, ties scored fractionally (§15.1). **G3** (fp32 re-read) would
+  change at most those inputs. It stays on hold, as you decided.
+- **Stored readouts and activations in generation jobs** (archived and future) were computed at
+  readout batch size 4 (or 2). For sensitive inputs they depend on batch composition. This is
+  numerical noise, not bias, but it is real.
+  - **Recommendation for G2/G4** (decision for review; **applied** in `configs/main_250.yaml` so
+    the runbook is consistent, and reversible): `model.readout_batch_size: 1`. This makes every
+    stored distribution and activation batch-invariant.
+  - **Its cost:** readouts were measured at about 0.23 s per state at batch 4; at batch 1 an
+    estimated 0.3–0.4 s, so about +0.3–0.5 h (+2–3.5 units) for the 200-question base. G2
+    measures it.
+  - Generation stays batched; sampling is stochastic anyway.
+- **The archived probe features** (pilot and validation activations) carry this
+  batch-composition noise for sensitive inputs. It is recorded as a limitation of the earlier
+  probe results.
+
+**Tests at this point:** full suite 310 passed; ruff clean.

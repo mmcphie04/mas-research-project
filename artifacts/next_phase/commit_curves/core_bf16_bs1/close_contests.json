@@ -1,0 +1,18 @@
+{
+ "core_rows": 13851,
+ "gaps_on_0.0625_grid": 1.0,
+ "gap_le_0.0": 25,
+ "gap_le_0.0625": 25,
+ "gap_le_0.125": 26,
+ "gap_le_0.25": 88,
+ "standard_inputs": 9234,
+ "standard_gap_le_0.125": 18,
+ "standard_gap_le_0.125_by_fraction": {
+  "0.0": 4,
+  "0.1": 4,
+  "0.25": 5,
+  "0.5": 3,
+  "0.75": 1,
+  "1.0": 1
+ }
+}

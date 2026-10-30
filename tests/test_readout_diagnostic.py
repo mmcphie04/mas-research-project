@@ -24,7 +24,7 @@ def rows(shift=None, rep_shift=0.0, d5_fixes=False, eager_fixes=False, drop=None
     for t in T:
         for attn in ("default", "eager"):
             for head in ("fp32_head", "bf16_logits"):
-                def add(cond, rep=-1, p=BASE):
+                def add(cond, rep=-1, p=BASE, attn=attn, head=head, t=t):
                     out.append({"attn": attn, "head": head, "cond": cond, "rep": rep, "target": t, "p": p})
                 add("D1_single", 0)
                 add("D1_single", 1, BASE + np.array([rep_shift, -rep_shift, 0, 0]))
