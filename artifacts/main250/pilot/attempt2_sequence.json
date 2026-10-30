@@ -1,0 +1,30 @@
+[
+ {
+  "step": "parent",
+  "exit": 0,
+  "state": "finished",
+  "chunks_done": 3,
+  "chunks_total": 3,
+  "seconds": 3186.1,
+  "subset_prespecified": [
+   "1660",
+   "10903",
+   "3361",
+   "10477"
+  ],
+  "subset_runnable": [
+   "1660",
+   "10903",
+   "3361",
+   "10477"
+  ]
+ },
+ {
+  "step": "child",
+  "exit": 0,
+  "state": "finished",
+  "chunks_done": 3,
+  "chunks_total": 3,
+  "seconds": 1029.9
+ }
+]

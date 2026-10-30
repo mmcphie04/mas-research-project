@@ -1279,3 +1279,62 @@ verified, and a test covers the gating.
    7, 10) spans all three chunks, so a parent capped after chunk 1 would leave 2 of the 4.
 
 Full suite 318 passed; ruff clean.
+
+## 19. G2 development timing pilot (attempt 2): measured
+
+**Session:** 82 min, **8.67 units**. G2 total (both attempts) **9.73 of 13**. Both jobs
+finished. Development questions only: 12 validation-pool questions, 4 of them in the subset.
+**Accuracy is not interpreted** (12 questions). Measurements:
+`artifacts/main250/pilot/attempt2_measurements.json` (stress, status, sequence files alongside).
+
+| condition | responses | completion tokens median / p90 / max | capped | stated answer | prompt tokens median / max | generation s per response | readout s per response |
+|---|---|---|---|---|---|---|---|
+| pool (round 0) | 120 | 252 / 731 / 1,273 | 0 | 100% | 258 / 483 | 7.4 (incl. readout) | — |
+| debate3 | 36 | 194 / 412 / 675 | 0 | 100% | 1,140 / 3,600 | 7.1 | 0.6 |
+| structured3 | 36 | 314 / 578 / 1,280 | 1 (2.8%) | 100% | 1,268 / 3,728 | 12.4 | 0.7 |
+| debate5 | 60 | 195 / 301 / 519 | 0 | 100% | 1,670 / 4,926 | 5.8 | 0.8 |
+| structured5 | 60 | 307 / 529 / 809 | 0 | 100% | 1,798 / 5,054 | 9.8 | 0.9 |
+| debate3_r2 | 12 | 138 / 183 / 223 | 0 | 100% | 1,560 / 1,874 | 4.3 | 0.6 |
+| structured3_r2 | 12 | 294 / 352 / 383 | 0 | 100% | 2,224 / 2,469 | 8.6 | 0.8 |
+| debate5_r2 | 20 | 160 / 230 / 253 | 0 | 100% | 2,488 / 2,930 | 4.0 | 0.9 |
+| structured5_r2 | 20 | 273 / 333 / 374 | 0 | 100% | 3,196 / 3,556 | 8.2 | 1.2 |
+| self_structured5 | 20 | 318 / 342 / 400 | 0 | 100% | 644 / 867 | 7.4 | 0.3 |
+
+**Lengths.**
+
+- First answers are 1.57× the 150-word protocol's median (252 vs 161 tokens). The 1,280 cap was
+  hit once in 476 responses.
+- Structured revisions run about 1.6× longer than ordinary ones and cost about 1.7× the
+  generation time.
+
+**Memory.**
+
+- Every stress shape passed: worst-length generation batch 2, budget-filling 3 × 6,720 and
+  8 × 1,720, readout batch 1 at 8.4 k and 9.8 k tokens.
+- **But the real run's chunk 2 reached 41.3 GB reserved** (of 42.4), above any stress shape
+  (≤ 37.7). Reserved memory includes allocator caching and fragmentation. That margin is too thin
+  for a 12-hour collection.
+- **Recommendation for G4** (decision for review): set
+  `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True` and lower `gen_batch_tokens` to about
+  20,000, then confirm in G4's own stress pass and first chunk.
+
+**Throughput.** Measured generation runs at about 31–42 tokens/s per condition overall:
+batched decoding, with each batch lasting until its longest response finishes.
+
+**Projection** from measured per-question seconds (estimates; 12 development questions, so
+fresh questions may differ):
+
+| item | per question | hours | units at 6.73/h |
+|---|---|---|---|
+| **G4 base** (200 q: pool + debate3 + structured3 + debate5 + structured5) | **223 s** | **12.4 h** | **83.5**, + session overhead ≈ 1 h ≈ 7 → **≈ 90** |
+| E1 second round (50 q, 4 conditions) | 114 s | 1.6 h | 10.7 |
+| E2 no-peer control (50 q) | 38.5 s | 0.53 h | 3.6 |
+
+**Storage:** 51 MB per question (base, all 49 layers) → **10.2 GB** for 200 questions. E1
+adds about 2.4 GB.
+
+**Backup:** the 823 MB pilot archive downloaded in about 2 min; the local and Google Drive
+copies are verified separately (log).
+
+**Balance after G2:** 242.98 units. Base + E1 + E2 ≈ 104 units, which fits. E3 (curves on the
+new responses) remains to be priced from the measured readout rate.

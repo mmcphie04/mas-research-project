@@ -1,0 +1,218 @@
+{
+ "questions": 12,
+ "subset_questions": 4,
+ "measured": {
+  "pilot250-debate3": {
+   "responses": 36,
+   "completion_tokens_median": 194.5,
+   "p90": 412.5,
+   "max": 675,
+   "capped": 0,
+   "stated_answer_rate": 1.0,
+   "prompt_tokens_median": 1140.0,
+   "prompt_tokens_max": 3600
+  },
+  "pilot250-debate5": {
+   "responses": 60,
+   "completion_tokens_median": 195.0,
+   "p90": 300.90000000000003,
+   "max": 519,
+   "capped": 0,
+   "stated_answer_rate": 1.0,
+   "prompt_tokens_median": 1670.5,
+   "prompt_tokens_max": 4926
+  },
+  "pilot250-pool": {
+   "responses": 120,
+   "completion_tokens_median": 252.5,
+   "p90": 730.6000000000001,
+   "max": 1273,
+   "capped": 0,
+   "stated_answer_rate": 1.0,
+   "prompt_tokens_median": 257.5,
+   "prompt_tokens_max": 483
+  },
+  "pilot250-structured3": {
+   "responses": 36,
+   "completion_tokens_median": 313.5,
+   "p90": 578.0,
+   "max": 1280,
+   "capped": 1,
+   "stated_answer_rate": 1.0,
+   "prompt_tokens_median": 1268.0,
+   "prompt_tokens_max": 3728
+  },
+  "pilot250-structured5": {
+   "responses": 60,
+   "completion_tokens_median": 307.0,
+   "p90": 529.1,
+   "max": 809,
+   "capped": 0,
+   "stated_answer_rate": 1.0,
+   "prompt_tokens_median": 1798.5,
+   "prompt_tokens_max": 5054
+  },
+  "pilot250_r2-debate3_r2": {
+   "responses": 12,
+   "completion_tokens_median": 138.0,
+   "p90": 183.1,
+   "max": 223,
+   "capped": 0,
+   "stated_answer_rate": 1.0,
+   "prompt_tokens_median": 1559.5,
+   "prompt_tokens_max": 1874
+  },
+  "pilot250_r2-debate5_r2": {
+   "responses": 20,
+   "completion_tokens_median": 160.0,
+   "p90": 229.9,
+   "max": 253,
+   "capped": 0,
+   "stated_answer_rate": 1.0,
+   "prompt_tokens_median": 2487.5,
+   "prompt_tokens_max": 2930
+  },
+  "pilot250_r2-self_structured5": {
+   "responses": 20,
+   "completion_tokens_median": 318.0,
+   "p90": 342.1,
+   "max": 400,
+   "capped": 0,
+   "stated_answer_rate": 1.0,
+   "prompt_tokens_median": 644.0,
+   "prompt_tokens_max": 867
+  },
+  "pilot250_r2-structured3_r2": {
+   "responses": 12,
+   "completion_tokens_median": 294.0,
+   "p90": 351.90000000000003,
+   "max": 383,
+   "capped": 0,
+   "stated_answer_rate": 1.0,
+   "prompt_tokens_median": 2223.5,
+   "prompt_tokens_max": 2469
+  },
+  "pilot250_r2-structured5_r2": {
+   "responses": 20,
+   "completion_tokens_median": 273.0,
+   "p90": 333.0,
+   "max": 374,
+   "capped": 0,
+   "stated_answer_rate": 1.0,
+   "prompt_tokens_median": 3195.5,
+   "prompt_tokens_max": 3556
+  }
+ },
+ "seconds": {
+  "round0_pool_incl_readout": 892.3,
+  "pilot250-debate3": {
+   "generation_s": 255.7,
+   "generated_tokens": 8286.0,
+   "prompt_tokens": 52921.0,
+   "readout_s": 11.3,
+   "exposure_readout_s": 8.8,
+   "write_s": 0.5
+  },
+  "pilot250-debate5": {
+   "generation_s": 349.7,
+   "generated_tokens": 12785.0,
+   "prompt_tokens": 129831.0,
+   "readout_s": 25.9,
+   "exposure_readout_s": 22.0,
+   "write_s": 0.8
+  },
+  "pilot250-pool": {
+   "generation_s": 0.0,
+   "generated_tokens": 0.0,
+   "prompt_tokens": 0.0,
+   "readout_s": 0.0,
+   "exposure_readout_s": 0.0,
+   "write_s": 0.1
+  },
+  "pilot250-structured3": {
+   "generation_s": 446.1,
+   "generated_tokens": 13831.0,
+   "prompt_tokens": 57529.0,
+   "readout_s": 14.4,
+   "exposure_readout_s": 9.6,
+   "write_s": 0.5
+  },
+  "pilot250-structured5": {
+   "generation_s": 586.5,
+   "generated_tokens": 20928.0,
+   "prompt_tokens": 137511.0,
+   "readout_s": 30.4,
+   "exposure_readout_s": 23.4,
+   "write_s": 0.8
+  },
+  "pilot250_r2-debate3_r2": {
+   "generation_s": 51.4,
+   "generated_tokens": 1711.0,
+   "prompt_tokens": 18808.0,
+   "readout_s": 3.5,
+   "exposure_readout_s": 3.1,
+   "write_s": 0.2
+  },
+  "pilot250_r2-debate5_r2": {
+   "generation_s": 79.0,
+   "generated_tokens": 3206.0,
+   "prompt_tokens": 49376.0,
+   "readout_s": 9.1,
+   "exposure_readout_s": 8.3,
+   "write_s": 0.3
+  },
+  "pilot250_r2-self_structured5": {
+   "generation_s": 147.4,
+   "generated_tokens": 6201.0,
+   "prompt_tokens": 13366.0,
+   "readout_s": 3.9,
+   "exposure_readout_s": 2.2,
+   "write_s": 0.3
+  },
+  "pilot250_r2-structured3_r2": {
+   "generation_s": 103.0,
+   "generated_tokens": 3679.0,
+   "prompt_tokens": 26634.0,
+   "readout_s": 5.5,
+   "exposure_readout_s": 4.4,
+   "write_s": 0.2
+  },
+  "pilot250_r2-structured5_r2": {
+   "generation_s": 164.3,
+   "generated_tokens": 5564.0,
+   "prompt_tokens": 64475.0,
+   "readout_s": 12.8,
+   "exposure_readout_s": 11.0,
+   "write_s": 0.3
+  }
+ },
+ "chunk_peak_reserved_gb": {
+  "parent": [
+   37.33,
+   41.32,
+   36.04
+  ],
+  "child": [
+   37.94,
+   37.94,
+   37.94
+  ]
+ },
+ "per_question_seconds": {
+  "base": 223.2,
+  "E1_second_round": 114.2,
+  "E2_self_structured5": 38.5
+ },
+ "projection_200q": {
+  "base_hours": 12.4,
+  "base_units": 83.5,
+  "E1_50q_hours": 1.59,
+  "E1_units": 10.7,
+  "E2_50q_hours": 0.53,
+  "E2_units": 3.6
+ },
+ "storage_mb": {
+  "parent_12q": 613,
+  "child_4q": 191
+ }
+}

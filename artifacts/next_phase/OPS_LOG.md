@@ -50,3 +50,15 @@ deterministic at batch size 1 (§11 of the results). The default is now `fp32_he
 Fix (CPU, before any relaunch): token-budget generation batching (`model.gen_batch_tokens: 24000`
 in `configs/main_250.yaml`; worst case 2 per batch, round-0 8 per batch); the stress test now
 checks the budget-derived worst-case batch.
+
+## 2026-10-29: G2 development timing pilot, attempt 2 (approved; remaining cap 11.94 units)
+
+| time | event |
+|---|---|
+| 22:14 | balance 251.65 (cumulative G2 job stop at 241.21, hard cap 239.71); session `pilot2` (A100); code `671f438` |
+| 22:15 | setup verified; `scripts/pilot_g2.py` launched detached |
+| ~22:24 | model loaded; stress PASSED: generation worst-length batch 2 (7,119 + 1,280 tokens; 33.7 GB reserved), budget-filling 3 × 6,720 (37.7 GB) and 8 × 1,720 (33.3 GB), readout batch 1 at 8,402 tokens (29.6 GB) |
+| 22:24–23:15 | parent: 3 / 3 chunks finished (chunk seconds 491 / 906 / 1,285; peak reserved 37.3 / **41.3** / 36.0 GB) |
+| 23:15–23:32 | child (second rounds + no-peer control on all 4 prespecified subset questions): 3 / 3 chunks finished; its stress at the round-2 worst case (9,813 readout tokens) passed |
+| 23:33 | `pilot_attempt2.tar` (823 MB, SHA-256 `f85c7f77…`) downloaded in ~2 min, hash matched; session stopped; balance **242.98** (attempt 2: **8.67 units**; G2 total **9.73** of 13) |
+| 23:37 | both archives verified (15 chunk directories each); copies to `mas_backup/pilot250` and Google Drive started |
