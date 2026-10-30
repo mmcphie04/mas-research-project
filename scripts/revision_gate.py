@@ -260,9 +260,14 @@ def coefficients(tev: pd.DataFrame) -> dict:
             "note": "fitted on all non-test helpful/harmful events; positive = more likely helpful"}
 
 
-def feasibility(ev: pd.DataFrame) -> dict:
+def feasibility(ev: pd.DataFrame, out: Path | None = None) -> dict:
     tev = training_events(ev)
     ch = cross_validate(tev)
+    if out is not None:  # per-event out-of-fold decisions, for comparison with the judge (section 5)
+        keep = ["dataset", "condition", "question_id", "agent_id", "fold", "p_logistic", "accept_logistic",
+                "p_boosted_tree", "accept_boosted_tree"]
+        oof = ch[keep].assign(event_id=ch.dataset + "|" + ch.condition + "|" + ch.question_id + "|" + ch.agent_id.astype(str))
+        oof.to_csv(out / "oof_gate_decisions.csv", index=False)
     hh = ch[ch.kind.isin(["helpful", "harmful"])]
     y = (hh.kind == "helpful").to_numpy(int)
     qs = hh.question_id.to_numpy()
@@ -395,7 +400,7 @@ def main(argv=None) -> int:
     o = oracle(L["events"])
     (out / "oracle.json").write_text(json.dumps({"label": LABEL, **o}, indent=1, default=_default) + "\n")
     (out / "oracle.md").write_text(md_oracle(o))
-    f = feasibility(L["events"])
+    f = feasibility(L["events"], out)
     (out / "feasibility.json").write_text(json.dumps({"label": LABEL, **f}, indent=1, default=_default) + "\n")
     (out / "feasibility.md").write_text(md_feasibility(f))
     print("written:", sorted(p.name for p in out.iterdir()))

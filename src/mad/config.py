@@ -43,6 +43,15 @@ class ModelConfig:
     # while count x (longest prompt in the batch + max_new_tokens) <= gen_batch_tokens, up to
     # batch_size: short round-0 prompts batch fully, long 5-agent revision prompts in twos/threes.
     gen_batch_tokens: int | None = None
+    # Sampling settings passed to generate EXPLICITLY (versioned; None = not passed, so the
+    # model's own generation_config.json decides -- the legacy behaviour, omitted from the
+    # serialized config). Gemma-3-12B's config sets top_k 64 and no repetition penalty, so a
+    # cross-model protocol sets top_k: 64, repetition_penalty: 1.0 for every model.
+    top_k: int | None = None
+    repetition_penalty: float | None = None
+    # Extra keyword arguments for the tokenizer's chat template (versioned; None = none), e.g.
+    # {"enable_thinking": false} for Qwen3.
+    chat_template_kwargs: dict | None = None
 
 
 @dataclass
@@ -142,8 +151,9 @@ class RunConfig:
             del d["debate"]["brevity_words"]  # legacy protocol: identical to pre-versioning identities
         if d["model"].get("readout_head") == LEGACY_READOUT_HEAD:
             del d["model"]["readout_head"]
-        if d["model"].get("gen_batch_tokens") is None:
-            d["model"].pop("gen_batch_tokens", None)
+        for key in ("gen_batch_tokens", "top_k", "repetition_penalty", "chat_template_kwargs"):
+            if d["model"].get(key) is None:
+                d["model"].pop(key, None)
         return d
 
     def hash(self) -> str:

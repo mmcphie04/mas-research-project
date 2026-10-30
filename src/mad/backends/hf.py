@@ -200,7 +200,8 @@ class HFBackend(Backend):
         if not self._supports_system:
             messages = self._merge_system(messages)
         return self.tokenizer.apply_chat_template(
-            messages, tokenize=False, add_generation_prompt=add_generation_prompt
+            messages, tokenize=False, add_generation_prompt=add_generation_prompt,
+            **(self.cfg.model.chat_template_kwargs or {}),
         )
 
     @staticmethod
@@ -248,6 +249,7 @@ class HFBackend(Backend):
                     temperature=mc.temperature,
                     top_p=mc.top_p,
                     pad_token_id=pad,
+                    **self.sampling_overrides(),
                 )
             n_prompt = int(enc["input_ids"].shape[1])
             for i in range(len(chunk)):
@@ -486,6 +488,34 @@ class HFBackend(Backend):
         return None
 
     HEADS = ("fp32_head", "bf16_logits")
+
+    def sampling_overrides(self) -> dict:
+        """top_k / repetition_penalty when the config sets them; otherwise nothing, and the
+        model's generation_config.json decides (legacy)."""
+        mc = self.cfg.model
+        return {k: v for k, v in (("top_k", mc.top_k), ("repetition_penalty", mc.repetition_penalty)) if v is not None}
+
+    def choice_logprobs_ids(self, seqs: list[list[int]], choice_ids: list[int]) -> list[np.ndarray]:
+        """Log-probabilities over arbitrary single-token choices (e.g. "1" / "2") at the LAST token
+        of each id sequence, renormalized over the choices: the final hidden state projected onto
+        those rows of the output embedding in float32 (the fp32 head). One sequence per forward
+        pass (readout batch size 1; docs/NEXT_PHASE_CPU_RESULTS.md s16)."""
+        torch = self.torch
+        out = []
+        for seq in seqs:
+            ids = torch.tensor([list(seq)], device=self.device)
+            with torch.no_grad():
+                res = self.model(input_ids=ids, attention_mask=torch.ones_like(ids), logits_to_keep=1,
+                                 use_cache=False, output_hidden_states=True)
+                h = res.hidden_states[-1][0, -1, :]
+                W = self.model.get_output_embeddings().weight[list(choice_ids)]
+                z = W.float() @ h.float()
+                cfg = getattr(self.model.config, "text_config", self.model.config)
+                cap = getattr(cfg, "final_logit_softcapping", None)
+                if cap:
+                    z = torch.tanh(z / cap) * cap
+                out.append(torch.log_softmax(z, dim=-1).cpu().numpy())
+        return out
 
     def letter_logprobs_ids(self, seqs: list[list[int]], n_options: list[int],
                             batch_size: int | None = None, head: str = "fp32_head",

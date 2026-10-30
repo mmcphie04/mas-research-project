@@ -1,0 +1,42 @@
+{
+ "label": "EXPLORATORY",
+ "rule": "QUESTIONS are drawn, not events, so every sampled panel is complete (all its changed answers are judged) and the gated panel can be simulated. ``n_questions`` = round(400 / (helpful+harmful events per question in the population)), drawn by numpy.random.default_rng(seed).permutation over the sorted question ids; every changed answer of every source on a drawn question is included. The thinking subsample: the drawn questions in a second permutation (seed + 1), taken in order until they hold at least ``thinking_events`` events (counts of events only). Selection never reads a judge output, and no per-question outcome is used.",
+ "seed": 20261031,
+ "thinking_seed": 20261032,
+ "target_helpful_harmful": 400,
+ "population": {
+  "questions": 212,
+  "helpful_harmful_per_question": 2.6934
+ },
+ "n_questions": 149,
+ "n_events": 644,
+ "events_by_kind": {
+  "wrong_wrong": 253,
+  "harmful": 196,
+  "helpful": 195
+ },
+ "thinking_subsample": {
+  "questions": 44,
+  "events": 157
+ },
+ "events_by_source": {
+  "main250 debate3": 47,
+  "main250 debate5": 79,
+  "main250 structured3": 38,
+  "main250 structured5": 53,
+  "pilot12b debate": 71,
+  "pilot12b debate_answer_only": 68,
+  "pilot12b misleading_one": 104,
+  "pilot250 debate3": 13,
+  "pilot250 debate5": 23,
+  "pilot250 structured3": 11,
+  "pilot250 structured5": 14,
+  "val12b debate": 123
+ },
+ "files": {
+  "events.jsonl": "012a2508606ba3f8e64d59dd4483903d46e705802600ca3bb1e3bde421aa5523",
+  "questions.jsonl": "0a928265fa63cf10a5e530cc9a672042f10c769139f99e3b1489762e2112a165"
+ },
+ "deviation": "questions (complete panels) are sampled rather than ~400 helpful/harmful + ~100 wrong->wrong events, so the gated panel can be simulated; wrong->wrong events are therefore ~250, not ~100",
+ "limitation_identifiable_revision": "share of responses mentioning panel/peer/member: revised 0.984, original 0.009: without labels the revision is still usually identifiable from its content"
+}
