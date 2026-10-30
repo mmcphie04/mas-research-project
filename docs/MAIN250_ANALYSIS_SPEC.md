@@ -66,7 +66,10 @@ are not expected to be resolvable; intervals are reported as such, not as tests 
 - Prediction curves for the new responses (extension E3).
 - The second-round extension (E1) and the no-peer control (E2), on the 50 questions in
   `artifacts/main250/plan/extension_subset.json` (2 per chunk, seed 20261030, outcome-blind;
-  committed before any main250 accuracy). Both run regardless of the primary results.
+  committed before any main250 accuracy). Both were to run regardless of the primary results;
+  **both were dropped on 2026-10-30, after the primary and exploratory results were seen and
+  before any extension data existed** (budget redirected to the revision-gate work; see
+  docs/NEXT_PHASE_PLAN.md).
 - **The action predictor / controller.** Trained on the split's *train* questions (74), tuned on
   *validation* (28), evaluated once on *test* (98). Treated as exploratory: 98 test questions
   cannot establish a reliable controller.

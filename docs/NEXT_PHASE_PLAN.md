@@ -138,6 +138,18 @@ gets one debate round. There is no forced-opening condition.
 - **Both E1 and E2 run regardless of the primary results.** Neither is conditional on what the
   base comparisons show, so neither can be chosen or dropped after seeing them.
 
+**E1/E2 dropped (decision recorded 2026-10-30).**
+
+- **What:** E1 and E2 were dropped after the main250 primary analysis
+  (`artifacts/main250/analysis/primary.md`) and the exploratory analyses (`exploratory.md`,
+  `selection_signals.md`) had been computed, **before any extension data existed**. Neither was
+  launched; nothing was staged on a runtime.
+- **Reason:** budget redirected to the revision-gate work: can helpful and harmful revisions be
+  told apart, by a gate on the agent's own signals or by a different model judging?
+- **The commitment above is therefore not met.** It said both would run regardless of the
+  primary results. Any reader should know the drop came after those results were seen.
+- The committed subset (`extension_subset.json`) is kept for the record.
+
 **History policy** (`prompts.HISTORY_POLICY`, recorded in every round-2 manifest).
 
 - Each agent keeps its own full transcript. It sees the panel peers' responses from the
