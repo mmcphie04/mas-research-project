@@ -1,7 +1,8 @@
 """Runtime: start one command detached in the pinned checkout (log -> /content/<NAME>.log,
 pid -> /content/<NAME>.pid). Parameters from /content/session_env.json: NAME, CMD (JSON list,
 run with this Python from the checkout), optional REQUIRE {path: sha256} checked first, optional
-EXTRACT {tarball: destination directory} unpacked after the checks."""
+EXTRACT {tarball: destination directory} unpacked after the checks, optional ENV {name: value}
+for the command, optional PIDFILE / LOGFILE paths (default /content/<NAME>.pid / .log)."""
 import hashlib
 import json
 import os
@@ -19,8 +20,11 @@ for tgz, dest in env.get("EXTRACT", {}).items():
     os.makedirs(dest, exist_ok=True)
     with tarfile.open(tgz) as t:
         t.extractall(dest, filter="data")
-log = open(f"/content/{name}.log", "a")
+pidfile, logfile = env.get("PIDFILE", f"/content/{name}.pid"), env.get("LOGFILE", f"/content/{name}.log")
+os.makedirs(os.path.dirname(pidfile), exist_ok=True)
+log = open(logfile, "a")
 p = subprocess.Popen([sys.executable, *env["CMD"]], cwd=code, stdout=log, stderr=subprocess.STDOUT,
-                     start_new_session=True, env={**os.environ, "PYTHONPATH": f"{code}/src", "PYTHONUNBUFFERED": "1"})
-open(f"/content/{name}.pid", "w").write(str(p.pid))
+                     start_new_session=True,
+                     env={**os.environ, **env.get("ENV", {}), "PYTHONPATH": f"{code}/src", "PYTHONUNBUFFERED": "1"})
+open(pidfile, "w").write(str(p.pid))
 print("launched", name, "pid", p.pid, " ".join(env["CMD"]))

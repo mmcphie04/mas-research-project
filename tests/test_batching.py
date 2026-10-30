@@ -29,7 +29,7 @@ def test_budget_is_versioned_and_drives_the_stress_batch():
     legacy = load_config("configs/base.yaml", "configs/colab_12b.yaml")
     assert "gen_batch_tokens" not in legacy.to_dict()["model"]
     new = load_config("configs/base.yaml", "configs/colab_12b.yaml", "configs/main_250.yaml")
-    assert new.to_dict()["model"]["gen_batch_tokens"] == 24000
+    assert new.to_dict()["model"]["gen_batch_tokens"] == 20000
     spec = importlib.util.spec_from_file_location("run_experiment", ROOT / "scripts" / "run_experiment.py")
     re = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(re)
@@ -60,7 +60,7 @@ def test_budget_filling_stress_shapes():
     spec.loader.exec_module(re)
     new = load_config("configs/base.yaml", "configs/colab_12b.yaml", "configs/main_250.yaml")
     shapes = re.budget_stress_shapes(new, {"worst_round1_prompt_tokens": 7119})
-    assert shapes == [(3, 24000 // 3 - 1280), (8, 24000 // 8 - 1280)]  # 3 x 6,720 and 8 x 1,720
-    assert all(k * (p + 1280) <= 24000 and k * (p + 1280) > 24000 - k for k, p in shapes)
+    assert shapes == [(3, 20000 // 3 - 1280), (8, 20000 // 8 - 1280)]  # 3 x 5,386 and 8 x 1,220
+    assert all(k * (p + 1280) <= 20000 and k * (p + 1280) > 20000 - k for k, p in shapes)
     legacy = load_config("configs/base.yaml", "configs/colab_12b.yaml")
     assert re.budget_stress_shapes(legacy, {"worst_round1_prompt_tokens": 7119}) == []

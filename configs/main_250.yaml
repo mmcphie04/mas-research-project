@@ -18,7 +18,8 @@ model:
   max_new_tokens: 1280
   batch_size: 8
   # Token-budget generation batches (G2 attempt 1: a fixed batch of 8 ran out of memory at the
-  # worst-case 5-agent length, 7,119 + 1,280 tokens x 8). 24k tokens: worst case 2 per batch,
-  # round-0 prompts 8 per batch, typical 5-agent revisions ~6.
-  gen_batch_tokens: 24000
+  # worst-case 5-agent length, 7,119 + 1,280 tokens x 8). G2 attempt 2 ran at 24k but one chunk
+  # reached 41.3 of 42.4 GB reserved; 20k for G4 (worst case 2 per batch, round-0 prompts 8),
+  # with PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True set in the job's environment.
+  gen_batch_tokens: 20000
   readout_batch_size: 1

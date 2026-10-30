@@ -63,3 +63,19 @@ checks the budget-derived worst-case batch.
 | 23:33 | `pilot_attempt2.tar` (823 MB, SHA-256 `f85c7f77…`) downloaded in ~2 min, hash matched; session stopped; balance **242.98** (attempt 2: **8.67 units**; G2 total **9.73** of 13) |
 | 23:37 | both archives verified (15 chunk directories each); copies to `mas_backup/pilot250` and Google Drive started |
 | 23:42 | pilot backups verified: `mas_backup/pilot250` (both jobs, 15 chunk directories each, `verify_archive`) and Google Drive `mas_research_backup/pilot250` (313 files, 0 differences, `rclone check`); ALL VERIFIED |
+
+## 2026-10-30: G4 main collection (approved; hard cap 113 units, stop line 129.98)
+
+Settings: `configs/main_250.yaml` with `gen_batch_tokens: 20000` (was 24,000; G2 chunk 2 reached
+41.3 of 42.4 GB reserved) and `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True` in the job's
+environment (recorded in the job's execution record). Conditions pool, debate3, structured3,
+debate5, structured5; chunks of 8; `--max-hours 13.5` as a backstop. The job refuses to start
+unless its question ids hash to the split manifest's `question_ids_sha256` (`9a33c0ea…`) and the
+manifest's dataset revision equals the job's (`b189ec76…`); a CPU check of the real selection
+(no model) gives `9a33c0ea…`. Pre-launch: pilot250 laptop archive verified and Google Drive copy
+ALL VERIFIED (23:42 on 10-29). Supervisor: `scripts/g4_supervisor.py` on the laptop (per-chunk
+backup to `runs/main250` + Google Drive `mas_research_backup/main250`; stops the runtime at
+balance ≤ 129.98, after a final backup from ≤ 130.98, and whenever the job process exits).
+
+| time | event |
+|---|---|

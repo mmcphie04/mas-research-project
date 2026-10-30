@@ -29,6 +29,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import shutil
 import sys
 import time
@@ -494,6 +495,8 @@ def main(argv=None) -> int:
                          "notebook passes this for main-pool collection")
     ap.add_argument("--parent", help="child job: take round 0 from this job's saved caches")
     ap.add_argument("--subset-n", type=int, help="child job: the first N questions of the parent")
+    ap.add_argument("--expect-question-ids-sha256", default=None,
+                    help="refuse to start unless the selected question ids (in order) hash to this")
     ap.add_argument("--subset-ids", help="child job: a JSON file with the parent questions to use "
                                          "(a list, or an object with 'question_ids'); parent order is kept")
     args = ap.parse_args(argv)
@@ -550,12 +553,22 @@ def main(argv=None) -> int:
                              "--validation-size.")
     # The split is checked BEFORE any model is loaded, so a main run with a missing or wrong split
     # costs nothing.
+    if args.expect_question_ids_sha256:  # exact ids AND order, before any model is loaded
+        got = hashlib.sha256(",".join(q.question_id for q in intended).encode()).hexdigest()
+        if got != args.expect_question_ids_sha256:
+            raise SystemExit(f"question ids hash {got} != expected {args.expect_question_ids_sha256}; refusing to start")
+        log(f"  question ids verified: sha256 {got[:12]}... ({len(intended)} questions)")
     split_info, split_src = None, None
     if args.split_manifest and not args.smoke:
         from make_split import load_split
 
         _, smeta = load_split(args.split_manifest, [q.question_id for q in intended], allow_subset=bool(parent))
         split_info = {"assignment_sha256": smeta["assignment_sha256"], "counts": smeta["counts"]}
+        # the manifest's pinned dataset revision must be the one this job loads
+        sel = smeta.get("selection") or {}
+        if sel.get("dataset_revision") and sel["dataset_revision"] != cfg.data.dataset_revision:
+            raise SystemExit(f"dataset revision {cfg.data.dataset_revision} != the split manifest's "
+                             f"{sel['dataset_revision']}; refusing to start")
         if parent and parent["identity"].get("split") and parent["identity"]["split"] != split_info:
             raise SystemExit("a child job must use its parent's split manifest")
         split_src = Path(args.split_manifest)
@@ -634,6 +647,8 @@ def main(argv=None) -> int:
     if split_info is not None:
         identity["split"] = split_info
     execution = {"batch_size": cfg.model.batch_size, "readout_batch_size": cfg.model.readout_batch_size,
+                 "gen_batch_tokens": cfg.model.gen_batch_tokens,
+                 "pytorch_cuda_alloc_conf": os.environ.get("PYTORCH_CUDA_ALLOC_CONF"),
                  "packages": package_versions(), **gpu_identity()}
     job = open_job(out_root, identity, questions, allow_code_change=args.allow_code_change,
                    execution=execution, chunks=chunks)

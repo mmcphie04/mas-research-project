@@ -645,3 +645,26 @@ def test_notebook_validation_stage_needs_a_cap_and_reserves_its_questions_from_m
     src = "\n".join(cells)
     assert '"--validation-size", str(VALIDATION_SIZE)' in src  # passed to every stage, so main starts after it
     assert 'SMOKE_FOR   = "pilot"' in settings and "_FOR = SMOKE_FOR if STAGE == \"smoke\" else STAGE" in settings
+
+
+def test_expected_question_ids_hash_gates_the_job_before_anything_is_written(driver, tmp_path):
+    import hashlib
+
+    root = tmp_path / "r"
+    with pytest.raises(SystemExit, match="question ids hash"):
+        driver.main(_args(root, "--expect-question-ids-sha256", "0" * 64))
+    assert not root.exists() or not any(root.iterdir()), "files written before the id check"
+    assert driver.main(_args(root)) == 0
+    ids = [json.loads(x)["question_id"] for x in (root / "t-questions.jsonl").read_text().splitlines()]
+    want = hashlib.sha256(",".join(ids).encode()).hexdigest()
+    assert driver.main(_args(tmp_path / "r2", "--expect-question-ids-sha256", want)) == 0
+
+
+def test_split_manifest_dataset_revision_must_match_the_job(driver, tmp_path):
+    src = _split_for(tmp_path, 6)
+    m = json.loads(src.read_text())
+    m["meta"].setdefault("selection", {})["dataset_revision"] = "not-this-revision"
+    bad = tmp_path / "bad-split.json"
+    bad.write_text(json.dumps(m))
+    with pytest.raises(SystemExit, match="dataset revision"):
+        driver.main(_args(tmp_path / "r", "--split-manifest", str(bad)))
