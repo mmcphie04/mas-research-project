@@ -49,8 +49,8 @@ def colab_balance(timeout=120) -> float:
     return float(m.group(1))
 
 
-def offdevice(timeout=3600) -> bool:
-    r = subprocess.run([sys.executable, str(ROOT / "scripts/offdevice_backup.py"), "--sets", "main250"],
+def offdevice(set_name="main250", timeout=3600) -> bool:
+    r = subprocess.run([sys.executable, str(ROOT / "scripts/offdevice_backup.py"), "--sets", set_name],
                        capture_output=True, text=True, timeout=timeout)
     return r.returncode == 0 and "ALL VERIFIED" in r.stdout
 
@@ -61,7 +61,8 @@ def incomplete(dest: Path, job: str) -> dict:
     if not jp.exists():
         return {"job_record": "missing locally"}
     rec = json.loads(jp.read_text())
-    conds = ["round0", *rec["identity"]["conditions"]]
+    # a child job owns no round 0: it reads its parent's
+    conds = ([] if rec["identity"].get("parent") else ["round0"]) + list(rec["identity"]["conditions"])
     out = {}
     for c in conds:
         missing = [chunk_tag(i) for i, m in enumerate(rec["chunks"]) if m and not is_complete(dest / f"{job}-{c}-{chunk_tag(i)}")]
@@ -197,15 +198,17 @@ def main(argv=None) -> int:
     ap.add_argument("--wind-down", type=float, default=1.0)
     ap.add_argument("--poll", type=int, default=240)
     ap.add_argument("--max-failures", type=int, default=8)
+    ap.add_argument("--offdevice-set", default="main250", help="scripts/offdevice_backup.py set holding --dest")
     a = ap.parse_args(argv)
     dest = Path(a.dest)
 
     def log(msg):
         print(f"[{time.strftime('%H:%M:%S')}] {msg}", flush=True)
 
-    sup = Supervisor(ColabRemote(a.session, a.code_dir, a.remote_root, a.state_dir, a.job, per_chunk=True), a.job, dest,
+    sup = Supervisor(ColabRemote(a.session, a.code_dir, a.remote_root, a.state_dir, a.job), a.job, dest,
                      dest / ".backup-work", stop_balance=a.stop_balance, wind_down=a.wind_down, poll=a.poll,
-                     max_failures=a.max_failures, log=log, events=dest / "supervisor-events.jsonl")
+                     max_failures=a.max_failures, log=log, offdevice=lambda: offdevice(a.offdevice_set),
+                     events=dest / ("supervisor-events.jsonl" if a.job == "main250" else f"supervisor-{a.job}-events.jsonl"))
     out = sup.run()
     return 0 if out["runtime_stopped"] and out["local_verified"] else 1
 

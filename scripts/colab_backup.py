@@ -6,7 +6,8 @@
     # until nothing is pending, verify the COMPLETE local archive, and only then stop the runtime
     python scripts/colab_backup.py watch --session mas --job main12b --dest runs/colab
 
-Conventions on the runtime: code at --code-dir (a checkout of the pinned commit), outputs in
+Batches hold one chunk each by default (``per_chunk``): a backlog is never sent as one large tar
+(a 7.4 GB one took WSL down during G4). Conventions on the runtime: code at --code-dir (a checkout of the pinned commit), outputs in
 --remote-root, the job's process id in <remote-root>/<job>.pid, backup state in --state-dir.
 Run ``watch`` as a long-lived background process (it does not expire). Mounted Drive (the
 notebook) remains the recommended destination for main collection; this is the CLI route.
@@ -31,7 +32,7 @@ MARK = "<<<BACKUP_JSON>>>"
 
 
 class ColabRemote(B.Remote):
-    def __init__(self, session, code_dir, remote_root, state_dir, job, per_chunk=False):
+    def __init__(self, session, code_dir, remote_root, state_dir, job, per_chunk=True):
         self.session, self.code_dir, self.root, self.state_dir, self.job = session, code_dir, remote_root, state_dir, job
         self.per_chunk = per_chunk
 

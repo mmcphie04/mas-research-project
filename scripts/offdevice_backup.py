@@ -31,7 +31,8 @@ SETS = {  # name -> (local dir, rclone filter args)
     "frozen": (ROOT / "runs/frozen", ["--include", "pilot12b_scorers_3857a72.pkl"]),
     "next_commit": (ROOT / "runs/next_commit", []),
     "pilot250": (ROOT / "runs/pilot250", ["--include", "out/**", "--include", "pilot_attempt1.tgz"]),
-    "main250": (ROOT / "runs/main250", ["--exclude", ".backup-work/**", "--exclude", "supervisor*"]),
+    "main250": (ROOT / "runs/main250", ["--exclude", ".backup-work/**", "--exclude", ".stage-work/**",
+                                        "--exclude", "supervisor*"]),
 }
 
 

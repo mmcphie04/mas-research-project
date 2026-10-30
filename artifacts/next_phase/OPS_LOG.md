@@ -96,3 +96,8 @@ balance ≤ 129.98, after a final backup from ≤ 130.98, and whenever the job p
 | 10:47 | job process exited: state `finished`, 25 / 25 chunks, 10.75 h, no failures |
 | 10:54–11:12 | final backup: c024 (10:54) and the five condition views (11:10), each Drive-verified; `verify_archive` on the complete local archive passed (11:12:31); **runtime stopped 11:12:33** (first attempt); final Google Drive check: 1,066 files, 10.43 GB, 0 differences; nothing incomplete |
 | 11:13 | balance 166.86, no active assignments. G4: 75.56 units from the 242.42 at launch (76.12 from the brief's 242.98, which includes G2's late-posted 0.56); cap 113. Operations report: `artifacts/main250/run/g4_operations.json` |
+
+**Standing rule (from G4):** for any supervised run, **the laptop must stay awake** — set the
+Windows power settings so it never sleeps (plugged in) for the whole session, and keep a WSL
+terminal open. G4's supervisor was paused for 7 h by sleep (01:40–08:39) and killed when WSL went
+down (~09:50); the runtime job was unaffected, but nothing would have stopped an idle runtime.

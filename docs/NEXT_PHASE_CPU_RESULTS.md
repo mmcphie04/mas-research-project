@@ -1338,3 +1338,79 @@ copies are verified separately (log).
 
 **Balance after G2:** 242.98 units. Base + E1 + E2 ≈ 104 units, which fits. E3 (curves on the
 new responses) remains to be priced from the measured readout rate.
+
+## 20. E1 + E2 extension run: priced and staged (NOT launched; awaiting approval)
+
+**What runs.** One child job, `main250_ext`, of `main250`:
+
+- conditions `debate3_r2`, `structured3_r2`, `debate5_r2`, `structured5_r2` (E1) and
+  `self_structured5` (E2);
+- on the 50 committed subset questions (`artifacts/main250/plan/extension_subset.json`, 2 per
+  chunk, seed 20261030, outcome-blind; ids hash `9e754da4…`, committed before any main250
+  accuracy);
+- 21 new responses per question (16 + 5), 1,050 in all.
+
+The job refuses to start unless its questions hash to `9e754da4…`. A CPU check of the real
+command (no model) gives exactly that.
+
+**What must be on the runtime** (the previous runtime was stopped, so its outputs are gone):
+
+- the parent's job record, question snapshot and split copy;
+- for **all 25 chunks** (2 subset questions in each):
+  - `round0` in full (its shard hashes are checked on reuse);
+  - the four round-1 condition directories, without their activation arrays. The child reads
+    only their manifest, completion record, rows and transcripts
+    (`multi._load_previous_round`); each such directory is marked `STAGED_PARTIAL.json`.
+- `pool` is not needed.
+
+| | size |
+|---|---|
+| upload | ≈ 3.4 GB (≈ 25 × 136 MB; with the arrays it would be ≈ 10.3 GB) |
+
+`scripts/stage_extension.py` stages it **one chunk per upload**. Each tar is hash-checked on
+the runtime, file by file, before the next is sent; chunks already installed are skipped, so a
+rerun resumes. Tested on CPU end to end: a stub parent is staged with the arrays left out, then
+the real child job runs on the staged copy and its archive verifies (`tests/test_stage.py`).
+
+**Price** (estimates from measurements; nothing in this section has run on a GPU yet):
+
+| step | basis | hours |
+|---|---|---|
+| session + setup | G4: 1 min | 0.05 |
+| staging upload, 26 uploads | Drive upload measured ≈ 12–14 MB/s; CLI overhead ≈ 30–60 s per call | 0.25–0.6 |
+| model load + stress pass | G4: 1.6 min + 6.6 min; G2 child stress 6.6 min | 0.15 |
+| **generation + readouts, 50 q** | G2 child: 153 s/q overall, 135 s/q in its 2-question chunk; G4 ran at 0.87× G2's per-question time → 133–153 s/q | **1.85–2.15** |
+| final backup + verification | G4's final step: 25 min including a catch-up; here ≈ 10–20 min | 0.15–0.35 |
+| **total** | | **2.45–3.3 h ≈ 16.5–22 units** at 6.73/h |
+
+**Limits proposed:**
+
+- **hard cap 25 units**: stop line = balance at launch − 25 (166.86 now → **141.86**);
+- job `--max-hours 2.6` as a backstop (counted from the job's start, after staging).
+
+**Supervision.**
+
+- `scripts/g4_supervisor.py` (general now: `--job`, `--offdevice-set`).
+- Backups are **one chunk per batch by default** (`ColabRemote(per_chunk=True)`); each is
+  Drive-verified before the next fetch.
+- Runs under `systemd-run --user --scope -p MemoryMax=6G`.
+- Stops the runtime at the stop line and whenever the job ends.
+- Child outputs land in `runs/main250` next to the parent: the child's directories reference
+  the parent's round-0 shards. Its batches carry only `main250_ext-*` items, so the staged
+  partial parent copies are never fetched back.
+- **The laptop must stay awake** (power settings) for the whole session, including staging,
+  when no supervisor is yet running.
+
+**Launch sequence (on approval):**
+
+1. Read the balance and set the stop line.
+2. `colab new -s ext --gpu A100`; upload the bundle, commit file and token; run `setup.py`.
+3. `stage_extension.py --session ext`.
+4. `launch_cmd.py`, with NAME `main250_ext`; PIDFILE `/content/main/main250_ext.pid`; ENV
+   `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True`; CMD `run_experiment.py --config
+   configs/base.yaml configs/colab_12b.yaml configs/main_250.yaml --out-root /content/main
+   --name main250_ext --parent main250 --subset-ids artifacts/main250/plan/extension_subset.json
+   --conditions debate3_r2 structured3_r2 debate5_r2 structured5_r2 self_structured5
+   --max-hours 2.6 --expect-question-ids-sha256 9e754da4…`.
+5. Supervisor: `--session ext --job main250_ext --dest runs/main250 --code-dir
+   /content/mas-research-project --stop-balance <balance − 25>`.
