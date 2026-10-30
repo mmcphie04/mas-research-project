@@ -148,3 +148,68 @@ def test_report_reads_no_correctness_column(setup, monkeypatch):
     r = R.report(dest, "j")
     assert seen and all(c is not None and not any("correct" in x for x in c) for c in seen)
     assert r["conditions"]["debate"]["responses"] > 0 and "accuracy" not in json.dumps(r)
+
+
+class PerChunkRemote(FakeRemote):
+    def prepare(self, prefix):
+        from mad import cli_backup as B
+
+        return B.prepare(self.out_root, prefix, self.state_dir, per_chunk=True)
+
+
+def test_a_backlog_is_fetched_chunk_by_chunk_with_a_drive_copy_after_each(setup):
+    remote, dest, work = setup
+    r = PerChunkRemote(remote.out_root, remote.state_dir)
+    r.alive = False
+    S = _sup()
+    order = []
+    sup = S.Supervisor(r, "j", dest, work, stop_balance=100.0, poll=0, balance=lambda: 150.0,
+                       offdevice=lambda: order.append("drive") or True, sleep=lambda s: None,
+                       log=lambda m: order.append(json.loads(m)["event"]) if m.startswith("{") else None)
+    out = sup.run()
+    assert out["local_verified"] and r.stopped
+    fetched = [i for i, e in enumerate(order) if e in ("cycle", "backed_up")]
+    drives = [i for i, e in enumerate(order) if e == "drive"]
+    assert len(fetched) >= 2 and all(any(f < d < g for d in drives) for f, g in zip(fetched, fetched[1:], strict=False))
+
+
+def test_no_further_fetch_until_the_drive_copy_verifies(setup):
+    remote, dest, work = setup
+    r = PerChunkRemote(remote.out_root, remote.state_dir)
+    r.alive = True
+    S = _sup()
+    drive = iter([False, False, True, True, True, True, True, True])
+    alive = iter([True, True, True, False])
+    r.process_alive = lambda: next(alive)
+    events = []
+    sup = S.Supervisor(r, "j", dest, work, stop_balance=100.0, poll=0, balance=lambda: 150.0,
+                       offdevice=lambda: next(drive), sleep=lambda s: None,
+                       log=lambda m: events.append(json.loads(m)))
+    sup.run()
+    cycles = [e for e in events if e["event"] == "cycle"]
+    assert cycles[0]["backed_up"] and cycles[1]["backed_up"] == [], "fetched again before the Drive copy verified"
+    assert r.stopped
+
+
+def test_final_backup_is_not_cut_off_while_it_makes_progress(setup):
+    remote, dest, work = setup
+    r = PerChunkRemote(remote.out_root, remote.state_dir)
+    r.alive = False
+    S = _sup()
+    clock = {"t": 0.0}
+    import time as _t
+
+    real = _t.time
+    try:
+        S.time.time = lambda: clock["t"]
+
+        def slow_offdevice():
+            clock["t"] += 50  # each chunk takes 50 s; the no-progress limit is 60 s, total > 60 s
+            return True
+
+        sup = S.Supervisor(r, "j", dest, work, stop_balance=100.0, poll=0, balance=lambda: 150.0,
+                           offdevice=slow_offdevice, sleep=lambda s: None, log=lambda m: None, final_seconds=60)
+        out = sup.run()
+    finally:
+        S.time.time = real
+    assert out["local_verified"] and r.stopped

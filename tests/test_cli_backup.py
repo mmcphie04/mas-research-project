@@ -203,3 +203,26 @@ def test_a_lost_acknowledgment_is_confirmed_from_the_runtime_state(monkeypatch):
     state["pending"] = "b1"  # still pending: genuinely not acknowledged
     with pytest.raises(RuntimeError):
         remote.acknowledge("b1")
+
+
+def test_per_chunk_batches_hold_one_chunk_and_replace_a_backlog_tar(job):
+    """A backlog is sent one chunk at a time; a pending all-chunks tar is discarded unsent
+    (its directories stay unacknowledged and are sent chunk by chunk)."""
+    remote, dest, work = job
+    big = B.prepare(remote.out_root, "j", remote.state_dir)  # the old behaviour: everything
+    assert {B.chunk_of(n) for n in big["items"] if B.chunk_of(n)} == {"c000", "c001"}
+    m = B.prepare(remote.out_root, "j", remote.state_dir, per_chunk=True)
+    assert not Path(big["tar"]).exists(), "the backlog tar was kept"
+    assert {B.chunk_of(n) for n in m["items"] if B.chunk_of(n)} == {"c000"}
+    assert "j-round0-c000" in m["items"] and "j-job.json" in m["items"]
+    seen = []
+
+    class PerChunk(FakeRemote):
+        def prepare(self, prefix):
+            return B.prepare(self.out_root, prefix, self.state_dir, per_chunk=True)
+
+    r = PerChunk(remote.out_root, remote.state_dir)
+    while names := B.sync_once(r, "j", dest, work):
+        seen.append({B.chunk_of(n) for n in names if B.chunk_of(n)})
+    assert seen == [{"c000"}, {"c001"}, set()]  # then the condition views (no chunk tag)
+    assert (dest / "j-debate-c001" / "completion.json").exists()

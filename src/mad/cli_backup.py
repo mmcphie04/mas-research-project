@@ -28,6 +28,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import shutil
 import tarfile
 import time
@@ -60,19 +61,33 @@ def _stamp(path: Path) -> str:
 # ----------------------------------------------------------------------------- runtime side
 
 
-def prepare(out_root, prefix: str, state_dir) -> dict:
+def chunk_of(name: str) -> str | None:
+    """The chunk tag ending a chunk directory's name (``<job>-<cond>-c007`` -> ``c007``)."""
+    tail = name.rsplit("-", 1)[-1]
+    return tail if re.fullmatch(r"c\d{3,}", tail) else None
+
+
+def prepare(out_root, prefix: str, state_dir, per_chunk: bool = False) -> dict:
     """The batch to send: the pending one if unacknowledged, else everything not yet acknowledged.
-    Returns the manifest ({} items when there is nothing to send)."""
+    Returns the manifest ({} items when there is nothing to send).
+
+    ``per_chunk``: a batch holds the directories of ONE chunk tag (the lowest with anything
+    unacknowledged: round 0 and every condition, ~0.4 GB in main250) plus the job's small files,
+    so a backlog is fetched chunk by chunk, never as one large tar. A pending batch spanning
+    several chunks (packed without ``per_chunk``) is discarded and repacked; only its tar goes --
+    the directories it held are untouched and still unacknowledged."""
     out_root, state_dir = Path(out_root), Path(state_dir)
     state_dir.mkdir(parents=True, exist_ok=True)
     pending = state_dir / "pending.json"
     if pending.exists():
         m = json.loads(pending.read_text())
-        if Path(m["tar"]).exists() and _sha(Path(m["tar"])) == m["tar_sha256"]:
+        too_big = per_chunk and len({chunk_of(n) for n, v in m["items"].items() if v["type"] == "dir"}) > 1
+        if not too_big and Path(m["tar"]).exists() and _sha(Path(m["tar"])) == m["tar_sha256"]:
             return m  # resend exactly the unacknowledged batch
-        pending.unlink()  # its tar is gone or damaged: repack everything unacknowledged
+        Path(m["tar"]).unlink(missing_ok=True)  # gone, damaged or too big: repack what is unacknowledged
+        pending.unlink()
     acked = json.loads((state_dir / "acked.json").read_text()) if (state_dir / "acked.json").exists() else {}
-    items = {}
+    todo = []  # (path, stamp): complete and not yet acknowledged
     for p in sorted(out_root.iterdir()):
         if not p.name.startswith(prefix + "-") or ".tmp-" in p.name or ".verify-" in p.name:
             continue
@@ -82,8 +97,13 @@ def prepare(out_root, prefix: str, state_dir) -> dict:
         elif not p.name.endswith(SMALL_SUFFIXES):
             continue
         stamp = _stamp(p)
-        if acked.get(p.name) == stamp:
-            continue
+        if acked.get(p.name) != stamp:
+            todo.append((p, stamp))
+    if per_chunk:
+        tags = sorted({chunk_of(p.name) for p, _ in todo if p.is_dir() and chunk_of(p.name)})
+        todo = [(p, s) for p, s in todo if not p.is_dir() or chunk_of(p.name) in (tags[:1] or [None])]
+    items = {}
+    for p, stamp in todo:  # file checksums only for what is sent
         files = ({str(f.relative_to(out_root)): _sha(f) for f in sorted(p.rglob("*")) if f.is_file()}
                  if p.is_dir() else {p.name: _sha(p)})
         items[p.name] = {"type": "dir" if p.is_dir() else "file", "stamp": stamp, "files": files}

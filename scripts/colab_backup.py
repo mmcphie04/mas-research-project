@@ -31,8 +31,9 @@ MARK = "<<<BACKUP_JSON>>>"
 
 
 class ColabRemote(B.Remote):
-    def __init__(self, session, code_dir, remote_root, state_dir, job):
+    def __init__(self, session, code_dir, remote_root, state_dir, job, per_chunk=False):
         self.session, self.code_dir, self.root, self.state_dir, self.job = session, code_dir, remote_root, state_dir, job
+        self.per_chunk = per_chunk
 
     def _colab(self, *args, timeout=600) -> str:
         """One CLI call. A hung call (seen live: the CLI waited on output indefinitely) becomes
@@ -52,8 +53,12 @@ class ColabRemote(B.Remote):
     def _exec(self, body: str, timeout=900, retries=3):
         """Run code on the runtime and return its JSON result. Retried on failure: use only for
         idempotent bodies (prepare and status reads are; acknowledge is handled separately)."""
-        code = (f"import sys, json\nsys.path.insert(0, {self.code_dir + '/src'!r})\n"
-                f"from mad import cli_backup as B\n{body}\n")
+        # loaded by path on every call: the runtime's kernel persists between calls and may hold a
+        # different ``mad`` (e.g. the job's checkout) in sys.modules already
+        code = (f"import sys, json, importlib.util\nsys.path.insert(0, {self.code_dir + '/src'!r})\n"
+                f"_s = importlib.util.spec_from_file_location('mad_cli_backup_live', "
+                f"{self.code_dir + '/src/mad/cli_backup.py'!r})\n"
+                f"B = importlib.util.module_from_spec(_s)\n_s.loader.exec_module(B)\n{body}\n")
         with tempfile.NamedTemporaryFile("w", suffix=".py", delete=False) as fh:
             fh.write(code)
         last = None
@@ -98,7 +103,8 @@ class ColabRemote(B.Remote):
         return bool(self._exec(body, timeout=150))
 
     def prepare(self, prefix):
-        return self._exec(f"print({MARK!r} + json.dumps(B.prepare({self.root!r}, {prefix!r}, {self.state_dir!r})))",
+        call = f"B.prepare({self.root!r}, {prefix!r}, {self.state_dir!r}" + (", per_chunk=True)" if self.per_chunk else ")")
+        return self._exec(f"print({MARK!r} + json.dumps({call}))",
                           timeout=900)
 
     def stop(self):
