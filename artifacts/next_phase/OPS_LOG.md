@@ -101,3 +101,11 @@ balance ≤ 129.98, after a final backup from ≤ 130.98, and whenever the job p
 Windows power settings so it never sleeps (plugged in) for the whole session, and keep a WSL
 terminal open. G4's supervisor was paused for 7 h by sleep (01:40–08:39) and killed when WSL went
 down (~09:50); the runtime job was unaffected, but nothing would have stopped an idle runtime.
+
+## 2026-10-30: revision-gate judge smoke test (authorized; cap 6 units, stop line 160.86)
+
+| time | event |
+|---|---|
+| 17:06 | balance 166.86; session `judge` (A100); code `20a4391`; setup verified; `scripts/judge_smoke.py` launched (gemma, qwen3, qwen3_think, llama; 10 events + 10 questions each) |
+| 17:08–17:27 | gemma (judge 4 s; own 30 in 235 s), qwen3 (2 s; 68 s), qwen3_think (judge 299 s; own 10 in 128 s), llama (2 s; 90 s): all exit 0; peak reserved ≤ 28.3 GB |
+| 17:27 | `judge_smoke.tgz` (39 KB, SHA-256 `45eb9847…`) downloaded, hash matched; session stopped; balance **164.92** (smoke: **1.94 units**, may still post a little more) |

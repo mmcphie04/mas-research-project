@@ -1,0 +1,22 @@
+[
+ {
+  "model": "gemma",
+  "exit": 0,
+  "seconds": 339.4
+ },
+ {
+  "model": "qwen3",
+  "exit": 0,
+  "seconds": 134.3
+ },
+ {
+  "model": "qwen3_think",
+  "exit": 0,
+  "seconds": 443.3
+ },
+ {
+  "model": "llama",
+  "exit": 0,
+  "seconds": 154.4
+ }
+]
