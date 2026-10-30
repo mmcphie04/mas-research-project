@@ -1,0 +1,383 @@
+{
+ "rule": "questions with existing 250-word Gemma pool answers (main250 / pilot250): Gemma's own samples are pool agents 5, 6, 7 (never on a debate panel); every other question gets 3 fresh samples",
+ "questions": [
+  {
+   "question_id": "10427",
+   "source": "main250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "10731",
+   "source": "main250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "10882",
+   "source": "main250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "10910",
+   "source": "main250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "10940",
+   "source": "main250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "11080",
+   "source": "main250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "11095",
+   "source": "main250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "11631",
+   "source": "main250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "11958",
+   "source": "main250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "11959",
+   "source": "pilot250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "12239",
+   "source": "main250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "125",
+   "source": "main250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "151",
+   "source": "main250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "1595",
+   "source": "main250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "1821",
+   "source": "main250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "2048",
+   "source": "main250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "2632",
+   "source": "pilot250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "3126",
+   "source": "main250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "3361",
+   "source": "pilot250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "340",
+   "source": "main250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "3959",
+   "source": "pilot250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "4229",
+   "source": "main250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "4384",
+   "source": "main250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "4872",
+   "source": "main250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "5084",
+   "source": "main250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "5229",
+   "source": "main250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "5795",
+   "source": "main250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "6130",
+   "source": "main250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "6744",
+   "source": "main250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "6755",
+   "source": "main250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "6793",
+   "source": "main250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "7086",
+   "source": "main250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "7495",
+   "source": "main250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "759",
+   "source": "main250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "7659",
+   "source": "main250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "77",
+   "source": "pilot250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "8199",
+   "source": "main250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "8982",
+   "source": "main250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "9249",
+   "source": "pilot250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "9465",
+   "source": "main250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "9466",
+   "source": "main250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "question_id": "9885",
+   "source": "main250",
+   "pool_agents": [
+    5,
+    6,
+    7
+   ]
+  }
+ ]
+}

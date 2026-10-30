@@ -185,6 +185,8 @@ def main(argv=None) -> int:
                     help="own answers on the first N questions (default: the limited events' questions, or all)")
     ap.add_argument("--own-samples", type=int, default=None, help="default: 1 thinking, 3 otherwise")
     ap.add_argument("--think-cap", type=int, default=2000)
+    ap.add_argument("--skip-questions", default=None,
+                    help="JSON with 'questions': [{question_id, ...}]: no own answers generated for these")
     a = ap.parse_args(argv)
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
@@ -201,6 +203,9 @@ def main(argv=None) -> int:
             questions = [q for q in questions if q["question_id"] in keep]
     if a.questions_limit:
         questions = questions[: a.questions_limit]
+    if a.skip_questions:
+        skip = {q["question_id"] for q in json.loads(Path(a.skip_questions).read_text())["questions"]}
+        questions = [q for q in questions if q["question_id"] not in skip]
 
     def log(msg):
         print(f"[{time.strftime('%H:%M:%S')}] {msg}", flush=True)

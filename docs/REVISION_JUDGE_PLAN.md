@@ -190,3 +190,59 @@ protocol:
 
 Supervision as for G4: a 6 GB memory cap on the laptop and the laptop kept awake. Outputs are
 small, so they are fetched at the end, not per chunk.
+
+## Decision bar and reporting (approved 2026-10-30; committed before any full-run output)
+
+**Run.**
+
+- All four judges, with a hard cap of **18 units**: stop line = balance at launch − 18.
+- Thinking traces at batch 16, as smoked.
+- Order:
+  1. Gemma judge;
+  2. Qwen3 judge + own answers;
+  3. Llama judge + own answers;
+  4. Qwen3 thinking judge + own answers;
+  5. Gemma own answers.
+
+  Each runs as its own process.
+- Gemma's own answers are generated only for the 107 questions without existing 250-word answers
+  (`artifacts/revision_gate/judge/gemma_reuse.json`). The other 42 use main250/pilot250 pool
+  agents 5–7.
+
+**Definitions, fixed now.**
+
+- **Judge decision:** accept the revision iff P(revision) > ½ (exactly ½ scores ½).
+- **Own-answer rule (comparator (c)):**
+  - the judge model's own majority answer is the plurality of its own samples; a tied plurality
+    counts as no majority;
+  - side with the revision if the revised answer equals it, and with the original if the
+    original answer equals it;
+  - otherwise ½.
+- **Output-feature gate:** section 4's out-of-fold decisions and probabilities, matched by
+  `event_id` (`oof_gate_decisions.csv`). The **logistic** gate is the reference; the boosted
+  tree is reported alongside.
+- **Combined gate (fixed now):** P = ½ (judge P(revision) + logistic out-of-fold P(helpful));
+  accept iff P > ½.
+- **"Beats":** the paired difference in accuracy on the same helpful/harmful events, with a
+  question-grouped 95% interval (10,000 resamples).
+  - "Clearly beats": the interval excludes 0.
+  - A higher point estimate alone is reported as "not clearly".
+
+**Decision bar.** The judge path is worth a collection run only if **some judge** meets all three:
+
+- (a) accuracy ≥ 0.75 on helpful/harmful events (pooled; point estimate, with its interval
+  reported);
+- (b) clearly beats the out-of-fold output-feature gate on the same events (the logistic gate;
+  the boosted tree is also reported, and (b) is read as met only if both are clearly beaten);
+- (c) clearly beats the own-answer rule on the same events.
+
+**Reported per judge.**
+
+- Accuracy on helpful events (share accepted), on harmful events (share rejected), and pooled.
+- AUROC of P(revision) on the pooled helpful/harmful events. AUROC is undefined within one
+  class; per class, mean P(revision) is reported instead.
+- Mean P(revision) over all events and over wrong→wrong events (revision bias).
+- Position bias.
+- Simulated gated panel and agent accuracy, judge alone and combined, against accept-all,
+  reject-all, the fixed rules and the out-of-fold gates, pooled and by dataset × condition.
+- Thinking: on its 157-event subsample, next to non-thinking Qwen3 on the same events.
