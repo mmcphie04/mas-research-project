@@ -64,7 +64,9 @@ are not expected to be resolvable; intervals are reported as such, not as tests 
 
 - Subgroups: initial agreement pattern, subject, calculation vs non-calculation.
 - Prediction curves for the new responses (extension E3).
-- The second-round extension (E1, 50 prespecified questions) and the no-peer control (E2).
+- The second-round extension (E1) and the no-peer control (E2), on the 50 questions in
+  `artifacts/main250/plan/extension_subset.json` (2 per chunk, seed 20261030, outcome-blind;
+  committed before any main250 accuracy). Both run regardless of the primary results.
 - **The action predictor / controller.** Trained on the split's *train* questions (74), tuned on
   *validation* (28), evaluated once on *test* (98). Treated as exploratory: 98 test questions
   cannot establish a reliable controller.

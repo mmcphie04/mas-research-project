@@ -128,6 +128,16 @@ gets one debate round. There is no forced-opening condition.
 | **E2** | structured reconsideration without peers (`self_structured5`) on a matched subset (the same 50 questions) |
 | **E3** | prediction curves for the new debate responses, **full** (all 3,200 revisions) or **subset** (the 50 questions) |
 
+**E1/E2 subset, committed 2026-10-30 before any main250 accuracy was computed:**
+`artifacts/main250/plan/extension_subset.json` (`scripts/extension_subset.py`).
+
+- **Rule:** 2 questions per chunk of main250 (25 chunks × 2 = 50), drawn without replacement
+  within each chunk by `numpy.random.default_rng(20261030)`.
+- **Outcome-blind:** the selector reads only the job record's chunk membership.
+- **Hashes:** question ids `9e754da4…`; job identity and chunk membership hashes are in the file.
+- **Both E1 and E2 run regardless of the primary results.** Neither is conditional on what the
+  base comparisons show, so neither can be chosen or dropped after seeing them.
+
 **History policy** (`prompts.HISTORY_POLICY`, recorded in every round-2 manifest).
 
 - Each agent keeps its own full transcript. It sees the panel peers' responses from the
