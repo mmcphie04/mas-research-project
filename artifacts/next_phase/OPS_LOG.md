@@ -62,3 +62,4 @@ checks the budget-derived worst-case batch.
 | 23:15–23:32 | child (second rounds + no-peer control on all 4 prespecified subset questions): 3 / 3 chunks finished; its stress at the round-2 worst case (9,813 readout tokens) passed |
 | 23:33 | `pilot_attempt2.tar` (823 MB, SHA-256 `f85c7f77…`) downloaded in ~2 min, hash matched; session stopped; balance **242.98** (attempt 2: **8.67 units**; G2 total **9.73** of 13) |
 | 23:37 | both archives verified (15 chunk directories each); copies to `mas_backup/pilot250` and Google Drive started |
+| 23:42 | pilot backups verified: `mas_backup/pilot250` (both jobs, 15 chunk directories each, `verify_archive`) and Google Drive `mas_research_backup/pilot250` (313 files, 0 differences, `rclone check`); ALL VERIFIED |
