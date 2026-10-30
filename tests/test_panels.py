@@ -178,3 +178,16 @@ def test_second_round_on_a_prespecified_subset_uses_the_parents_first_round(run,
         assert t["messages"][: len(r1[k]["messages"])] == r1[k]["messages"]
         assert t["shown_peer_sources"] == r1[k]["shown_peer_sources"]
     assert set(r2) >= set(kid)  # the parent's own full second round is untouched
+
+
+def test_pilot_sequence_runs_the_child_only_after_the_parent_finished(tmp_path):
+    spec = importlib.util.spec_from_file_location("pilot_g2", ROOT / "scripts" / "pilot_g2.py")
+    pg = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(pg)
+    assert pg.main(["--out-root", str(tmp_path / "ok"), "--stub"]) == 0
+    seq = json.loads((tmp_path / "ok" / "pilot_g2-sequence.json").read_text())
+    assert [s["state"] for s in seq] == ["finished", "finished"]
+    # a parent stopped by its time cap exits 0 -- the child must still be skipped
+    assert pg.main(["--out-root", str(tmp_path / "cap"), "--stub", "--parent-hours", "0"]) == 1
+    seq = json.loads((tmp_path / "cap" / "pilot_g2-sequence.json").read_text())
+    assert seq[0]["state"] != "finished" and "skipped" in seq[1]

@@ -1203,3 +1203,35 @@ is 0.0008. No threshold was changed.
   probe results.
 
 **Tests at this point:** full suite 310 passed; ruff clean.
+
+## 17. Off-device copy verified; G2 preparation
+
+**Off-device copy (2026-10-29, 21:25–21:39).** `scripts/offdevice_backup.py` → `gdrive:mas_research_backup/`
+printed **ALL VERIFIED**. `rclone check --one-way` (size + MD5) found 0 differences:
+
+| set | files | size |
+|---|---|---|
+| pilot12b | 272 | 3.84 GB |
+| val12b | 303 | 4.31 GB |
+| frozen | 1 | 38.7 MB |
+| next_commit | 545 | 138 MB |
+
+The log is in `artifacts/next_phase/backup/offdevice_log.jsonl`. Session outputs from now on are
+copied there after each session.
+
+**Decisions relayed on 2026-10-29:**
+
+- G1 diagnosis and readout batch size 1 agreed;
+- **G3 cancelled.** The replication curves stay on the bf16-logit readout: at most 18 inputs
+  within one rounding step; ties scored ½ each;
+- the headline comparison uses all 200 fresh questions; the split is used only for the
+  predictor;
+- G2 approved with a 13-unit session cap, conditional on ALL VERIFIED.
+
+**G2 runner.** `scripts/pilot_g2.py` runs the parent job (pool + both panels × both prompts, 12
+validation-pool questions, `--max-hours 1.1`). It then runs the child (second rounds + no-peer
+control on 4, `--max-hours 0.35`) **only if the parent's status is "finished"** with every chunk
+done, never on the exit code: a time-capped parent also exits 0. A stub dry run of both jobs
+verified, and a test covers the gating.
+
+**Headline analysis spec** committed before any fresh data: docs/MAIN250_ANALYSIS_SPEC.md.
