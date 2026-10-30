@@ -1,0 +1,81 @@
+% fig1_pipeline.tex -- pipeline diagram for the midterm report.
+% Use inside a figure environment:  \input{figures/midterm/fig1_pipeline.tex}
+% Preamble needs:
+%   \usepackage{tikz}
+%   \usetikzlibrary{positioning,arrows.meta,calc}
+% Colors match the matplotlib figures (debate, independent voting, neutral).
+\definecolor{debate}{HTML}{2A78D6}
+\definecolor{independent}{HTML}{199E70}
+\definecolor{neutral}{HTML}{898781}
+\definecolor{ink2}{HTML}{52514E}
+\begin{tikzpicture}[
+    font=\small,
+    >={Stealth[length=2.2mm]},
+    box/.style={draw=ink2, rounded corners=2pt, align=center, minimum height=8mm,
+                text width=#1, inner sep=2pt},
+    box/.default=20mm,
+    flow/.style={->, draw=ink2, line width=0.6pt},
+    snap/.style={circle, draw=ink2, fill=white, inner sep=1pt, minimum size=4.2mm,
+                 font=\scriptsize\bfseries},
+    head/.style={font=\small\bfseries, align=center},
+]
+  % Question
+  \node[box=14mm] (q) at (0,0) {Question};
+
+  % Round 0
+  \foreach \i/\y in {1/1.1, 2/0, 3/-1.1}
+    \node[box=19mm] (a\i) at (2.9,\y) {Agent \i\\answers};
+  \node[head, above=1mm of a1] {Round 0:\\independent};
+  \foreach \i in {1,2,3} \draw[flow] (q.east) -- (a\i.west);
+
+  % Read peers
+  \foreach \i/\p/\y in {1/{2 and 3}/1.1, 2/{1 and 3}/0, 3/{1 and 2}/-1.1}
+    \node[box=23mm] (r\i) at (6.6,\y) {Agent \i\ reads\\agents \p};
+  \node[head, above=1mm of r1] {Read the two\\peers' responses};
+
+  % Revise
+  \foreach \i/\y in {1/1.1, 2/0, 3/-1.1}
+    \node[box=19mm] (v\i) at (10.2,\y) {Agent \i\\revises once};
+  \node[head, above=1mm of v1] {Revision};
+
+  % Vote
+  \node[box=17mm, minimum height=30mm] (vote) at (13.5,0) {Plurality\\vote\\(panel\\answer)};
+
+  % Main (debate) path with the three snapshot points
+  \foreach \i in {1,2,3} {
+    \draw[flow, draw=debate] (a\i.east) -- (r\i.west)
+      node[snap, pos=0.5] {1};
+    \draw[flow, draw=debate] (r\i.east) -- (v\i.west)
+      node[snap, pos=0.5] {2};
+    \draw[flow, draw=debate] (v\i.east) -- (vote.west |- v\i.east)
+      node[snap, pos=0.42] {3};
+  }
+
+  % The three actions compared
+  \coordinate (lane1) at (0,-2.45);
+  \coordinate (lane2) at (0,-3.25);
+  \coordinate (lane3) at (0,-4.05);
+  \draw[->, draw=neutral, line width=0.9pt]
+    (a3.south |- lane1) -- (vote.south |- lane1)
+    node[pos=0.5, fill=white, inner sep=2pt, text=ink2]
+      {\textbf{Stop:} vote over the three round-0 answers};
+  \draw[->, draw=debate, line width=0.9pt]
+    (a3.south |- lane2) -- (vote.south |- lane2)
+    node[pos=0.5, fill=white, inner sep=2pt, text=ink2]
+      {\textbf{Debate:} read peers, revise once, vote over the revised answers};
+  \draw[->, draw=independent, line width=0.9pt]
+    (a3.south |- lane3) -- (vote.south |- lane3)
+    node[pos=0.5, fill=white, inner sep=2pt, text=ink2]
+      {\textbf{Add independent answers:} more fresh round-0 answers, vote over all};
+  \draw[draw=ink2, line width=0.4pt] (a3.south) -- (a3.south |- lane3);
+  \draw[draw=ink2, line width=0.4pt] (vote.south) -- (vote.south |- lane3);
+
+  % Snapshot key
+  \node[anchor=west, text=ink2, font=\footnotesize] (k0) at ($(a3.south |- lane3) + (-1.2,-0.7)$) {Snapshots:};
+  \node[snap, right=1.5mm of k0] (k1) {1};
+  \node[right=0.5mm of k1, text=ink2, font=\footnotesize] (t1) {after the original answer};
+  \node[snap, right=3mm of t1] (k2) {2};
+  \node[right=0.5mm of k2, text=ink2, font=\footnotesize] (t2) {after reading peers, before writing};
+  \node[snap, right=3mm of t2] (k3) {3};
+  \node[right=0.5mm of k3, text=ink2, font=\footnotesize] {after the revision};
+\end{tikzpicture}
