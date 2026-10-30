@@ -141,3 +141,24 @@ Plurality 0.667 [0.603, 0.730]; coverage 0.730 [0.665, 0.790]; gap 0.062 [0.033,
 | (iv) peer-exposure readout | c_highest_signal | 0.665 [0.600, 0.730] | -0.003 [-0.035, 0.030] | 14 | -0.04 [-0.83, 0.41] | -0.008 [-0.119, 0.095] | -0.04 [-0.85, 0.42] |
 
 Rules (b) and (c) choose among the answers given: on unanimous answer sets the gap is zero and they equal plurality, so their share of the gap closed is the same overall and on non-unanimous questions by construction (only the per-question difference grows). A soft vote (a) can choose an option no agent gave, so it can differ even on unanimous sets (e.g. (iv) on structured3).
+
+## Within-question AUROC (exploratory; non-unanimous questions)
+
+Every correct answer paired with every incorrect answer to the same question (non-unanimous answer sets only); the share of pairs in which the correct answer's signal value is higher, ties counted ½, pooled over pairs with questions resampled. Ordinary AUROC beside it: over all states, and over the states of the same non-unanimous questions. Signal values as above ((iv): exposure probability of the post answer).
+
+| answers | signal | within-question | questions with pairs | pairs | tied pairs | ordinary AUROC, all states | ordinary AUROC, non-unanimous questions |
+|---|---|---|---|---|---|---|---|
+| pool first 10 | (ii) response mean log-prob (as exp) | 0.555 [0.498, 0.612] | 70 | 1,228 | 0.0% | 0.648 [0.585, 0.706] | 0.530 [0.456, 0.604] |
+| pool first 10 | (iii) verbalized confidence | 0.560 [0.514, 0.606] | 69 | 1,173 | 65.3% | 0.674 [0.631, 0.716] | 0.617 [0.563, 0.668] |
+| debate3 post-debate | (ii) response mean log-prob (as exp) | 0.542 [0.411, 0.671] | 36 | 72 | 0.0% | 0.632 [0.572, 0.689] | 0.549 [0.450, 0.648] |
+| debate3 post-debate | (iii) verbalized confidence | 0.585 [0.462, 0.706] | 36 | 71 | 38.0% | 0.788 [0.733, 0.839] | 0.648 [0.547, 0.739] |
+| debate3 post-debate | (iv) peer-exposure readout | 0.542 [0.400, 0.683] | 36 | 72 | 0.0% | 0.771 [0.708, 0.828] | 0.598 [0.495, 0.694] |
+| structured3 post-debate | (ii) response mean log-prob (as exp) | 0.641 [0.500, 0.781] | 32 | 64 | 0.0% | 0.600 [0.534, 0.666] | 0.512 [0.413, 0.614] |
+| structured3 post-debate | (iii) verbalized confidence | 0.641 [0.510, 0.766] | 32 | 64 | 21.9% | 0.788 [0.737, 0.837] | 0.697 [0.605, 0.779] |
+| structured3 post-debate | (iv) peer-exposure readout | 0.688 [0.534, 0.824] | 32 | 64 | 0.0% | 0.807 [0.753, 0.857] | 0.674 [0.557, 0.779] |
+| debate5 post-debate | (ii) response mean log-prob (as exp) | 0.461 [0.373, 0.550] | 45 | 232 | 0.0% | 0.643 [0.585, 0.696] | 0.514 [0.429, 0.594] |
+| debate5 post-debate | (iii) verbalized confidence | 0.610 [0.495, 0.719] | 45 | 232 | 20.3% | 0.809 [0.756, 0.859] | 0.658 [0.568, 0.737] |
+| debate5 post-debate | (iv) peer-exposure readout | 0.685 [0.565, 0.797] | 45 | 232 | 0.0% | 0.787 [0.728, 0.843] | 0.658 [0.566, 0.746] |
+| structured5 post-debate | (ii) response mean log-prob (as exp) | 0.579 [0.469, 0.683] | 43 | 216 | 0.0% | 0.584 [0.519, 0.649] | 0.447 [0.357, 0.540] |
+| structured5 post-debate | (iii) verbalized confidence | 0.688 [0.585, 0.786] | 43 | 216 | 22.7% | 0.789 [0.743, 0.832] | 0.684 [0.600, 0.760] |
+| structured5 post-debate | (iv) peer-exposure readout | 0.699 [0.584, 0.805] | 43 | 216 | 0.0% | 0.818 [0.766, 0.866] | 0.761 [0.670, 0.838] |

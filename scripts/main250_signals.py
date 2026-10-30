@@ -205,12 +205,73 @@ def rules(d, bt) -> dict:
     return out
 
 
+WITHIN = ("ii_response_logprob_mean", "iii_verbalized_confidence", "iv_peer_exposure")
+
+
+def _auroc_boot(per_q_s, per_q_y, bt) -> dict:
+    if not per_q_s:
+        return {"mean": float("nan"), "lo": float("nan"), "hi": float("nan"), "n": 0}
+    S, Y = np.concatenate(per_q_s), np.concatenate(per_q_y)
+    boots = np.array([auroc(np.concatenate([per_q_s[i] for i in row]), np.concatenate([per_q_y[i] for i in row]))
+                      for row in bt.idx(len(per_q_s))])
+    boots = boots[np.isfinite(boots)]
+    if not len(boots):  # one class only: undefined
+        return {"mean": float("nan"), "lo": float("nan"), "hi": float("nan"), "n": int(len(S))}
+    return {"mean": auroc(S, Y), "lo": float(np.quantile(boots, .025)), "hi": float(np.quantile(boots, .975)),
+            "n": int(len(S))}
+
+
+def within_question(d, bt) -> dict:
+    """On non-unanimous questions: every (correct, incorrect) pair of answers to the same question;
+    the share in which the correct answer's signal value is higher (ties 1/2), pooled over pairs
+    (questions resampled). Next to it, the ordinary AUROC over all states and over the states of
+    the same non-unanimous questions."""
+    out = {}
+    for label, (name, k) in {"pool first 10": ("pool", 10), **{f"{c} post-debate": (c, None) for c in DEBATES}}.items():
+        sets, res = d["sets"][name], {}
+        for sig in WITHIN:
+            if sig not in sets[d["qs"][0]]["signals"]:
+                continue
+            kind = SIGNALS[sig]
+            num, den, ties = [], [], []
+            all_s, all_y, nu_s, nu_y = [], [], [], []
+            for q in d["qs"]:
+                ans = sets[q]["answers"][:k] if k else sets[q]["answers"]
+                sg = sets[q]["signals"][sig][:k] if k else sets[q]["signals"][sig]
+                vals = [(value(x, kind, a), int(int(a) == d["gold"][q])) for a, x in zip(ans, sg, strict=True)]
+                vals = [(v, y) for v, y in vals if v is not None]
+                sv, yv = np.array([v for v, _ in vals]), np.array([y for _, y in vals])
+                all_s.append(sv)
+                all_y.append(yv)
+                nonu = len(set(np.asarray(ans).tolist())) > 1
+                c, w = sv[yv == 1], sv[yv == 0]
+                if nonu:
+                    nu_s.append(sv)
+                    nu_y.append(yv)
+                if nonu and len(c) and len(w):
+                    diff = c[:, None] - w[None, :]
+                    num.append(float((diff > 0).sum() + 0.5 * (diff == 0).sum()))
+                    den.append(float(diff.size))
+                    ties.append(float((diff == 0).sum()))
+                else:
+                    num.append(0.0)
+                    den.append(0.0)
+                    ties.append(0.0)
+            num, den, ties = np.array(num), np.array(den), np.array(ties)
+            res[sig] = {"within_question": bt.ratio(num, den), "questions_with_pairs": int((den > 0).sum()),
+                        "pairs": int(den.sum()), "tie_share": float(ties.sum() / den.sum()) if den.sum() else None,
+                        "ordinary_auroc_all_states": _auroc_boot(all_s, all_y, bt),
+                        "ordinary_auroc_non_unanimous_states": _auroc_boot(nu_s, nu_y, Boot(bt.n_boot))}
+        out[label] = res
+    return out
+
+
 def analyze(dest: Path, job: str, n_boot: int = B_DEFAULT) -> dict:
     d = load(dest, job)
     bt = Boot(n_boot)
     return {"label": LABEL, "note": "exploratory; signals, value definitions and rules fixed before computing",
             "questions": len(d["qs"]), "bootstrap": {"resamples": n_boot, "seed": 0},
-            "describe": describe(d, bt), "selection": rules(d, bt)}
+            "describe": describe(d, bt), "selection": rules(d, bt), "within_question": within_question(d, bt)}
 
 
 NAMES = {"i_before_stated_answer": "(i) before-stated-answer distribution",
@@ -250,6 +311,18 @@ def markdown(r: dict) -> str:
           "equal plurality, so their share of the gap closed is the same overall and on non-unanimous questions by "
           "construction (only the per-question difference grows). A soft vote (a) can choose an option no agent "
           "gave, so it can differ even on unanimous sets (e.g. (iv) on structured3)."]
+    L += ["", "## Within-question AUROC (exploratory; non-unanimous questions)", "",
+          "Every correct answer paired with every incorrect answer to the same question (non-unanimous answer sets "
+          "only); the share of pairs in which the correct answer's signal value is higher, ties counted ½, pooled "
+          "over pairs with questions resampled. Ordinary AUROC beside it: over all states, and over the states of "
+          "the same non-unanimous questions. Signal values as above ((iv): exposure probability of the post answer).",
+          "", "| answers | signal | within-question | questions with pairs | pairs | tied pairs | ordinary AUROC, all states | ordinary AUROC, non-unanimous questions |",
+          "|---|---|---|---|---|---|---|---|"]
+    for label, sigs in r.get("within_question", {}).items():
+        for s, v in sigs.items():
+            L.append(f"| {label} | {NAMES[s]} | {ci(v['within_question'])} | {v['questions_with_pairs']} | {v['pairs']:,} | "
+                     f"{100 * (v['tie_share'] or 0):.1f}% | {ci(v['ordinary_auroc_all_states'])} | "
+                     f"{ci(v['ordinary_auroc_non_unanimous_states'])} |")
     return "\n".join(L) + "\n"
 
 

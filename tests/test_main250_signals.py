@@ -53,3 +53,20 @@ def test_signals_on_a_stub_main_job(tmp_path):
         "b_weighted_plurality", "c_highest_signal"}
     json.dumps(r, default=S._json_default)
     assert "exploratory" in S.markdown(r).lower()
+
+
+def test_within_question_pairs_and_ties():
+    gold = {"q": 0}
+    d = {"qs": ["q"], "gold": gold, "sets": {"pool": {"q": {
+        "answers": np.array([0, 0, 1, 2, 0, 0, 0, 0, 0, 0]),
+        "signals": {"ii_response_logprob_mean": [0.9, 0.5, 0.5, 0.2, None, None, None, None, None, None],
+                    "iii_verbalized_confidence": [None] * 10}}}}}
+    for c in S.DEBATES:
+        d["sets"][c] = {"q": {"answers": np.array([0, 0, 0]), "signals": {
+            "ii_response_logprob_mean": [0.5, 0.5, 0.5], "iii_verbalized_confidence": [0.5, 0.5, 0.5],
+            "iv_peer_exposure": [np.array([1.0, 0.0, 0.0])] * 3}}}
+    r = S.within_question(d, S.Boot(50))
+    w = r["pool first 10"]["ii_response_logprob_mean"]
+    # correct {0.9, 0.5} vs wrong {0.5, 0.2}: pairs win, win, tie, win -> 3.5 / 4
+    assert w["pairs"] == 4 and w["within_question"]["mean"] == 0.875 and w["tie_share"] == 0.25
+    assert r["debate3 post-debate"]["ii_response_logprob_mean"]["pairs"] == 0  # unanimous: no pairs

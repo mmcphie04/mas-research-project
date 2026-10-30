@@ -3081,5 +3081,353 @@
     }
    }
   }
+ },
+ "within_question": {
+  "pool first 10": {
+   "ii_response_logprob_mean": {
+    "within_question": {
+     "n": 70,
+     "den": 1228.0,
+     "mean": 0.5545602605863192,
+     "lo": 0.4977692908155929,
+     "hi": 0.6115256347691292
+    },
+    "questions_with_pairs": 70,
+    "pairs": 1228,
+    "tie_share": 0.0,
+    "ordinary_auroc_all_states": {
+     "mean": 0.6475282181301759,
+     "lo": 0.5852246271128495,
+     "hi": 0.7063547867052639,
+     "n": 2000
+    },
+    "ordinary_auroc_non_unanimous_states": {
+     "mean": 0.5298320479191951,
+     "lo": 0.45627326836767984,
+     "hi": 0.6038016291795721,
+     "n": 930
+    }
+   },
+   "iii_verbalized_confidence": {
+    "within_question": {
+     "n": 69,
+     "den": 1173.0,
+     "mean": 0.5601023017902813,
+     "lo": 0.5136396243100378,
+     "hi": 0.6061340500630904
+    },
+    "questions_with_pairs": 69,
+    "pairs": 1173,
+    "tie_share": 0.6530264279624893,
+    "ordinary_auroc_all_states": {
+     "mean": 0.6741338920673231,
+     "lo": 0.6314548693598508,
+     "hi": 0.7159406653034581,
+     "n": 1983
+    },
+    "ordinary_auroc_non_unanimous_states": {
+     "mean": 0.6170228922615854,
+     "lo": 0.5632428892653606,
+     "hi": 0.6679630003981964,
+     "n": 915
+    }
+   }
+  },
+  "debate3 post-debate": {
+   "ii_response_logprob_mean": {
+    "within_question": {
+     "n": 36,
+     "den": 72.0,
+     "mean": 0.5416666666666666,
+     "lo": 0.4107142857142857,
+     "hi": 0.6714285714285714
+    },
+    "questions_with_pairs": 36,
+    "pairs": 72,
+    "tie_share": 0.0,
+    "ordinary_auroc_all_states": {
+     "mean": 0.6318158580530929,
+     "lo": 0.5724547936747536,
+     "hi": 0.6891363489989217,
+     "n": 600
+    },
+    "ordinary_auroc_non_unanimous_states": {
+     "mean": 0.5485705003248863,
+     "lo": 0.4498630128845148,
+     "hi": 0.6483749161689433,
+     "n": 168
+    }
+   },
+   "iii_verbalized_confidence": {
+    "within_question": {
+     "n": 36,
+     "den": 71.0,
+     "mean": 0.5845070422535211,
+     "lo": 0.46152597402597406,
+     "hi": 0.7063571428571428
+    },
+    "questions_with_pairs": 36,
+    "pairs": 71,
+    "tie_share": 0.38028169014084506,
+    "ordinary_auroc_all_states": {
+     "mean": 0.7875062656641604,
+     "lo": 0.7330788741939714,
+     "hi": 0.8393539346843736,
+     "n": 599
+    },
+    "ordinary_auroc_non_unanimous_states": {
+     "mean": 0.6480662078007211,
+     "lo": 0.5470726239167072,
+     "hi": 0.7389427570093458,
+     "n": 167
+    }
+   },
+   "iv_peer_exposure": {
+    "within_question": {
+     "n": 36,
+     "den": 72.0,
+     "mean": 0.5416666666666666,
+     "lo": 0.4,
+     "hi": 0.6829268292682927
+    },
+    "questions_with_pairs": 36,
+    "pairs": 72,
+    "tie_share": 0.0,
+    "ordinary_auroc_all_states": {
+     "mean": 0.7708387885135725,
+     "lo": 0.7083454780507833,
+     "hi": 0.8277092899230676,
+     "n": 600
+    },
+    "ordinary_auroc_non_unanimous_states": {
+     "mean": 0.5977095516569201,
+     "lo": 0.49486841348152766,
+     "hi": 0.694291619425548,
+     "n": 168
+    }
+   }
+  },
+  "structured3 post-debate": {
+   "ii_response_logprob_mean": {
+    "within_question": {
+     "n": 32,
+     "den": 64.0,
+     "mean": 0.640625,
+     "lo": 0.5,
+     "hi": 0.78125
+    },
+    "questions_with_pairs": 32,
+    "pairs": 64,
+    "tie_share": 0.0,
+    "ordinary_auroc_all_states": {
+     "mean": 0.600029501788546,
+     "lo": 0.5336516907722808,
+     "hi": 0.6656664564861834,
+     "n": 600
+    },
+    "ordinary_auroc_non_unanimous_states": {
+     "mean": 0.5123879008967929,
+     "lo": 0.41287200780849975,
+     "hi": 0.6135796686493947,
+     "n": 180
+    }
+   },
+   "iii_verbalized_confidence": {
+    "within_question": {
+     "n": 32,
+     "den": 64.0,
+     "mean": 0.640625,
+     "lo": 0.51040625,
+     "hi": 0.7663134057971013
+    },
+    "questions_with_pairs": 32,
+    "pairs": 64,
+    "tie_share": 0.21875,
+    "ordinary_auroc_all_states": {
+     "mean": 0.7882816437413185,
+     "lo": 0.7372502658397334,
+     "hi": 0.836966720238295,
+     "n": 600
+    },
+    "ordinary_auroc_non_unanimous_states": {
+     "mean": 0.6966864265085879,
+     "lo": 0.6049303985302431,
+     "hi": 0.7794951971925134,
+     "n": 180
+    }
+   },
+   "iv_peer_exposure": {
+    "within_question": {
+     "n": 32,
+     "den": 64.0,
+     "mean": 0.6875,
+     "lo": 0.5344827586206896,
+     "hi": 0.8243243243243243
+    },
+    "questions_with_pairs": 32,
+    "pairs": 64,
+    "tie_share": 0.0,
+    "ordinary_auroc_all_states": {
+     "mean": 0.8066956767587369,
+     "lo": 0.7527440086763605,
+     "hi": 0.8566680278339608,
+     "n": 600
+    },
+    "ordinary_auroc_non_unanimous_states": {
+     "mean": 0.674266605867153,
+     "lo": 0.5567043704387217,
+     "hi": 0.7790317039921364,
+     "n": 180
+    }
+   }
+  },
+  "debate5 post-debate": {
+   "ii_response_logprob_mean": {
+    "within_question": {
+     "n": 45,
+     "den": 232.0,
+     "mean": 0.46120689655172414,
+     "lo": 0.3729508196721312,
+     "hi": 0.5500096899224806
+    },
+    "questions_with_pairs": 45,
+    "pairs": 232,
+    "tie_share": 0.0,
+    "ordinary_auroc_all_states": {
+     "mean": 0.6426346918835927,
+     "lo": 0.5847764507456072,
+     "hi": 0.696379567774803,
+     "n": 1000
+    },
+    "ordinary_auroc_non_unanimous_states": {
+     "mean": 0.5143920407078302,
+     "lo": 0.42908462220817023,
+     "hi": 0.5941177134669469,
+     "n": 345
+    }
+   },
+   "iii_verbalized_confidence": {
+    "within_question": {
+     "n": 45,
+     "den": 232.0,
+     "mean": 0.6099137931034483,
+     "lo": 0.49509558823529415,
+     "hi": 0.71875
+    },
+    "questions_with_pairs": 45,
+    "pairs": 232,
+    "tie_share": 0.2025862068965517,
+    "ordinary_auroc_all_states": {
+     "mean": 0.8094031335054784,
+     "lo": 0.7563208535134978,
+     "hi": 0.8590916112536823,
+     "n": 1000
+    },
+    "ordinary_auroc_non_unanimous_states": {
+     "mean": 0.6576479076479076,
+     "lo": 0.5675239075015339,
+     "hi": 0.7369164748100197,
+     "n": 345
+    }
+   },
+   "iv_peer_exposure": {
+    "within_question": {
+     "n": 45,
+     "den": 232.0,
+     "mean": 0.6853448275862069,
+     "lo": 0.5652173913043478,
+     "hi": 0.7971031583264971
+    },
+    "questions_with_pairs": 45,
+    "pairs": 232,
+    "tie_share": 0.0,
+    "ordinary_auroc_all_states": {
+     "mean": 0.7867327622304418,
+     "lo": 0.7284909896461956,
+     "hi": 0.8427148865834213,
+     "n": 1000
+    },
+    "ordinary_auroc_non_unanimous_states": {
+     "mean": 0.6575339864813549,
+     "lo": 0.566310163681546,
+     "hi": 0.7463867408603357,
+     "n": 345
+    }
+   }
+  },
+  "structured5 post-debate": {
+   "ii_response_logprob_mean": {
+    "within_question": {
+     "n": 43,
+     "den": 216.0,
+     "mean": 0.5787037037037037,
+     "lo": 0.4690265486725664,
+     "hi": 0.6826948924731182
+    },
+    "questions_with_pairs": 43,
+    "pairs": 216,
+    "tie_share": 0.0,
+    "ordinary_auroc_all_states": {
+     "mean": 0.5844311792577565,
+     "lo": 0.5190930906659766,
+     "hi": 0.648734293822453,
+     "n": 1000
+    },
+    "ordinary_auroc_non_unanimous_states": {
+     "mean": 0.4465039689241682,
+     "lo": 0.35701421031252206,
+     "hi": 0.5399595538275013,
+     "n": 315
+    }
+   },
+   "iii_verbalized_confidence": {
+    "within_question": {
+     "n": 43,
+     "den": 216.0,
+     "mean": 0.6875,
+     "lo": 0.5851633738601824,
+     "hi": 0.7857214285714285
+    },
+    "questions_with_pairs": 43,
+    "pairs": 216,
+    "tie_share": 0.22685185185185186,
+    "ordinary_auroc_all_states": {
+     "mean": 0.789248262737397,
+     "lo": 0.74278641172564,
+     "hi": 0.8323648159665927,
+     "n": 1000
+    },
+    "ordinary_auroc_non_unanimous_states": {
+     "mean": 0.6835627427799358,
+     "lo": 0.6002053668751202,
+     "hi": 0.7596212058590857,
+     "n": 315
+    }
+   },
+   "iv_peer_exposure": {
+    "within_question": {
+     "n": 43,
+     "den": 216.0,
+     "mean": 0.6990740740740741,
+     "lo": 0.5839833333333333,
+     "hi": 0.8053097345132744
+    },
+    "questions_with_pairs": 43,
+    "pairs": 216,
+    "tie_share": 0.0,
+    "ordinary_auroc_all_states": {
+     "mean": 0.8181824093220449,
+     "lo": 0.7659079960119467,
+     "hi": 0.8660563501605282,
+     "n": 1000
+    },
+    "ordinary_auroc_non_unanimous_states": {
+     "mean": 0.7605978719810843,
+     "lo": 0.6699643073822191,
+     "hi": 0.838469526372857,
+     "n": 315
+    }
+   }
+  }
  }
 }
