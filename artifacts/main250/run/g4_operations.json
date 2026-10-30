@@ -1,0 +1,238 @@
+{
+ "job": "main250",
+ "state": "finished",
+ "chunks_done": 25,
+ "chunks_total": 25,
+ "elapsed_hours_total": 10.749,
+ "failures": [],
+ "token_cap": 1280,
+ "chunks": [
+  {
+   "chunk": "c000",
+   "questions": 8,
+   "seconds": 1790.4,
+   "peak_allocated_gb": 31.88,
+   "peak_reserved_gb": 32.68
+  },
+  {
+   "chunk": "c001",
+   "questions": 8,
+   "seconds": 1837.9,
+   "peak_allocated_gb": 31.24,
+   "peak_reserved_gb": 32.68
+  },
+  {
+   "chunk": "c002",
+   "questions": 8,
+   "seconds": 1496.0,
+   "peak_allocated_gb": 31.33,
+   "peak_reserved_gb": 32.68
+  },
+  {
+   "chunk": "c003",
+   "questions": 8,
+   "seconds": 1308.4,
+   "peak_allocated_gb": 31.52,
+   "peak_reserved_gb": 32.68
+  },
+  {
+   "chunk": "c004",
+   "questions": 8,
+   "seconds": 2228.1,
+   "peak_allocated_gb": 32.09,
+   "peak_reserved_gb": 32.93
+  },
+  {
+   "chunk": "c005",
+   "questions": 8,
+   "seconds": 1293.4,
+   "peak_allocated_gb": 30.99,
+   "peak_reserved_gb": 32.94
+  },
+  {
+   "chunk": "c006",
+   "questions": 8,
+   "seconds": 1186.2,
+   "peak_allocated_gb": 31.11,
+   "peak_reserved_gb": 32.94
+  },
+  {
+   "chunk": "c007",
+   "questions": 8,
+   "seconds": 1915.5,
+   "peak_allocated_gb": 32.08,
+   "peak_reserved_gb": 32.94
+  },
+  {
+   "chunk": "c008",
+   "questions": 8,
+   "seconds": 1117.6,
+   "peak_allocated_gb": 30.13,
+   "peak_reserved_gb": 32.94
+  },
+  {
+   "chunk": "c009",
+   "questions": 8,
+   "seconds": 1174.9,
+   "peak_allocated_gb": 30.49,
+   "peak_reserved_gb": 32.94
+  },
+  {
+   "chunk": "c010",
+   "questions": 8,
+   "seconds": 1743.0,
+   "peak_allocated_gb": 30.89,
+   "peak_reserved_gb": 32.94
+  },
+  {
+   "chunk": "c011",
+   "questions": 8,
+   "seconds": 2080.9,
+   "peak_allocated_gb": 32.77,
+   "peak_reserved_gb": 33.67
+  },
+  {
+   "chunk": "c012",
+   "questions": 8,
+   "seconds": 1480.6,
+   "peak_allocated_gb": 31.71,
+   "peak_reserved_gb": 33.67
+  },
+  {
+   "chunk": "c013",
+   "questions": 8,
+   "seconds": 1357.5,
+   "peak_allocated_gb": 31.1,
+   "peak_reserved_gb": 33.67
+  },
+  {
+   "chunk": "c014",
+   "questions": 8,
+   "seconds": 2167.2,
+   "peak_allocated_gb": 32.1,
+   "peak_reserved_gb": 33.67
+  },
+  {
+   "chunk": "c015",
+   "questions": 8,
+   "seconds": 1080.6,
+   "peak_allocated_gb": 30.51,
+   "peak_reserved_gb": 33.67
+  },
+  {
+   "chunk": "c016",
+   "questions": 8,
+   "seconds": 1760.8,
+   "peak_allocated_gb": 32.2,
+   "peak_reserved_gb": 33.67
+  },
+  {
+   "chunk": "c017",
+   "questions": 8,
+   "seconds": 1016.8,
+   "peak_allocated_gb": 30.79,
+   "peak_reserved_gb": 33.67
+  },
+  {
+   "chunk": "c018",
+   "questions": 8,
+   "seconds": 1214.0,
+   "peak_allocated_gb": 32.15,
+   "peak_reserved_gb": 33.67
+  },
+  {
+   "chunk": "c019",
+   "questions": 8,
+   "seconds": 1298.4,
+   "peak_allocated_gb": 31.27,
+   "peak_reserved_gb": 33.67
+  },
+  {
+   "chunk": "c020",
+   "questions": 8,
+   "seconds": 1331.6,
+   "peak_allocated_gb": 31.17,
+   "peak_reserved_gb": 33.67
+  },
+  {
+   "chunk": "c021",
+   "questions": 8,
+   "seconds": 1834.3,
+   "peak_allocated_gb": 31.15,
+   "peak_reserved_gb": 33.67
+  },
+  {
+   "chunk": "c022",
+   "questions": 8,
+   "seconds": 1036.6,
+   "peak_allocated_gb": 30.04,
+   "peak_reserved_gb": 33.67
+  },
+  {
+   "chunk": "c023",
+   "questions": 8,
+   "seconds": 1620.3,
+   "peak_allocated_gb": 31.4,
+   "peak_reserved_gb": 33.67
+  },
+  {
+   "chunk": "c024",
+   "questions": 8,
+   "seconds": 1827.6,
+   "peak_allocated_gb": 32.06,
+   "peak_reserved_gb": 33.67
+  }
+ ],
+ "conditions": {
+  "pool": {
+   "chunks": 25,
+   "responses": 2000,
+   "capped_share": 0.0085,
+   "capped": 17,
+   "at_cap_tokens": 17,
+   "stated_answer_rate": 0.9915,
+   "generation_s_per_response": 5.97,
+   "timing_note": "round-0 stage (generation + readout of all 10 agents)"
+  },
+  "debate3": {
+   "chunks": 25,
+   "responses": 600,
+   "capped_share": 0.0017,
+   "capped": 1,
+   "at_cap_tokens": 1,
+   "stated_answer_rate": 0.9983,
+   "generation_s_per_response": 5.66,
+   "timing_note": "generation stage"
+  },
+  "structured3": {
+   "chunks": 25,
+   "responses": 600,
+   "capped_share": 0.0,
+   "capped": 0,
+   "at_cap_tokens": 0,
+   "stated_answer_rate": 1.0,
+   "generation_s_per_response": 8.37,
+   "timing_note": "generation stage"
+  },
+  "debate5": {
+   "chunks": 25,
+   "responses": 1000,
+   "capped_share": 0.0,
+   "capped": 0,
+   "at_cap_tokens": 0,
+   "stated_answer_rate": 1.0,
+   "generation_s_per_response": 6.2,
+   "timing_note": "generation stage"
+  },
+  "structured5": {
+   "chunks": 25,
+   "responses": 1000,
+   "capped_share": 0.0,
+   "capped": 0,
+   "at_cap_tokens": 0,
+   "stated_answer_rate": 1.0,
+   "generation_s_per_response": 9.38,
+   "timing_note": "generation stage"
+  }
+ }
+}

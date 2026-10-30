@@ -79,3 +79,20 @@ balance ≤ 129.98, after a final backup from ≤ 130.98, and whenever the job p
 
 | time | event |
 |---|---|
+| 23:57 | balance 242.42 (the brief's 242.98 less a late-posted 0.56 from G2; stop line kept at 129.98 = 242.98 − 113, so G4 can use at most 112.44); session `main` (A100); code `b33b916` |
+| 23:58 | setup verified (code `b33b916`, torch 2.11.0+cu130, A100 40 GB, token present); `run_experiment.py` launched detached (pid 1526); supervisor started on the laptop |
+| 23:58 (03:58 UTC) | question ids verified on the runtime: sha256 `9a33c0ea…`, 200 questions; model loaded in 96 s; worst-case round-1 prompt 7,779 tokens (G2's pilot set: 7,119), readout 9,064 |
+| 00:06 | stress PASSED (396 s) at gen_batch_tokens 20,000 + expandable segments: worst-length batch 2 (7,779 + 1,280; 33.5 GB reserved), budget-filling 3 × 5,386 (33.8 GB) and 8 × 1,220 (29.8 GB), readout batch 1 at 9,062 tokens (28.9 GB) |
+| 00:07–00:22 | one supervisor cycle took 15 min (a CLI call hung until its timeout; recovered); chunk c000 round 0, pool and debate3 backed up and on Google Drive (verified). Reported balance lags use (241.47 at 00:22) |
+| 00:40 | chunk c000 complete in all conditions and backed up (laptop + Google Drive verified): 1,790 s (224 s/question), peak 31.9 GB allocated / 32.7 GB reserved; balance 238.10 |
+| 01:40–08:39 | laptop suspended (supervisor paused; the runtime job continued); 08:44: job running, 20 / 25 chunks, 8.62 h, balance 183.70; supervisor resumed at 08:39 and is backing up the 17 chunks finished overnight |
+| ~09:2x | WSL ended (supervisor killed mid-catch-up). 09:34: job alive, 22 / 25 chunks, 9.50 h; balance 178.08; supervisor restarted (job not touched); local archive at that point: chunks c000–c002 |
+| ~09:50 | WSL rebooted again (the supervisor's single backlog batch -- a 7.36 GB tar of 109 items -- was being downloaded; the CLI download's memory grew to ~19.8 GB) |
+| 09:59 | status only: runtime up, job running, 23 / 25 chunks, 9.79 h; balance 175.29. Nothing lost: chunks c000–c022 complete on the runtime (0.41 GB each), c000–c002 on the laptop and Google Drive |
+| 10:01–10:08 | fix (`6114054`): one chunk per batch (`cli_backup.prepare(per_chunk=True)`; the 7.36 GB pending tar discarded, its directories untouched), Drive copy verified before the next fetch, final backup bounded by lack of progress, runtime-side backup code at `/content/backup_code` loaded by path (the runtime kernel had the job checkout's `mad` cached); 332 tests pass |
+| 10:09–10:10 | c003 backed up by hand under MemoryMax=6G: fetch + hash check + install 40 s, Google Drive verified (34 s), peak RSS 1.7 GB |
+| 10:10 | supervisor restarted under `systemd-run --user --scope -p MemoryMax=6G` (stop line 129.98); c004 backed up and Drive-verified at 10:11 |
+| 10:11–10:47 | backlog c004–c023 backed up one chunk per batch, each Google Drive-verified before the next fetch; no failed cycles |
+| 10:47 | job process exited: state `finished`, 25 / 25 chunks, 10.75 h, no failures |
+| 10:54–11:12 | final backup: c024 (10:54) and the five condition views (11:10), each Drive-verified; `verify_archive` on the complete local archive passed (11:12:31); **runtime stopped 11:12:33** (first attempt); final Google Drive check: 1,066 files, 10.43 GB, 0 differences; nothing incomplete |
+| 11:13 | balance 166.86, no active assignments. G4: 75.56 units from the 242.42 at launch (76.12 from the brief's 242.98, which includes G2's late-posted 0.56); cap 113. Operations report: `artifacts/main250/run/g4_operations.json` |
