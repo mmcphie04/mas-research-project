@@ -50,7 +50,8 @@ def main(argv=None) -> int:
                   "--set", "data.dataset_revision=b189ec765aa7ed75c8acfea42df31fdae71f97be",
                   "--conditions", *PARENT_CONDS, "--max-hours", str(a.parent_hours)]
     rc = RE.main(parent)
-    st = json.loads((out / "pilot250-status.json").read_text())
+    sp = out / "pilot250-status.json"  # absent if the job stopped before its first chunk (e.g. stress)
+    st = json.loads(sp.read_text()) if sp.exists() else {"state": f"no status (exit {rc})"}
     seq.append({"step": "parent", "exit": rc, "state": st.get("state"), "chunks_done": st.get("chunks_done"),
                 "chunks_total": st.get("chunks_total"), "seconds": round(time.time() - t0, 1)})
     finished = st.get("state") == "finished" and st.get("chunks_done") == st.get("chunks_total")
@@ -65,7 +66,8 @@ def main(argv=None) -> int:
         child = [*(STUB if a.stub else REAL), "--out-root", str(out), "--name", "pilot250_r2", "--parent", "pilot250",
                  "--subset-ids", str(ids), "--conditions", *CHILD_CONDS, "--max-hours", str(a.child_hours)]
         rc2 = RE.main(child)
-        st2 = json.loads((out / "pilot250_r2-status.json").read_text())
+        sp2 = out / "pilot250_r2-status.json"
+        st2 = json.loads(sp2.read_text()) if sp2.exists() else {"state": f"no status (exit {rc2})"}
         seq.append({"step": "child", "exit": rc2, "state": st2.get("state"), "chunks_done": st2.get("chunks_done"),
                     "chunks_total": st2.get("chunks_total"), "seconds": round(time.time() - t1, 1)})
     else:

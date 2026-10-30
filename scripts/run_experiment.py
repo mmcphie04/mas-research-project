@@ -647,11 +647,12 @@ def main(argv=None) -> int:
         prior = json.loads(stress_path.read_text()) if stress_path.exists() else {}
         rb = cfg.model.readout_batch_size or cfg.model.batch_size
         now = stress_context(job, cfg, cov)
-        reuse, why = stress_reusable(prior, now, cfg.model.batch_size, rb)
+        gen_cfg_b = worst_case_generation_batch(cfg, cov)
+        reuse, why = stress_reusable(prior, now, gen_cfg_b, rb)
         if reuse:
             log(f"  stress report {stress_path.name} covers these settings; not repeating")
         else:
-            gen_b = sorted(set(args.stress_batches or []) | {cfg.model.batch_size})
+            gen_b = sorted(set(args.stress_batches or []) | {gen_cfg_b})
             ro_b = sorted(set(args.stress_batches or []) | {rb})
             log(f"  stress ({why}): the real generation and readout/extraction workload at the "
                 f"worst-case lengths, generation batches {gen_b}, readout batches {ro_b} ...")
@@ -659,10 +660,12 @@ def main(argv=None) -> int:
             rep = backend.stress(cov["worst_round1_prompt_tokens"], cfg.model.max_new_tokens,
                                  cov["worst_readout_tokens"], gen_b, ro_b)
             # the CONFIGURED sizes must themselves pass; a bigger passing size is not enough
-            passed = (any(r["ok"] and r["batch"] == cfg.model.batch_size for r in rep["generation"])
+            passed = (any(r["ok"] and r["batch"] == gen_cfg_b for r in rep["generation"])
                       and any(r["ok"] and r.get("finite_all_layers") and r.get("likelihood_computed")
                               and r["batch"] == rb for r in rep["readout"]))
-            rec = {**now, "configured": {"batch_size": cfg.model.batch_size, "readout_batch_size": rb},
+            rec = {**now, "configured": {"batch_size": cfg.model.batch_size, "readout_batch_size": rb,
+                                         "gen_batch_tokens": cfg.model.gen_batch_tokens,
+                                         "worst_case_generation_batch": gen_cfg_b},
                    "passed": passed, "seconds": round(time.time() - t, 1), **rep}
             stress_path.write_text(json.dumps(rec, indent=2))
             ledger("stress", seconds=rec["seconds"], passed=passed,
@@ -804,6 +807,16 @@ def archived_peer_orders(out_root: Path, parent: str, tag: str) -> dict | None:
         if r["phase"] == "post" and r.get("shown_peer_sources"):
             out[(str(r["question_id"]), int(r["agent_id"]))] = r["shown_peer_sources"].split(",")
     return out
+
+
+def worst_case_generation_batch(cfg, cov: dict) -> int:
+    """The generation batch the backend would form from worst-case-length prompts: batch_size
+    (legacy fixed batches), or what the token budget allows (``plan_generation_batches``)."""
+    from mad.backends.hf import plan_generation_batches
+
+    b = cfg.model.batch_size
+    worst = int(cov["worst_round1_prompt_tokens"])
+    return plan_generation_batches([worst] * b, b, cfg.model.max_new_tokens, cfg.model.gen_batch_tokens)[0][1]
 
 
 def template_changes(parent: dict, child: dict) -> list[str]:

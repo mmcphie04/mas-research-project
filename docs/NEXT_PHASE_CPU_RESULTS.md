@@ -1235,3 +1235,31 @@ done, never on the exit code: a time-capped parent also exits 0. A stub dry run 
 verified, and a test covers the gating.
 
 **Headline analysis spec** committed before any fresh data: docs/MAIN250_ANALYSIS_SPEC.md.
+
+## 18. G2 attempt 1: stopped by the memory stress test (no generation)
+
+- **What happened (measured).** The driver's pre-run stress test at the worst-case 5-agent
+  length (7,119 prompt + 1,280 generated tokens) ran **out of memory at generation batch 8**:
+  37.6 GB allocated / 41.0 GB reserved on the 40 GB A100. Readout at batch 1 on an 8,402-token
+  sequence passed, at 29.8 GB peak, with every layer finite and replay exact. The job stopped
+  before generating anything.
+- **Cost:** 1.06 units (`artifacts/next_phase/OPS_LOG.md`; stress report in
+  `artifacts/main250/pilot/attempt1_stress.json`).
+- **Fix:** token-budget generation batching. `model.gen_batch_tokens` is versioned and omitted
+  when unset, so legacy identities are unchanged. A batch grows while count × (longest prompt +
+  max_new_tokens) ≤ budget, up to `batch_size`. With 24,000 tokens:
+
+  | prompts | per batch |
+  |---|---|
+  | worst-case 5-agent revisions | 2 |
+  | round-0 prompts | 8 |
+  | typical 5-agent revisions (~2.5 k-token prompts) | ~6 |
+
+- **Stress test.** It now tests the batch the budget forms at the worst-case length, and that
+  batch must pass.
+- **Also fixed:** `pilot_g2.py` treats a parent with no status file as not finished.
+- **Tests:** `tests/test_batching.py` (planner; versioning; stress batch; budgeted generation on
+  the 270m model). Full suite 316 passed; ruff clean.
+- **Cost estimates change.** Revision generation will run at smaller effective batches than the
+  estimates assumed (batch 8), so G4 throughput for 5-agent conditions will be lower. G2
+  measures it.

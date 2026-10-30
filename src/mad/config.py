@@ -38,6 +38,11 @@ class ModelConfig:
     # serialized config so every existing identity is unchanged); "fp32_head" -- the final hidden
     # state at the readout position projected onto the option-letter rows in float32.
     readout_head: str = "bf16_logits"
+    # Token-budget generation batching (versioned; None = legacy fixed batches of batch_size,
+    # omitted from the serialized config). When set, a generation batch holds consecutive prompts
+    # while count x (longest prompt in the batch + max_new_tokens) <= gen_batch_tokens, up to
+    # batch_size: short round-0 prompts batch fully, long 5-agent revision prompts in twos/threes.
+    gen_batch_tokens: int | None = None
 
 
 @dataclass
@@ -137,6 +142,8 @@ class RunConfig:
             del d["debate"]["brevity_words"]  # legacy protocol: identical to pre-versioning identities
         if d["model"].get("readout_head") == LEGACY_READOUT_HEAD:
             del d["model"]["readout_head"]
+        if d["model"].get("gen_batch_tokens") is None:
+            d["model"].pop("gen_batch_tokens", None)
         return d
 
     def hash(self) -> str:

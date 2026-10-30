@@ -24,6 +24,27 @@ from mad.permute import LETTERS
 from mad.prompts import READOUT_SUFFIX
 
 
+def plan_generation_batches(prompt_lengths: list[int], batch_size: int, max_new_tokens: int,
+                            budget: int | None) -> list[tuple[int, int]]:
+    """Consecutive generation batches. Without a budget: fixed batches of ``batch_size`` (legacy).
+    With one: grow a batch while (count + 1) x (longest prompt so far + max_new_tokens) <= budget
+    and count < batch_size; a single prompt always forms a batch, however long."""
+    n = len(prompt_lengths)
+    if not budget:
+        return [(s, min(s + batch_size, n)) for s in range(0, n, batch_size)]
+    out, s = [], 0
+    while s < n:
+        e, longest = s + 1, prompt_lengths[s]
+        while e < n and e - s < batch_size:
+            cand = max(longest, prompt_lengths[e])
+            if (e - s + 1) * (cand + max_new_tokens) > budget:
+                break
+            longest, e = cand, e + 1
+        out.append((s, e))
+        s = e
+    return out
+
+
 def _host_memory() -> dict:
     """Host resident memory: current, and the process peak so far (Linux units)."""
     import resource
@@ -191,6 +212,12 @@ class HFBackend(Backend):
             rest = [{"role": "user", "content": f"{system}\n\n{rest[0]['content']}"}, *rest[1:]]
         return rest
 
+    def plan_batches(self, prompt_lengths: list[int]) -> list[tuple[int, int]]:
+        """(start, end) of each generation batch over the prompts IN ORDER (see
+        ``plan_generation_batches``)."""
+        mc = self.cfg.model
+        return plan_generation_batches(prompt_lengths, mc.batch_size, mc.max_new_tokens, mc.gen_batch_tokens)
+
     def generate(
         self, prompts: list[str], seed: int, meta: list[dict] | None = None
     ) -> list[Generation]:
@@ -205,8 +232,10 @@ class HFBackend(Backend):
         out: list[Generation] = []
         self.tokenizer.padding_side = "left"
         pad = self.tokenizer.pad_token_id
-        for start in range(0, len(prompts), mc.batch_size):
-            chunk = prompts[start : start + mc.batch_size]
+        lengths = [len(self.tokenizer.encode(p, add_special_tokens=False)) for p in prompts] \
+            if mc.gen_batch_tokens else [0] * len(prompts)
+        for start, end in self.plan_batches(lengths):
+            chunk = prompts[start:end]
             torch.manual_seed(seed + start)
             enc = self.tokenizer(
                 chunk, return_tensors="pt", padding=True, add_special_tokens=False

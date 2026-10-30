@@ -37,3 +37,16 @@ deterministic at batch size 1 (§11 of the results). The default is now `fp32_he
 | 19:58 | one status call returned no output (CLI connection); later calls fine |
 | ~20:02 | complete: 680 reads (default and eager attention, both heads), 378 s of reading |
 | 20:04 | `diag_out.tgz` (SHA-256 `ae771979…`) downloaded, hash matched, copied to `mas_backup/next_commit/`; session stopped; balance **252.71** (this session **1.34 units**, ~15 min) |
+
+## 2026-10-29: G2 development timing pilot, attempt 1 (approved; cap 13 units)
+
+| time | event |
+|---|---|
+| 21:41 | balance 252.71 (job stop at 241.21, hard cap 239.71); off-device copy ALL VERIFIED beforehand; session `pilot` (A100); code `856b314` |
+| 21:42 | setup verified; `scripts/pilot_g2.py` launched detached |
+| 21:44 | dataset loaded, model loaded in 97 s; **stress FAILED**: generation batch 8 at the worst 5-agent length (7,119 prompt + 1,280 new tokens) ran out of memory (peak 37.6 GB allocated / 41.0 reserved); readout batch 1 at 8,402 tokens passed (29.8 GB). The driver stopped before generating anything (as designed). `pilot_g2.py` then crashed on the missing status file (fixed since) |
+| 21:53 | records downloaded (`pilot_attempt1.tgz`, SHA-256 `cbb80000…`); session stopped; balance **251.65** (attempt 1: **1.06 units**; 11.94 left under the G2 cap) |
+
+Fix (CPU, before any relaunch): token-budget generation batching (`model.gen_batch_tokens: 24000`
+in `configs/main_250.yaml`; worst case 2 per batch, round-0 8 per batch); the stress test now
+checks the budget-derived worst-case batch.
