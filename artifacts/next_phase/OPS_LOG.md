@@ -109,3 +109,9 @@ down (~09:50); the runtime job was unaffected, but nothing would have stopped an
 | 17:06 | balance 166.86; session `judge` (A100); code `20a4391`; setup verified; `scripts/judge_smoke.py` launched (gemma, qwen3, qwen3_think, llama; 10 events + 10 questions each) |
 | 17:08–17:27 | gemma (judge 4 s; own 30 in 235 s), qwen3 (2 s; 68 s), qwen3_think (judge 299 s; own 10 in 128 s), llama (2 s; 90 s): all exit 0; peak reserved ≤ 28.3 GB |
 | 17:27 | `judge_smoke.tgz` (39 KB, SHA-256 `45eb9847…`) downloaded, hash matched; session stopped; balance **164.92** (smoke: **1.94 units**, may still post a little more) |
+
+## 2026-10-30: cross-model judge, full run (approved; hard cap 18 units, stop line 146.92)
+
+| time | event |
+|---|---|
+| 18:34 | balance 164.92; session `judgefull` (A100); code `7ef8e31` (decision bar committed before any output); setup verified; `judge_sequence.py` launched (pid 1234); `judge_supervisor.py` started under MemoryMax=6G |

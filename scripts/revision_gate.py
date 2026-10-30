@@ -171,13 +171,13 @@ def inner_tune(kind, grid, X, y, qids):
     return h, best_threshold(oof_by_h[h], y), scores
 
 
-def cross_validate(tev: pd.DataFrame) -> pd.DataFrame:
+def cross_validate(tev: pd.DataFrame, features=None) -> pd.DataFrame:
     """Out-of-fold P(helpful) for every changed answer; each fold's model sees only the other
-    folds' helpful/harmful events."""
+    folds' helpful/harmful events. ``features``: default ``revision_events.FEATURES``."""
     ch = tev[tev.changed == 1].copy()
     folds = question_folds(tev.question_id, K_OUTER, SEED)
     ch["fold"] = ch.question_id.map(folds)
-    X = ch[R.FEATURES].to_numpy(float)
+    X = ch[list(features or R.FEATURES)].to_numpy(float)
     hh = ch.kind.isin(["helpful", "harmful"]).to_numpy()
     y = (ch.kind == "helpful").to_numpy(int)
     for kind, grid in (("logistic", LR_C), ("boosted_tree", GB_DEPTH)):
@@ -288,6 +288,96 @@ def feasibility(ev: pd.DataFrame, out: Path | None = None) -> dict:
             "sources": sorted(f"{d} {c}" for d, c in R.TRAIN_SOURCES)}
 
 
+# ----------------------------------------------------------------------------- follow-ups (2026-10-30)
+
+PANEL_LEVEL = ["panel_unanimous", "n_peers_new", "n_peers_old", "new_is_peer_majority"]
+CONFIDENCE = ["conf_before", "conf_after", "conf_change"]
+EXPOSURE = ["p_old_exposure", "p_new_exposure", "p_diff_exposure"]
+ABLATIONS = {"all features": [],
+             "minus panel-level": PANEL_LEVEL,
+             "minus panel-level, confidence": PANEL_LEVEL + CONFIDENCE,
+             "minus panel-level, confidence, exposure readout": PANEL_LEVEL + CONFIDENCE + EXPOSURE}
+MODELS = ("logistic", "boosted_tree")
+
+
+def within_question_auroc(hh: pd.DataFrame, col: str) -> dict:
+    """Questions with both a helpful and a harmful event: every (helpful, harmful) pair of the
+    same question id; the share in which the helpful one has the higher P(helpful), ties 1/2;
+    pooled over pairs, questions resampled."""
+    num, den, qs = [], [], []
+    for q, g in hh.groupby("question_id"):
+        a, b = g[g.kind == "helpful"][col].to_numpy(), g[g.kind == "harmful"][col].to_numpy()
+        if len(a) and len(b):
+            d = a[:, None] - b[None, :]
+            num.append(float((d > 0).sum() + 0.5 * (d == 0).sum()))
+            den.append(float(d.size))
+            qs.append(q)
+    num, den = np.array(num), np.array(den)
+    idx = np.random.default_rng(SEED).integers(0, len(num), (N_BOOT, len(num)))
+    b = num[idx].sum(1) / den[idx].sum(1)
+    return {"questions": len(num), "pairs": int(den.sum()), "mean": float(num.sum() / den.sum()),
+            "lo": float(np.quantile(b, .025)), "hi": float(np.quantile(b, .975)), "question_ids": qs}
+
+
+def _gain(sim: pd.DataFrame, gate: str) -> dict:
+    acc = np.array([x[1] for x in sim.accept_all])
+    return cluster_mean(np.array([x[1] for x in sim[gate]]) - acc, sim.question_id.to_numpy())
+
+
+def followups(ev: pd.DataFrame) -> dict:
+    tev = training_events(ev)
+    out = {"ablation": {}}
+    for name, drop in ABLATIONS.items():
+        feats = [f for f in R.FEATURES if f not in drop]
+        ch = cross_validate(tev, feats)
+        hh = ch[ch.kind.isin(["helpful", "harmful"])]
+        y, qs = (hh.kind == "helpful").to_numpy(int), hh.question_id.to_numpy()
+        sim = simulate(tev, ch)
+        out["ablation"][name] = {"features": feats, **{m: {
+            "auroc": cluster_stat(auroc, qs, hh[f"p_{m}"].to_numpy(), y),
+            "pooled_panel_gain_vs_accept_all": _gain(sim, m)} for m in MODELS}}
+        if name == "all features":
+            out["within_question"] = {}
+            for m in MODELS:
+                w = within_question_auroc(hh, f"p_{m}")
+                sub = hh[hh.question_id.isin(set(w.pop("question_ids")))]
+                out["within_question"][m] = {"within_question_pairs": w, "ordinary_auroc_same_questions": cluster_stat(
+                    auroc, sub.question_id.to_numpy(), sub[f"p_{m}"].to_numpy(), (sub.kind == "helpful").to_numpy(int))}
+            keep = ~((sim.dataset == "pilot12b") & (sim.condition == "misleading_one"))
+            out["excluding_misleading_one"] = {"panels": int(keep.sum()), **{
+                m: {"pooled_panel_gain_vs_accept_all": _gain(sim[keep], m),
+                    "with_misleading_one": _gain(sim, m)} for m in MODELS},
+                "note": "evaluation excludes pilot12b misleading_one panels; the gates were trained with them"}
+    return out
+
+
+def md_followups(f) -> str:
+    L = [f"# Output-feature gate: follow-ups ({LABEL})", "",
+         "Same data, folds and tuning as `feasibility.md`; out-of-fold throughout; question-grouped 95% intervals "
+         "(10,000 resamples).", "", "## (i) Within-question AUROC", "",
+         "Questions with both a helpful and a harmful event (same question id, any source): every (helpful, harmful) "
+         "pair; share in which the helpful revision gets the higher out-of-fold P(helpful), ties ½.", "",
+         "| model | questions | pairs | within-question | ordinary AUROC, same questions |", "|---|---|---|---|---|"]
+    for m, v in f["within_question"].items():
+        w = v["within_question_pairs"]
+        L.append(f"| {m} | {w['questions']} | {w['pairs']} | {ci(w)} | {ci(v['ordinary_auroc_same_questions'])} |")
+    L += ["", "## (ii) Feature-group ablation (cumulative)", "",
+          "| features | logistic AUROC | logistic pooled panel gain | boosted-tree AUROC | boosted-tree pooled panel gain |",
+          "|---|---|---|---|---|"]
+    for name, v in f["ablation"].items():
+        L.append(f"| {name} | {ci(v['logistic']['auroc'])} | {ci(v['logistic']['pooled_panel_gain_vs_accept_all'])} | "
+                 f"{ci(v['boosted_tree']['auroc'])} | {ci(v['boosted_tree']['pooled_panel_gain_vs_accept_all'])} |")
+    L += ["", "Panel-level: " + ", ".join(PANEL_LEVEL) + ". Confidence: " + ", ".join(CONFIDENCE) +
+          ". Exposure readout: " + ", ".join(EXPOSURE) + ". Panel gain: simulated panel accuracy minus accept-all, "
+          "pooled over all panels.", "", "## (iii) Pooled panel gain excluding misleading_one", "",
+          f"{f['excluding_misleading_one']['panels']} panels (pilot12b misleading_one excluded from the evaluation; the "
+          "gates were trained with it).", "", "| model | gain, excluding misleading_one | gain, all panels |", "|---|---|---|"]
+    for m in MODELS:
+        v = f["excluding_misleading_one"][m]
+        L.append(f"| {m} | {ci(v['pooled_panel_gain_vs_accept_all'])} | {ci(v['with_misleading_one'])} |")
+    return "\n".join(L) + "\n"
+
+
 # ----------------------------------------------------------------------------- markdown
 
 
@@ -390,10 +480,17 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True)
     ap.add_argument("--root", default=str(ROOT))
+    ap.add_argument("--followups-only", action="store_true")
     a = ap.parse_args(argv)
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
     L = R.load_events(a.root)
+    if a.followups_only:
+        f = followups(L["events"])
+        (out / "feasibility_followup.json").write_text(json.dumps({"label": LABEL, **f}, indent=1, default=_default) + "\n")
+        (out / "feasibility_followup.md").write_text(md_followups(f))
+        print("written: feasibility_followup.{json,md}")
+        return 0
     inv = R.inventory(L)
     (out / "inventory.json").write_text(json.dumps({"label": LABEL, "rows": inv}, indent=1, default=_default) + "\n")
     (out / "inventory.md").write_text(md_inventory(inv, L["events"]))
