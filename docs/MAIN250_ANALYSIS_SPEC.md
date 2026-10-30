@@ -78,3 +78,11 @@ are not expected to be resolvable; intervals are reported as such, not as tests 
 
 Both are CPU changes with tests. Neither affects the base collection's primary comparisons,
 which use one round only.
+
+**Status: both implemented and tested** (after the G2 pilot launched; the pilot runs the earlier
+commit, so its round-2 rows carry round-0 panel metadata and are re-labelled at analysis):
+
+- `multi.run_condition` writes round-1 panel answers for a further round;
+- `panels.debate_table` and `panels.compare` take the previous round's answers as the
+  `before` baseline;
+- `tests/test_panels.py` covers both.

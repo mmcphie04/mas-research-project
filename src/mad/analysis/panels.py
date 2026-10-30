@@ -50,11 +50,13 @@ def panel_events(initial: list[int], revised: list[int], gold: int) -> dict:
 
 
 def debate_table(initial: dict[str, list[int]], revised: dict[str, list[int]], gold: dict[str, int],
-                 condition: str, k: int) -> pd.DataFrame:
+                 condition: str, k: int, before: dict[str, list[int]] | None = None) -> pd.DataFrame:
+    """Per-question panel events. ``before`` (e.g. the round-1 answers for a second round) is the
+    baseline the revision is measured against; by default the pool's first k answers."""
     rows = []
     for q, rev in revised.items():
-        rows.append({"question_id": q, "condition": condition, "k": k,
-                     **panel_events(initial[q][:k], rev, gold[q])})
+        base = before[q] if before is not None else initial[q][:k]
+        rows.append({"question_id": q, "condition": condition, "k": k, **panel_events(base, rev, gold[q])})
     return pd.DataFrame(rows)
 
 
@@ -71,12 +73,15 @@ def paired(a: pd.Series, b: pd.Series, n_boot: int = 10000, seed: int = 0) -> di
             "expected_gain": float(d[d > 0].sum()), "expected_loss": float(-d[d < 0].sum())}
 
 
-def compare(pool: dict, gold: dict, debates: dict[str, tuple[int, dict]], n_boot: int = 10000) -> dict:
-    """The headline comparisons. ``debates``: condition -> (panel size k, {qid: revised answers})."""
+def compare(pool: dict, gold: dict, debates: dict[str, tuple], n_boot: int = 10000) -> dict:
+    """The headline comparisons. ``debates``: condition -> (panel size k, {qid: revised answers})
+    or (k, revised, before) for a further round, whose events are measured against ``before``
+    (the previous round's answers), not the original ones."""
     ind = independent_curve(pool, gold).pivot(index="question_id", columns="k", values="acc")
     out = {"independent_accuracy": {int(k): float(ind[k].mean()) for k in ind.columns}, "debate": {}}
-    for cond, (k, rev) in debates.items():
-        t = debate_table(pool, rev, gold, cond, k).set_index("question_id")
+    for cond, spec in debates.items():
+        k, rev, before = (*spec, None)[:3]
+        t = debate_table(pool, rev, gold, cond, k, before).set_index("question_id")
         out["debate"][cond] = {
             "k": k, "acc_after": float(t.acc_after.mean()), "acc_before": float(t.acc_before.mean()),
             "vs_initial_panel": paired(t.acc_after, t.acc_before, n_boot),

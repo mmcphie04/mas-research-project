@@ -442,6 +442,8 @@ def run_condition(cfg, questions, cond, r0: Round0, backend, perms, gold, final_
         for a in range(k_panel):
             pre = r0_ans[(qid, a)]
             panel = [r0_ans[(qid, b)] for b in range(k_panel) if b != a]
+            if prev is not None:  # panel metadata for a further round is the previous round's answers
+                panel = [prev[(qid, b)]["answer"] for b in range(k_panel) if b != a]
             if prev is not None:  # a further round: the panel peers' previous-round responses
                 pr = prev[(qid, a)]
                 sources = pr["sources"]
@@ -487,7 +489,8 @@ def run_condition(cfg, questions, cond, r0: Round0, backend, perms, gold, final_
                 "n_shown_agree_pre": sum(1 for p in stated_shown if p == pre) if shown_ans else -1,
                 "n_shown_missing": sum(1 for p in shown_ans if p < 0) if shown_ans else -1,
                 "misleading_target": target,
-                # what its real panel-mates answered, whatever it was shown
+                # what its real panel-mates answered (round 0, or the previous round in a further
+                # round), whatever it was shown
                 "panel_peer_answers": ",".join(map(str, panel)),
                 "panel_peer_majority": -1 if pmaj is None else pmaj,
                 "n_panel_agree_pre": sum(1 for p in panel if p == pre),

@@ -191,3 +191,22 @@ def test_pilot_sequence_runs_the_child_only_after_the_parent_finished(tmp_path):
     assert pg.main(["--out-root", str(tmp_path / "cap"), "--stub", "--parent-hours", "0"]) == 1
     seq = json.loads((tmp_path / "cap" / "pilot_g2-sequence.json").read_text())
     assert seq[0]["state"] != "finished" and "skipped" in seq[1]
+
+
+def test_second_round_events_use_round_one_as_baseline_and_rows_carry_round_one_panel(run):
+    from mad.analysis import panels as PN
+
+    pool, gold = {"q": [1, 1, 2, 3, 3, 1, 2, 2, 3, 1]}, {"q": 2}
+    r1, r2 = [1, 2, 2], [2, 2, 2]
+    t0 = PN.debate_table(pool, {"q": r2}, gold, "r2", 3).iloc[0]
+    t1 = PN.debate_table(pool, {"q": r2}, gold, "r2", 3, before={"q": r1}).iloc[0]
+    assert t0.acc_before == 0 and t1.acc_before == 1  # round-1 baseline: the panel already had it
+    assert t1.helpful == 1 and t1.changed == 1
+    out = PN.compare(pool, gold, {"r2": (3, {"q": r2}, {"q": r1})}, n_boot=20)
+    assert out["debate"]["r2"]["acc_before"] == 1.0
+    _, out_dir = run
+    rows1 = _rows(out_dir, "debate3").query("phase == 'post'").set_index(["question_id", "agent_id"])
+    rows2 = _rows(out_dir, "debate3_r2").query("phase == 'post'").set_index(["question_id", "agent_id"])
+    for (q, a), r in rows2.iterrows():
+        want = [rows1.loc[(q, b)].answer for b in range(3) if b != a]
+        assert r.panel_peer_answers == ",".join(map(str, want))
