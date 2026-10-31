@@ -163,13 +163,14 @@ def main(argv=None) -> int:
     ap.add_argument("--pidfile", default="/content/judge_full.pid")
     ap.add_argument("--code-dir", default="/content/mas-research-project")
     ap.add_argument("--poll", type=int, default=180)
+    ap.add_argument("--wind-down", type=float, default=1.0)
     a = ap.parse_args(argv)
 
     def log(msg):
         print(f"[{time.strftime('%H:%M:%S')}] {msg}", flush=True)
 
     sup = JudgeSupervisor(ColabJudgeRemote(a.session, a.code_dir, a.remote_dir, a.pidfile), a.dest,
-                          stop_balance=a.stop_balance, poll=a.poll, log=log, events=Path(a.dest) / "supervisor-events.jsonl")
+                          stop_balance=a.stop_balance, wind_down=a.wind_down, poll=a.poll, log=log, events=Path(a.dest) / "supervisor-events.jsonl")
     out = sup.run()
     return 0 if out["runtime_stopped"] and out["fetched"] else 1
 
