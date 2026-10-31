@@ -1,0 +1,27 @@
+[
+ {
+  "step": "gemma_judge",
+  "exit": 0,
+  "seconds": 278.6
+ },
+ {
+  "step": "qwen3",
+  "exit": 0,
+  "seconds": 1038.2
+ },
+ {
+  "step": "llama",
+  "exit": 0,
+  "seconds": 1328.0
+ },
+ {
+  "step": "qwen3_think",
+  "exit": 0,
+  "seconds": 4002.8
+ },
+ {
+  "step": "gemma_own",
+  "exit": 0,
+  "seconds": 2778.1
+ }
+]

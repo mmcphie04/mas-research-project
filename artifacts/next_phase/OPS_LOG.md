@@ -117,3 +117,6 @@ down (~09:50); the runtime job was unaffected, but nothing would have stopped an
 | 18:34 | balance 164.92; session `judgefull` (A100); code `7ef8e31` (decision bar committed before any output); setup verified; `judge_sequence.py` launched (pid 1234); `judge_supervisor.py` started under MemoryMax=6G |
 | 18:41–20:27 | steps fetched and hash-checked as they finished: gemma_judge 18:41, qwen3 18:59, llama 19:20, qwen3_think 20:27 |
 | 20:28–20:31 | supervisor restarted with a wind-down margin of 0.6 units instead of 1.0 (stop line unchanged at 146.92): the projected end of gemma_own (~148.1) was only ~0.2 above the old wind-down trigger, and that step writes its answers only on completion. An overly broad `pkill` killed the old supervisor and the shell before the restart; unsupervised ≈ 3 min |
+| 21:13 | gemma_own finished (all 5 steps exit 0); all steps fetched (balance 147.62) |
+| 21:16 | wind-down at balance 147.07 (≤ 146.92 + 0.6): final fetch (553 KB, hash checked), **runtime stopped** (first attempt); nothing incomplete. Full run: **17.85 units** (164.92 → 147.07; cap 18; a little may still post) |
+| 21:19 | judge outputs on Google Drive (`mas_research_backup/judge`, 25 files, 0 differences); analysis run as committed: `artifacts/revision_gate/judge/results.md` |

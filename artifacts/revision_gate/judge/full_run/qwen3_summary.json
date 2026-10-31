@@ -1,0 +1,38 @@
+{
+ "model": "qwen3",
+ "repo_id": "Qwen/Qwen3-8B",
+ "model_commit": "b968826d9c46dd6066d109eabc6255188de91218",
+ "chat_template_sha256": "a55ee1b1660128b7098723e0abcd92caa0788061051c62d51cbe87d9cf1974d8",
+ "template_hashes": {
+  "JUDGE_SYSTEM": "32db09cd939bd878",
+  "JUDGE_USER": "895e4d46be81b326",
+  "JUDGE_PREFILL": "db5510988521dc0c",
+  "THINK_CLOSE": "8fcc7a51aad47b9f",
+  "OWN_SYSTEM": "04bd051205ba5ecc"
+ },
+ "load_seconds": 60.8,
+ "events": 644,
+ "questions": 149,
+ "think_cap": 2000,
+ "judge": {
+  "events": 644,
+  "passes": 1288,
+  "seconds": 107.5,
+  "thinking_generation_seconds": 2.6,
+  "prompt_tokens_mean": 832.3788819875776,
+  "thinking_tokens_mean": 0,
+  "thinking_closed_share": null
+ },
+ "own": {
+  "responses": 447,
+  "seconds": 867.7,
+  "generation_seconds": 838.9,
+  "generated_tokens_mean": 262.7986577181208,
+  "parse_rate": 1.0,
+  "capped": 0
+ },
+ "peak_allocated_gb": 20.85,
+ "peak_reserved_gb": 21.38,
+ "total_seconds": 1036.6,
+ "alloc_conf": "expandable_segments:True"
+}

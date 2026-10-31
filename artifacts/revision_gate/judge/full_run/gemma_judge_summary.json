@@ -1,0 +1,30 @@
+{
+ "model": "gemma",
+ "repo_id": "google/gemma-3-12b-it",
+ "model_commit": "96b6f1eccf38110c56df3a15bffe176da04bfd80",
+ "chat_template_sha256": "7de1c58e208eda46e9c7f86397df37ec49883aeece39fb961e0a6b24088dd3c4",
+ "template_hashes": {
+  "JUDGE_SYSTEM": "32db09cd939bd878",
+  "JUDGE_USER": "895e4d46be81b326",
+  "JUDGE_PREFILL": "db5510988521dc0c",
+  "THINK_CLOSE": "8fcc7a51aad47b9f",
+  "OWN_SYSTEM": "04bd051205ba5ecc"
+ },
+ "load_seconds": 95.9,
+ "events": 644,
+ "questions": 149,
+ "think_cap": 2000,
+ "judge": {
+  "events": 644,
+  "passes": 1288,
+  "seconds": 179.1,
+  "thinking_generation_seconds": 1.9,
+  "prompt_tokens_mean": 847.7406832298136,
+  "thinking_tokens_mean": 0,
+  "thinking_closed_share": null
+ },
+ "peak_allocated_gb": 25.72,
+ "peak_reserved_gb": 25.76,
+ "total_seconds": 275.1,
+ "alloc_conf": "expandable_segments:True"
+}

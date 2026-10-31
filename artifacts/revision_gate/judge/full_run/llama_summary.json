@@ -1,0 +1,38 @@
+{
+ "model": "llama",
+ "repo_id": "meta-llama/Llama-3.1-8B-Instruct",
+ "model_commit": "0e9e39f249a16976918f6564b8830bc894c89659",
+ "chat_template_sha256": "e10ca381b1ccc5cf9db52e371f3b6651576caee0a630b452e2816b2d404d4b65",
+ "template_hashes": {
+  "JUDGE_SYSTEM": "32db09cd939bd878",
+  "JUDGE_USER": "895e4d46be81b326",
+  "JUDGE_PREFILL": "db5510988521dc0c",
+  "THINK_CLOSE": "8fcc7a51aad47b9f",
+  "OWN_SYSTEM": "04bd051205ba5ecc"
+ },
+ "load_seconds": 61.2,
+ "events": 644,
+ "questions": 149,
+ "think_cap": 2000,
+ "judge": {
+  "events": 644,
+  "passes": 1288,
+  "seconds": 96.5,
+  "thinking_generation_seconds": 2.6,
+  "prompt_tokens_mean": 814.6521739130435,
+  "thinking_tokens_mean": 0,
+  "thinking_closed_share": null
+ },
+ "own": {
+  "responses": 447,
+  "seconds": 1168.4,
+  "generation_seconds": 1140.8,
+  "generated_tokens_mean": 325.17897091722597,
+  "parse_rate": 0.9351230425055929,
+  "capped": 20
+ },
+ "peak_allocated_gb": 20.94,
+ "peak_reserved_gb": 21.71,
+ "total_seconds": 1326.5,
+ "alloc_conf": "expandable_segments:True"
+}

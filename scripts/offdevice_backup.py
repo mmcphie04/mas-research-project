@@ -33,6 +33,7 @@ SETS = {  # name -> (local dir, rclone filter args)
     "pilot250": (ROOT / "runs/pilot250", ["--include", "out/**", "--include", "pilot_attempt1.tgz"]),
     "main250": (ROOT / "runs/main250", ["--exclude", ".backup-work/**", "--exclude", ".stage-work/**",
                                         "--exclude", "supervisor*"]),
+    "judge": (ROOT / "runs", ["--include", "judge_full/judge/**", "--include", "judge_smoke/judge_smoke.tgz"]),
 }
 
 
