@@ -246,3 +246,70 @@ small, so they are fetched at the end, not per chunk.
 - Simulated gated panel and agent accuracy, judge alone and combined, against accept-all,
   reject-all, the fixed rules and the out-of-fold gates, pooled and by dataset × condition.
 - Thinking: on its 157-event subsample, next to non-thinking Qwen3 on the same events.
+
+## Correction (2026-10-31)
+
+The first `results.md` (commit `dbbe9a6`) simulated the **Qwen3-thinking** judge's panels over
+every panel on the 149 questions whose changed answers it had all judged. That test passes
+trivially for panels with no changed answer, so 59 unchanged panels from questions outside its
+44-question subsample were included, adding zero gain each.
+
+`judge_analysis.simulate` now restricts each judge to the questions it judged. The thinking
+column changes:
+
+| gate | before (169 panels) | after (110 panels) |
+|---|---|---|
+| judge, minus accept-all | +6.9 | +10.6 [5.0, 17.8] |
+| combined | +5.7 | +8.8 [3.9, 15.1] |
+
+The other judges' columns are unchanged (they judged all 149 questions).
+
+## Confirmation run: priced, NOT launched (proposal for approval)
+
+**What.** The Qwen3-thinking judge on the **303** helpful/harmful events not yet judged with
+thinking, both orders (606 traces), plus **3** thinking own answers per question on all 149
+questions (447).
+
+- Same templates, the 2,000-token thinking cap, and the same sampling settings and seed
+  constants (`judge_run.py`).
+- Batch composition differs from the subsample run, so individual traces are not bitwise
+  repeats.
+
+**Analysis (to be committed before the run if approved).**
+
+- **Primary:** the same decision bar (a)–(c) on the **303 new events only**, so the
+  confirmation is on events the thinking judge has not been seen on.
+  - (b) uses the out-of-fold gates.
+  - (c) uses the own-answer rule from the 3 new thinking samples (majority; ties ½).
+- **Secondary:** all 391 events, and the panel simulation on all 149 questions.
+- Same intervals and limitations as above.
+
+**Price, HF backend (rates measured in the full run).**
+
+- Thinking judge: 177 s per batch of 16; mean trace 1,591 tokens, 55% at the cap. 606 traces →
+  38 batches → **~112 min**.
+- Thinking own answers: about 150 s per batch of 16. 447 → 28 batches → **~70 min**.
+- Session, load, readouts and fetch: **~5 min**.
+- **Total ≈ 3.1 h ≈ 20–22 units** (6.6 units/h measured in the full run).
+
+**vLLM would cut this substantially (estimate, unmeasured).**
+
+- Measured HF throughput here: about 140 generated tokens/s for judge traces and about 110 for
+  own answers (padded batches of 16 wait for their longest trace).
+- Tokens needed: about 1.0 M for judge traces and 0.5 M for own answers.
+- vLLM on an A100-40GB with Qwen3-8B: the KV cache would hold about 115 k tokens after the
+  weights, so about 40 concurrent sequences, typically 1,000–1,500 generated tokens/s. That is
+  **~16–25 min** of generation.
+- Then the forced readouts on HF's fp32 head, as now: load ~1 min, about 1,050 readouts ~4 min.
+- Plus install and startup, about 10 min.
+- **Total ≈ 0.6–0.8 h ≈ 4–6 units, against about 21.**
+
+**Costs of using vLLM:**
+
+- A new generation path (none exists) with tests.
+- vLLM pins its own torch, so a separate install on the runtime, checked with a smoke test of
+  about 1–2 units.
+- Samples are not bitwise comparable to HF's (different RNG). The sampling parameters and the
+  distribution are the same.
+- A cheaper HF-only option: thinking at batch 32. That is unmeasured, needs a memory check, and
+  might save a third.

@@ -1,0 +1,422 @@
+{
+ "label": "EXPLORATORY",
+ "mixed_panels": {
+  "questions": 149,
+  "accuracy": {
+   "GGG": {
+    "n": 149,
+    "questions": 149,
+    "mean": 0.45302013422818793,
+    "lo": 0.37583892617449666,
+    "hi": 0.5302013422818792
+   },
+   "QQQ": {
+    "n": 149,
+    "questions": 149,
+    "mean": 0.5011185682326621,
+    "lo": 0.4250559284116331,
+    "hi": 0.5771812080536913
+   },
+   "LLL": {
+    "n": 149,
+    "questions": 149,
+    "mean": 0.37919463087248323,
+    "lo": 0.3076062639821029,
+    "hi": 0.4519015659955257
+   },
+   "QQG": {
+    "n": 149,
+    "questions": 149,
+    "mean": 0.49639572458364406,
+    "lo": 0.425795426298782,
+    "hi": 0.5672383793189162
+   },
+   "QGG": {
+    "n": 149,
+    "questions": 149,
+    "mean": 0.4985085756897837,
+    "lo": 0.43015162813820534,
+    "hi": 0.567987198608004
+   }
+  },
+  "minus_GGG": {
+   "QQQ": {
+    "n": 149,
+    "questions": 149,
+    "mean": 0.04809843400447428,
+    "lo": -0.04697986577181208,
+    "hi": 0.14429530201342283
+   },
+   "LLL": {
+    "n": 149,
+    "questions": 149,
+    "mean": -0.07382550335570472,
+    "lo": -0.15662751677852346,
+    "hi": 0.007829977628635347
+   },
+   "QQG": {
+    "n": 149,
+    "questions": 149,
+    "mean": 0.043375590355456115,
+    "lo": -0.039149888143176735,
+    "hi": 0.12552821277653492
+   },
+   "QGG": {
+    "n": 149,
+    "questions": 149,
+    "mean": 0.045488441461595815,
+    "lo": 0.009942828734775037,
+    "hi": 0.08153119562515536
+   }
+  },
+  "minus_QQQ": {
+   "GGG": {
+    "n": 149,
+    "questions": 149,
+    "mean": -0.04809843400447428,
+    "lo": -0.14429530201342283,
+    "hi": 0.04697986577181208
+   },
+   "LLL": {
+    "n": 149,
+    "questions": 149,
+    "mean": -0.12192393736017898,
+    "lo": -0.19686800894854586,
+    "hi": -0.04697986577181209
+   },
+   "QQG": {
+    "n": 149,
+    "questions": 149,
+    "mean": -0.00472284364901815,
+    "lo": -0.036297539149888154,
+    "hi": 0.02634849614715386
+   },
+   "QGG": {
+    "n": 149,
+    "questions": 149,
+    "mean": -0.0026099925428784633,
+    "lo": -0.07792692020879942,
+    "hi": 0.07382861048968427
+   }
+  },
+  "thinking_subsample_single_answers": {
+   "questions": 44,
+   "qwen3_think_single": {
+    "n": 44,
+    "questions": 44,
+    "mean": 0.5,
+    "lo": 0.36363636363636365,
+    "hi": 0.6590909090909091
+   },
+   "qwen3_single_mean_of_3": {
+    "n": 44,
+    "questions": 44,
+    "mean": 0.4393939393939394,
+    "lo": 0.30303030303030304,
+    "hi": 0.5757575757575757
+   },
+   "gemma_single_mean_of_3": {
+    "n": 44,
+    "questions": 44,
+    "mean": 0.3939393939393939,
+    "lo": 0.2727272727272727,
+    "hi": 0.5153409090909064
+   },
+   "note": "one thinking sample per question: no QQQ-thinking panel"
+  }
+ },
+ "pair_stats": {
+  "G-G": {
+   "questions": 149,
+   "correlation_of_correctness": {
+    "mean": 0.5897567221510892,
+    "lo": 0.4856463589891797,
+    "hi": 0.6858086185765699
+   },
+   "same_wrong_answer_rate": {
+    "mean": 0.5686274509803921,
+    "lo": 0.4798200616025728,
+    "hi": 0.656653961949907,
+    "wrong_pairs": 204
+   },
+   "uniform_expected_rate": 0.11968954248366012
+  },
+  "Q-Q": {
+   "questions": 149,
+   "correlation_of_correctness": {
+    "mean": 0.6776571451464292,
+    "lo": 0.5793985572887208,
+    "hi": 0.7664888829607455
+   },
+   "same_wrong_answer_rate": {
+    "mean": 0.6373056994818653,
+    "lo": 0.5449728018548243,
+    "hi": 0.727749418266434,
+    "wrong_pairs": 193
+   },
+   "uniform_expected_rate": 0.12104202648244099
+  },
+  "L-L": {
+   "questions": 142,
+   "correlation_of_correctness": {
+    "mean": 0.4480313415566577,
+    "lo": 0.32626365878873503,
+    "hi": 0.5624525374937744
+   },
+   "same_wrong_answer_rate": {
+    "mean": 0.4484536082474227,
+    "lo": 0.3631578947368421,
+    "hi": 0.5373134328358209,
+    "wrong_pairs": 194
+   },
+   "uniform_expected_rate": 0.12550114547537228
+  },
+  "G-Q": {
+   "questions": 149,
+   "correlation_of_correctness": {
+    "mean": 0.24281996115874427,
+    "lo": 0.12666742531427527,
+    "hi": 0.3588757381783433
+   },
+   "same_wrong_answer_rate": {
+    "mean": 0.3017241379310345,
+    "lo": 0.2131518145106648,
+    "hi": 0.3995222061412509,
+    "wrong_pairs": 464
+   },
+   "uniform_expected_rate": 0.1182052203065134
+  },
+  "G-L": {
+   "questions": 149,
+   "correlation_of_correctness": {
+    "mean": 0.2893052795664399,
+    "lo": 0.1851177555651884,
+    "hi": 0.3926531842391157
+   },
+   "same_wrong_answer_rate": {
+    "mean": 0.31334622823984526,
+    "lo": 0.2505210085736871,
+    "hi": 0.3816975863218731,
+    "wrong_pairs": 517
+   },
+   "uniform_expected_rate": 0.1185256823554696
+  },
+  "Q-L": {
+   "questions": 149,
+   "correlation_of_correctness": {
+    "mean": 0.3665723824478811,
+    "lo": 0.26503153302170473,
+    "hi": 0.4646906782783933
+   },
+   "same_wrong_answer_rate": {
+    "mean": 0.3540856031128405,
+    "lo": 0.2817426108374384,
+    "hi": 0.4294261277969765,
+    "wrong_pairs": 514
+   },
+   "uniform_expected_rate": 0.122568093385214
+  }
+ },
+ "by_own_majority": {
+  "gemma": {
+   "original": {
+    "events": 175,
+    "helpful": 58,
+    "accuracy": {
+     "n": 175,
+     "questions": 78,
+     "mean": 0.6057142857142858,
+     "lo": 0.5047671178343949,
+     "hi": 0.7055912212600776
+    }
+   },
+   "revision": {
+    "events": 132,
+    "helpful": 89,
+    "accuracy": {
+     "n": 132,
+     "questions": 54,
+     "mean": 0.6212121212121212,
+     "lo": 0.4744525547445255,
+     "hi": 0.7534296208060353
+    }
+   },
+   "neither": {
+    "events": 84,
+    "helpful": 48,
+    "accuracy": {
+     "n": 84,
+     "questions": 25,
+     "mean": 0.6547619047619048,
+     "lo": 0.5606060606060606,
+     "hi": 0.7763157894736842
+    }
+   }
+  },
+  "qwen3": {
+   "original": {
+    "events": 137,
+    "helpful": 19,
+    "accuracy": {
+     "n": 137,
+     "questions": 60,
+     "mean": 0.6642335766423357,
+     "lo": 0.5471657797129496,
+     "hi": 0.7761194029850746
+    }
+   },
+   "revision": {
+    "events": 151,
+    "helpful": 128,
+    "accuracy": {
+     "n": 151,
+     "questions": 54,
+     "mean": 0.7417218543046358,
+     "lo": 0.6451612903225806,
+     "hi": 0.8282208588957055
+    }
+   },
+   "neither": {
+    "events": 103,
+    "helpful": 48,
+    "accuracy": {
+     "n": 103,
+     "questions": 30,
+     "mean": 0.5922330097087378,
+     "lo": 0.4645669291338583,
+     "hi": 0.7304347826086957
+    }
+   }
+  },
+  "qwen3_think": {
+   "original": {
+    "events": 39,
+    "helpful": 11,
+    "accuracy": {
+     "n": 39,
+     "questions": 22,
+     "mean": 0.8461538461538461,
+     "lo": 0.6857142857142857,
+     "hi": 0.9574468085106383
+    }
+   },
+   "revision": {
+    "events": 37,
+    "helpful": 28,
+    "accuracy": {
+     "n": 37,
+     "questions": 19,
+     "mean": 0.8378378378378378,
+     "lo": 0.6842105263157895,
+     "hi": 0.9722222222222222
+    }
+   },
+   "neither": {
+    "events": 12,
+    "helpful": 4,
+    "accuracy": {
+     "n": 12,
+     "questions": 6,
+     "mean": 0.9166666666666666,
+     "lo": 0.625,
+     "hi": 1.0
+    }
+   }
+  },
+  "llama": {
+   "original": {
+    "events": 117,
+    "helpful": 26,
+    "accuracy": {
+     "n": 117,
+     "questions": 51,
+     "mean": 0.46153846153846156,
+     "lo": 0.34145857530003876,
+     "hi": 0.5963342990503782
+    }
+   },
+   "revision": {
+    "events": 116,
+    "helpful": 93,
+    "accuracy": {
+     "n": 116,
+     "questions": 43,
+     "mean": 0.7155172413793104,
+     "lo": 0.5833333333333334,
+     "hi": 0.8214354928017717
+    }
+   },
+   "neither": {
+    "events": 158,
+    "helpful": 76,
+    "accuracy": {
+     "n": 158,
+     "questions": 46,
+     "mean": 0.5569620253164557,
+     "lo": 0.45651809162532825,
+     "hi": 0.6642335766423357
+    }
+   }
+  }
+ },
+ "thinking_subsample": {
+  "questions": 44,
+  "panels": 110,
+  "accuracy": {
+   "gemma_accept_all": {
+    "n": 44,
+    "questions": 44,
+    "mean": 0.3630050505050505,
+    "lo": 0.2380050505050505,
+    "hi": 0.495580808080808
+   },
+   "gemma_gated_by_thinking_judge": {
+    "n": 44,
+    "questions": 44,
+    "mean": 0.5593434343434344,
+    "lo": 0.41792929292929293,
+    "hi": 0.7007575757575757
+   },
+   "qwen3_thinking_single_own_answer": {
+    "n": 44,
+    "questions": 44,
+    "mean": 0.5,
+    "lo": 0.36363636363636365,
+    "hi": 0.6590909090909091
+   }
+  },
+  "differences": {
+   "gated_minus_accept_all": {
+    "n": 44,
+    "questions": 44,
+    "mean": 0.19633838383838384,
+    "lo": 0.09595959595959597,
+    "hi": 0.3125
+   },
+   "own_minus_accept_all": {
+    "n": 44,
+    "questions": 44,
+    "mean": 0.1369949494949495,
+    "lo": -0.03472222222222222,
+    "hi": 0.30808080808080807
+   },
+   "own_minus_gated": {
+    "n": 44,
+    "questions": 44,
+    "mean": -0.05934343434343434,
+    "lo": -0.19191919191919188,
+    "hi": 0.07575757575757576
+   }
+  },
+  "seconds_per_question": {
+   "gemma_accept_all": 37.88776022727272,
+   "gemma_gated_by_thinking_judge": 77.83396752316156,
+   "qwen3_thinking_single_own_answer": 10.218181818181819
+  },
+  "seconds_basis": {
+   "gemma": "source jobs' measured stage times (round 0 shared per agent + the condition's stages), averaged over the question's panels",
+   "judge_seconds_per_changed_answer": 22.53375796178344,
+   "own": "Qwen3-thinking own-answer step seconds / responses (judge run)"
+  }
+ }
+}

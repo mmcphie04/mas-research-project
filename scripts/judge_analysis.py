@@ -179,8 +179,9 @@ def simulate(t: pd.DataFrame, root: Path, judges: dict, owns: dict) -> dict:
     for name, j in judges.items():
         jp = j.p_rev.to_dict()
         oap = dict(zip(t.event_id, own_accept_prob(t, owns[name]), strict=True))
+        judged_q = {e.split("|")[2] for e in jp}  # only the questions this judge saw (thinking: its subsample)
         rows = []
-        for (d, c, q), g in ev.groupby(["dataset", "condition", "question_id"]):
+        for (d, c, q), g in ev[ev.question_id.isin(judged_q)].groupby(["dataset", "condition", "question_id"]):
             g = g.sort_values("agent_id")
             ids = [f"{d}|{c}|{q}|{a}" for a in g.agent_id]
             ch = [i for i, (b, a) in enumerate(zip(g.before, g.after, strict=True)) if b != a]
