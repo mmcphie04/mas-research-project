@@ -45,6 +45,12 @@ for v in VERSIONS:
     print(f"vllm {v}: import/CUDA check failed: {(p.stderr or p.stdout)[-800:]}")
 if info is None:
     raise SystemExit("no pinned vLLM version imports with CUDA; nothing launched")
+# best effort: vLLM's prebuilt FlashInfer kernels (sampling and attention); recorded, never required
+try:
+    k = sh(f"{ENV}/bin/vllm", "download-kernels", timeout=600)
+    info["flashinfer_kernels"] = "installed" if k.returncode == 0 else f"not installed: {(k.stderr or k.stdout)[-300:]}"
+except (OSError, subprocess.TimeoutExpired) as exc:
+    info["flashinfer_kernels"] = f"not installed: {exc}"
 sysinfo = sh(sys.executable, "-c", "import torch, transformers; print(torch.__version__, transformers.__version__)").stdout.strip()
 info["system_env_torch_transformers"] = sysinfo
 json.dump(info, open("/content/vllm_env_versions.json", "w"), indent=1)

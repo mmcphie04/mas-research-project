@@ -1,5 +1,5 @@
 {
- "note": "GPU smoke test (docs/EXPAB_PLAN.md section 6): 20 development questions per model and mode, the chooser arms, B (debate + alone, 10 disputed panels per mode), the judge confirmation (10 events, 10 own-answer questions), a like-for-like vLLM-vs-HF sanity check on 20 judge questions, then the HF readouts. Tagged 'smoke' so no part name collides with the real runs. The thinking bank and B use the visible rationale (D1, on by default); a variant WITHOUT it (tag smokenovis) on the same 20 questions measures the answer-cap rate of both. qwen_t answer cap 700. Steps grouped by model (one vLLM process per model, one HF process) so each model loads once.",
+ "note": "GPU smoke test (docs/EXPAB_PLAN.md section 6): 20 development questions per model and mode, the chooser arms, B (debate + alone, 10 disputed panels per mode), the judge confirmation (10 events, 10 own-answer questions), a like-for-like vLLM-vs-HF sanity check on 20 judge questions, then the HF readouts. Tagged 'smoke' so no part name collides with the real runs. The thinking bank and B use the visible rationale (D1, on by default); a variant WITHOUT it (tag smokenovis) on the same 20 questions measures the answer-cap rate of both. qwen_t answer cap 700. Steps grouped by model (one vLLM process per model, one HF process) so each model loads once. Attempt 2 (after the attempt-1 OOM): trimmed to 10 questions per model and mode, 5 B panels per mode, 5 judge events, 10 sanity questions, to fit the remaining cap.",
  "steps": [
   {
    "name": "gemma",
@@ -9,7 +9,7 @@
     "--module",
     "gen_run",
     "--steps",
-    "[[\"--task\", \"bank\", \"--mode\", \"gemma\", \"--split\", \"dev\", \"--limit\", \"20\", \"--chunk\", \"20\", \"--tag\", \"smoke\"], [\"--task\", \"sanity\", \"--mode\", \"gemma\", \"--limit\", \"20\", \"--chunk\", \"20\", \"--tag\", \"smoke\"], [\"--task\", \"choose\", \"--arm\", \"A1_g5\", \"A1_g10\", \"--split\", \"dev\", \"--limit\", \"20\", \"--chunk\", \"20\", \"--tag\", \"smoke\"]]"
+    "[[\"--task\", \"bank\", \"--mode\", \"gemma\", \"--split\", \"dev\", \"--limit\", \"10\", \"--chunk\", \"10\", \"--tag\", \"smoke\"], [\"--task\", \"sanity\", \"--mode\", \"gemma\", \"--limit\", \"10\", \"--chunk\", \"10\", \"--tag\", \"smoke\"], [\"--task\", \"choose\", \"--arm\", \"A1_g5\", \"A1_g10\", \"--split\", \"dev\", \"--limit\", \"10\", \"--chunk\", \"10\", \"--tag\", \"smoke\"]]"
    ]
   },
   {
@@ -20,7 +20,7 @@
     "--module",
     "gen_run",
     "--steps",
-    "[[\"--task\", \"bank\", \"--mode\", \"qwen_nt\", \"--split\", \"dev\", \"--limit\", \"20\", \"--chunk\", \"20\", \"--tag\", \"smoke\"], [\"--task\", \"bank\", \"--mode\", \"qwen_t\", \"--split\", \"dev\", \"--limit\", \"20\", \"--chunk\", \"20\", \"--tag\", \"smoke\"], [\"--task\", \"bank\", \"--mode\", \"qwen_t\", \"--split\", \"dev\", \"--limit\", \"20\", \"--chunk\", \"20\", \"--tag\", \"smokenovis\", \"--no-visible-rationale\"], [\"--task\", \"sanity\", \"--mode\", \"qwen_nt\", \"--limit\", \"20\", \"--chunk\", \"20\", \"--tag\", \"smoke\"], [\"--task\", \"choose\", \"--arm\", \"A1_qnt5\", \"A1_qnt10\", \"A1_qt5\", \"A2_5\", \"A2_10\", \"A3\", \"--split\", \"dev\", \"--limit\", \"20\", \"--chunk\", \"20\", \"--tag\", \"smoke\"], [\"--task\", \"b\", \"--mode\", \"qwen_nt\", \"--arms\", \"debate\", \"alone\", \"--split\", \"dev\", \"--limit\", \"20\", \"--n-panels\", \"10\", \"--chunk\", \"10\", \"--tag\", \"smoke\"], [\"--task\", \"b\", \"--mode\", \"qwen_t\", \"--arms\", \"debate\", \"alone\", \"--split\", \"dev\", \"--limit\", \"20\", \"--n-panels\", \"10\", \"--chunk\", \"10\", \"--tag\", \"smoke\"], [\"--task\", \"judge\", \"--limit\", \"10\", \"--chunk\", \"10\", \"--tag\", \"smoke\"]]"
+    "[[\"--task\", \"bank\", \"--mode\", \"qwen_nt\", \"--split\", \"dev\", \"--limit\", \"10\", \"--chunk\", \"10\", \"--tag\", \"smoke\"], [\"--task\", \"bank\", \"--mode\", \"qwen_t\", \"--split\", \"dev\", \"--limit\", \"10\", \"--chunk\", \"10\", \"--tag\", \"smoke\"], [\"--task\", \"bank\", \"--mode\", \"qwen_t\", \"--split\", \"dev\", \"--limit\", \"10\", \"--chunk\", \"10\", \"--tag\", \"smokenovis\", \"--no-visible-rationale\"], [\"--task\", \"sanity\", \"--mode\", \"qwen_nt\", \"--limit\", \"10\", \"--chunk\", \"10\", \"--tag\", \"smoke\"], [\"--task\", \"choose\", \"--arm\", \"A1_qnt5\", \"A1_qnt10\", \"A1_qt5\", \"A2_5\", \"A2_10\", \"A3\", \"--split\", \"dev\", \"--limit\", \"10\", \"--chunk\", \"10\", \"--tag\", \"smoke\"], [\"--task\", \"b\", \"--mode\", \"qwen_nt\", \"--arms\", \"debate\", \"alone\", \"--split\", \"dev\", \"--limit\", \"10\", \"--n-panels\", \"5\", \"--chunk\", \"5\", \"--tag\", \"smoke\"], [\"--task\", \"b\", \"--mode\", \"qwen_t\", \"--arms\", \"debate\", \"alone\", \"--split\", \"dev\", \"--limit\", \"10\", \"--n-panels\", \"5\", \"--chunk\", \"5\", \"--tag\", \"smoke\"], [\"--task\", \"judge\", \"--limit\", \"5\", \"--chunk\", \"5\", \"--tag\", \"smoke\"]]"
    ]
   },
   {

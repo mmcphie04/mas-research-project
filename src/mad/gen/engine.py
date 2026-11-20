@@ -110,13 +110,18 @@ class Engine:
 
 
 class VLLMEngine(Engine):
-    def __init__(self, mode: Mode, max_model_len: int, gpu_memory_utilization: float = 0.90,
-                 revision: str | None = None, enable_prefix_caching: bool = True):
+    def __init__(self, mode: Mode, max_model_len: int, gpu_memory_utilization: float = 0.85,
+                 revision: str | None = None, enable_prefix_caching: bool = True, max_num_seqs: int = 128):
         from vllm import LLM  # noqa: PLC0415 -- the runtime's separate vLLM environment only
 
+        # Smoke test 1 (2026-11-20) ran out of memory in vLLM's start-up profiling of Gemma-3-12B
+        # (multimodal: it also profiles the image encoder) without FlashInfer sampling kernels (native
+        # top-k/top-p over a 262k vocabulary for up to 256 sequences). Text only, at most 128
+        # concurrent sequences, 85% of the GPU.
+        extra = {"limit_mm_per_prompt": {"image": 0}} if "gemma-3" in mode.repo_id else {}
         self.llm = LLM(model=mode.repo_id, revision=revision, dtype="bfloat16", max_model_len=max_model_len,
-                       gpu_memory_utilization=gpu_memory_utilization, seed=0,
-                       enable_prefix_caching=enable_prefix_caching)
+                       gpu_memory_utilization=gpu_memory_utilization, seed=0, max_num_seqs=max_num_seqs,
+                       enable_prefix_caching=enable_prefix_caching, **extra)
         self.tokenizer = self.llm.get_tokenizer()
         self.max_model_len = max_model_len
         from transformers import GenerationConfig  # noqa: PLC0415

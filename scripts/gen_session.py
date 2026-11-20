@@ -68,9 +68,11 @@ def main(argv=None) -> int:
         s = Sampler()
         s.start()
         t0 = time.time()
+        # vLLM manages its own GPU memory: the HF stack's allocator setting is not passed to it
+        drop = {"PYTHONPATH"} | ({"PYTORCH_CUDA_ALLOC_CONF"} if step["env"] == "vllm" else set())
         with open(out / f"{a.job}-{step['name']}.steplog", "w") as log:
             rc = subprocess.run(cmd, cwd=ROOT, stdout=log, stderr=subprocess.STDOUT,
-                                env={**{k: v for k, v in os.environ.items() if k != "PYTHONPATH"},
+                                env={**{k: v for k, v in os.environ.items() if k not in drop},
                                      "PYTHONPATH": str(ROOT / "src"), "PYTHONUNBUFFERED": "1"}).returncode
         s.stop_flag = True
         lines = (out / f"{a.job}-{step['name']}.steplog").read_text(errors="replace").splitlines()
