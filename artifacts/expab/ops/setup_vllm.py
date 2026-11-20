@@ -8,6 +8,7 @@ Pinned: vllm 0.33.0 (released 2026-11-02; torch 2.14.0, transformers >=5.16.1,<5
 """
 import json
 import os
+import shutil
 import subprocess
 import sys
 
@@ -20,17 +21,20 @@ def sh(*a, timeout=1800):
     return subprocess.run(list(a), capture_output=True, text=True, timeout=timeout)
 
 
+# uv creates the environment and installs into it (Colab's Python has no ensurepip, so `python -m
+# venv` cannot bootstrap pip there)
+r = sh(sys.executable, "-m", "pip", "install", "-q", "uv")
+UV = shutil.which("uv") or os.path.join(os.path.dirname(sys.executable), "uv")
 if not os.path.exists(PY):
-    r = sh(sys.executable, "-m", "venv", ENV)
+    r = sh(UV, "venv", ENV, "--python", sys.executable)
     if r.returncode:
-        raise SystemExit(f"venv failed: {r.stderr[-1000:]}")
-    sh(PY, "-m", "pip", "install", "-q", "--upgrade", "pip")
+        raise SystemExit(f"venv failed: {(r.stderr or r.stdout)[-1000:]}")
 probe = ("import json, torch, vllm, transformers, pandas, pyarrow; print(json.dumps({'vllm': vllm.__version__, "
          "'torch': torch.__version__, 'cuda': torch.version.cuda, 'cuda_available': torch.cuda.is_available(), "
          "'transformers': transformers.__version__, 'pandas': pandas.__version__}))")
 info = None
 for v in VERSIONS:
-    r = sh(PY, "-m", "pip", "install", "-q", f"vllm=={v}", "pandas", "pyarrow")
+    r = sh(UV, "pip", "install", "--python", PY, "-q", f"vllm=={v}", "pandas", "pyarrow")
     if r.returncode:
         print(f"vllm {v}: install failed: {r.stderr[-800:]}")
         continue
