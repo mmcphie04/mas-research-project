@@ -1,0 +1,180 @@
+"""Generation tasks for Experiments A/B and the judge confirmation (vLLM; run with the runtime's
+separate vLLM environment). One model per process; output chunks are resumable and hash-recorded.
+
+    PY=/content/vllm_env/bin/python
+    $PY scripts/gen_run.py --task bank --mode gemma --out-root /content/expab --job expab --split dev
+    $PY scripts/gen_run.py --task choose --arm A2_5 --bank-root /content/expab --bank-job expab ...
+    $PY scripts/gen_run.py --task b --mode qwen_t --arms debate alone --split dev --n-panels 100 ...
+    $PY scripts/gen_run.py --task judge --out-root /content/judgec --job judgec
+    # CPU check: --engine stub
+
+Parts (chunk directory prefixes): bank_<mode>, choose_<arm>, b_<mode>_<arm>, judge_traces, judge_own.
+The job record lists every part's expected chunk count; a part's count is written when its task
+starts (choosers and B depend on the bank). Chunks already complete are skipped (resume).
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))
+
+from mad.gen import archive as A  # noqa: E402
+from mad.gen import engine as E  # noqa: E402
+from mad.gen import prompts_ab as PA  # noqa: E402
+from mad.gen import tasks as T  # noqa: E402
+from mad.provenance import is_complete  # noqa: E402
+
+MODEL_LIMIT = {"Qwen/Qwen3-8B": 40960, "google/gemma-3-12b-it": 131072}
+JUDGE_EVENTS = ROOT / "artifacts/revision_gate/judge/confirm_events.json"
+
+
+def chunks(items, size):
+    return [items[i:i + size] for i in range(0, len(items), size)]
+
+
+def code_commit() -> str | None:
+    try:
+        return subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
+    except OSError:
+        return None
+
+
+def update_job(out_root: Path, job: str, part: str, n_chunks: int, info: dict):
+    p = out_root / f"{job}-job.json"
+    rec = json.loads(p.read_text()) if p.exists() else {"job": job, "parts": {}, "part_info": {}, "created": time.strftime("%Y-%m-%dT%H:%M:%S%z")}
+    rec["parts"][part] = n_chunks
+    rec["part_info"][part] = info
+    A.write_job(out_root, job, rec)
+
+
+def make_engine(kind: str, mode: E.Mode, prompt_lens: list[int]):
+    need = (max(prompt_lens) if prompt_lens else 0) + E.budget(mode) + 64
+    limit = MODEL_LIMIT.get(mode.repo_id, 32768)
+    mml = min(limit, max(4096, ((need + 1023) // 1024) * 1024))
+    if kind == "stub":
+        return E.StubEngine(max_model_len=mml)
+    return E.VLLMEngine(mode, max_model_len=mml)
+
+
+def prompt_lengths(kind: str, mode: E.Mode, reqs) -> list[int]:
+    if kind == "stub":
+        tok = E.StubTokenizer()
+    else:
+        from transformers import AutoTokenizer  # noqa: PLC0415
+
+        tok = AutoTokenizer.from_pretrained(mode.repo_id)
+    eng = type("L", (), {"tokenizer": tok})()
+    return [len(E.render_ids(eng, mode, r)) for r in reqs]
+
+
+def run_part(args, out_root, job, part, mode, batches, info, answer=True, post=None):
+    """batches: list of request lists (one chunk each)."""
+    update_job(out_root, job, part, len(batches), {**info, "mode": mode.name, "repo_id": mode.repo_id,
+                                                   "template_hashes": PA.TEMPLATE_HASHES, "code": code_commit()})
+    todo = [i for i in range(len(batches)) if not is_complete(A.chunk_dir(out_root, job, part, i))]
+    if not todo:
+        return
+    lens = prompt_lengths(args.engine, mode, [r for i in todo for r in batches[i]])
+    eng = make_engine(args.engine, mode, lens)
+    t0 = time.time()
+    for n, i in enumerate(todo):
+        rows, calls = E.run_requests(eng, mode, batches[i], answer=answer, call_prefix=f"{part}-c{i:03d}-")
+        if post:
+            rows = post(rows)
+        A.write_chunk(out_root, job, part, i, rows, calls, {"question_ids": sorted({r.question_id for r in batches[i]}),
+                                                            "max_model_len": eng.max_model_len})
+        A.write_status(out_root, job, {"part": part, "chunks_done": len(batches) - len(todo) + n + 1,
+                                       "chunks_total": len(batches), "seconds": round(time.time() - t0, 1),
+                                       "time": time.strftime("%Y-%m-%dT%H:%M:%S%z")})
+        print(f"[{time.strftime('%H:%M:%S')}] {part} chunk {i}: {len(rows)} rows, "
+              f"{sum(c['seconds'] for c in calls):.1f}s", flush=True)
+
+
+def select(qs, assign, split, limit):
+    q = [x for x in qs if split == "all" or assign[x.question_id] == split]
+    return q[:limit] if limit else q
+
+
+def main(argv=None) -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--task", required=True, choices=["bank", "choose", "b", "judge"])
+    ap.add_argument("--mode", choices=sorted(E.MODES))
+    ap.add_argument("--arm", choices=sorted(T.ARMS))
+    ap.add_argument("--arms", nargs="+", choices=T.B_ARMS)
+    ap.add_argument("--plan", default=str(ROOT / "artifacts/expab/plan"))
+    ap.add_argument("--split", default="all", choices=["dev", "heldout", "all"])
+    ap.add_argument("--limit", type=int, default=None, help="first N questions of the split (smoke)")
+    ap.add_argument("--samples", type=int, default=None, help="bank: samples per question (default: the plan's)")
+    ap.add_argument("--n-panels", type=int, default=None)
+    ap.add_argument("--panel-seed", type=int, default=20261122)
+    ap.add_argument("--out-root", required=True)
+    ap.add_argument("--job", required=True)
+    ap.add_argument("--bank-root", default=None)
+    ap.add_argument("--bank-job", default=None)
+    ap.add_argument("--chunk", type=int, default=50, help="questions per chunk")
+    ap.add_argument("--engine", default="vllm", choices=["vllm", "stub"])
+    a = ap.parse_args(argv)
+    out = Path(a.out_root)
+    out.mkdir(parents=True, exist_ok=True)
+    qs, assign, manifest = T.load_questions(a.plan)
+    qsel = select(qs, assign, a.split, a.limit)
+    plan_info = {"question_ids_sha256": manifest["question_ids_sha256"], "split": a.split, "limit": a.limit}
+    pid = out / f"{a.job}.pid"
+    if not pid.exists():
+        pid.write_text(str(os.getpid()))
+    if a.task == "bank":
+        mode = E.MODES[a.mode]
+        batches = [T.bank_requests(c, a.mode, a.samples) for c in chunks(qsel, a.chunk)]
+        run_part(a, out, a.job, f"bank_{a.mode}", mode, batches, {**plan_info, "samples": a.samples or T.BANK[a.mode]})
+    elif a.task == "choose":
+        chooser, spec = T.ARMS[a.arm]
+        bank = T.bank_index(A.read_rows(a.bank_root or out, a.bank_job or a.job))
+        reqs = []
+        for q in qsel:
+            pool = T.pool_rows(bank, q.question_id, spec)
+            if T.disagreeing(pool):
+                reqs.append(T.chooser_requests(q, a.arm, T.candidates(pool, q.question_id, a.arm)))
+        batches = [[r for g in c for r in g] for c in chunks(reqs, a.chunk)]
+
+        def post(rows):
+            for r in rows:
+                order = json.loads(r["meta_order_answers"])
+                pos = T.parse_pick(r["text"], r["meta_m"])
+                r["pick_position"], r["pick_answer"] = pos, (order[pos - 1] if pos > 0 else -1)
+            return rows
+        run_part(a, out, a.job, f"choose_{a.arm}", E.MODES[chooser], batches,
+                 {**plan_info, "arm": a.arm, "pool": spec, "questions_with_disagreement": len(reqs)}, post=post)
+    elif a.task == "b":
+        bank = T.bank_index(A.read_rows(a.bank_root or out, a.bank_job or a.job))
+        ids = T.select_panels(bank, qs, assign, a.split, a.mode, a.n_panels, a.panel_seed)
+        byq = {q.question_id: q for q in qs}
+        for arm in a.arms:
+            reqs = [T.b_requests(byq[i], a.mode, T.panel(bank, a.mode, i), arm) for i in ids]
+            batches = [[r for g in c for r in g] for c in chunks(reqs, a.chunk)]
+            run_part(a, out, a.job, f"b_{a.mode}_{arm}", E.MODES[a.mode], batches,
+                     {**plan_info, "arm": arm, "panels": len(ids), "panel_seed": a.panel_seed})
+    elif a.task == "judge":
+        rec = json.loads(JUDGE_EVENTS.read_text())
+        ev = {json.loads(x)["event_id"]: json.loads(x) for x in open(ROOT / "artifacts/revision_gate/judge/events.jsonl")}
+        events = [ev[e] for e in rec["event_ids"]][: a.limit]
+        questions = [json.loads(x) for x in open(ROOT / "artifacts/revision_gate/judge/questions.jsonl")][: a.limit]
+        reqs = T.judge_confirm_requests(events, questions)
+        judge = [r for r in reqs if r.condition.endswith("/judge")]
+        own = [r for r in reqs if r.condition.endswith("/own")]
+        mode = E.MODES["qwen_t_judge"]
+        info = {"events_sha256": rec["sha256"], "events": len(events), "questions": len(questions)}
+        run_part(a, out, a.job, "judge_traces", mode, chunks(judge, a.chunk * 2), info, answer=False)
+        run_part(a, out, a.job, "judge_own", mode, chunks(own, a.chunk * 3), info, answer=True)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
