@@ -9,6 +9,8 @@ import json
 import sys
 from pathlib import Path
 
+from mad.gen import tasks as T
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -50,6 +52,10 @@ def test_smoke_session_and_report_on_the_stub(tmp_path):
     tl = r["think_location"]["bank_qwen_t__dev_smoke"]
     assert tl["think_in_generation"] == 1.0 and tl["think_in_prompt"] == 0.0  # the stub generates its own <think>
     assert r["parts"]["bank_qwen_t__dev_smokenovis"]["answer_cap_rate"] is not None
+    pt = r["pricing_tokens"]
+    assert list(pt["launches"]) == ["1 bank + judge confirmation", "2 B pilot", "3 choosers", "4 B full"]
+    assert set(pt["p2_coverage_in_qwen_t_samples"]) == set(T.ARMS) and pt["total_units"] > 0
+    assert all(pt["call_rates_used"][a] >= 0.4 for a in T.ARMS)
     if r["sanity"] is not None:
         assert set(r["sanity"]) == {"gemma", "qwen_nt"}
 

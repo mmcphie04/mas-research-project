@@ -1,0 +1,129 @@
+{
+ "plan": {
+  "note": "GPU smoke test (docs/EXPAB_PLAN.md section 6): 20 development questions per model and mode, the chooser arms, B (debate + alone, 10 disputed panels per mode), the judge confirmation (10 events, 10 own-answer questions), a like-for-like vLLM-vs-HF sanity check on 20 judge questions, then the HF readouts. Tagged 'smoke' so no part name collides with the real runs. The thinking bank and B use the visible rationale (D1, on by default); a variant WITHOUT it (tag smokenovis) on the same 20 questions measures the answer-cap rate of both. qwen_t answer cap 700. Steps grouped by model (one vLLM process per model, one HF process) so each model loads once. Attempt 2 (after the attempt-1 OOM): trimmed to 10 questions per model and mode, 5 B panels per mode, 5 judge events, 10 sanity questions, to fit the remaining cap.",
+  "steps": [
+   {
+    "name": "gemma",
+    "env": "vllm",
+    "script": "multi_step.py",
+    "args": [
+     "--module",
+     "gen_run",
+     "--steps",
+     "[[\"--task\", \"bank\", \"--mode\", \"gemma\", \"--split\", \"dev\", \"--limit\", \"10\", \"--chunk\", \"10\", \"--tag\", \"smoke\"], [\"--task\", \"sanity\", \"--mode\", \"gemma\", \"--limit\", \"10\", \"--chunk\", \"10\", \"--tag\", \"smoke\"], [\"--task\", \"choose\", \"--arm\", \"A1_g5\", \"A1_g10\", \"--split\", \"dev\", \"--limit\", \"10\", \"--chunk\", \"10\", \"--tag\", \"smoke\"]]"
+    ]
+   },
+   {
+    "name": "qwen",
+    "env": "vllm",
+    "script": "multi_step.py",
+    "args": [
+     "--module",
+     "gen_run",
+     "--steps",
+     "[[\"--task\", \"bank\", \"--mode\", \"qwen_nt\", \"--split\", \"dev\", \"--limit\", \"10\", \"--chunk\", \"10\", \"--tag\", \"smoke\"], [\"--task\", \"bank\", \"--mode\", \"qwen_t\", \"--split\", \"dev\", \"--limit\", \"10\", \"--chunk\", \"10\", \"--tag\", \"smoke\"], [\"--task\", \"bank\", \"--mode\", \"qwen_t\", \"--split\", \"dev\", \"--limit\", \"10\", \"--chunk\", \"10\", \"--tag\", \"smokenovis\", \"--no-visible-rationale\"], [\"--task\", \"sanity\", \"--mode\", \"qwen_nt\", \"--limit\", \"10\", \"--chunk\", \"10\", \"--tag\", \"smoke\"], [\"--task\", \"choose\", \"--arm\", \"A1_qnt5\", \"A1_qnt10\", \"A1_qt5\", \"A2_5\", \"A2_10\", \"A3\", \"--split\", \"dev\", \"--limit\", \"10\", \"--chunk\", \"10\", \"--tag\", \"smoke\"], [\"--task\", \"b\", \"--mode\", \"qwen_nt\", \"--arms\", \"debate\", \"alone\", \"--split\", \"dev\", \"--limit\", \"10\", \"--n-panels\", \"5\", \"--chunk\", \"5\", \"--tag\", \"smoke\"], [\"--task\", \"b\", \"--mode\", \"qwen_t\", \"--arms\", \"debate\", \"alone\", \"--split\", \"dev\", \"--limit\", \"10\", \"--n-panels\", \"5\", \"--chunk\", \"5\", \"--tag\", \"smoke\"], [\"--task\", \"judge\", \"--limit\", \"5\", \"--chunk\", \"5\", \"--tag\", \"smoke\"]]"
+    ]
+   },
+   {
+    "name": "readouts",
+    "env": "hf",
+    "script": "multi_step.py",
+    "args": [
+     "--module",
+     "hf_readouts",
+     "--steps",
+     "[[\"--task\", \"b\", \"--parts\", \"b_qwen_nt_debate__dev_smoke\", \"b_qwen_nt_alone__dev_smoke\", \"b_qwen_t_debate__dev_smoke\", \"b_qwen_t_alone__dev_smoke\"], [\"--task\", \"judge\", \"--parts\", \"judge_traces__all_smoke\"], [\"--task\", \"own\", \"--parts\", \"judge_own__all_smoke\"], [\"--task\", \"posctl\", \"--mode\", \"qwen_t\", \"--n-posctl\", \"20\"]]"
+    ]
+   }
+  ]
+ },
+ "steps": [
+  {
+   "name": "gemma",
+   "env": "vllm",
+   "exit": 0,
+   "seconds": 268.1,
+   "peak_gpu_mb": 33592.0,
+   "time": "2026-11-20T21:44:51+0000",
+   "vllm_memory_lines": [
+    "(EngineCore pid=2805) INFO 11-20 21:42:22 [utils.py:381] Using LBNHC KV cache layout.",
+    "(EngineCore pid=2805) INFO 11-20 21:43:13 [gpu_worker.py:772] Available KV cache memory: 8.4 GiB",
+    "v0.21.0). The current --gpu-memory-utilization=0.8500 is equivalent to --gpu-memory-utilization=0.8397 without CUDA graph memory profiling. To maintain the same effective KV cache size as before, increase --gpu-memory-utilization to 0.8603. To disable, set VLLM_MEMORY_PROFILER_ESTIMATE_CUDAGRAPHS=0.",
+    "(EngineCore pid=2805) INFO 11-20 21:43:13 [kv_cache_utils.py:1147] GPU KV cache size: 37,609 tokens, Maximum concurrency for 32,768 tokens per request: 1.15x"
+   ],
+   "log_tail": [
+    "{\"substep\": 1, \"args\": [\"--task\", \"sanity\", \"--mode\", \"gemma\", \"--limit\", \"10\", \"--chunk\", \"10\", \"--tag\", \"smoke\"], \"exit\": 0, \"seconds\": 21.5}",
+    "[21:44:32] choose_A1_g5__dev_smoke chunk 0: 9 rows, 8.4s",
+    "[21:44:46] choose_A1_g10__dev_smoke chunk 0: 9 rows, 10.6s",
+    "{\"substep\": 2, \"args\": [\"--task\", \"choose\", \"--arm\", \"A1_g5\", \"A1_g10\", \"--split\", \"dev\", \"--limit\", \"10\", \"--chunk\", \"10\", \"--tag\", \"smoke\"], \"exit\": 0, \"seconds\": 24.3}",
+    "(MainProcess pid=2479) INFO 11-20 21:44:46 [utils.py:628] [shutdown] Process manager: send sigterm to process EngineCore",
+    "(EngineCore pid=2805) INFO 11-20 21:44:46 [core.py:1525] [shutdown] EngineCore: trigger received signal=SIGTERM",
+    "(EngineCore pid=2805) INFO 11-20 21:44:46 [core.py:1712] [shutdown] EngineCore: start mode=abort timeout=0s",
+    "(EngineCore pid=2805) INFO 11-20 21:44:46 [core.py:1743] [shutdown] EngineCore: request processing complete; starting resource teardown",
+    "(EngineCore pid=2805) INFO 11-20 21:44:46 [core.py:1573] [shutdown] EngineCore: exiting busy loop",
+    "(MainProcess pid=2479) WARNING 11-20 21:44:48 [core_client.py:839] [shutdown] MPClient: engine core exited unexpectedly; starting cleanup",
+    "(MainProcess pid=2479) INFO 11-20 21:44:48 [core_client.py:792] [shutdown] MPClient: start timeout=default",
+    "(MainProcess pid=2479) INFO 11-20 21:44:48 [core_client.py:794] [shutdown] MPClient: stopping engine manager",
+    "(MainProcess pid=2479) INFO 11-20 21:44:48 [core_client.py:796] [shutdown] MPClient: engine manager stopped",
+    "(MainProcess pid=2479) INFO 11-20 21:44:48 [core_client.py:797] [shutdown] MPClient: cleaning up background resources",
+    "(MainProcess pid=2479) INFO 11-20 21:44:48 [core_client.py:799] [shutdown] MPClient: complete"
+   ]
+  },
+  {
+   "name": "qwen",
+   "env": "vllm",
+   "exit": 0,
+   "seconds": 521.9,
+   "peak_gpu_mb": 34670.0,
+   "time": "2026-11-20T21:53:32+0000",
+   "vllm_memory_lines": [
+    "(EngineCore pid=4463) INFO 11-20 21:46:16 [utils.py:381] Using LBNHC KV cache layout.",
+    "(EngineCore pid=4463) INFO 11-20 21:46:56 [gpu_worker.py:772] Available KV cache memory: 16.61 GiB",
+    "v0.21.0). The current --gpu-memory-utilization=0.8500 is equivalent to --gpu-memory-utilization=0.8422 without CUDA graph memory profiling. To maintain the same effective KV cache size as before, increase --gpu-memory-utilization to 0.8578. To disable, set VLLM_MEMORY_PROFILER_ESTIMATE_CUDAGRAPHS=0.",
+    "(EngineCore pid=4463) INFO 11-20 21:46:56 [kv_cache_utils.py:1147] GPU KV cache size: 120,928 tokens, Maximum concurrency for 32,768 tokens per request: 3.69x"
+   ],
+   "log_tail": [
+    "{\"substep\": 6, \"args\": [\"--task\", \"b\", \"--mode\", \"qwen_t\", \"--arms\", \"debate\", \"alone\", \"--split\", \"dev\", \"--limit\", \"10\", \"--n-panels\", \"5\", \"--chunk\", \"5\", \"--tag\", \"smoke\"], \"exit\": 0, \"seconds\": 41.5}",
+    "[21:52:58] judge_traces__all_smoke chunk 0: 10 rows, 20.9s",
+    "[21:53:28] judge_own__all_smoke chunk 0: 15 rows, 28.8s",
+    "{\"substep\": 7, \"args\": [\"--task\", \"judge\", \"--limit\", \"5\", \"--chunk\", \"5\", \"--tag\", \"smoke\"], \"exit\": 0, \"seconds\": 51.9}",
+    "(MainProcess pid=4196) INFO 11-20 21:53:28 [utils.py:628] [shutdown] Process manager: send sigterm to process EngineCore",
+    "(EngineCore pid=4463) INFO 11-20 21:53:28 [core.py:1525] [shutdown] EngineCore: trigger received signal=SIGTERM",
+    "(EngineCore pid=4463) INFO 11-20 21:53:28 [core.py:1712] [shutdown] EngineCore: start mode=abort timeout=0s",
+    "(EngineCore pid=4463) INFO 11-20 21:53:28 [core.py:1743] [shutdown] EngineCore: request processing complete; starting resource teardown",
+    "(EngineCore pid=4463) INFO 11-20 21:53:28 [core.py:1573] [shutdown] EngineCore: exiting busy loop",
+    "(MainProcess pid=4196) WARNING 11-20 21:53:30 [core_client.py:839] [shutdown] MPClient: engine core exited unexpectedly; starting cleanup",
+    "(MainProcess pid=4196) INFO 11-20 21:53:30 [core_client.py:792] [shutdown] MPClient: start timeout=default",
+    "(MainProcess pid=4196) INFO 11-20 21:53:30 [core_client.py:794] [shutdown] MPClient: stopping engine manager",
+    "(MainProcess pid=4196) INFO 11-20 21:53:30 [core_client.py:796] [shutdown] MPClient: engine manager stopped",
+    "(MainProcess pid=4196) INFO 11-20 21:53:30 [core_client.py:797] [shutdown] MPClient: cleaning up background resources",
+    "(MainProcess pid=4196) INFO 11-20 21:53:30 [core_client.py:799] [shutdown] MPClient: complete"
+   ]
+  },
+  {
+   "name": "readouts",
+   "env": "hf",
+   "exit": 0,
+   "seconds": 43.2,
+   "peak_gpu_mb": 17070.0,
+   "time": "2026-11-20T21:54:16+0000",
+   "vllm_memory_lines": [],
+   "log_tail": [
+    "",
+    "Loading weights:   0%|          | 0/399 [00:00<?, ?it/s]",
+    "Loading weights:  97%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b| 386/399 [00:00<00:00, 3857.35it/s]",
+    "Loading weights: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 399/399 [00:00<00:00, 3938.55it/s]",
+    "[21:54:02] b_qwen_nt_debate__dev_smoke_ro c000: 3 in 5.34s",
+    "[21:54:03] b_qwen_nt_alone__dev_smoke_ro c000: 3 in 0.39s",
+    "[21:54:05] b_qwen_t_debate__dev_smoke_ro c000: 3 in 2.09s",
+    "[21:54:07] b_qwen_t_alone__dev_smoke_ro c000: 3 in 2.09s",
+    "{\"substep\": 0, \"args\": [\"--task\", \"b\", \"--parts\", \"b_qwen_nt_debate__dev_smoke\", \"b_qwen_nt_alone__dev_smoke\", \"b_qwen_t_debate__dev_smoke\", \"b_qwen_t_alone__dev_smoke\"], \"exit\": 0, \"seconds\": 34.0}",
+    "[21:54:09] judge_traces__all_smoke_ro c000: 10 in 1.54s",
+    "{\"substep\": 1, \"args\": [\"--task\", \"judge\", \"--parts\", \"judge_traces__all_smoke\"], \"exit\": 0, \"seconds\": 1.6}",
+    "[21:54:11] judge_own__all_smoke_ro c000: 15 in 1.98s",
+    "{\"substep\": 2, \"args\": [\"--task\", \"own\", \"--parts\", \"judge_own__all_smoke\"], \"exit\": 0, \"seconds\": 2.0}",
+    "{\"substep\": 3, \"args\": [\"--task\", \"posctl\", \"--mode\", \"qwen_t\", \"--n-posctl\", \"20\"], \"exit\": 0, \"seconds\": 2.3}"
+   ]
+  }
+ ]
+}

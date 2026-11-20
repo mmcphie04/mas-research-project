@@ -1,0 +1,879 @@
+{
+ "parts": {
+  "b_qwen_nt_alone__dev_smoke": {
+   "requests": 3,
+   "seconds": 3.0987,
+   "seconds_per_request": 1.0329,
+   "tokens_per_second_overall": 191.37057475715622,
+   "tokens_per_second_per_sequence": 63.467475608050684,
+   "parse_rate": 1.0,
+   "mean_prompt_tokens": 431.0,
+   "mean_thinking_tokens": 0.0,
+   "mean_answer_tokens": 196.66666666666666,
+   "thinking_cap_rate": null,
+   "answer_cap_rate": 0.0,
+   "refused_context": 0
+  },
+  "b_qwen_nt_debate__dev_smoke": {
+   "requests": 3,
+   "seconds": 3.1618,
+   "seconds_per_request": 1.0539333333333334,
+   "tokens_per_second_overall": 178.69567967613386,
+   "tokens_per_second_per_sequence": 59.248951019461494,
+   "parse_rate": 1.0,
+   "mean_prompt_tokens": 718.0,
+   "mean_thinking_tokens": 0.0,
+   "mean_answer_tokens": 187.33333333333334,
+   "thinking_cap_rate": null,
+   "answer_cap_rate": 0.0,
+   "refused_context": 0
+  },
+  "b_qwen_t_alone__dev_smoke": {
+   "requests": 3,
+   "seconds": 24.957099999999997,
+   "seconds_per_request": 8.319033333333332,
+   "tokens_per_second_overall": 117.64187345484854,
+   "tokens_per_second_per_sequence": 39.13382030230543,
+   "parse_rate": 1.0,
+   "mean_prompt_tokens": 372.3333333333333,
+   "mean_thinking_tokens": 768.0,
+   "mean_answer_tokens": 208.66666666666666,
+   "thinking_cap_rate": 0.0,
+   "answer_cap_rate": 0.0,
+   "refused_context": 0
+  },
+  "b_qwen_t_debate__dev_smoke": {
+   "requests": 3,
+   "seconds": 14.459499999999998,
+   "seconds_per_request": 4.8198333333333325,
+   "tokens_per_second_overall": 150.28182163975242,
+   "tokens_per_second_per_sequence": 49.955623177380495,
+   "parse_rate": 1.0,
+   "mean_prompt_tokens": 439.6666666666667,
+   "mean_thinking_tokens": 580.6666666666666,
+   "mean_answer_tokens": 141.66666666666666,
+   "thinking_cap_rate": 0.0,
+   "answer_cap_rate": 0.0,
+   "refused_context": 0
+  },
+  "bank_gemma__dev_smoke": {
+   "requests": 100,
+   "seconds": 33.8307,
+   "seconds_per_request": 0.338307,
+   "tokens_per_second_overall": 689.4034116941122,
+   "tokens_per_second_per_sequence": 6.8644751660474075,
+   "parse_rate": 1.0,
+   "mean_prompt_tokens": 266.8,
+   "mean_thinking_tokens": 0.0,
+   "mean_answer_tokens": 232.23,
+   "thinking_cap_rate": null,
+   "answer_cap_rate": 0.0,
+   "refused_context": 0
+  },
+  "bank_qwen_nt__dev_smoke": {
+   "requests": 100,
+   "seconds": 22.7138,
+   "seconds_per_request": 0.22713799999999998,
+   "tokens_per_second_overall": 943.4352684271237,
+   "tokens_per_second_per_sequence": 9.390326585599944,
+   "parse_rate": 1.0,
+   "mean_prompt_tokens": 259.7,
+   "mean_thinking_tokens": 0.0,
+   "mean_answer_tokens": 213.29,
+   "thinking_cap_rate": null,
+   "answer_cap_rate": 0.0,
+   "refused_context": 0
+  },
+  "bank_qwen_t__dev_smoke": {
+   "requests": 50,
+   "seconds": 26.4133,
+   "seconds_per_request": 0.528266,
+   "tokens_per_second_overall": 1567.278605853869,
+   "tokens_per_second_per_sequence": 31.269852687850445,
+   "parse_rate": 1.0,
+   "mean_prompt_tokens": 285.7,
+   "mean_thinking_tokens": 726.54,
+   "mean_answer_tokens": 99.4,
+   "thinking_cap_rate": 0.0,
+   "answer_cap_rate": 0.0,
+   "refused_context": 0
+  },
+  "bank_qwen_t__dev_smokenovis": {
+   "requests": 50,
+   "seconds": 30.303800000000003,
+   "seconds_per_request": 0.6060760000000001,
+   "tokens_per_second_overall": 1269.8077468832291,
+   "tokens_per_second_per_sequence": 25.330156614022002,
+   "parse_rate": 1.0,
+   "mean_prompt_tokens": 255.7,
+   "mean_thinking_tokens": 756.54,
+   "mean_answer_tokens": 11.06,
+   "thinking_cap_rate": 0.0,
+   "answer_cap_rate": 0.0,
+   "refused_context": 0
+  },
+  "choose_A1_g10__dev_smoke": {
+   "requests": 9,
+   "seconds": 10.6418,
+   "seconds_per_request": 1.1824222222222223,
+   "tokens_per_second_overall": 233.1372512168994,
+   "tokens_per_second_per_sequence": 25.81016995871626,
+   "parse_rate": 0.0,
+   "mean_prompt_tokens": 810.6666666666666,
+   "mean_thinking_tokens": 0.0,
+   "mean_answer_tokens": 274.6666666666667,
+   "thinking_cap_rate": null,
+   "answer_cap_rate": 0.0,
+   "refused_context": 0
+  },
+  "choose_A1_g5__dev_smoke": {
+   "requests": 9,
+   "seconds": 8.4023,
+   "seconds_per_request": 0.9335888888888889,
+   "tokens_per_second_overall": 285.1600157099842,
+   "tokens_per_second_per_sequence": 31.565431158399747,
+   "parse_rate": 0.0,
+   "mean_prompt_tokens": 751.6666666666666,
+   "mean_thinking_tokens": 0.0,
+   "mean_answer_tokens": 265.22222222222223,
+   "thinking_cap_rate": null,
+   "answer_cap_rate": 0.0,
+   "refused_context": 0
+  },
+  "choose_A1_qnt10__dev_smoke": {
+   "requests": 12,
+   "seconds": 3.2386,
+   "seconds_per_request": 0.2698833333333333,
+   "tokens_per_second_overall": 500.83369357129624,
+   "tokens_per_second_per_sequence": 41.42736573416497,
+   "parse_rate": 0.08333333333333333,
+   "mean_prompt_tokens": 743.0,
+   "mean_thinking_tokens": 0.0,
+   "mean_answer_tokens": 134.16666666666666,
+   "thinking_cap_rate": null,
+   "answer_cap_rate": 0.0,
+   "refused_context": 0
+  },
+  "choose_A1_qnt5__dev_smoke": {
+   "requests": 6,
+   "seconds": 2.8392,
+   "seconds_per_request": 0.4732,
+   "tokens_per_second_overall": 363.8348830656523,
+   "tokens_per_second_per_sequence": 60.2869352869353,
+   "parse_rate": 0.0,
+   "mean_prompt_tokens": 481.5,
+   "mean_thinking_tokens": 0.0,
+   "mean_answer_tokens": 171.16666666666666,
+   "thinking_cap_rate": null,
+   "answer_cap_rate": 0.0,
+   "refused_context": 0
+  },
+  "choose_A1_qt5__dev_smoke": {
+   "requests": 9,
+   "seconds": 43.04,
+   "seconds_per_request": 4.782222222222222,
+   "tokens_per_second_overall": 403.57806691449815,
+   "tokens_per_second_per_sequence": 44.795539033457246,
+   "parse_rate": 0.0,
+   "mean_prompt_tokens": 594.0,
+   "mean_thinking_tokens": 1923.0,
+   "mean_answer_tokens": 5.0,
+   "thinking_cap_rate": 0.0,
+   "answer_cap_rate": 0.0,
+   "refused_context": 0
+  },
+  "choose_A2_10__dev_smoke": {
+   "requests": 12,
+   "seconds": 43.486200000000004,
+   "seconds_per_request": 3.6238500000000005,
+   "tokens_per_second_overall": 329.04691603313233,
+   "tokens_per_second_per_sequence": 27.374584734160873,
+   "parse_rate": 0.0,
+   "mean_prompt_tokens": 673.75,
+   "mean_thinking_tokens": 1185.4166666666667,
+   "mean_answer_tokens": 5.0,
+   "thinking_cap_rate": 0.0,
+   "answer_cap_rate": 0.0,
+   "refused_context": 0
+  },
+  "choose_A2_5__dev_smoke": {
+   "requests": 6,
+   "seconds": 48.344,
+   "seconds_per_request": 8.057333333333334,
+   "tokens_per_second_overall": 223.08869766672183,
+   "tokens_per_second_per_sequence": 37.14007943074632,
+   "parse_rate": 0.0,
+   "mean_prompt_tokens": 526.5,
+   "mean_thinking_tokens": 1790.5,
+   "mean_answer_tokens": 5.0,
+   "thinking_cap_rate": 0.0,
+   "answer_cap_rate": 0.0,
+   "refused_context": 0
+  },
+  "choose_A3__dev_smoke": {
+   "requests": 15,
+   "seconds": 45.488800000000005,
+   "seconds_per_request": 3.032586666666667,
+   "tokens_per_second_overall": 416.4761435781994,
+   "tokens_per_second_per_sequence": 27.721109371977278,
+   "parse_rate": 0.0,
+   "mean_prompt_tokens": 770.2,
+   "mean_thinking_tokens": 1256.0,
+   "mean_answer_tokens": 5.0,
+   "thinking_cap_rate": 0.0,
+   "answer_cap_rate": 0.0,
+   "refused_context": 0
+  },
+  "judge_own__all_smoke": {
+   "requests": 15,
+   "seconds": 28.839199999999998,
+   "seconds_per_request": 1.9226133333333333,
+   "tokens_per_second_overall": 625.6761630003607,
+   "tokens_per_second_per_sequence": 41.64470581708231,
+   "parse_rate": 1.0,
+   "mean_prompt_tokens": 250.6,
+   "mean_thinking_tokens": 1190.0,
+   "mean_answer_tokens": 11.0,
+   "thinking_cap_rate": 0.06666666666666667,
+   "answer_cap_rate": 0.0,
+   "refused_context": 0
+  },
+  "judge_traces__all_smoke": {
+   "requests": 10,
+   "seconds": 20.9384,
+   "seconds_per_request": 2.09384,
+   "tokens_per_second_overall": 498.7487105031903,
+   "tokens_per_second_per_sequence": 49.827111909219425,
+   "parse_rate": null,
+   "mean_prompt_tokens": 666.6,
+   "mean_thinking_tokens": 1043.3,
+   "mean_answer_tokens": 0.0,
+   "thinking_cap_rate": 0.0,
+   "answer_cap_rate": 0.0,
+   "refused_context": 0
+  },
+  "posctl_qwen_t": {
+   "requests": 20,
+   "seconds": 2.27,
+   "seconds_per_request": 0.1135,
+   "tokens_per_second_overall": 0.0,
+   "tokens_per_second_per_sequence": NaN,
+   "parse_rate": null,
+   "mean_prompt_tokens": NaN,
+   "mean_thinking_tokens": NaN,
+   "mean_answer_tokens": NaN,
+   "thinking_cap_rate": null,
+   "answer_cap_rate": 0.0,
+   "refused_context": 0
+  },
+  "sanity_gemma__all_smoke": {
+   "requests": 30,
+   "seconds": 19.0296,
+   "seconds_per_request": 0.63432,
+   "tokens_per_second_overall": 458.601336864674,
+   "tokens_per_second_per_sequence": 15.234161516794892,
+   "parse_rate": 1.0,
+   "mean_prompt_tokens": 286.4,
+   "mean_thinking_tokens": 0.0,
+   "mean_answer_tokens": 289.9,
+   "thinking_cap_rate": null,
+   "answer_cap_rate": 0.0,
+   "refused_context": 0
+  },
+  "sanity_qwen_nt__all_smoke": {
+   "requests": 30,
+   "seconds": 6.6949,
+   "seconds_per_request": 0.22316333333333332,
+   "tokens_per_second_overall": 1040.3441425562742,
+   "tokens_per_second_per_sequence": 34.5287706562707,
+   "parse_rate": 1.0,
+   "mean_prompt_tokens": 277.3,
+   "mean_thinking_tokens": 0.0,
+   "mean_answer_tokens": 231.16666666666666,
+   "thinking_cap_rate": null,
+   "answer_cap_rate": 0.0,
+   "refused_context": 0
+  }
+ },
+ "readouts": {
+  "b_qwen_nt_alone__dev_smoke_ro": {
+   "seconds_per_row": 0.13
+  },
+  "b_qwen_nt_debate__dev_smoke_ro": {
+   "seconds_per_row": 1.78
+  },
+  "b_qwen_t_alone__dev_smoke_ro": {
+   "seconds_per_row": 0.6966666666666667
+  },
+  "b_qwen_t_debate__dev_smoke_ro": {
+   "seconds_per_row": 0.6966666666666667
+  },
+  "judge_own__all_smoke_ro": {
+   "seconds_per_row": 0.132
+  },
+  "judge_traces__all_smoke_ro": {
+   "seconds_per_row": 0.154
+  }
+ },
+ "session": {
+  "plan": {
+   "note": "GPU smoke test (docs/EXPAB_PLAN.md section 6): 20 development questions per model and mode, the chooser arms, B (debate + alone, 10 disputed panels per mode), the judge confirmation (10 events, 10 own-answer questions), a like-for-like vLLM-vs-HF sanity check on 20 judge questions, then the HF readouts. Tagged 'smoke' so no part name collides with the real runs. The thinking bank and B use the visible rationale (D1, on by default); a variant WITHOUT it (tag smokenovis) on the same 20 questions measures the answer-cap rate of both. qwen_t answer cap 700. Steps grouped by model (one vLLM process per model, one HF process) so each model loads once. Attempt 2 (after the attempt-1 OOM): trimmed to 10 questions per model and mode, 5 B panels per mode, 5 judge events, 10 sanity questions, to fit the remaining cap.",
+   "steps": [
+    {
+     "name": "gemma",
+     "env": "vllm",
+     "script": "multi_step.py",
+     "args": [
+      "--module",
+      "gen_run",
+      "--steps",
+      "[[\"--task\", \"bank\", \"--mode\", \"gemma\", \"--split\", \"dev\", \"--limit\", \"10\", \"--chunk\", \"10\", \"--tag\", \"smoke\"], [\"--task\", \"sanity\", \"--mode\", \"gemma\", \"--limit\", \"10\", \"--chunk\", \"10\", \"--tag\", \"smoke\"], [\"--task\", \"choose\", \"--arm\", \"A1_g5\", \"A1_g10\", \"--split\", \"dev\", \"--limit\", \"10\", \"--chunk\", \"10\", \"--tag\", \"smoke\"]]"
+     ]
+    },
+    {
+     "name": "qwen",
+     "env": "vllm",
+     "script": "multi_step.py",
+     "args": [
+      "--module",
+      "gen_run",
+      "--steps",
+      "[[\"--task\", \"bank\", \"--mode\", \"qwen_nt\", \"--split\", \"dev\", \"--limit\", \"10\", \"--chunk\", \"10\", \"--tag\", \"smoke\"], [\"--task\", \"bank\", \"--mode\", \"qwen_t\", \"--split\", \"dev\", \"--limit\", \"10\", \"--chunk\", \"10\", \"--tag\", \"smoke\"], [\"--task\", \"bank\", \"--mode\", \"qwen_t\", \"--split\", \"dev\", \"--limit\", \"10\", \"--chunk\", \"10\", \"--tag\", \"smokenovis\", \"--no-visible-rationale\"], [\"--task\", \"sanity\", \"--mode\", \"qwen_nt\", \"--limit\", \"10\", \"--chunk\", \"10\", \"--tag\", \"smoke\"], [\"--task\", \"choose\", \"--arm\", \"A1_qnt5\", \"A1_qnt10\", \"A1_qt5\", \"A2_5\", \"A2_10\", \"A3\", \"--split\", \"dev\", \"--limit\", \"10\", \"--chunk\", \"10\", \"--tag\", \"smoke\"], [\"--task\", \"b\", \"--mode\", \"qwen_nt\", \"--arms\", \"debate\", \"alone\", \"--split\", \"dev\", \"--limit\", \"10\", \"--n-panels\", \"5\", \"--chunk\", \"5\", \"--tag\", \"smoke\"], [\"--task\", \"b\", \"--mode\", \"qwen_t\", \"--arms\", \"debate\", \"alone\", \"--split\", \"dev\", \"--limit\", \"10\", \"--n-panels\", \"5\", \"--chunk\", \"5\", \"--tag\", \"smoke\"], [\"--task\", \"judge\", \"--limit\", \"5\", \"--chunk\", \"5\", \"--tag\", \"smoke\"]]"
+     ]
+    },
+    {
+     "name": "readouts",
+     "env": "hf",
+     "script": "multi_step.py",
+     "args": [
+      "--module",
+      "hf_readouts",
+      "--steps",
+      "[[\"--task\", \"b\", \"--parts\", \"b_qwen_nt_debate__dev_smoke\", \"b_qwen_nt_alone__dev_smoke\", \"b_qwen_t_debate__dev_smoke\", \"b_qwen_t_alone__dev_smoke\"], [\"--task\", \"judge\", \"--parts\", \"judge_traces__all_smoke\"], [\"--task\", \"own\", \"--parts\", \"judge_own__all_smoke\"], [\"--task\", \"posctl\", \"--mode\", \"qwen_t\", \"--n-posctl\", \"20\"]]"
+     ]
+    }
+   ]
+  },
+  "steps": [
+   {
+    "name": "gemma",
+    "env": "vllm",
+    "exit": 0,
+    "seconds": 268.1,
+    "peak_gpu_mb": 33592.0,
+    "time": "2026-11-20T21:44:51+0000",
+    "vllm_memory_lines": [
+     "(EngineCore pid=2805) INFO 11-20 21:42:22 [utils.py:381] Using LBNHC KV cache layout.",
+     "(EngineCore pid=2805) INFO 11-20 21:43:13 [gpu_worker.py:772] Available KV cache memory: 8.4 GiB",
+     "v0.21.0). The current --gpu-memory-utilization=0.8500 is equivalent to --gpu-memory-utilization=0.8397 without CUDA graph memory profiling. To maintain the same effective KV cache size as before, increase --gpu-memory-utilization to 0.8603. To disable, set VLLM_MEMORY_PROFILER_ESTIMATE_CUDAGRAPHS=0.",
+     "(EngineCore pid=2805) INFO 11-20 21:43:13 [kv_cache_utils.py:1147] GPU KV cache size: 37,609 tokens, Maximum concurrency for 32,768 tokens per request: 1.15x"
+    ],
+    "log_tail": [
+     "{\"substep\": 1, \"args\": [\"--task\", \"sanity\", \"--mode\", \"gemma\", \"--limit\", \"10\", \"--chunk\", \"10\", \"--tag\", \"smoke\"], \"exit\": 0, \"seconds\": 21.5}",
+     "[21:44:32] choose_A1_g5__dev_smoke chunk 0: 9 rows, 8.4s",
+     "[21:44:46] choose_A1_g10__dev_smoke chunk 0: 9 rows, 10.6s",
+     "{\"substep\": 2, \"args\": [\"--task\", \"choose\", \"--arm\", \"A1_g5\", \"A1_g10\", \"--split\", \"dev\", \"--limit\", \"10\", \"--chunk\", \"10\", \"--tag\", \"smoke\"], \"exit\": 0, \"seconds\": 24.3}",
+     "(MainProcess pid=2479) INFO 11-20 21:44:46 [utils.py:628] [shutdown] Process manager: send sigterm to process EngineCore",
+     "(EngineCore pid=2805) INFO 11-20 21:44:46 [core.py:1525] [shutdown] EngineCore: trigger received signal=SIGTERM",
+     "(EngineCore pid=2805) INFO 11-20 21:44:46 [core.py:1712] [shutdown] EngineCore: start mode=abort timeout=0s",
+     "(EngineCore pid=2805) INFO 11-20 21:44:46 [core.py:1743] [shutdown] EngineCore: request processing complete; starting resource teardown",
+     "(EngineCore pid=2805) INFO 11-20 21:44:46 [core.py:1573] [shutdown] EngineCore: exiting busy loop",
+     "(MainProcess pid=2479) WARNING 11-20 21:44:48 [core_client.py:839] [shutdown] MPClient: engine core exited unexpectedly; starting cleanup",
+     "(MainProcess pid=2479) INFO 11-20 21:44:48 [core_client.py:792] [shutdown] MPClient: start timeout=default",
+     "(MainProcess pid=2479) INFO 11-20 21:44:48 [core_client.py:794] [shutdown] MPClient: stopping engine manager",
+     "(MainProcess pid=2479) INFO 11-20 21:44:48 [core_client.py:796] [shutdown] MPClient: engine manager stopped",
+     "(MainProcess pid=2479) INFO 11-20 21:44:48 [core_client.py:797] [shutdown] MPClient: cleaning up background resources",
+     "(MainProcess pid=2479) INFO 11-20 21:44:48 [core_client.py:799] [shutdown] MPClient: complete"
+    ]
+   },
+   {
+    "name": "qwen",
+    "env": "vllm",
+    "exit": 0,
+    "seconds": 521.9,
+    "peak_gpu_mb": 34670.0,
+    "time": "2026-11-20T21:53:32+0000",
+    "vllm_memory_lines": [
+     "(EngineCore pid=4463) INFO 11-20 21:46:16 [utils.py:381] Using LBNHC KV cache layout.",
+     "(EngineCore pid=4463) INFO 11-20 21:46:56 [gpu_worker.py:772] Available KV cache memory: 16.61 GiB",
+     "v0.21.0). The current --gpu-memory-utilization=0.8500 is equivalent to --gpu-memory-utilization=0.8422 without CUDA graph memory profiling. To maintain the same effective KV cache size as before, increase --gpu-memory-utilization to 0.8578. To disable, set VLLM_MEMORY_PROFILER_ESTIMATE_CUDAGRAPHS=0.",
+     "(EngineCore pid=4463) INFO 11-20 21:46:56 [kv_cache_utils.py:1147] GPU KV cache size: 120,928 tokens, Maximum concurrency for 32,768 tokens per request: 3.69x"
+    ],
+    "log_tail": [
+     "{\"substep\": 6, \"args\": [\"--task\", \"b\", \"--mode\", \"qwen_t\", \"--arms\", \"debate\", \"alone\", \"--split\", \"dev\", \"--limit\", \"10\", \"--n-panels\", \"5\", \"--chunk\", \"5\", \"--tag\", \"smoke\"], \"exit\": 0, \"seconds\": 41.5}",
+     "[21:52:58] judge_traces__all_smoke chunk 0: 10 rows, 20.9s",
+     "[21:53:28] judge_own__all_smoke chunk 0: 15 rows, 28.8s",
+     "{\"substep\": 7, \"args\": [\"--task\", \"judge\", \"--limit\", \"5\", \"--chunk\", \"5\", \"--tag\", \"smoke\"], \"exit\": 0, \"seconds\": 51.9}",
+     "(MainProcess pid=4196) INFO 11-20 21:53:28 [utils.py:628] [shutdown] Process manager: send sigterm to process EngineCore",
+     "(EngineCore pid=4463) INFO 11-20 21:53:28 [core.py:1525] [shutdown] EngineCore: trigger received signal=SIGTERM",
+     "(EngineCore pid=4463) INFO 11-20 21:53:28 [core.py:1712] [shutdown] EngineCore: start mode=abort timeout=0s",
+     "(EngineCore pid=4463) INFO 11-20 21:53:28 [core.py:1743] [shutdown] EngineCore: request processing complete; starting resource teardown",
+     "(EngineCore pid=4463) INFO 11-20 21:53:28 [core.py:1573] [shutdown] EngineCore: exiting busy loop",
+     "(MainProcess pid=4196) WARNING 11-20 21:53:30 [core_client.py:839] [shutdown] MPClient: engine core exited unexpectedly; starting cleanup",
+     "(MainProcess pid=4196) INFO 11-20 21:53:30 [core_client.py:792] [shutdown] MPClient: start timeout=default",
+     "(MainProcess pid=4196) INFO 11-20 21:53:30 [core_client.py:794] [shutdown] MPClient: stopping engine manager",
+     "(MainProcess pid=4196) INFO 11-20 21:53:30 [core_client.py:796] [shutdown] MPClient: engine manager stopped",
+     "(MainProcess pid=4196) INFO 11-20 21:53:30 [core_client.py:797] [shutdown] MPClient: cleaning up background resources",
+     "(MainProcess pid=4196) INFO 11-20 21:53:30 [core_client.py:799] [shutdown] MPClient: complete"
+    ]
+   },
+   {
+    "name": "readouts",
+    "env": "hf",
+    "exit": 0,
+    "seconds": 43.2,
+    "peak_gpu_mb": 17070.0,
+    "time": "2026-11-20T21:54:16+0000",
+    "vllm_memory_lines": [],
+    "log_tail": [
+     "",
+     "Loading weights:   0%|          | 0/399 [00:00<?, ?it/s]",
+     "Loading weights:  97%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u258b| 386/399 [00:00<00:00, 3857.35it/s]",
+     "Loading weights: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 399/399 [00:00<00:00, 3938.55it/s]",
+     "[21:54:02] b_qwen_nt_debate__dev_smoke_ro c000: 3 in 5.34s",
+     "[21:54:03] b_qwen_nt_alone__dev_smoke_ro c000: 3 in 0.39s",
+     "[21:54:05] b_qwen_t_debate__dev_smoke_ro c000: 3 in 2.09s",
+     "[21:54:07] b_qwen_t_alone__dev_smoke_ro c000: 3 in 2.09s",
+     "{\"substep\": 0, \"args\": [\"--task\", \"b\", \"--parts\", \"b_qwen_nt_debate__dev_smoke\", \"b_qwen_nt_alone__dev_smoke\", \"b_qwen_t_debate__dev_smoke\", \"b_qwen_t_alone__dev_smoke\"], \"exit\": 0, \"seconds\": 34.0}",
+     "[21:54:09] judge_traces__all_smoke_ro c000: 10 in 1.54s",
+     "{\"substep\": 1, \"args\": [\"--task\", \"judge\", \"--parts\", \"judge_traces__all_smoke\"], \"exit\": 0, \"seconds\": 1.6}",
+     "[21:54:11] judge_own__all_smoke_ro c000: 15 in 1.98s",
+     "{\"substep\": 2, \"args\": [\"--task\", \"own\", \"--parts\", \"judge_own__all_smoke\"], \"exit\": 0, \"seconds\": 2.0}",
+     "{\"substep\": 3, \"args\": [\"--task\", \"posctl\", \"--mode\", \"qwen_t\", \"--n-posctl\", \"20\"], \"exit\": 0, \"seconds\": 2.3}"
+    ]
+   }
+  ]
+ },
+ "sanity": {
+  "gemma": {
+   "questions": 10,
+   "vllm": {
+    "parse_rate": 1.0,
+    "mean_generated_tokens": 289.9,
+    "accuracy": 0.36666666666666664
+   },
+   "hf": {
+    "parse_rate": 1.0,
+    "mean_generated_tokens": 351.44444444444446,
+    "accuracy": 0.4666666666666667
+   },
+   "accuracy_difference": {
+    "mean": -0.1,
+    "lo": -0.33333333333333337,
+    "hi": 0.06666666666666668
+   }
+  },
+  "qwen_nt": {
+   "questions": 10,
+   "vllm": {
+    "parse_rate": 1.0,
+    "mean_generated_tokens": 231.16666666666666,
+    "accuracy": 0.4666666666666666
+   },
+   "hf": {
+    "parse_rate": 1.0,
+    "mean_generated_tokens": 257.46666666666664,
+    "accuracy": 0.4666666666666666
+   },
+   "accuracy_difference": {
+    "mean": -1.1102230246251566e-17,
+    "lo": -0.16666666666666669,
+    "hi": 0.13333333333333333
+   }
+  }
+ },
+ "position_bias": {
+  "choose_A1_g10": {
+   "runs": 9,
+   "parsed_picks": 9,
+   "share_first": 0.3333333333333333,
+   "expected_first": 0.4444444444444444,
+   "share_last": 0.6666666666666666
+  },
+  "choose_A1_g5": {
+   "runs": 9,
+   "parsed_picks": 9,
+   "share_first": 0.4444444444444444,
+   "expected_first": 0.4444444444444444,
+   "share_last": 0.5555555555555556
+  },
+  "choose_A1_qnt10": {
+   "runs": 12,
+   "parsed_picks": 12,
+   "share_first": 0.5,
+   "expected_first": 0.4166666666666666,
+   "share_last": 0.4166666666666667
+  },
+  "choose_A1_qnt5": {
+   "runs": 6,
+   "parsed_picks": 6,
+   "share_first": 0.6666666666666666,
+   "expected_first": 0.5,
+   "share_last": 0.3333333333333333
+  },
+  "choose_A1_qt5": {
+   "runs": 9,
+   "parsed_picks": 9,
+   "share_first": 0.7777777777777778,
+   "expected_first": 0.5,
+   "share_last": 0.2222222222222222
+  },
+  "choose_A2_10": {
+   "runs": 12,
+   "parsed_picks": 12,
+   "share_first": 0.5833333333333334,
+   "expected_first": 0.4166666666666666,
+   "share_last": 0.3333333333333333
+  },
+  "choose_A2_5": {
+   "runs": 6,
+   "parsed_picks": 6,
+   "share_first": 0.5,
+   "expected_first": 0.5,
+   "share_last": 0.5
+  },
+  "choose_A3": {
+   "runs": 15,
+   "parsed_picks": 15,
+   "share_first": 0.4,
+   "expected_first": 0.41666666666666663,
+   "share_last": 0.4666666666666667
+  }
+ },
+ "think_location": {
+  "b_qwen_t_alone__dev_smoke": {
+   "rows": 3,
+   "think_in_prompt": 0.0,
+   "think_in_generation": 1.0
+  },
+  "b_qwen_t_debate__dev_smoke": {
+   "rows": 3,
+   "think_in_prompt": 0.0,
+   "think_in_generation": 1.0
+  },
+  "bank_qwen_t__dev_smoke": {
+   "rows": 50,
+   "think_in_prompt": 0.0,
+   "think_in_generation": 1.0
+  },
+  "bank_qwen_t__dev_smokenovis": {
+   "rows": 50,
+   "think_in_prompt": 0.0,
+   "think_in_generation": 1.0
+  },
+  "choose_A1_qt5__dev_smoke": {
+   "rows": 9,
+   "think_in_prompt": 0.0,
+   "think_in_generation": 1.0
+  },
+  "choose_A2_10__dev_smoke": {
+   "rows": 12,
+   "think_in_prompt": 0.0,
+   "think_in_generation": 1.0
+  },
+  "choose_A2_5__dev_smoke": {
+   "rows": 6,
+   "think_in_prompt": 0.0,
+   "think_in_generation": 1.0
+  },
+  "choose_A3__dev_smoke": {
+   "rows": 15,
+   "think_in_prompt": 0.0,
+   "think_in_generation": 1.0
+  },
+  "judge_own__all_smoke": {
+   "rows": 15,
+   "think_in_prompt": 0.0,
+   "think_in_generation": 1.0
+  },
+  "judge_traces__all_smoke": {
+   "rows": 10,
+   "think_in_prompt": 0.0,
+   "think_in_generation": 1.0
+  }
+ },
+ "pricing": {
+  "seconds_per_request": {
+   "b_qwen_nt_alone": 1.0329,
+   "b_qwen_nt_debate": 1.0539333333333334,
+   "b_qwen_t_alone": 8.319033333333332,
+   "b_qwen_t_debate": 4.8198333333333325,
+   "bank_gemma": 0.338307,
+   "bank_qwen_nt": 0.22713799999999998,
+   "bank_qwen_t": 0.567171,
+   "choose_A1_g10": 1.1824222222222223,
+   "choose_A1_g5": 0.9335888888888889,
+   "choose_A1_qnt10": 0.2698833333333333,
+   "choose_A1_qnt5": 0.4732,
+   "choose_A1_qt5": 4.782222222222222,
+   "choose_A2_10": 3.6238500000000005,
+   "choose_A2_5": 8.057333333333334,
+   "choose_A3": 3.032586666666667,
+   "judge_own": 1.9226133333333333,
+   "judge_traces": 2.09384,
+   "posctl_qwen_t": 0.1135,
+   "sanity_gemma": 0.63432,
+   "sanity_qwen_nt": 0.22316333333333332
+  },
+  "call_rates": {
+   "A1_qt5": 0.3,
+   "A1_qnt5": 0.2,
+   "A1_qnt10": 0.4,
+   "A1_g5": 0.3,
+   "A1_g10": 0.3,
+   "A2_5": 0.2,
+   "A2_10": 0.4,
+   "A3": 0.5
+  },
+  "launches": {
+   "1 bank + judge confirmation": {
+    "items_gpu_hours": {
+     "bank_gemma": 1.41,
+     "bank_qwen_nt": 0.946,
+     "bank_qwen_t": 1.182,
+     "judge_traces": 0.352,
+     "judge_own": 0.239,
+     "judge_traces readouts (HF)": 0.026,
+     "judge_own readouts (HF)": 0.016
+    },
+    "gpu_hours": 4.42,
+    "units": 29.8
+   },
+   "2 B pilot": {
+    "items_gpu_hours": {
+     "b_qwen_nt_debate": 0.088,
+     "b_qwen_nt_alone": 0.086,
+     "b_qwen_nt readouts (HF)": 0.138,
+     "b_qwen_t_debate": 0.402,
+     "b_qwen_t_alone": 0.693,
+     "b_qwen_t readouts (HF)": 0.138
+    },
+    "gpu_hours": 1.79,
+    "units": 12.1
+   },
+   "3 choosers": {
+    "items_gpu_hours": {
+     "choose_A1_qt5": 1.793,
+     "choose_A1_qnt5": 0.118,
+     "choose_A1_qnt10": 0.135,
+     "choose_A1_g5": 0.35,
+     "choose_A1_g10": 0.443,
+     "choose_A2_5": 2.014,
+     "choose_A2_10": 1.812,
+     "choose_A3": 1.895
+    },
+    "gpu_hours": 8.81,
+    "units": 59.3
+   },
+   "4 B full": {
+    "items_gpu_hours": {
+     "b_qwen_nt_debate": 0.132,
+     "b_qwen_nt_alone": 0.129,
+     "b_qwen_nt_dissent": 0.132,
+     "b_qwen_nt_anon": 0.132,
+     "b_qwen_nt readouts (HF)": 0.413,
+     "b_qwen_t_debate": 0.602,
+     "b_qwen_t_alone": 1.04,
+     "b_qwen_t_dissent": 0.602,
+     "b_qwen_t_anon": 0.602,
+     "b_qwen_t readouts (HF)": 0.413
+    },
+    "gpu_hours": 4.45,
+    "units": 29.9
+   }
+  },
+  "total_units": 131.1,
+  "p2_coverage": {
+   "A1_qt5": {
+    "chooser": "qwen_t",
+    "call_rate": 0.3,
+    "seconds_per_question": 7.139854999999999,
+    "in_qwen_t_samples": 12.588540316765137,
+    "in_own_chooser_samples": 12.588540316765137
+   },
+   "A1_qnt5": {
+    "chooser": "qwen_nt",
+    "call_rate": 0.2,
+    "seconds_per_question": 1.41961,
+    "in_qwen_t_samples": 2.5029664774821,
+    "in_own_chooser_samples": 6.249988993475333
+   },
+   "A1_qnt10": {
+    "chooser": "qwen_nt",
+    "call_rate": 0.4,
+    "seconds_per_question": 2.5952399999999995,
+    "in_qwen_t_samples": 4.575762865167647,
+    "in_own_chooser_samples": 11.425829231568473
+   },
+   "A1_g5": {
+    "chooser": "gemma",
+    "call_rate": 0.3,
+    "seconds_per_question": 2.531765,
+    "in_qwen_t_samples": 4.463847763725578,
+    "in_own_chooser_samples": 7.483631730942605
+   },
+   "A1_g10": {
+    "chooser": "gemma",
+    "call_rate": 0.3,
+    "seconds_per_question": 4.44725,
+    "in_qwen_t_samples": 7.8411096477076585,
+    "in_own_chooser_samples": 13.14560443620735
+   },
+   "A2_5": {
+    "chooser": "qwen_t",
+    "call_rate": 0.2,
+    "seconds_per_question": 5.970090000000001,
+    "in_qwen_t_samples": 10.526084725770536,
+    "in_own_chooser_samples": 10.526084725770536
+   },
+   "A2_10": {
+    "chooser": "qwen_t",
+    "call_rate": 0.4,
+    "seconds_per_question": 6.620000000000001,
+    "in_qwen_t_samples": 11.671964892422217,
+    "in_own_chooser_samples": 11.671964892422217
+   },
+   "A3": {
+    "chooser": "qwen_t",
+    "call_rate": 0.5,
+    "seconds_per_question": 7.376105000000001,
+    "in_qwen_t_samples": 13.005081359942594,
+    "in_own_chooser_samples": 13.005081359942594
+   }
+  },
+  "qwen_t_8_samples": {
+   "proposal": "raise the qwen_t bank from 5 to 8 samples (an arm costs more than ~4 qwen_t samples, so its matched-seconds self-consistency point would lie beyond a 5-sample curve)",
+   "extra_requests": 4500,
+   "gpu_hours": 0.71,
+   "units": 4.8
+  },
+  "units_per_hour": 6.73,
+  "assumptions": {
+   "b_panels_full_per_mode_arm": 150,
+   "b_pilot_panels_per_mode": 100,
+   "session_overhead_hours_each": 0.25
+  }
+ },
+ "pricing_tokens": {
+  "method": "tokens / max measured aggregate throughput",
+  "throughput_tokens_per_s": {
+   "gemma": 689.4034116941122,
+   "qwen": 1567.278605853869
+  },
+  "mean_generated_tokens": {
+   "b_qwen_nt_alone": 196.7,
+   "b_qwen_nt_debate": 187.3,
+   "b_qwen_t_alone": 976.7,
+   "b_qwen_t_debate": 722.3,
+   "bank_gemma": 232.2,
+   "bank_qwen_nt": 213.3,
+   "bank_qwen_t": 796.8,
+   "choose_A1_g10": 274.7,
+   "choose_A1_g5": 265.2,
+   "choose_A1_qnt10": 134.2,
+   "choose_A1_qnt5": 171.2,
+   "choose_A1_qt5": 1928.0,
+   "choose_A2_10": 1190.4,
+   "choose_A2_5": 1795.5,
+   "choose_A3": 1261.0,
+   "judge_own": 1201.0,
+   "judge_traces": 1043.3,
+   "posctl_qwen_t": NaN,
+   "sanity_gemma": 289.9,
+   "sanity_qwen_nt": 231.2
+  },
+  "call_rates_used": {
+   "A1_qt5": 0.4,
+   "A1_qnt5": 0.4,
+   "A1_qnt10": 0.47,
+   "A1_g5": 0.4,
+   "A1_g10": 0.47,
+   "A2_5": 0.4,
+   "A2_10": 0.47,
+   "A3": 0.55
+  },
+  "smoke_call_rates": {
+   "A1_qt5": 0.3,
+   "A1_qnt5": 0.2,
+   "A1_qnt10": 0.4,
+   "A1_g5": 0.3,
+   "A1_g10": 0.3,
+   "A2_5": 0.2,
+   "A2_10": 0.4,
+   "A3": 0.5
+  },
+  "launches": {
+   "1 bank + judge confirmation": {
+    "items_gpu_hours": {
+     "bank_gemma": 1.404,
+     "bank_qwen_nt": 0.567,
+     "bank_qwen_t (8 samples)": 1.695,
+     "judge_traces": 0.112,
+     "judge_own": 0.095,
+     "judge readouts (HF)": 0.042
+    },
+    "gpu_hours": 4.21,
+    "units": 28.4
+   },
+   "2 B pilot": {
+    "items_gpu_hours": {
+     "b_qwen_nt_debate": 0.01,
+     "b_qwen_nt_alone": 0.01,
+     "b_qwen_nt readouts (HF)": 0.022,
+     "b_qwen_t_debate": 0.038,
+     "b_qwen_t_alone": 0.052,
+     "b_qwen_t readouts (HF)": 0.116
+    },
+    "gpu_hours": 0.55,
+    "units": 3.7
+   },
+   "3 choosers": {
+    "items_gpu_hours": {
+     "choose_A1_qt5": 0.615,
+     "choose_A1_qnt5": 0.055,
+     "choose_A1_qnt10": 0.05,
+     "choose_A1_g5": 0.192,
+     "choose_A1_g10": 0.234,
+     "choose_A2_5": 0.573,
+     "choose_A2_10": 0.446,
+     "choose_A3": 0.553
+    },
+    "gpu_hours": 3.02,
+    "units": 20.3
+   },
+   "4 B full": {
+    "items_gpu_hours": {
+     "b_qwen_nt_debate": 0.015,
+     "b_qwen_nt_alone": 0.016,
+     "b_qwen_nt_dissent": 0.015,
+     "b_qwen_nt_anon": 0.015,
+     "b_qwen_nt readouts (HF)": 0.065,
+     "b_qwen_t_debate": 0.058,
+     "b_qwen_t_alone": 0.078,
+     "b_qwen_t_dissent": 0.058,
+     "b_qwen_t_anon": 0.058,
+     "b_qwen_t readouts (HF)": 0.348
+    },
+    "gpu_hours": 1.02,
+    "units": 6.9
+   }
+  },
+  "total_units": 59.3,
+  "p2_coverage_in_qwen_t_samples": {
+   "A1_qt5": 7.9,
+   "A1_qnt5": 1.6,
+   "A1_qnt10": 2.91,
+   "A1_g5": 4.22,
+   "A1_g10": 7.73,
+   "A2_5": 4.04,
+   "A2_10": 4.78,
+   "A3": 7.26
+  },
+  "assumptions": {
+   "b_pilot_panels_per_mode": 100,
+   "b_full_panels_per_mode_arm": 150,
+   "overhead_hours_per_launch": 0.3,
+   "qwen_t_samples": 8
+  }
+ }
+}

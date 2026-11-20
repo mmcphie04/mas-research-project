@@ -199,6 +199,74 @@ def price(pp: dict, rows: pd.DataFrame, units_per_hour: float, b_panels_full: in
                             "session_overhead_hours_each": SESSION_OVERHEAD_H}}
 
 
+PRIOR_CALL_RATE = {5: 0.40, 10: 0.47, "mixed": 0.55}  # main250: Gemma pools of 5 / 10 non-unanimous 40% / 47%
+MODEL_OF = {"bank_gemma": "gemma", "choose_A1_g5": "gemma", "choose_A1_g10": "gemma"}
+
+
+def price_tokens(pp: dict, rows: pd.DataFrame, ro: dict, units_per_hour: float, b_pilot: int, b_full: int,
+                 overhead_h: float = 0.3, qwen_t_samples: int = 8) -> dict:
+    """Token-based re-pricing. The smoke's calls were small (6-100 requests), so seconds per request
+    there measure latency, not throughput. Cost = generated tokens (measured mean per request, per
+    part) x full request counts / aggregate throughput per model (the HIGHEST measured in the
+    smoke's bank calls; full runs keep up to 128 sequences busy, so this errs toward overpricing),
+    plus HF readouts (measured seconds per row) and ``overhead_h`` per launch (setup, vLLM
+    environment, model loads, final backup). Chooser call rates: the larger of the smoke rate (10
+    questions) and main250's disagreement rate for that pool size."""
+    toks = {}
+    for part in pp:
+        r = rows[rows._part == part]
+        toks.setdefault(base(part), []).append(r)
+    gen = {k: float(pd.concat(v).generated_tokens.mean()) for k, v in toks.items()}
+    thr = {}
+    for part, v in pp.items():
+        b = base(part)
+        if b.startswith("bank_") and v["tokens_per_second_overall"]:
+            m = MODEL_OF.get(b, "qwen")
+            thr[m] = max(thr.get(m, 0.0), v["tokens_per_second_overall"])
+    def hours(part_base, n):
+        m = MODEL_OF.get(part_base, "qwen")
+        return n * gen.get(part_base, 0.0) / thr[m] / 3600
+    smoke_rates = disagreement_rates(rows)
+    rates = {}
+    for arm, (_, spec) in T.ARMS.items():
+        size = sum(k for _, k in spec)
+        prior = PRIOR_CALL_RATE["mixed"] if len(spec) > 1 else PRIOR_CALL_RATE[size]
+        rates[arm] = max(prior, smoke_rates.get(arm, 0.0))
+    s_ro = {base(k[:-3]): v["seconds_per_row"] for k, v in ro.items()}
+    ro_t = np.mean([v for k, v in s_ro.items() if k.startswith("b_qwen_t")]) if any(k.startswith("b_qwen_t") for k in s_ro) else 0.7
+    ro_nt = min([v for k, v in s_ro.items() if k.startswith("b_qwen_nt")] or [0.13])
+    L = {"1 bank + judge confirmation": {
+            "bank_gemma": hours("bank_gemma", 15000), "bank_qwen_nt": hours("bank_qwen_nt", 15000),
+            f"bank_qwen_t ({qwen_t_samples} samples)": hours("bank_qwen_t", 1500 * qwen_t_samples),
+            "judge_traces": hours("judge_traces", 606), "judge_own": hours("judge_own", 447),
+            "judge readouts (HF)": (606 * s_ro.get("judge_traces", 0.15) + 447 * s_ro.get("judge_own", 0.13)) / 3600},
+         "2 B pilot": {}, "3 choosers": {}, "4 B full": {}}
+    for arm, rate in rates.items():
+        L["3 choosers"][f"choose_{arm}"] = hours(f"choose_{arm}", 1500 * rate * 3)
+    for mode, ro_s in (("qwen_nt", ro_nt), ("qwen_t", ro_t)):
+        for arm in ("debate", "alone"):
+            L["2 B pilot"][f"b_{mode}_{arm}"] = hours(f"b_{mode}_{arm}", b_pilot * 3)
+        L["2 B pilot"][f"b_{mode} readouts (HF)"] = b_pilot * 3 * 2 * ro_s / 3600
+        for arm in T.B_ARMS:
+            src = f"b_{mode}_{arm}" if f"b_{mode}_{arm}" in gen else f"b_{mode}_debate"
+            L["4 B full"][f"b_{mode}_{arm}"] = hours(src, b_full * 3)
+        L["4 B full"][f"b_{mode} readouts (HF)"] = b_full * 3 * len(T.B_ARMS) * ro_s / 3600
+    out = {k: {"items_gpu_hours": {i: round(h, 3) for i, h in v.items()}, "gpu_hours": round(sum(v.values()) + overhead_h, 2),
+               "units": round((sum(v.values()) + overhead_h) * units_per_hour, 1)} for k, v in L.items()}
+    s_qt_tok = gen.get("bank_qwen_t", 1.0)
+    cov = {}
+    for arm, (_, spec) in T.ARMS.items():
+        # in qwen_t-sample units of GPU time: tokens / throughput, relative to one qwen_t bank sample
+        t = sum(k * gen.get(f"bank_{m}", 0.0) / thr[MODEL_OF.get(f"bank_{m}", "qwen")] for m, k in spec)
+        t += rates[arm] * 3 * gen.get(f"choose_{arm}", 0.0) / thr[MODEL_OF.get(f"choose_{arm}", "qwen")]
+        cov[arm] = round(t / (s_qt_tok / thr["qwen"]), 2)
+    return {"method": "tokens / max measured aggregate throughput", "throughput_tokens_per_s": thr,
+            "mean_generated_tokens": {k: round(v, 1) for k, v in gen.items()}, "call_rates_used": rates,
+            "smoke_call_rates": smoke_rates, "launches": out, "total_units": round(sum(v["units"] for v in out.values()), 1),
+            "p2_coverage_in_qwen_t_samples": cov, "assumptions": {"b_pilot_panels_per_mode": b_pilot,
+            "b_full_panels_per_mode_arm": b_full, "overhead_hours_per_launch": overhead_h, "qwen_t_samples": qwen_t_samples}}
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", required=True)
@@ -206,7 +274,7 @@ def main(argv=None) -> int:
     ap.add_argument("--prev", default=str(ROOT / "runs/judge_full"))
     ap.add_argument("--out", required=True)
     ap.add_argument("--units-per-hour", type=float, default=6.73)
-    ap.add_argument("--b-panels-full", type=int, default=300)
+    ap.add_argument("--b-panels-full", type=int, default=150)
     ap.add_argument("--b-pilot-panels", type=int, default=100)
     a = ap.parse_args(argv)
     root = Path(a.root)
@@ -219,12 +287,14 @@ def main(argv=None) -> int:
     r = {"parts": pp, "readouts": ro, "session": json.loads(sess.read_text()) if sess.exists() else None,
          "sanity": sanity(rows, Path(a.prev)) if (Path(a.prev) / "judge").exists() else None,
          "position_bias": position_bias(rows), "think_location": think_location(rows),
-         "pricing": price(pp, rows, a.units_per_hour, a.b_panels_full, a.b_pilot_panels, ro)}
+         "pricing": price(pp, rows, a.units_per_hour, a.b_panels_full, a.b_pilot_panels, ro),
+         "pricing_tokens": price_tokens(pp, rows, ro, a.units_per_hour, a.b_pilot_panels, a.b_panels_full)}
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
     (out / "smoke_report.json").write_text(json.dumps(r, indent=1, default=str))
-    print(json.dumps({"launches": {k: v["units"] for k, v in r["pricing"]["launches"].items()},
-                      "total_units": r["pricing"]["total_units"]}, default=str))
+    print(json.dumps({"per_request_seconds_pricing": {k: v["units"] for k, v in r["pricing"]["launches"].items()},
+                      "token_pricing": {k: v["units"] for k, v in r["pricing_tokens"]["launches"].items()},
+                      "token_total": r["pricing_tokens"]["total_units"]}, default=str))
     return 0
 
 

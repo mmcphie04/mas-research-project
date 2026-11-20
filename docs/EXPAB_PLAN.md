@@ -346,3 +346,92 @@ anything, high.
      from 5 to 8 samples. Otherwise that arm's matched-seconds self-consistency point lies beyond
      the 5-sample curve.
 5. `test_bank_requests_use_the_main_protocol` is skipped when `runs/main250` is absent.
+
+## Stop 2: GPU smoke test results and re-pricing (2026-11-20)
+
+**Run.**
+
+- Two attempts, **2.95 units** of the 4-unit cap, balance 244.12. The runtime stopped
+  automatically both times.
+- Attempt 1 ran out of GPU memory in vLLM's start-up profiling of Gemma-3-12B (fixed in `812ec0f`).
+- Attempt 2 was trimmed to fit the remaining cap: 10 development questions per model and mode,
+  5 B panels per mode, 5 judge events, 10 sanity questions.
+- Report: `artifacts/expab/smoke/smoke_report.json`.
+
+| measured | Gemma-3-12B | Qwen3-8B, no thinking | Qwen3-8B, thinking |
+|---|---|---|---|
+| aggregate tokens/s, bank call | 689 (100 sequences) | 943 (100) | 1,567 (50) |
+| per-sequence decode, small calls | ~26–32 | ~40–60 | ~37–50 |
+| peak GPU memory (vLLM step) | 33.6 GB (KV cache 8.4 GiB) | 34.7 GB (KV 16.6 GiB) | (same process) |
+| parse rate (bank / sanity / B) | 1.00 / 1.00 / — | 1.00 / 1.00 / 1.00 | 1.00 / — / 1.00 |
+| mean generated tokens (bank) | 232 | 213 | 797 (thinking 727 + visible 99) |
+| thinking-cap rate | — | — | bank 0/50, choosers 0/42, judge traces 0/10, judge own 1/15 |
+| answer-cap rate | 0 | 0 | 0 with the visible rationale (mean 99 tokens) and 0 without (11 tokens) |
+| context refusals | 0 | 0 | 0 |
+
+**Other measurements.**
+
+- HF readouts: peak 17.1 GB; about 0.70 s per thinking B row (with curves), 0.13 s per
+  non-thinking row, 0.15 s per judge readout.
+- Qwen3-8B's `<think>` is **always generated, never in the rendered prompt** (all thinking rows).
+- **Chooser picks parse 100%** (every arm); the thinking choosers' visible answer is just
+  "Best candidate: N".
+- **Position bias** on the smoke questions (6–15 runs per arm, too few to read): the share picking
+  the first position is near 1/m for most arms. The thinking self-chooser A1_qt5 picked first in 7
+  of 9 runs against 4.5 expected.
+- **Sanity: vLLM against HF,** same protocol and questions, 10 questions × 3 samples:
+
+  | | parse | mean tokens | accuracy |
+  |---|---|---|---|
+  | Gemma | 1.00 / 1.00 | 290 / 351 | 0.37 / 0.47, difference −0.10 [−0.33, +0.07] |
+  | Qwen3, no thinking | 1.00 / 1.00 | 231 / 257 | 0.47 / 0.47 |
+
+  Accuracy is within noise. vLLM's responses ran 10–17% shorter in both. That is not significant
+  at 30 samples but is worth watching in the bank.
+
+**Re-pricing.**
+
+- The smoke calls were small (6–100 requests), so seconds per request there measure latency, not
+  throughput. Pricing by seconds per request gives 131 units in all, mostly an artefact for the
+  choosers' 6–15-request calls.
+- **Token-based pricing** (`smoke_report.price_tokens`):
+  - the measured mean generated tokens per request, times the full request counts;
+  - divided by the highest aggregate throughput measured per model. Full runs keep up to 128
+    sequences busy, so this errs toward overpricing;
+  - plus measured readout seconds and 0.3 h of overhead per launch;
+  - chooser call rates: the larger of the smoke rate and main250's disagreement rate (pools of 5:
+    0.40; 10: 0.47; mixed: 0.55).
+
+**P2 coverage.** Each arm's measured cost per question, in units of one thinking-bank sample (in
+GPU time):
+
+| A1_qt5 | A1_g10 | A3 | A2_10 | A1_g5 | A2_5 | A1_qnt10 | A1_qnt5 |
+|---|---|---|---|---|---|---|---|
+| 7.9 | 7.7 | 7.3 | 4.8 | 4.2 | 4.0 | 2.9 | 1.6 |
+
+- Several arms exceed 4, so **the thinking bank goes to 8 samples** (already in launch 1's price).
+- A1_qt5, at 7.9, sits at the edge of an 8-sample curve; 10 samples would add about 2.9 units.
+- Arms whose pool is 10 samples also exceed their own chooser's 10-sample curve by construction.
+  P2 then uses the curve's end value, flagged as pre-registered.
+
+| launch | content | estimate | proposed cap |
+|---|---|---|---|
+| **1** | bank (Gemma ×10, Qwen non-thinking ×10, **Qwen thinking ×8**) on all 1,500 + judge confirmation (606 traces, 447 own answers, readouts) | 4.2 h, **28.4 units** | **36** |
+| **2** | B pilot: up to 100 disputed development panels per mode, debate + alone, with readouts | 0.55 h, **3.7 units** | **6** |
+| 3 | all 8 chooser arms on all 1,500 (3 runs where the pool disagrees) | 3.0 h, **20.3 units** | 27 |
+| 4 | B full: 4 arms × 2 modes × 150 panels, with readouts (re-sized after the pilot) | 1.0 h, **6.9 units** | 12 |
+| | **total** | **≈ 59 units** | **81** (≤ 200; ~160 in reserve) |
+
+**Issue for Experiment B: panel supply.**
+
+- On the 10 smoke questions, only 1 of 10 first-3 panels per mode was disputed (all three parsed,
+  not unanimous).
+- At that rate the 600 development questions give about 60 pilot panels per mode, short of 100.
+  The 900 held-out questions give about 90 per mode, which may fall short of 150 helpful+harmful
+  events per mode × arm.
+- **Proposal (no outcome involved; disputedness uses no gold answer):** also form panels from
+  disjoint later sample triples, counted after launch 1:
+  - Qwen non-thinking: samples 0–2, 3–5, 6–8, i.e. 3 per question;
+  - Qwen thinking at 8 samples: 0–2 and 3–5.
+- That needs a plan amendment before the pilot. Otherwise the pilot simply uses every disputed
+  development panel available.

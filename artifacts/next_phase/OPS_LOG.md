@@ -120,3 +120,16 @@ down (~09:50); the runtime job was unaffected, but nothing would have stopped an
 | 21:13 | gemma_own finished (all 5 steps exit 0); all steps fetched (balance 147.62) |
 | 21:16 | wind-down at balance 147.07 (≤ 146.92 + 0.6): final fetch (553 KB, hash checked), **runtime stopped** (first attempt); nothing incomplete. Full run: **17.85 units** (164.92 → 147.07; cap 18; a little may still post) |
 | 21:19 | judge outputs on Google Drive (`mas_research_backup/judge`, 25 files, 0 differences); analysis run as committed: `artifacts/revision_gate/judge/results.md` |
+
+## 2026-11-20: Experiments A/B GPU smoke test (approved; cap 4 units, stop line 243.07)
+
+| time | event |
+|---|---|
+| 16:20 | balance 247.07; session `smoke` (A100); setup at `90f72e9`; Colab's system torch is now 2.14.1+cu130 (transformers 5.17.0) |
+| 16:21 | `setup_vllm.py` failed: Colab's Python has no ensurepip (`python -m venv`); fixed to use uv (`6fb0e1a`), runtime checkout moved to it |
+| 16:22–16:27 | separate vLLM environment: vllm 0.33.0, torch 2.14.0+cu130, CUDA 13.0 available, transformers 5.20.2 |
+| 16:27–16:31 | attempt 1: the Gemma step ran out of GPU memory in vLLM's start-up profiling (23.3 GiB weights loaded; multimodal encoder profiling + native top-k/top-p sampling, no FlashInfer kernels); session ended at that step; supervisor backed up, verified and **stopped the runtime** (16:31:55) |
+| 16:32–16:34 | fix (`812ec0f`): text-only Gemma (`limit_mm_per_prompt` image 0), max_num_seqs 128, gpu_memory_utilization 0.85, no expandable-segments setting for vLLM steps, FlashInfer kernels best-effort; smoke trimmed (10 questions per model/mode, 5 B panels, 5 judge events) to fit the remaining cap |
+| 16:34–16:40 | attempt 2: session `smoke2`; vLLM 0.33.0 environment with FlashInfer kernels installed; launched 16:40 |
+| 16:40–16:55 | gemma step 268 s (peak 33.6 GB; KV cache 8.4 GiB), qwen step 522 s (peak 34.7 GB; KV 16.6 GiB), HF readouts 43 s (peak 17.1 GB): all exit 0; every chunk backed up, verified locally and on Google Drive; **runtime stopped** 16:55:37; nothing incomplete |
+| 16:57 | balance 244.12: smoke total **2.95 units** of the 4-unit cap (both attempts) |
