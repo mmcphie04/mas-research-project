@@ -62,8 +62,9 @@ def load(root: Path, job: str) -> tuple[pd.DataFrame, pd.DataFrame]:
     frames = []
     for p in parts:
         r = A.read_rows(root, job, p)
-        mode = "qwen_t" if p.startswith("b_qwen_t_") else "qwen_nt"  # part = b_<mode>_<arm>
-        arm = p[len(f"b_{mode}_"):]
+        base = p.split("__")[0]  # part = b_<mode>_<arm>[__<split>[_<tag>]]
+        mode = "qwen_t" if base.startswith("b_qwen_t_") else "qwen_nt"
+        arm = base[len(f"b_{mode}_"):]
         ro = A.read_rows(root, job, f"{p}_ro")
         if len(ro):
             r = r.merge(ro, on="request_id", how="left")
@@ -81,7 +82,7 @@ def summary(df: pd.DataFrame, calls: pd.DataFrame, units_per_hour: float) -> dic
         k = g.kind.value_counts()
         panels = g.panel.nunique()
         hh = int(k.get("helpful", 0) + k.get("harmful", 0))
-        secs = float(calls[calls.part == g._part.iloc[0]].seconds.sum()) if len(calls) else 0.0
+        secs = float(calls[calls.part.isin(set(g._part))].seconds.sum()) if len(calls) else 0.0
         valid = g[g.kind != "unparsed"]
         per_panel_hh = hh / panels if panels else 0.0
         need = math.ceil(TARGET_HH / per_panel_hh) if per_panel_hh else None

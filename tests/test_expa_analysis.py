@@ -39,7 +39,7 @@ def test_analysis_invariants_on_the_stub(tmp_path):
         assert G.main(["--task", "choose", "--arm", arm, *base]) == 0
     r = X.run(tmp_path, "x", ROOT / "artifacts/expab/plan")
     assert r["headline_arm"] in {"A1_qt5", "A1_qnt10", "A2_5", "A3"}
-    for arm, v in r["heldout"].items():
+    for v in r["heldout"].values():
         d = v["decomposition"]
         assert math.isclose(d["R_recovery"] + d["I_new_correct"] - d["L_damage"], d["net"], abs_tol=1e-9)
         assert math.isclose(v["P1_minus_pool_plurality"]["mean"], v["accuracy"]["mean"] - v["pool_plurality"]["mean"], abs_tol=1e-9)

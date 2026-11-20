@@ -73,10 +73,12 @@ def sc_curve(answers: list[int], gold: int, n_max: int) -> np.ndarray:
 def costs(calls: pd.DataFrame, rows: pd.DataFrame) -> dict:
     """part -> {"seconds": per request, "tokens": per request}."""
     out = {}
-    for part, c in calls.groupby("part"):
-        r = rows[rows._part == part]
+    calls = calls.assign(base=calls.part.str.split("__").str[0])
+    rows = rows.assign(base=rows._part.str.split("__").str[0])
+    for base, c in calls.groupby("base"):  # every split / tag of a part pooled (e.g. bank_gemma__dev + __heldout)
+        r = rows[rows.base == base]
         n = max(len(r), 1)
-        out[part] = {"seconds": float(c.seconds.sum()) / n,
+        out[base] = {"seconds": float(c.seconds.sum()) / n,
                      "tokens": float((r.prompt_tokens + r.generated_tokens).mean()) if len(r) else 0.0}
     return out
 

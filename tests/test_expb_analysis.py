@@ -33,7 +33,7 @@ def test_pipeline_on_the_stub(tmp_path):
         assert G.main(["--task", "bank", "--mode", mode, *base]) == 0
         assert G.main(["--task", "b", "--mode", mode, "--arms", "debate", "alone", "dissent", "anon", "--n-panels", "6", *base]) == 0
     assert H.main(["--task", "b", "--out-root", str(tmp_path), "--job", "x", "--fake",
-                   "--parts", *[f"b_{m}_{a}" for m in ("qwen_nt", "qwen_t") for a in ("debate", "alone", "dissent", "anon")]]) == 0
+                   "--parts", *[f"b_{m}_{a}__dev" for m in ("qwen_nt", "qwen_t") for a in ("debate", "alone", "dissent", "anon")]]) == 0
     assert B.main(["--root", str(tmp_path), "--job", "x", "--out", str(tmp_path / "an"), "--pilot"]) == 0
     assert B.main(["--root", str(tmp_path), "--job", "x", "--out", str(tmp_path / "an")]) == 0
     r = json.loads((tmp_path / "an" / "expb_results.json").read_text())

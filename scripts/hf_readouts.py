@@ -93,7 +93,7 @@ def main(argv=None) -> int:
         rows, acts = [], []
         t0 = time.time()
         for q in dev:
-            letter = "ABCDEFGHIJ"[int(rng.integers(0, q.n_options))]
+            letter = "ABCD"[int(rng.integers(0, min(4, q.n_options)))]  # A-D: ~12 contexts per letter
             msgs = RO.positive_control_messages(T.round0(q), letter)
             text = tok.apply_chat_template(msgs, tokenize=False, add_generation_prompt=True, **(mode.template_kwargs or {}))
             row = {"request_id": f"{q.question_id}|posctl", "prompt_ids": RO.enc(tok, text), "gen_ids": [],

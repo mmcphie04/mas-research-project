@@ -47,21 +47,21 @@ def test_readouts_end_to_end_on_the_stub(tmp_path):
         assert G.main(["--task", "bank", "--mode", mode, *base]) == 0
         assert G.main(["--task", "b", "--mode", mode, "--arms", "debate", "--n-panels", "2", *base]) == 0
     assert H.main(["--task", "b", "--out-root", str(tmp_path), "--job", "x", "--fake",
-                   "--parts", "b_qwen_nt_debate", "b_qwen_t_debate"]) == 0
-    ro_t = A.read_rows(tmp_path, "x", "b_qwen_t_debate_ro")
-    ro_nt = A.read_rows(tmp_path, "x", "b_qwen_nt_debate_ro")
-    gen = A.read_rows(tmp_path, "x", "b_qwen_t_debate")
+                   "--parts", "b_qwen_nt_debate__dev", "b_qwen_t_debate__dev"]) == 0
+    ro_t = A.read_rows(tmp_path, "x", "b_qwen_t_debate__dev_ro")
+    ro_nt = A.read_rows(tmp_path, "x", "b_qwen_nt_debate__dev_ro")
+    gen = A.read_rows(tmp_path, "x", "b_qwen_t_debate__dev")
     assert len(ro_t) == len(gen) and set(ro_t.request_id) == set(gen.request_id)
     assert all(len(c) == 6 for c in ro_t.curve_logprobs) and "curve_logprobs" not in ro_nt.columns
     assert ro_t.b_letter_aligned.all() and (ro_t.b_letter_offset > 0).all()
-    d = next(tmp_path.glob("x-b_qwen_t_debate_ro-c*"))
+    d = next(tmp_path.glob("x-b_qwen_t_debate__dev_ro-c*"))
     acts = np.load(d / "acts.npy")
     assert acts.shape == (len(pd.read_parquet(d / "rows.parquet")), 2, 3, 8)  # one per row: [A, B] x 3 layers
     assert acts.dtype == np.float16 and A.verify_job(tmp_path, "x")["missing"] == []
     # resume: nothing recomputed
-    n = len(list(tmp_path.glob("x-b_qwen_t_debate_ro-c*")))
-    assert H.main(["--task", "b", "--out-root", str(tmp_path), "--job", "x", "--fake", "--parts", "b_qwen_t_debate"]) == 0
-    assert len(list(tmp_path.glob("x-b_qwen_t_debate_ro-c*"))) == n
+    n = len(list(tmp_path.glob("x-b_qwen_t_debate__dev_ro-c*")))
+    assert H.main(["--task", "b", "--out-root", str(tmp_path), "--job", "x", "--fake", "--parts", "b_qwen_t_debate__dev"]) == 0
+    assert len(list(tmp_path.glob("x-b_qwen_t_debate__dev_ro-c*"))) == n
     assert H.main(["--task", "posctl", "--out-root", str(tmp_path), "--job", "x", "--fake", "--n-posctl", "5"]) == 0
     pc = A.read_rows(tmp_path, "x", "posctl_qwen_t")
     assert len(pc) == 5 and pc.instructed.between(0, 9).all() and "curve_logprobs" not in pc.columns

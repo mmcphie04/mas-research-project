@@ -79,7 +79,15 @@ def run_part(args, out_root, job, part, mode, batches, info, answer=True, post=N
     """batches: list of request lists (one chunk each)."""
     update_job(out_root, job, part, len(batches), {**info, "mode": mode.name, "repo_id": mode.repo_id,
                                                    "template_hashes": PA.TEMPLATE_HASHES, "code": code_commit()})
-    todo = [i for i in range(len(batches)) if not is_complete(A.chunk_dir(out_root, job, part, i))]
+    todo = []
+    for i in range(len(batches)):
+        d = A.chunk_dir(out_root, job, part, i)
+        if not is_complete(d):
+            todo.append(i)
+            continue
+        have = json.loads((d / "manifest.json").read_text()).get("question_ids")
+        if have != sorted({r.question_id for r in batches[i]}):  # a different selection under the same name
+            raise SystemExit(f"{d.name} is complete but holds other questions; refusing to resume into it")
     if not todo:
         return
     lens = prompt_lengths(args.engine, mode, [r for i in todo for r in batches[i]])
@@ -96,6 +104,14 @@ def run_part(args, out_root, job, part, mode, batches, info, answer=True, post=N
                                        "time": time.strftime("%Y-%m-%dT%H:%M:%S%z")})
         print(f"[{time.strftime('%H:%M:%S')}] {part} chunk {i}: {len(rows)} rows, "
               f"{sum(c['seconds'] for c in calls):.1f}s", flush=True)
+
+
+def part_name(base: str, split: str, tag: str | None) -> str:
+    """``base`` for the whole set; ``base__<split>[_<tag>]`` otherwise, so a split (or a pilot)
+    run separately never shares chunk names with another selection."""
+    if split == "all" and not tag:
+        return base
+    return f"{base}__{split}" + (f"_{tag}" if tag else "")
 
 
 def select(qs, assign, split, limit):
@@ -121,6 +137,7 @@ def main(argv=None) -> int:
     ap.add_argument("--bank-job", default=None)
     ap.add_argument("--chunk", type=int, default=50, help="questions per chunk")
     ap.add_argument("--engine", default="vllm", choices=["vllm", "stub"])
+    ap.add_argument("--tag", default=None, help="suffix for the part names, e.g. pilot or smoke")
     a = ap.parse_args(argv)
     out = Path(a.out_root)
     out.mkdir(parents=True, exist_ok=True)
@@ -133,7 +150,7 @@ def main(argv=None) -> int:
     if a.task == "bank":
         mode = E.MODES[a.mode]
         batches = [T.bank_requests(c, a.mode, a.samples) for c in chunks(qsel, a.chunk)]
-        run_part(a, out, a.job, f"bank_{a.mode}", mode, batches, {**plan_info, "samples": a.samples or T.BANK[a.mode]})
+        run_part(a, out, a.job, part_name(f"bank_{a.mode}", a.split, a.tag), mode, batches, {**plan_info, "samples": a.samples or T.BANK[a.mode]})
     elif a.task == "choose":
         chooser, spec = T.ARMS[a.arm]
         bank = T.bank_index(A.read_rows(a.bank_root or out, a.bank_job or a.job))
@@ -150,7 +167,7 @@ def main(argv=None) -> int:
                 pos = T.parse_pick(r["text"], r["meta_m"])
                 r["pick_position"], r["pick_answer"] = pos, (order[pos - 1] if pos > 0 else -1)
             return rows
-        run_part(a, out, a.job, f"choose_{a.arm}", E.MODES[chooser], batches,
+        run_part(a, out, a.job, part_name(f"choose_{a.arm}", a.split, a.tag), E.MODES[chooser], batches,
                  {**plan_info, "arm": a.arm, "pool": spec, "questions_with_disagreement": len(reqs)}, post=post)
     elif a.task == "b":
         bank = T.bank_index(A.read_rows(a.bank_root or out, a.bank_job or a.job))
@@ -159,7 +176,7 @@ def main(argv=None) -> int:
         for arm in a.arms:
             reqs = [T.b_requests(byq[i], a.mode, T.panel(bank, a.mode, i), arm) for i in ids]
             batches = [[r for g in c for r in g] for c in chunks(reqs, a.chunk)]
-            run_part(a, out, a.job, f"b_{a.mode}_{arm}", E.MODES[a.mode], batches,
+            run_part(a, out, a.job, part_name(f"b_{a.mode}_{arm}", a.split, a.tag), E.MODES[a.mode], batches,
                      {**plan_info, "arm": arm, "panels": len(ids), "panel_seed": a.panel_seed})
     elif a.task == "judge":
         rec = json.loads(JUDGE_EVENTS.read_text())
@@ -171,8 +188,8 @@ def main(argv=None) -> int:
         own = [r for r in reqs if r.condition.endswith("/own")]
         mode = E.MODES["qwen_t_judge"]
         info = {"events_sha256": rec["sha256"], "events": len(events), "questions": len(questions)}
-        run_part(a, out, a.job, "judge_traces", mode, chunks(judge, a.chunk * 2), info, answer=False)
-        run_part(a, out, a.job, "judge_own", mode, chunks(own, a.chunk * 3), info, answer=True)
+        run_part(a, out, a.job, part_name("judge_traces", "all", a.tag), mode, chunks(judge, a.chunk * 2), info, answer=False)
+        run_part(a, out, a.job, part_name("judge_own", "all", a.tag), mode, chunks(own, a.chunk * 3), info, answer=True)
     return 0
 
 
