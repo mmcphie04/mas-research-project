@@ -41,6 +41,7 @@ def test_question_set_is_checked_and_split(qs):
     assert all(0 <= T.gold_display(x) < x.n_options for x in allq[:50])
 
 
+@pytest.mark.skipif(not (ROOT / "runs/main250").exists(), reason="needs the main250 archive (runs/main250)")
 def test_bank_requests_use_the_main_protocol(qs):
     q, _ = qs
     r = T.bank_requests(q[:2], "qwen_t")

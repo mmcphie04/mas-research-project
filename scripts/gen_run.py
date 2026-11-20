@@ -149,8 +149,9 @@ def main(argv=None) -> int:
     ap.add_argument("--chunk", type=int, default=50, help="questions per chunk")
     ap.add_argument("--engine", default="vllm", choices=["vllm", "stub"])
     ap.add_argument("--tag", default=None, help="suffix for the part names, e.g. pilot or smoke")
-    ap.add_argument("--visible-rationale", action="store_true",
-                    help="thinking mode: ask for a visible rationale after thinking (prompts_ab.VISIBLE_RATIONALE)")
+    ap.add_argument("--no-visible-rationale", dest="visible_rationale", action="store_false",
+                    help="thinking mode: do NOT ask for a visible rationale after thinking. Default (decision D1): "
+                         "the qwen_t bank and Experiment B ask for it (prompts_ab.VISIBLE_RATIONALE)")
     a = ap.parse_args(argv)
     out = Path(a.out_root)
     out.mkdir(parents=True, exist_ok=True)

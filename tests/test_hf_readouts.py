@@ -76,3 +76,54 @@ def test_judge_and_own_readouts_on_the_stub(tmp_path):
     o = A.read_rows(tmp_path, "j", "judge_own_ro")
     assert len(j) == 4 and np.allclose(j.p1 + j.p2, 1) and len(o) == 6
     assert all(len(x) == y for x, y in zip(o.readout_logprobs, A.read_rows(tmp_path, "j", "judge_own").n_options, strict=True))
+
+
+class Recorder:
+    """Fake model that records every sequence it is given."""
+
+    def __init__(self):
+        self.seqs = []
+
+    def forward(self, ids, positions, layers):
+        self.seqs.append(list(ids))
+        return {p: {layer: np.zeros(4) for layer in layers} for p in positions}, np.zeros(10)
+
+    def letters(self, final, n):
+        return np.full(n, -np.log(n))
+
+
+def test_curves_and_commitments_are_well_formed():
+    tok = StubTokenizer()
+    prompt = tok.encode("<|user|>Q\n<|assistant|>")
+    answer = tok.encode("Because.\nAnswer: (B)\nConfidence: 70")
+    for generated_open in (True, False):  # the model generated "<think>\n" itself, or not
+        trace = tok.encode(("<think>\n" if generated_open else "") + "step one. step two.")
+        cont = trace + tok.encode("\n</think>\n\n")
+        row = {"request_id": "r", "prompt_ids": prompt, "gen_ids": cont + answer, "answer_tokens": len(answer),
+               "thinking_tokens": len(trace), "n_options": 4}
+        R = Recorder()
+        rec, _ = RO.b_row(R, tok, row, thinking=True)
+        texts = [tok.decode(s) for s in R.seqs]
+        curve = [t for t in texts if t.endswith("\n</think>\n\nFinal answer: (")]
+        assert len(curve) == 6
+        for t in curve:  # every point, including 0%, opens the think block exactly once and closes it
+            body = t[len(tok.decode(prompt)):]
+            assert body.startswith("<think>\n") and body.count("<think>") == 1 and body.count("</think>") == 1
+        assert curve[0] == tok.decode(prompt) + "<think>\n" + "\n</think>\n\nFinal answer: ("
+        assert curve[-1].endswith("step one. step two.\n</think>\n\nFinal answer: (")
+        assert rec["trace_began_with_think"] is generated_open
+        closed = [t for t in texts if t.endswith("<think>\n\n</think>\n\n\nFinal answer: (")]
+        assert len(closed) == 1 and "commit_closed_logprobs" in rec
+    # a template that already opens thinking: no second opening
+    opened = prompt + tok.encode("<think>\n")
+    assert RO.open_think(tok, opened) == opened and RO.open_think(tok, prompt) == opened
+
+
+def test_nonthinking_commitments_coincide():
+    tok = StubTokenizer()
+    prompt = tok.encode("<|user|>Q\n<|assistant|><think>\n\n</think>\n\n")
+    answer = tok.encode("Answer: (A)")
+    R = Recorder()
+    rec, _ = RO.b_row(R, tok, {"request_id": "r", "prompt_ids": prompt, "gen_ids": answer, "answer_tokens": len(answer),
+                               "thinking_tokens": 0, "n_options": 4}, thinking=False)
+    assert rec["commit_closed_logprobs"] == rec["commit_logprobs"] and "curve_logprobs" not in rec

@@ -1,5 +1,5 @@
 {
- "note": "GPU smoke test (docs/EXPAB_PLAN.md section 6): 20 development questions per model and mode, the chooser arms, B (debate + alone, 10 disputed panels per mode), the judge confirmation (10 events, 10 own-answer questions), a like-for-like vLLM-vs-HF sanity check on 20 judge questions, then the HF readouts. Tagged 'smoke' so no part name collides with the real runs. Also a Qwen3-thinking bank with --visible-rationale (tag smokevis) on the same 20 questions, for the decision on what thinking-mode peers and choosers see.",
+ "note": "GPU smoke test (docs/EXPAB_PLAN.md section 6): 20 development questions per model and mode, the chooser arms, B (debate + alone, 10 disputed panels per mode), the judge confirmation (10 events, 10 own-answer questions), a like-for-like vLLM-vs-HF sanity check on 20 judge questions, then the HF readouts. Tagged 'smoke' so no part name collides with the real runs. The thinking bank and B use the visible rationale (D1, on by default); a variant WITHOUT it (tag smokenovis) on the same 20 questions measures the answer-cap rate of both. qwen_t answer cap 700.",
  "steps": [
   {
    "name": "bank_gemma",
@@ -96,7 +96,7 @@
    ]
   },
   {
-   "name": "bank_qwen_t_vis",
+   "name": "bank_qwen_t_novis",
    "env": "vllm",
    "script": "gen_run.py",
    "args": [
@@ -111,8 +111,8 @@
     "--chunk",
     "20",
     "--tag",
-    "smokevis",
-    "--visible-rationale"
+    "smokenovis",
+    "--no-visible-rationale"
    ]
   },
   {

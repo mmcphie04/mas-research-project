@@ -29,7 +29,29 @@ LAYERS = (14, 22, 31)
 FRACTIONS = (0.0, 0.1, 0.25, 0.5, 0.75, 1.0)
 MENTION_RE = re.compile(r"\(([A-J])\)|\b(?:option|answer|choice)\s*\(?([A-J])\b", re.IGNORECASE)
 THINK_OPEN = "<think>\n"
+CLOSED_EMPTY = "<think>\n\n</think>\n\n"  # the non-thinking template's empty block: a cross-mode commitment
 CLOSE_THEN_ASK = "\n</think>\n\nFinal answer: ("
+
+
+def ends_with(seq: list[int], tail: list[int]) -> bool:
+    return len(tail) > 0 and list(seq[-len(tail):]) == list(tail)
+
+
+def open_think(tok, prompt_ids) -> list[int]:
+    """The prompt followed by an open think block -- unless the rendered prompt already ends with
+    one (a template that opens thinking itself)."""
+    p, op = list(prompt_ids), enc(tok, THINK_OPEN)
+    return p if ends_with(p, op) else p + op
+
+
+def trace_body(tok, trace: list[int]) -> list[int]:
+    """The reasoning tokens of a trace without its leading ``<think>`` / ``<think>\n`` (if the
+    model generated the opening itself)."""
+    op = enc(tok, THINK_OPEN)
+    if list(trace[: len(op)]) == op:
+        return list(trace[len(op):])
+    tid = tok.convert_tokens_to_ids("<think>")
+    return list(trace[1:]) if trace and trace[0] == tid else list(trace)
 
 
 def enc(tok, text: str) -> list[int]:
@@ -72,11 +94,21 @@ def letters_after_answer(R, tok, row) -> dict:
 
 
 def b_row(R, tok, row, thinking: bool, layers=LAYERS, curves: bool | None = None) -> tuple[dict, np.ndarray]:
-    """Commitment readout + activations at A and B, and (thinking) the answer-prediction curve.
-    Returns (record, activations[2, len(layers), d]); missing B (no stated answer) is NaN."""
-    prompt = list(row["prompt_ids"]) + (enc(tok, THINK_OPEN) if thinking else [])
+    """Commitment readouts + activations at A and B, and (thinking) the answer-prediction curve.
+    Returns (record, activations[2, len(layers), d]); missing B (no stated answer) is NaN.
+
+    Commitment: ``commit_closed_logprobs`` -- the prompt + a CLOSED empty think block + READOUT_SUFFIX
+    (for non-thinking rows the template already ends with that block) -- is the primary cross-mode
+    measure; ``commit_logprobs`` (thinking rows: the OPEN think block, "at the start of the
+    thinking"; non-thinking rows: identical to the closed one) is secondary."""
+    prompt = open_think(tok, row["prompt_ids"]) if thinking else list(row["prompt_ids"])
     acts_a, final = R.forward(prompt + enc(tok, READOUT_SUFFIX), [len(prompt) - 1], layers)
     commit = R.letters(final, row["n_options"])
+    if thinking:
+        _, fin_c = R.forward(list(row["prompt_ids"]) + enc(tok, CLOSED_EMPTY) + enc(tok, READOUT_SUFFIX), [], [])
+        commit_closed = R.letters(fin_c, row["n_options"])
+    else:
+        commit_closed = commit
     gen = list(row["gen_ids"])
     n_ans = int(row["answer_tokens"])
     ans_ids = gen[len(gen) - n_ans:] if n_ans else []
@@ -88,17 +120,23 @@ def b_row(R, tok, row, thinking: bool, layers=LAYERS, curves: bool | None = None
         acts_b, _ = R.forward(pre, [len(pre) - 1], layers)
         vec_b = np.stack([acts_b[len(pre) - 1][layer] for layer in layers])
     rec = {"request_id": row["request_id"], "commit_logprobs": [round(float(x), 5) for x in commit],
+           "commit_closed_logprobs": [round(float(x), 5) for x in commit_closed],
            "b_letter_offset": k, "b_letter_aligned": bool(aligned)}
     if thinking if curves is None else curves:
+        # cut the reasoning BODY; the open marker is always present once (from the prompt or added),
+        # so every point -- including 0% -- is a well-formed open-then-closed think block
         trace = gen[: int(row["thinking_tokens"])]
+        body = trace_body(tok, trace)
+        head = open_think(tok, row["prompt_ids"])
         curve, mentioned = [], []
         for f in FRACTIONS:
-            kf = int(round(f * len(trace)))
-            seq = list(row["prompt_ids"]) + trace[:kf] + enc(tok, CLOSE_THEN_ASK)
+            kf = int(round(f * len(body)))
+            seq = head + body[:kf] + enc(tok, CLOSE_THEN_ASK)
             _, fin = R.forward(seq, [], [])
             curve.append([round(float(x), 5) for x in R.letters(fin, row["n_options"])])
-            mentioned.append(bool(MENTION_RE.search(tok.decode(trace[:kf], skip_special_tokens=True))))
-        rec.update({"curve_fractions": list(FRACTIONS), "curve_logprobs": curve, "curve_letter_mentioned": mentioned})
+            mentioned.append(bool(MENTION_RE.search(tok.decode(body[:kf], skip_special_tokens=True))))
+        rec.update({"curve_fractions": list(FRACTIONS), "curve_logprobs": curve, "curve_letter_mentioned": mentioned,
+                    "trace_began_with_think": len(body) != len(trace)})
     return rec, np.stack([vec_a, vec_b]).astype(np.float16)
 
 

@@ -56,7 +56,8 @@ THINK = Sampling(temperature=0.6, top_p=0.95, top_k=20, repetition_penalty=1.0)
 MODES = {
     "gemma": Mode("gemma", "google/gemma-3-12b-it", False, None, NONTHINK, max_tokens=1280),
     "qwen_nt": Mode("qwen_nt", "Qwen/Qwen3-8B", False, {"enable_thinking": False}, NONTHINK, max_tokens=1280),
-    "qwen_t": Mode("qwen_t", "Qwen/Qwen3-8B", True, {"enable_thinking": True}, THINK, think_cap=4096, answer_cap=400),
+    # answer cap 700 (raised from 400 on review): room for the visible rationale (D1) + the two lines
+    "qwen_t": Mode("qwen_t", "Qwen/Qwen3-8B", True, {"enable_thinking": True}, THINK, think_cap=4096, answer_cap=700),
     # the judge confirmation (docs/REVISION_JUDGE_PLAN.md): the judge's own protocol, unchanged
     "qwen_t_judge": Mode("qwen_t_judge", "Qwen/Qwen3-8B", True, {"enable_thinking": True}, THINK, think_cap=2000,
                          answer_cap=1280, answer_sampling=NONTHINK),
@@ -286,6 +287,7 @@ def run_requests(engine: Engine, mode: Mode, reqs: list[Request], answer: bool =
     think = {}
     if mode.thinking:
         end = tok.convert_tokens_to_ids(THINK_END)
+        think_open = tok.convert_tokens_to_ids("<think>")
         cid, outs = call("think", ok, [prompts[i] for i in ok],
                          [GenParams(mode.sampling, mode.think_cap, seeds[i], [end, *engine.eos_ids]) for i in ok])
         nl, close = tok.encode("\n\n"), tok.encode("\n" + THINK_END)
@@ -297,7 +299,9 @@ def run_requests(engine: Engine, mode: Mode, reqs: list[Request], answer: bool =
             eos_end = (not closed) and o.finish == "stop"
             capped = (not closed) and o.finish == "length"
             cont = trace + ([end] if closed else close) + nl
-            think[i] = {"trace": trace, "cont": cont, "closed": closed, "capped": capped, "eos": eos_end, "call": cid}
+            think[i] = {"trace": trace, "cont": cont, "closed": closed, "capped": capped, "eos": eos_end, "call": cid,
+                        # where Qwen3's <think> opening sits: in the rendered prompt, or generated
+                        "think_in_prompt": think_open in prompts[i][-4:], "think_in_generation": bool(trace) and trace[0] == think_open}
     ans = {}
     if answer:
         seqs = [prompts[i] + (think[i]["cont"] if mode.thinking else []) for i in ok]
@@ -320,6 +324,7 @@ def run_requests(engine: Engine, mode: Mode, reqs: list[Request], answer: bool =
             "generated_tokens": (len(th["trace"]) if th else 0) + (len(an["ids"]) if an else 0),
             "thinking_capped": bool(th and th["capped"]), "thinking_closed": bool(th and th["closed"]),
             "thinking_eos": bool(th and th["eos"]),
+            "think_in_prompt": bool(th and th["think_in_prompt"]), "think_in_generation": bool(th and th["think_in_generation"]),
             "answer_finish": an["finish"] if an else None,
             "answer": int(idx) if parsed else -1, "parsed": bool(parsed),
             "confidence": float(parse_confidence(text)) if an else float("nan"),

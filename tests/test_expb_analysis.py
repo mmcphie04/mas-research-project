@@ -42,6 +42,8 @@ def test_pipeline_on_the_stub(tmp_path):
     assert s["helpful"] + s["harmful"] + s["wrong_wrong"] <= s["agents"]
     assert {"qwen_nt: debate - alone", "qwen_t: anon - debate"} <= set(r["contrasts"])
     assert "qwen_t alone" not in r["order_effect"] and "qwen_nt anon" in r["order_effect"]
-    assert set(r["commitment"]["qwen_t debate"]) == {"unchanged", "changed"}
+    assert set(r["commitment"]["qwen_t debate"]) == {"primary_closed_think", "secondary_open_think"}
+    assert set(r["commitment"]["qwen_nt debate"]) == {"primary_closed_think"}
+    assert set(r["commitment"]["qwen_t debate"]["primary_closed_think"]) == {"unchanged", "changed"}
     cv = r["curves"].get("qwen_t debate", {})
     assert all(len(v["p_final_answer"]) == 6 for v in cv.values()) and "qwen_nt debate" not in r["curves"]

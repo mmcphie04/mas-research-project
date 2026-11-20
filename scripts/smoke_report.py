@@ -109,35 +109,92 @@ def disagreement_rates(rows: pd.DataFrame) -> dict:
             for arm, (_, spec) in T.ARMS.items() if {m for m, _ in spec} <= present}
 
 
-def price(pp: dict, rows: pd.DataFrame, units_per_hour: float, b_panels_full: int, b_pilot_panels: int) -> dict:
+def position_bias(rows: pd.DataFrame) -> dict:
+    out = {}
+    ch = rows[rows._part.map(base).str.startswith("choose_")]
+    for part, g in ch.groupby(ch._part.map(base)):
+        ok = g[g.pick_position > 0]
+        out[part] = {"runs": len(g), "parsed_picks": len(ok),
+                     "share_first": float((ok.pick_position == 1).mean()) if len(ok) else None,
+                     "expected_first": float((1 / ok.meta_m).mean()) if len(ok) else None,
+                     "share_last": float((ok.pick_position == ok.meta_m).mean()) if len(ok) else None}
+    return out
+
+
+def think_location(rows: pd.DataFrame) -> dict:
+    t = rows[rows.thinking_tokens > 0] if "thinking_tokens" in rows else rows.iloc[0:0]
+    return {p: {"rows": len(g), "think_in_prompt": float(g.think_in_prompt.mean()),
+                "think_in_generation": float(g.think_in_generation.mean())} for p, g in t.groupby("_part")}
+
+
+def seconds_per_request(pp: dict) -> dict:
     sec = {}
     for part, v in pp.items():
         sec.setdefault(base(part), []).append((v["seconds"], v["requests"]))
-    spr = {k: sum(s for s, _ in v) / max(sum(n for _, n in v), 1) for k, v in sec.items()}
-    lines = {}
+    return {k: sum(s for s, _ in v) / max(sum(n for _, n in v), 1) for k, v in sec.items()}
+
+
+def p2_coverage(spr: dict, rates: dict) -> dict:
+    """Each arm's measured cost per question in units of one qwen_t bank sample (and of its own
+    chooser's samples): its pool's samples + 3 chooser calls x the call rate."""
+    s_qt = spr.get("bank_qwen_t")
+    out = {}
+    for arm, (chooser, spec) in T.ARMS.items():
+        if f"choose_{arm}" not in spr or arm not in rates or not s_qt:
+            continue
+        pool = sum(k * spr.get(f"bank_{m}", 0.0) for m, k in spec)
+        ch = rates[arm] * 3 * spr[f"choose_{arm}"]
+        out[arm] = {"chooser": chooser, "call_rate": rates[arm], "seconds_per_question": pool + ch,
+                    "in_qwen_t_samples": (pool + ch) / s_qt,
+                    "in_own_chooser_samples": (pool + ch) / spr[f"bank_{chooser}"] if spr.get(f"bank_{chooser}") else None}
+    return out
+
+
+def price(pp: dict, rows: pd.DataFrame, units_per_hour: float, b_panels_full: int, b_pilot_panels: int,
+          ro: dict) -> dict:
+    """GPU-hours and units per LAUNCH (1: bank + judge confirmation; 2: B pilot; 3: choosers; 4: B
+    full), from measured seconds per request; plus SESSION_OVERHEAD_H per launch."""
+    spr = seconds_per_request(pp)
+    rates = disagreement_rates(rows)
+    s_ro = {base(k[:-3]) if k.endswith("_ro") else base(k): v["seconds_per_row"] for k, v in ro.items()}
+    s_ro_b = np.mean([v for k, v in s_ro.items() if k.startswith("b_")]) if any(k.startswith("b_") for k in s_ro) else 0.0
+    launches = {"1 bank + judge confirmation": {}, "2 B pilot": {}, "3 choosers": {}, "4 B full": {}}
     for k, n in FULL.items():
         if k in spr:
-            lines[k] = {"requests": n, "gpu_hours": n * spr[k] / 3600}
-    rates = disagreement_rates(rows)
+            launches["1 bank + judge confirmation"][k] = n * spr[k] / 3600
+    for k in ("judge_traces", "judge_own"):
+        if k in s_ro:
+            launches["1 bank + judge confirmation"][f"{k} readouts (HF)"] = FULL[k] * s_ro[k] / 3600
     for arm, rate in rates.items():
-        k = f"choose_{arm}"
-        if k in spr:
-            n = int(round(1500 * rate)) * 3
-            lines[k] = {"requests": n, "gpu_hours": n * spr[k] / 3600, "call_rate": rate}
+        if f"choose_{arm}" in spr:
+            launches["3 choosers"][f"choose_{arm}"] = int(round(1500 * rate)) * 3 * spr[f"choose_{arm}"] / 3600
     for mode in ("qwen_nt", "qwen_t"):
+        src = {arm: spr.get(f"b_{mode}_{arm}") or spr.get(f"b_{mode}_debate") for arm in T.B_ARMS}
+        for arm in ("debate", "alone"):
+            if src[arm]:
+                launches["2 B pilot"][f"b_{mode}_{arm}"] = b_pilot_panels * 3 * src[arm] / 3600
+        if s_ro_b:
+            launches["2 B pilot"][f"b_{mode} readouts (HF)"] = b_pilot_panels * 3 * 2 * s_ro_b / 3600
         for arm in T.B_ARMS:
-            k = f"b_{mode}_{arm}"
-            src = spr.get(k) or spr.get(f"b_{mode}_debate")
-            if src:
-                lines[f"B pilot {mode} {arm}"] = ({"requests": b_pilot_panels * 3, "gpu_hours": b_pilot_panels * 3 * src / 3600}
-                                                  if arm in ("debate", "alone") else {"requests": 0, "gpu_hours": 0.0})
-                lines[f"B full {mode} {arm}"] = {"requests": b_panels_full * 3, "gpu_hours": b_panels_full * 3 * src / 3600}
-    for k in list(spr):
-        if k.endswith("_ro") and k.startswith("b_"):
-            lines.setdefault("B readouts (per 1,000 rows)", {"requests": 1000, "gpu_hours": 1000 * spr[k] / 3600})
-    total = sum(v["gpu_hours"] for v in lines.values())
-    return {"seconds_per_request": spr, "lines": lines, "gpu_hours": total,
-            "units": total * units_per_hour, "units_per_hour": units_per_hour,
+            if src[arm]:
+                launches["4 B full"][f"b_{mode}_{arm}"] = b_panels_full * 3 * src[arm] / 3600
+        if s_ro_b:
+            launches["4 B full"][f"b_{mode} readouts (HF)"] = b_panels_full * 3 * len(T.B_ARMS) * s_ro_b / 3600
+    out = {}
+    for name, items in launches.items():
+        h = sum(items.values()) + SESSION_OVERHEAD_H
+        out[name] = {"items_gpu_hours": {k: round(v, 3) for k, v in items.items()}, "gpu_hours": round(h, 2),
+                     "units": round(h * units_per_hour, 1)}
+    cov = p2_coverage(spr, rates)
+    extra = None
+    if any(v["in_qwen_t_samples"] > 4 for v in cov.values()) and spr.get("bank_qwen_t"):
+        h = 1500 * 3 * spr["bank_qwen_t"] / 3600
+        extra = {"proposal": "raise the qwen_t bank from 5 to 8 samples (an arm costs more than ~4 qwen_t samples, so "
+                             "its matched-seconds self-consistency point would lie beyond a 5-sample curve)",
+                 "extra_requests": 4500, "gpu_hours": round(h, 2), "units": round(h * units_per_hour, 1)}
+    return {"seconds_per_request": spr, "call_rates": rates, "launches": out,
+            "total_units": round(sum(v["units"] for v in out.values()), 1), "p2_coverage": cov, "qwen_t_8_samples": extra,
+            "units_per_hour": units_per_hour,
             "assumptions": {"b_panels_full_per_mode_arm": b_panels_full, "b_pilot_panels_per_mode": b_pilot_panels,
                             "session_overhead_hours_each": SESSION_OVERHEAD_H}}
 
@@ -161,13 +218,13 @@ def main(argv=None) -> int:
     sess = root / f"{a.job}-session-summary.json"
     r = {"parts": pp, "readouts": ro, "session": json.loads(sess.read_text()) if sess.exists() else None,
          "sanity": sanity(rows, Path(a.prev)) if (Path(a.prev) / "judge").exists() else None,
-         "pricing": price({**pp, **{p: {"seconds": float(calls[calls.part == p].seconds.sum()),
-                                         "requests": int(calls[calls.part == p].requests.sum())} for p in ro}},
-                          rows, a.units_per_hour, a.b_panels_full, a.b_pilot_panels)}
+         "position_bias": position_bias(rows), "think_location": think_location(rows),
+         "pricing": price(pp, rows, a.units_per_hour, a.b_panels_full, a.b_pilot_panels, ro)}
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
     (out / "smoke_report.json").write_text(json.dumps(r, indent=1, default=str))
-    print(json.dumps({"gpu_hours": r["pricing"]["gpu_hours"], "units": r["pricing"]["units"]}, default=str))
+    print(json.dumps({"launches": {k: v["units"] for k, v in r["pricing"]["launches"].items()},
+                      "total_units": r["pricing"]["total_units"]}, default=str))
     return 0
 
 

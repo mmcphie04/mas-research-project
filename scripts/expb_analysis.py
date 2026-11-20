@@ -127,14 +127,23 @@ def order_effect(df: pd.DataFrame) -> dict:
 
 
 def commitment(df: pd.DataFrame) -> dict:
-    if "commit_logprobs" not in df:
+    """Probability on the agent's own previous answer right after reading the peers.
+    PRIMARY (cross-mode): the CLOSED empty think block (``commit_closed_logprobs``; for non-thinking
+    rows the template's own block). SECONDARY (thinking rows): the OPEN think block, "at the start of
+    the thinking" (``commit_logprobs``)."""
+    if "commit_closed_logprobs" not in df:
         return {}
     out = {}
-    d = df[df.commit_logprobs.notna() & (df.kind != "unparsed")].copy()
-    d["p_before"] = [math.exp(lp[b]) for lp, b in zip(d.commit_logprobs, d.meta_before.astype(int), strict=True)]
+    d = df[df.commit_closed_logprobs.notna() & (df.kind != "unparsed")].copy()
+    b = d.meta_before.astype(int)
+    d["p_before_closed"] = [math.exp(lp[x]) for lp, x in zip(d.commit_closed_logprobs, b, strict=True)]
+    d["p_before_open"] = [math.exp(lp[x]) for lp, x in zip(d.commit_logprobs, b, strict=True)]
     for (mode, arm), g in d.groupby(["b_mode", "b_arm"]):
-        out[f"{mode} {arm}"] = {k: boot_groups(h.p_before, h.question_id) for k, h in
-                                (("unchanged", g[g.kind == "unchanged"]), ("changed", g[g.kind != "unchanged"]))}
+        groups = (("unchanged", g[g.kind == "unchanged"]), ("changed", g[g.kind != "unchanged"]))
+        res = {"primary_closed_think": {k: boot_groups(h.p_before_closed, h.question_id) for k, h in groups}}
+        if mode == "qwen_t":
+            res["secondary_open_think"] = {k: boot_groups(h.p_before_open, h.question_id) for k, h in groups}
+        out[f"{mode} {arm}"] = res
     return out
 
 

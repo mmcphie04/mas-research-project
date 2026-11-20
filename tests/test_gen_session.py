@@ -38,8 +38,15 @@ def test_smoke_session_and_report_on_the_stub(tmp_path):
     assert R.main(["--root", str(root), "--job", "smoke", "--out", str(tmp_path / "rep")]) == 0
     r = json.loads((tmp_path / "rep" / "smoke_report.json").read_text())
     assert r["parts"]["bank_qwen_t__dev_smoke"]["thinking_cap_rate"] is not None
-    assert {"bank_gemma", "bank_qwen_nt", "bank_qwen_t", "judge_traces", "choose_A3"} <= set(r["pricing"]["seconds_per_request"])
-    assert r["pricing"]["units"] >= 0 and "B full qwen_t dissent" in r["pricing"]["lines"]
+    pr = r["pricing"]
+    assert {"bank_gemma", "bank_qwen_nt", "bank_qwen_t", "judge_traces", "choose_A3"} <= set(pr["seconds_per_request"])
+    assert list(pr["launches"]) == ["1 bank + judge confirmation", "2 B pilot", "3 choosers", "4 B full"]
+    assert "b_qwen_t_dissent" in pr["launches"]["4 B full"]["items_gpu_hours"] and pr["total_units"] > 0
+    assert "A3" in pr["p2_coverage"] and pr["p2_coverage"]["A3"]["in_qwen_t_samples"] > 0
+    assert set(r["position_bias"]) >= {"choose_A3", "choose_A1_g5"}
+    tl = r["think_location"]["bank_qwen_t__dev_smoke"]
+    assert tl["think_in_generation"] == 1.0 and tl["think_in_prompt"] == 0.0  # the stub generates its own <think>
+    assert r["parts"]["bank_qwen_t__dev_smokenovis"]["answer_cap_rate"] is not None
     if r["sanity"] is not None:
         assert set(r["sanity"]) == {"gemma", "qwen_nt"}
 
