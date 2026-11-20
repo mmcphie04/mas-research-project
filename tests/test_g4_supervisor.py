@@ -213,3 +213,26 @@ def test_final_backup_is_not_cut_off_while_it_makes_progress(setup):
     finally:
         S.time.time = real
     assert out["local_verified"] and r.stopped
+
+
+def test_generation_jobs_are_backed_up_verified_and_stopped(tmp_path):
+    """A mad.gen job (stub engine) through the same per-chunk supervisor, with --kind gen hooks."""
+    import importlib.util as iu
+
+    from mad.gen import archive as GA
+
+    spec = iu.spec_from_file_location("gen_run", ROOT / "scripts" / "gen_run.py")
+    G = iu.module_from_spec(spec)
+    spec.loader.exec_module(G)
+    remote_root = tmp_path / "runtime" / "out"
+    assert G.main(["--task", "bank", "--mode", "qwen_nt", "--out-root", str(remote_root), "--job", "g", "--engine", "stub",
+                   "--limit", "6", "--chunk", "2"]) == 0
+    r = PerChunkRemote(remote_root, tmp_path / "runtime" / "sync")
+    r.alive = False
+    S = _sup()
+    sup = S.Supervisor(r, "g", tmp_path / "laptop", tmp_path / "work", stop_balance=100.0, poll=0, balance=lambda: 150.0,
+                       offdevice=lambda: True, sleep=lambda s: None, log=lambda m: None,
+                       verify=GA.verify_job, incomplete_fn=GA.incomplete)
+    out = sup.run()
+    assert out["local_verified"] and r.stopped and out["incomplete"] == {}
+    assert len(GA.read_rows(tmp_path / "laptop", "g")) == 60

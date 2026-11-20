@@ -37,6 +37,7 @@ sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from mad import cli_backup as B  # noqa: E402
+from mad.gen import archive as GA  # noqa: E402
 from mad.job import JobMismatch, chunk_tag, verify_archive  # noqa: E402
 from mad.provenance import is_complete  # noqa: E402
 
@@ -74,8 +75,11 @@ def incomplete(dest: Path, job: str) -> dict:
 class Supervisor:
     def __init__(self, remote, job, dest, work, *, stop_balance, wind_down=1.0, poll=240, max_failures=8,
                  balance=colab_balance, offdevice=offdevice, sleep=time.sleep, log=print, events=None,
-                 final_seconds=1800):
+                 final_seconds=1800, verify=None, incomplete_fn=None):
         self.remote, self.job, self.dest, self.work = remote, job, Path(dest), Path(work)
+        # run_experiment jobs by default; generation jobs (Experiments A/B, judge confirmation) pass
+        # mad.gen.archive.verify_job / incomplete
+        self.verify, self.incomplete_fn = verify or verify_archive, incomplete_fn or incomplete
         self.stop_balance, self.wind_down, self.poll, self.max_failures = stop_balance, wind_down, poll, max_failures
         self.balance, self.offdevice, self.sleep, self.log = balance, offdevice, sleep, log
         self.events = Path(events) if events else None
@@ -130,7 +134,7 @@ class Supervisor:
                     self.backup_offdevice()
                     deadline = time.time() + self.final_seconds
                     continue
-                report = verify_archive(self.dest, self.job)
+                report = self.verify(self.dest, self.job)
                 self.event("local_archive_verified", views=sorted(report["views"]))
                 return True
             except (B.BackupError, JobMismatch, OSError, RuntimeError) as exc:
@@ -143,7 +147,7 @@ class Supervisor:
         stopped = self.stop_runtime(reason)
         self.backup_offdevice()
         out = {"reason": reason, "local_verified": verified, "runtime_stopped": stopped,
-               "offdevice_verified": self.offdevice_ok, "incomplete": incomplete(self.dest, self.job)}
+               "offdevice_verified": self.offdevice_ok, "incomplete": self.incomplete_fn(self.dest, self.job)}
         self.event("finished", **out)
         return out
 
@@ -199,6 +203,8 @@ def main(argv=None) -> int:
     ap.add_argument("--poll", type=int, default=240)
     ap.add_argument("--max-failures", type=int, default=8)
     ap.add_argument("--offdevice-set", default="main250", help="scripts/offdevice_backup.py set holding --dest")
+    ap.add_argument("--kind", default="experiment", choices=["experiment", "gen"],
+                    help="gen: a mad.gen job (chunk hashes and the job record's expected chunks)")
     a = ap.parse_args(argv)
     dest = Path(a.dest)
 
@@ -208,7 +214,8 @@ def main(argv=None) -> int:
     sup = Supervisor(ColabRemote(a.session, a.code_dir, a.remote_root, a.state_dir, a.job), a.job, dest,
                      dest / ".backup-work", stop_balance=a.stop_balance, wind_down=a.wind_down, poll=a.poll,
                      max_failures=a.max_failures, log=log, offdevice=lambda: offdevice(a.offdevice_set),
-                     events=dest / ("supervisor-events.jsonl" if a.job == "main250" else f"supervisor-{a.job}-events.jsonl"))
+                     events=dest / ("supervisor-events.jsonl" if a.job == "main250" else f"supervisor-{a.job}-events.jsonl"),
+                     **({"verify": GA.verify_job, "incomplete_fn": GA.incomplete} if a.kind == "gen" else {}))
     out = sup.run()
     return 0 if out["runtime_stopped"] and out["local_verified"] else 1
 
