@@ -50,10 +50,15 @@ def gold_display(q: Question) -> int:
     return make_permutation(q.n_options, q.question_id, PERMUTATION_SEED).original_to_display(q.gold_index)
 
 
-def round0(q: Question) -> list[dict]:
+def round0(q: Question, visible_rationale: bool = False) -> list[dict]:
+    """The main collection's round-0 prompt. ``visible_rationale`` (thinking mode only, a recorded
+    protocol choice) appends prompts_ab.VISIBLE_RATIONALE to the system prompt."""
     perm = make_permutation(q.n_options, q.question_id, PERMUTATION_SEED)
-    return P.round0_messages(persona=PERSONA, subject=q.subject, question=q.question, options=list(q.options),
+    msgs = P.round0_messages(persona=PERSONA, subject=q.subject, question=q.question, options=list(q.options),
                              perm=perm, ask_confidence=True, brevity=P.BREVITY_250)
+    if visible_rationale:
+        msgs[0] = {"role": "system", "content": msgs[0]["content"] + "\n\n" + PA.VISIBLE_RATIONALE}
+    return msgs
 
 
 def question_block(q: Question) -> str:
@@ -65,9 +70,10 @@ def question_block(q: Question) -> str:
 BANK = {"gemma": 10, "qwen_nt": 10, "qwen_t": 5}
 
 
-def bank_requests(qs: list[Question], mode: str, n: int | None = None) -> list[Request]:
+def bank_requests(qs: list[Question], mode: str, n: int | None = None, visible_rationale: bool = False) -> list[Request]:
     n = n or BANK[mode]
-    return [Request(f"{q.question_id}|{a}", q.question_id, a, f"bank/{mode}", q.n_options, messages=round0(q),
+    vis = visible_rationale and mode == "qwen_t"
+    return [Request(f"{q.question_id}|{a}", q.question_id, a, f"bank/{mode}", q.n_options, messages=round0(q, vis),
                     meta={"gold": gold_display(q)}) for q in qs for a in range(n)]
 
 
@@ -155,12 +161,12 @@ def panel(bank: dict, mode: str, qid: str) -> list[dict] | None:
     return rows if len({int(r["answer"]) for r in rows}) >= 2 else None
 
 
-def b_requests(q: Question, mode: str, rows: list[dict], arm: str) -> list[Request]:
+def b_requests(q: Question, mode: str, rows: list[dict], arm: str, visible_rationale: bool = False) -> list[Request]:
     """One request per agent. Own previous response: its (post-thinking) answer text, as an
     assistant turn. Peers: the other two agents' answer texts, confidence lines removed.
     debate/dissent: fixed agent order, labelled 'Panel member <agent number>'; anon: seeded random
     order, labelled 'Response A/B'; alone: no peers."""
-    base = round0(q)
+    base = round0(q, visible_rationale and mode == "qwen_t")  # the same round-0 prompt the bank used
     out = []
     for r in rows:
         a = int(r["agent"])

@@ -149,18 +149,21 @@ def main(argv=None) -> int:
     ap.add_argument("--chunk", type=int, default=50, help="questions per chunk")
     ap.add_argument("--engine", default="vllm", choices=["vllm", "stub"])
     ap.add_argument("--tag", default=None, help="suffix for the part names, e.g. pilot or smoke")
+    ap.add_argument("--visible-rationale", action="store_true",
+                    help="thinking mode: ask for a visible rationale after thinking (prompts_ab.VISIBLE_RATIONALE)")
     a = ap.parse_args(argv)
     out = Path(a.out_root)
     out.mkdir(parents=True, exist_ok=True)
     qs, assign, manifest = T.load_questions(a.plan)
     qsel = select(qs, assign, a.split, a.limit)
-    plan_info = {"question_ids_sha256": manifest["question_ids_sha256"], "split": a.split, "limit": a.limit}
+    plan_info = {"question_ids_sha256": manifest["question_ids_sha256"], "split": a.split, "limit": a.limit,
+                 "visible_rationale": bool(a.visible_rationale)}
     pid = out / f"{a.job}.pid"
     if not pid.exists():
         pid.write_text(str(os.getpid()))
     if a.task == "bank":
         mode = E.MODES[a.mode]
-        batches = [T.bank_requests(c, a.mode, a.samples) for c in chunks(qsel, a.chunk)]
+        batches = [T.bank_requests(c, a.mode, a.samples, a.visible_rationale) for c in chunks(qsel, a.chunk)]
         run_part(a, out, a.job, part_name(f"bank_{a.mode}", a.split, a.tag), mode, batches, {**plan_info, "samples": a.samples or T.BANK[a.mode]})
     elif a.task == "choose":
         bank = T.bank_index(A.read_rows(a.bank_root or out, a.bank_job or a.job, "bank_*"))  # bank parts only
@@ -186,7 +189,7 @@ def main(argv=None) -> int:
         ids = T.select_panels(bank, qs, assign, a.split, a.mode, a.n_panels, a.panel_seed)
         byq = {q.question_id: q for q in qs}
         for arm in a.arms:
-            reqs = [T.b_requests(byq[i], a.mode, T.panel(bank, a.mode, i), arm) for i in ids]
+            reqs = [T.b_requests(byq[i], a.mode, T.panel(bank, a.mode, i), arm, a.visible_rationale) for i in ids]
             batches = [[r for g in c for r in g] for c in chunks(reqs, a.chunk)]
             run_part(a, out, a.job, part_name(f"b_{a.mode}_{arm}", a.split, a.tag), E.MODES[a.mode], batches,
                      {**plan_info, "arm": arm, "panels": len(ids), "panel_seed": a.panel_seed})

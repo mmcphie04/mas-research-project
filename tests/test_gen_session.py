@@ -34,7 +34,7 @@ def test_smoke_session_and_report_on_the_stub(tmp_path):
     assert S.main(["--plan", str(stubbed_plan(tmp_path)), "--out-root", str(root), "--job", "smoke",
                    "--python-vllm", sys.executable]) == 0
     summ = json.loads((root / "smoke-session-summary.json").read_text())
-    assert [s["exit"] for s in summ["steps"]] == [0] * 14
+    assert [s["exit"] for s in summ["steps"]] == [0] * 15
     assert R.main(["--root", str(root), "--job", "smoke", "--out", str(tmp_path / "rep")]) == 0
     r = json.loads((tmp_path / "rep" / "smoke_report.json").read_text())
     assert r["parts"]["bank_qwen_t__dev_smoke"]["thinking_cap_rate"] is not None

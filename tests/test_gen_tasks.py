@@ -122,3 +122,15 @@ def test_judge_confirm_requests():
     r = T.judge_confirm_requests(ev, qq)
     assert len(r) == 3 * 2 + 2 * 3
     assert {x.condition for x in r} == {"judge_confirm/judge", "judge_confirm/own"}
+
+
+def test_visible_rationale_switch_only_touches_thinking_mode(qs):
+    q, _ = qs
+    off = T.bank_requests(q[:1], "qwen_t", 1)[0].messages[0]["content"]
+    on = T.bank_requests(q[:1], "qwen_t", 1, visible_rationale=True)[0].messages[0]["content"]
+    nt = T.bank_requests(q[:1], "qwen_nt", 1, visible_rationale=True)[0].messages[0]["content"]
+    assert PA.VISIBLE_RATIONALE not in off and on.endswith(PA.VISIBLE_RATIONALE) and nt == off
+    bank = T.bank_index(bank_rows(q, "qwen_t", 3, letters=lambda i, a: [0, 0, 1][a]))
+    rows = T.panel(bank, "qwen_t", q[0].question_id)
+    b_on = T.b_requests(q[0], "qwen_t", rows, "debate", visible_rationale=True)
+    assert b_on[0].messages[0]["content"] == on  # the B prompt reuses the bank's round-0 prompt
