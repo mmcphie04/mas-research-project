@@ -55,13 +55,24 @@ def update_job(out_root: Path, job: str, part: str, n_chunks: int, info: dict):
     A.write_job(out_root, job, rec)
 
 
+_ENGINES: dict = {}
+
+
 def make_engine(kind: str, mode: E.Mode, prompt_lens: list[int]):
+    """One engine per model per process (several parts reuse it). The context limit covers the
+    longest prompt plus the generation budget, at least 32k (capped at the model's limit), so a
+    later part with longer prompts rarely forces a reload."""
     need = (max(prompt_lens) if prompt_lens else 0) + E.budget(mode) + 64
     limit = MODEL_LIMIT.get(mode.repo_id, 32768)
-    mml = min(limit, max(4096, ((need + 1023) // 1024) * 1024))
-    if kind == "stub":
-        return E.StubEngine(max_model_len=mml)
-    return E.VLLMEngine(mode, max_model_len=mml)
+    mml = min(limit, max(32768, ((need + 1023) // 1024) * 1024))
+    key = (kind, mode.repo_id)
+    eng = _ENGINES.get(key)
+    if eng is not None and eng.max_model_len >= min(need, limit):
+        return eng
+    _ENGINES.pop(key, None)
+    eng = E.StubEngine(max_model_len=mml) if kind == "stub" else E.VLLMEngine(E.MODES[mode.name], max_model_len=mml)
+    _ENGINES[key] = eng
+    return eng
 
 
 def prompt_lengths(kind: str, mode: E.Mode, reqs) -> list[int]:
@@ -121,9 +132,9 @@ def select(qs, assign, split, limit):
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--task", required=True, choices=["bank", "choose", "b", "judge"])
+    ap.add_argument("--task", required=True, choices=["bank", "choose", "b", "judge", "sanity"])
     ap.add_argument("--mode", choices=sorted(E.MODES))
-    ap.add_argument("--arm", choices=sorted(T.ARMS))
+    ap.add_argument("--arm", nargs="+", choices=sorted(T.ARMS))
     ap.add_argument("--arms", nargs="+", choices=T.B_ARMS)
     ap.add_argument("--plan", default=str(ROOT / "artifacts/expab/plan"))
     ap.add_argument("--split", default="all", choices=["dev", "heldout", "all"])
@@ -152,14 +163,7 @@ def main(argv=None) -> int:
         batches = [T.bank_requests(c, a.mode, a.samples) for c in chunks(qsel, a.chunk)]
         run_part(a, out, a.job, part_name(f"bank_{a.mode}", a.split, a.tag), mode, batches, {**plan_info, "samples": a.samples or T.BANK[a.mode]})
     elif a.task == "choose":
-        chooser, spec = T.ARMS[a.arm]
-        bank = T.bank_index(A.read_rows(a.bank_root or out, a.bank_job or a.job))
-        reqs = []
-        for q in qsel:
-            pool = T.pool_rows(bank, q.question_id, spec)
-            if T.disagreeing(pool):
-                reqs.append(T.chooser_requests(q, a.arm, T.candidates(pool, q.question_id, a.arm)))
-        batches = [[r for g in c for r in g] for c in chunks(reqs, a.chunk)]
+        bank = T.bank_index(A.read_rows(a.bank_root or out, a.bank_job or a.job, "bank_*"))  # bank parts only
 
         def post(rows):
             for r in rows:
@@ -167,10 +171,18 @@ def main(argv=None) -> int:
                 pos = T.parse_pick(r["text"], r["meta_m"])
                 r["pick_position"], r["pick_answer"] = pos, (order[pos - 1] if pos > 0 else -1)
             return rows
-        run_part(a, out, a.job, part_name(f"choose_{a.arm}", a.split, a.tag), E.MODES[chooser], batches,
-                 {**plan_info, "arm": a.arm, "pool": spec, "questions_with_disagreement": len(reqs)}, post=post)
+        for arm in a.arm:  # arms with the same chooser share the loaded model
+            chooser, spec = T.ARMS[arm]
+            reqs = []
+            for q in qsel:
+                pool = T.pool_rows(bank, q.question_id, spec)
+                if T.disagreeing(pool):
+                    reqs.append(T.chooser_requests(q, arm, T.candidates(pool, q.question_id, arm)))
+            batches = [[r for g in c for r in g] for c in chunks(reqs, a.chunk)]
+            run_part(a, out, a.job, part_name(f"choose_{arm}", a.split, a.tag), E.MODES[chooser], batches,
+                     {**plan_info, "arm": arm, "pool": spec, "questions_with_disagreement": len(reqs)}, post=post)
     elif a.task == "b":
-        bank = T.bank_index(A.read_rows(a.bank_root or out, a.bank_job or a.job))
+        bank = T.bank_index(A.read_rows(a.bank_root or out, a.bank_job or a.job, "bank_*"))  # bank parts only
         ids = T.select_panels(bank, qs, assign, a.split, a.mode, a.n_panels, a.panel_seed)
         byq = {q.question_id: q for q in qs}
         for arm in a.arms:
@@ -178,6 +190,17 @@ def main(argv=None) -> int:
             batches = [[r for g in c for r in g] for c in chunks(reqs, a.chunk)]
             run_part(a, out, a.job, part_name(f"b_{a.mode}_{arm}", a.split, a.tag), E.MODES[a.mode], batches,
                      {**plan_info, "arm": arm, "panels": len(ids), "panel_seed": a.panel_seed})
+    elif a.task == "sanity":
+        # vLLM on questions that already have HF-generated answers under the same protocol (the judge
+        # run's own answers: same system prompt, persona, 250 words, question block): a like-for-like check
+        from mad import judge as J  # noqa: PLC0415
+
+        jq = [json.loads(x) for x in open(ROOT / "artifacts/revision_gate/judge/questions.jsonl")][: a.limit or 20]
+        n = a.samples or 3
+        reqs = [E.Request(f"{q['question_id']}|{s}", q["question_id"], s, f"sanity/{a.mode}", q["n_options"],
+                          messages=J.own_messages(q["question_block"])) for q in jq for s in range(n)]
+        run_part(a, out, a.job, part_name(f"sanity_{a.mode}", "all", a.tag), E.MODES[a.mode], chunks(reqs, a.chunk * n),
+                 {"questions": len(jq), "samples": n, "source": "artifacts/revision_gate/judge/questions.jsonl"})
     elif a.task == "judge":
         rec = json.loads(JUDGE_EVENTS.read_text())
         ev = {json.loads(x)["event_id"]: json.loads(x) for x in open(ROOT / "artifacts/revision_gate/judge/events.jsonl")}

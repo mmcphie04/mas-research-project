@@ -71,3 +71,18 @@ def test_splits_and_tags_get_their_own_parts_and_resume_refuses_a_mismatch(tmp_p
     with pytest.raises(SystemExit, match="holds other questions"):
         G.main(["--task", "bank", "--mode", "qwen_nt", "--split", "dev", "--out-root", str(tmp_path), "--job", "s",
                 "--engine", "stub", "--limit", "6", "--chunk", "3"])  # same part name, different selection
+
+
+def test_b_panels_come_from_bank_parts_only(tmp_path):
+    """Chooser rows (runs numbered 0-2, mode qwen_t) must never be mistaken for bank agents."""
+    G = _gen()
+    base = ["--out-root", str(tmp_path), "--job", "k", "--engine", "stub", "--split", "dev", "--limit", "10", "--chunk", "10"]
+    for mode in ("qwen_nt", "qwen_t"):
+        assert G.main(["--task", "bank", "--mode", mode, *base]) == 0
+    assert G.main(["--task", "choose", "--arm", "A2_5", "A1_qt5", *base]) == 0
+    assert G.main(["--task", "b", "--mode", "qwen_t", "--arms", "debate", "--n-panels", "5", *base]) == 0
+    b = A.read_rows(tmp_path, "k", "b_qwen_t_debate__dev")
+    bank = A.read_rows(tmp_path, "k", "bank_qwen_t__dev")
+    # every revised agent's "before" answer is its bank answer (not a chooser run's pick)
+    ans = {(r.question_id, int(r.agent)): int(r.answer) for r in bank.itertuples()}
+    assert all(int(r.meta_before) == ans[(r.question_id, int(r.agent))] for r in b.itertuples())

@@ -34,6 +34,8 @@ SETS = {  # name -> (local dir, rclone filter args)
     "main250": (ROOT / "runs/main250", ["--exclude", ".backup-work/**", "--exclude", ".stage-work/**",
                                         "--exclude", "supervisor*"]),
     "judge": (ROOT / "runs", ["--include", "judge_full/judge/**", "--include", "judge_smoke/judge_smoke.tgz"]),
+    "expab": (ROOT / "runs/expab", ["--exclude", ".backup-work/**", "--exclude", ".stage-work/**", "--exclude", "supervisor*"]),
+    "judgec": (ROOT / "runs/judgec", ["--exclude", ".backup-work/**", "--exclude", "supervisor*"]),
 }
 
 

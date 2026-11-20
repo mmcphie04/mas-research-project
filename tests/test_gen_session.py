@@ -1,0 +1,55 @@
+"""The session driver and the smoke report on the CPU stub: the smoke plan's steps run in order
+(both environments = this Python; stub engine, fake readouts), the session summary is written, the
+first failing step ends the session, and the report computes throughput, sanity and pricing."""
+
+from __future__ import annotations
+
+import importlib.util
+import json
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def _load(name):
+    spec = importlib.util.spec_from_file_location(name, ROOT / "scripts" / f"{name}.py")
+    m = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    return m
+
+
+def stubbed_plan(tmp_path) -> Path:
+    plan = json.loads((ROOT / "artifacts/expab/ops/smoke_session.json").read_text())
+    for s in plan["steps"]:
+        s["args"] = s["args"] + (["--engine", "stub"] if s["script"] == "gen_run.py" else ["--fake"])
+    p = tmp_path / "plan.json"
+    p.write_text(json.dumps(plan))
+    return p
+
+
+def test_smoke_session_and_report_on_the_stub(tmp_path):
+    S, R = _load("gen_session"), _load("smoke_report")
+    root = tmp_path / "rt"
+    assert S.main(["--plan", str(stubbed_plan(tmp_path)), "--out-root", str(root), "--job", "smoke",
+                   "--python-vllm", sys.executable]) == 0
+    summ = json.loads((root / "smoke-session-summary.json").read_text())
+    assert [s["exit"] for s in summ["steps"]] == [0] * 14
+    assert R.main(["--root", str(root), "--job", "smoke", "--out", str(tmp_path / "rep")]) == 0
+    r = json.loads((tmp_path / "rep" / "smoke_report.json").read_text())
+    assert r["parts"]["bank_qwen_t__dev_smoke"]["thinking_cap_rate"] is not None
+    assert {"bank_gemma", "bank_qwen_nt", "bank_qwen_t", "judge_traces", "choose_A3"} <= set(r["pricing"]["seconds_per_request"])
+    assert r["pricing"]["units"] >= 0 and "B full qwen_t dissent" in r["pricing"]["lines"]
+    if r["sanity"] is not None:
+        assert set(r["sanity"]) == {"gemma", "qwen_nt"}
+
+
+def test_a_failing_step_ends_the_session(tmp_path):
+    S = _load("gen_session")
+    plan = {"steps": [{"name": "bad", "env": "hf", "script": "gen_run.py", "args": ["--task", "nope"]},
+                      {"name": "never", "env": "hf", "script": "gen_run.py", "args": ["--task", "bank"]}]}
+    p = tmp_path / "p.json"
+    p.write_text(json.dumps(plan))
+    assert S.main(["--plan", str(p), "--out-root", str(tmp_path / "rt"), "--job", "j"]) != 0
+    steps = json.loads((tmp_path / "rt" / "j-session-summary.json").read_text())["steps"]
+    assert [s["name"] for s in steps] == ["bad"]
