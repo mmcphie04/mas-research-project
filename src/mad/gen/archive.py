@@ -20,6 +20,7 @@ import shutil
 import time
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 from mad.job import JobMismatch, _check_hashes, chunk_tag
@@ -38,7 +39,8 @@ def chunk_dir(out_root, job: str, part: str, idx: int) -> Path:
     return Path(out_root) / f"{job}-{part}-{chunk_tag(idx)}"
 
 
-def write_chunk(out_root, job: str, part: str, idx: int, rows: list[dict], calls: list[dict], meta: dict) -> Path:
+def write_chunk(out_root, job: str, part: str, idx: int, rows: list[dict], calls: list[dict], meta: dict,
+                arrays: dict | None = None) -> Path:
     final = chunk_dir(out_root, job, part, idx)
     tmp = final.with_name(final.name + f".tmp-{os.getpid()}")
     if tmp.exists():
@@ -46,6 +48,8 @@ def write_chunk(out_root, job: str, part: str, idx: int, rows: list[dict], calls
     tmp.mkdir(parents=True)
     pd.DataFrame(rows).to_parquet(tmp / "rows.parquet", index=False)
     (tmp / "calls.json").write_text(json.dumps(calls, indent=1))
+    for name, arr in (arrays or {}).items():  # e.g. activations, row-aligned with rows.parquet
+        np.save(tmp / f"{name}.npy", arr)
     (tmp / "manifest.json").write_text(json.dumps({"job": job, "part": part, "chunk": chunk_tag(idx), **meta}, indent=1))
     files = {f.name: _sha(f) for f in sorted(tmp.iterdir()) if f.is_file()}
     (tmp / "completion.json").write_text(json.dumps({
