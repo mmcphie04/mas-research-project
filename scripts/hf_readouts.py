@@ -53,7 +53,17 @@ class FakeReadouter:
         return z - np.log(np.exp(z).sum())
 
 
+_HF: dict = {}
+
+
 def load_hf(repo_id):
+    """Cached per process (scripts/multi_step.py runs several readout steps with one load)."""
+    if repo_id not in _HF:
+        _HF[repo_id] = _load_hf(repo_id)
+    return _HF[repo_id]
+
+
+def _load_hf(repo_id):
     from mad.backends.base import build_backend  # noqa: PLC0415
     from mad.config import load_config  # noqa: PLC0415
 
