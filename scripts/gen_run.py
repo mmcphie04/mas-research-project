@@ -26,6 +26,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
+from mad.data import Question  # noqa: E402
 from mad.gen import archive as A  # noqa: E402
 from mad.gen import engine as E  # noqa: E402
 from mad.gen import prompts_ab as PA  # noqa: E402
@@ -132,7 +133,7 @@ def select(qs, assign, split, limit):
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--task", required=True, choices=["bank", "choose", "b", "judge", "sanity"])
+    ap.add_argument("--task", required=True, choices=["bank", "choose", "b", "judge", "sanity", "sanity_main250"])
     ap.add_argument("--mode", choices=sorted(E.MODES))
     ap.add_argument("--arm", nargs="+", choices=sorted(T.ARMS))
     ap.add_argument("--arms", nargs="+", choices=T.B_ARMS)
@@ -208,6 +209,22 @@ def main(argv=None) -> int:
                           messages=J.own_messages(q["question_block"])) for q in jq for s in range(n)]
         run_part(a, out, a.job, part_name(f"sanity_{a.mode}", "all", a.tag), E.MODES[a.mode], chunks(reqs, a.chunk * n),
                  {"questions": len(jq), "samples": n, "source": "artifacts/revision_gate/judge/questions.jsonl"})
+    elif a.task == "sanity_main250":
+        # like-for-like vLLM-vs-HF check: the bank protocol on main250's own 200 questions (HF pool:
+        # 10 Gemma samples each), checked against main250's manifest content hashes
+        from mad.job import question_sha256  # noqa: PLC0415
+
+        ref = json.loads((ROOT / "artifacts/main250/plan/main250-split.json").read_text())["meta"]["selection"]["question_content_sha256"]
+        mq = [Question(**{**{k: d[k] for k in ("question_id", "subject", "question", "gold_index")}, "options": tuple(d["options"])})
+              for d in map(json.loads, (ROOT / "artifacts/expab/plan/main250_questions.jsonl").read_text().splitlines())]
+        if any(question_sha256(q) != ref[q.question_id] for q in mq):
+            raise SystemExit("main250 question snapshot does not match main250's manifest")
+        mq = mq[: a.limit] if a.limit else mq
+        batches = [[E.Request(f"{q.question_id}|{s}", q.question_id, s, f"sanity_main250/{a.mode}", q.n_options,
+                              messages=T.round0(q), meta={"gold": T.gold_display(q)}) for q in c for s in range(a.samples or 10)]
+                   for c in chunks(mq, a.chunk)]
+        run_part(a, out, a.job, part_name(f"sanity_main250_{a.mode}", "all", a.tag), E.MODES[a.mode], batches,
+                 {"questions": len(mq), "samples": a.samples or 10, "source": "artifacts/expab/plan/main250_questions.jsonl"})
     elif a.task == "judge":
         rec = json.loads(JUDGE_EVENTS.read_text())
         ev = {json.loads(x)["event_id"]: json.loads(x) for x in open(ROOT / "artifacts/revision_gate/judge/events.jsonl")}

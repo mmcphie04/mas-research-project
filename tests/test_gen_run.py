@@ -86,3 +86,11 @@ def test_b_panels_come_from_bank_parts_only(tmp_path):
     # every revised agent's "before" answer is its bank answer (not a chooser run's pick)
     ans = {(r.question_id, int(r.agent)): int(r.answer) for r in bank.itertuples()}
     assert all(int(r.meta_before) == ans[(r.question_id, int(r.agent))] for r in b.itertuples())
+
+
+def test_sanity_main250_uses_the_bank_protocol_on_main250_questions(tmp_path):
+    G = _gen()
+    assert G.main(["--task", "sanity_main250", "--mode", "gemma", "--out-root", str(tmp_path), "--job", "m", "--engine", "stub",
+                   "--limit", "3", "--samples", "2", "--chunk", "3"]) == 0
+    r = A.read_rows(tmp_path, "m", "sanity_main250_gemma")
+    assert len(r) == 6 and r.meta_gold.between(0, 9).all()

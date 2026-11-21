@@ -1,0 +1,33 @@
+{
+ "note": "Launch 3 (cap 42): bank on the 2,000-question held-out extension (Qwen non-thinking x10, Qwen thinking x10 with the visible rationale, Gemma x10), plus a like-for-like vLLM-vs-HF check: Gemma x10 on main250's own 200 questions (bank protocol) against main250's HF pool (~1 unit).",
+ "steps": [
+  {
+   "name": "prompt_check",
+   "env": "vllm",
+   "script": "prompt_check.py",
+   "args": []
+  },
+  {
+   "name": "qwen",
+   "env": "vllm",
+   "script": "multi_step.py",
+   "args": [
+    "--module",
+    "gen_run",
+    "--steps",
+    "[[\"--task\", \"bank\", \"--mode\", \"qwen_nt\", \"--set\", \"extension\", \"--split\", \"all\", \"--chunk\", \"50\", \"--tag\", \"ext\"], [\"--task\", \"bank\", \"--mode\", \"qwen_t\", \"--set\", \"extension\", \"--split\", \"all\", \"--chunk\", \"50\", \"--tag\", \"ext\"]]"
+   ]
+  },
+  {
+   "name": "gemma",
+   "env": "vllm",
+   "script": "multi_step.py",
+   "args": [
+    "--module",
+    "gen_run",
+    "--steps",
+    "[[\"--task\", \"sanity_main250\", \"--mode\", \"gemma\", \"--samples\", \"10\", \"--chunk\", \"50\"], [\"--task\", \"bank\", \"--mode\", \"gemma\", \"--set\", \"extension\", \"--split\", \"all\", \"--chunk\", \"50\", \"--tag\", \"ext\"]]"
+   ]
+  }
+ ]
+}
