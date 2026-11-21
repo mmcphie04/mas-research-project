@@ -599,3 +599,49 @@ are used, which leaves about 99 of the ~186.
      resamples questions (`expab_launch_report.main250_like_for_like`).
    - **Rule:** **a real gap = that CI excludes zero.** A real gap stops the work for review before
      launch 4. Otherwise launch 4 then launch 5 run.
+
+## Launch 3 results (2026-11-21)
+
+Launch 3 used **32.85 of its 42 units**, about 1 of them idle while a zombie process kept the runtime
+alive (fixed in `43dd746`). Results are in `artifacts/expab/launch3/`.
+
+**Extension bank** (2,000 held-out questions × 10 samples per mode):
+
+| | Gemma | Qwen non-thinking | Qwen thinking |
+|---|---|---|---|
+| parse rate | 98.8% | 99.9% | 99.9% |
+| mean generated tokens | 326 | 244 | 1,150 (thinking 1,033 + visible 117) |
+| thinking-cap rate | – | – | 4.7% |
+| answer-cap rate | 1.2% | 0.04% | 0.2% |
+| context refusals | 0 | 0 | 0 |
+| tokens/s | 1,491 | 4,074 | 2,240 |
+
+**Like-for-like Gemma check (rule committed before its data):**
+
+- main250's own 200 questions: vLLM 0.6425, HF 0.643.
+- Difference −0.0005, 95% CI [−0.018, 0.018]. **No real gap.**
+- So the bank's lower accuracy (0.59 on the original and on the extension) reflects the question
+  set, not the vLLM path.
+
+**Positive control, 200 development contexts per mode** (pass rule: readout ≥ 0.9 and best probe
+≥ 0.8):
+
+| mode | readout | probe at A (layers 14 / 22 / 31) | probe at R (layers 14 / 22 / 31) | A | R |
+|---|---|---|---|---|---|
+| thinking | 1.00 | 0.63 / 0.77 / 0.70 | 0.97 / 0.97 / 1.00 | fails | passes |
+| non-thinking | 1.00 | 0.48 / 0.73 / 0.38 | 0.99 / 0.96 / 1.00 | fails | passes |
+
+- Chance is 0.25.
+- By the approved rule, B's probes are reported at R and B, with A shown as failing.
+- **Interpretation limit:** R is the position where the model is about to emit the letter.
+  Passing there shows the instructed letter is linearly readable where it is output. It does not
+  show an earlier internal commitment.
+
+**Held-out disputed-panel supply** (original + extension):
+
+| mode | panels | launch 5 needs |
+|---|---|---|
+| non-thinking | 2,602 | 440 shared + 1,913 more alone = 2,353 |
+| thinking | 1,852 | 393 + 1,146 = 1,539 |
+
+Development supply: 524 non-thinking and 355 thinking.

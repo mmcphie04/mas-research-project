@@ -1,0 +1,18 @@
+{
+ "qwen_nt dev": {
+  "questions": 600,
+  "disputed_panels": 524
+ },
+ "qwen_nt heldout": {
+  "questions": 2900,
+  "disputed_panels": 2602
+ },
+ "qwen_t dev": {
+  "questions": 600,
+  "disputed_panels": 355
+ },
+ "qwen_t heldout": {
+  "questions": 2900,
+  "disputed_panels": 1852
+ }
+}

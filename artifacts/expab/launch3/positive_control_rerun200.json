@@ -1,0 +1,42 @@
+{
+ "qwen_t": {
+  "contexts": 200,
+  "readout_recovery": 1.0,
+  "probe_accuracy_by_position_layer": {
+   "A": {
+    "14": 0.63,
+    "22": 0.765,
+    "31": 0.7
+   },
+   "R": {
+    "14": 0.97,
+    "22": 0.965,
+    "31": 1.0
+   }
+  },
+  "passed_by_position": {
+   "A": false,
+   "R": true
+  }
+ },
+ "qwen_nt": {
+  "contexts": 200,
+  "readout_recovery": 1.0,
+  "probe_accuracy_by_position_layer": {
+   "A": {
+    "14": 0.48,
+    "22": 0.73,
+    "31": 0.375
+   },
+   "R": {
+    "14": 0.985,
+    "22": 0.96,
+    "31": 1.0
+   }
+  },
+  "passed_by_position": {
+   "A": false,
+   "R": true
+  }
+ }
+}
