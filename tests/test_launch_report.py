@@ -43,3 +43,20 @@ def test_main250_like_for_like_check(tmp_path):
     r = R.main250_like_for_like(tmp_path, "m")
     assert r["questions"] == 200 and r["vllm_samples"] == 400 and 0.5 < r["hf_accuracy"] < 0.8
     assert r["ci95"][0] <= r["difference_vllm_minus_hf"] <= r["ci95"][1] and isinstance(r["real_gap"], bool)
+
+
+def test_choose_report_is_outcome_blind(tmp_path):
+    G, C = _load("gen_run"), _load("expab_choose_report")
+    base = ["--out-root", str(tmp_path), "--job", "x", "--engine", "stub", "--set", "original", "--limit", "20", "--chunk", "10"]
+    for mode in ("qwen_nt", "qwen_t"):
+        assert G.main(["--task", "bank", "--mode", mode, *base]) == 0
+    assert G.main(["--task", "choose", "--arm", "A1_qnt5", "A2_5", *base]) == 0
+    seen = []
+    orig = C.A.read_rows
+    C.A.read_rows = lambda *a, **k: (lambda df: (seen.append(set(df.columns)), df)[1])(orig(*a, **k))
+    r = C.report(tmp_path, "x")
+    C.A.read_rows = orig
+    assert set(r) == {"A1_qnt5", "A2_5"} and r["A2_5"]["thinking_cap_rate"] is not None
+    assert all(0 <= v["pick_parse_rate"] <= 1 and v["requests"] == 3 * v["questions"] for v in r.values())
+    assert "meta_gold" in set().union(*seen)  # the rows carry gold ...
+    assert not any(k for v in r.values() for k in v if "acc" in k or "correct" in k)  # ... the report never uses it
