@@ -435,3 +435,49 @@ GPU time):
   - Qwen thinking at 8 samples: 0–2 and 3–5.
 - That needs a plan amendment before the pilot. Otherwise the pilot simply uses every disputed
   development panel available.
+
+## Amendment after the Stop-2 review (2026-11-20, committed before launch 1)
+
+1. **B panel supply.**
+   - Panels are formed from every **disjoint sample triple**: Qwen3 non-thinking samples 0–2, 3–5
+     and 6–8; Qwen3 thinking samples 0–2, 3–5 and 6–8. That is up to 3 panels per question per
+     mode.
+   - A triple is a disputed panel iff all three parsed and not all equal. Parse status and answers
+     only; **no gold answer is used**.
+   - Agents keep their bank sample index (distinct seeds); peers are labelled by panel position
+     (1–3).
+   - **Every B interval and contrast resamples by question,** not by panel. Arm contrasts are
+     paired by panel and bootstrapped over questions.
+   - Panels per question are reported.
+2. **Held-out extension** (`artifacts/expab/plan_ext/`, `scripts/expab_questions_ext.py`).
+   - 2,000 more MMLU-Pro questions from unused positions above 520 (524–12,025), excluding the
+     original 1,500.
+   - The same as-equal-as-possible stratification (142–143 per subject), seed 20261124,
+     outcome-blind.
+   - **All held-out:** held-out 900 → **2,900**; development stays 600.
+   - Hashes: ids `35a6fee1…`, snapshot `d03da88d…`. The manifest records the original manifest's
+     hashes it extends.
+   - `tasks.load_questions` checks and merges both (`--set original | extension | all`).
+   - **Experiment A's analysis and headline rule are unchanged except for the held-out set**
+     (now 2,900).
+3. **Thinking bank at 10 samples** per question, replacing 8, for all questions.
+   - P2 coverage note: at the smoke's measured costs, every arm is within 10 thinking-bank samples
+     (the largest, A1_qt5, ≈ 7.9).
+   - Arms whose pool is 10 samples exceed their own chooser's 10-sample curve by construction; P2
+     then uses the curve's end value, flagged.
+4. **B full-run sizing target:** **~400** helpful+harmful events per mode × arm (was 150), drawn from
+   all held-out disputed panels (original held-out plus the extension, so after launch 3).
+
+**Launches** (supervision as before; a hard cap and stop line per launch):
+
+| # | content | cap |
+|---|---|---|
+| 1 | bank on the original 1,500 (Gemma ×10, Qwen non-thinking ×10, Qwen thinking ×10) + judge confirmation | 38 |
+| 2 | B pilot on development (debate + alone, both modes, with readouts) | 6 |
+| 3 | bank on the 2,000-question extension | 42 |
+| 4 | all chooser arms on all 3,500 questions (after review) | 58 |
+| 5 | B full, sized from the pilot (after review) | 30 |
+
+Launches 1–3 may run back to back. Launches 2–5 are re-priced from launch 1's measured throughput
+(total ≤ ~186 units). **No held-out choosing outcome is looked at before its one committed
+analysis.**

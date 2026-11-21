@@ -47,5 +47,5 @@ def test_analysis_invariants_on_the_stub(tmp_path):
         assert v["called"] <= v["questions"] and v["P3_gap"]["questions"] <= v["called"]
         assert v["mean_cost"]["seconds"] >= 0
     sc = r["self_consistency_heldout"]
-    assert len(sc["gemma"]["accuracy"]) == 10 and len(sc["qwen_t"]["accuracy"]) == 5
+    assert len(sc["gemma"]["accuracy"]) == 10 and len(sc["qwen_t"]["accuracy"]) == 10  # thinking bank: 10
     assert set(r["costs"]) >= {"bank_gemma", "bank_qwen_nt", "bank_qwen_t", "choose_A3"}

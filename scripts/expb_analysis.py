@@ -33,7 +33,7 @@ import pandas as pd  # noqa: E402
 
 from mad.gen import archive as A  # noqa: E402
 
-TARGET_HH = 150
+TARGET_HH = 400  # helpful + harmful events per mode x arm (review of Stop 2; was 150)
 N_BOOT = 10000
 
 
@@ -72,7 +72,8 @@ def load(root: Path, job: str) -> tuple[pd.DataFrame, pd.DataFrame]:
     df = pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
     if len(df):
         df["kind"] = kinds(df)
-        df["panel"] = df.question_id + "|" + df.b_mode
+        trip = df["meta_triple"].astype(str) if "meta_triple" in df else "0"
+        df["panel"] = df.question_id + "|" + df.b_mode + "|" + trip  # a question can hold up to 3 panels
     return df, calls
 
 
@@ -86,8 +87,11 @@ def summary(df: pd.DataFrame, calls: pd.DataFrame, units_per_hour: float) -> dic
         valid = g[g.kind != "unparsed"]
         per_panel_hh = hh / panels if panels else 0.0
         need = math.ceil(TARGET_HH / per_panel_hh) if per_panel_hh else None
+        ppq = g.groupby("question_id").panel.nunique()
         out[f"{mode} {arm}"] = {
-            "panels": panels, "agents": len(g), "unparsed": int(k.get("unparsed", 0)),
+            "panels": panels, "questions": int(g.question_id.nunique()),
+            "panels_per_question": {"mean": float(ppq.mean()), "counts": {int(c): int(n) for c, n in ppq.value_counts().items()}},
+            "agents": len(g), "unparsed": int(k.get("unparsed", 0)),
             "change_rate": boot_groups((valid.kind != "unchanged").astype(float), valid.question_id),
             "helpful": int(k.get("helpful", 0)), "harmful": int(k.get("harmful", 0)), "wrong_wrong": int(k.get("wrong_wrong", 0)),
             "helpful_harmful_ratio": (int(k.get("helpful", 0)) / int(k.get("harmful", 0))) if k.get("harmful", 0) else None,
@@ -108,9 +112,10 @@ def contrasts(df: pd.DataFrame) -> dict:
                                 harmful=(h.kind == "harmful").astype(float)).groupby("panel")[["changed", "helpful", "harmful"]].mean()
         for a, b in (("debate", "alone"), ("dissent", "debate"), ("anon", "debate")):
             if a in piv and b in piv:
-                common = piv[a].index.intersection(piv[b].index)
+                common = piv[a].index.intersection(piv[b].index)  # paired by panel ...
                 d = piv[a].loc[common] - piv[b].loc[common]
-                out[f"{mode}: {a} - {b}"] = {m: boot_groups(d[m].to_numpy(), common.to_numpy()) for m in ("changed", "helpful", "harmful")}
+                qs = np.array([c.split("|")[0] for c in common])  # ... resampled by QUESTION
+                out[f"{mode}: {a} - {b}"] = {m: boot_groups(d[m].to_numpy(), qs) for m in ("changed", "helpful", "harmful")}
     return out
 
 

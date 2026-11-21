@@ -25,7 +25,7 @@ def test_pipeline_on_the_stub(tmp_path):
     for mode in ("gemma", "qwen_nt", "qwen_t"):
         assert G.main(["--task", "bank", "--mode", mode, *base]) == 0
     bank = A.read_rows(tmp_path, "x")
-    assert len(bank) == 8 * (10 + 10 + 5) and set(bank["mode"]) == {"gemma", "qwen_nt", "qwen_t"}
+    assert len(bank) == 8 * (10 + 10 + 10) and set(bank["mode"]) == {"gemma", "qwen_nt", "qwen_t"}
     calls = A.read_calls(tmp_path, "x")
     assert set(calls.part) == {"bank_gemma__dev", "bank_qwen_nt__dev", "bank_qwen_t__dev"} and (calls.seconds >= 0).all()
     # resume: a second run of a complete part generates nothing new

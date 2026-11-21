@@ -39,6 +39,7 @@ def test_pipeline_on_the_stub(tmp_path):
     r = json.loads((tmp_path / "an" / "expb_results.json").read_text())
     s = r["summary"]["qwen_t debate"]
     assert s["panels"] <= 6 and s["agents"] == 3 * s["panels"]
+    assert s["questions"] <= s["panels"] and sum(c * n for c, n in ((int(k), v) for k, v in s["panels_per_question"]["counts"].items())) == s["panels"]
     assert s["helpful"] + s["harmful"] + s["wrong_wrong"] <= s["agents"]
     assert {"qwen_nt: debate - alone", "qwen_t: anon - debate"} <= set(r["contrasts"])
     assert "qwen_t alone" not in r["order_effect"] and "qwen_nt anon" in r["order_effect"]

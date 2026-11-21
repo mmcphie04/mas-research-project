@@ -37,7 +37,12 @@ def bank_rows(qs, mode, n, letters=None):
 def test_question_set_is_checked_and_split(qs):
     q, assign = qs
     allq, assignment, m = T.load_questions(PLAN)
-    assert len(allq) == 1500 and sum(v == "dev" for v in assignment.values()) == 600
+    assert len(allq) == 3500 and sum(v == "dev" for v in assignment.values()) == 600
+    assert sum(v == "heldout" for v in assignment.values()) == 2900
+    orig, _, _ = T.load_questions(PLAN, which="original")
+    ext, _, _ = T.load_questions(PLAN, which="extension")
+    assert len(orig) == 1500 and len(ext) == 2000 and all(assignment[q.question_id] == "heldout" for q in ext)
+    assert set(m["sets"]) == {"original", "extension"}
     assert all(0 <= T.gold_display(x) < x.n_options for x in allq[:50])
 
 
@@ -45,7 +50,7 @@ def test_question_set_is_checked_and_split(qs):
 def test_bank_requests_use_the_main_protocol(qs):
     q, _ = qs
     r = T.bank_requests(q[:2], "qwen_t")
-    assert len(r) == 10 and r[0].messages == T.round0(q[0]) and "250 words" in r[0].messages[0]["content"]
+    assert len(r) == 20 and r[0].messages == T.round0(q[0]) and "250 words" in r[0].messages[0]["content"]
     rec = next(json.loads(x) for x in open(ROOT / "runs/main250/main250-debate3/transcripts.jsonl")
                if json.loads(x)["phase"] == "pre")
     assert r[0].messages[0]["content"] == next(m["content"] for m in rec["messages"] if m["role"] == "system")
@@ -98,7 +103,25 @@ def test_b_panels_and_arms(qs):
     assert out["debate"][0].messages[-1]["content"].startswith(P.PEER_BLOCK.split("{peers}")[0])
     assert out["anon"][0].messages[-1]["content"].startswith(P.PEER_BLOCK.split("{peers}")[0])
     sel = T.select_panels(bank, q, {x.question_id: "dev" for x in q}, "dev", "qwen_nt", 3, seed=1)
-    assert len(sel) == 3 and all(T.panel(bank, "qwen_nt", s) for s in sel)
+    assert len(sel) == 3 and all(T.panel(bank, "qwen_nt", qid, t) for qid, t in sel)
+
+
+def test_panels_from_disjoint_triples(qs):
+    q, _ = qs
+    # 10 samples: triple 0 unanimous, triple 1 disputed, triple 2 has an unparsed answer
+    bank = T.bank_index(bank_rows(q, "qwen_t", 10, letters=lambda i, a: [0, 0, 0, 1, 2, 1, 3, -1, 3, 0][a]))
+    assert T.panel(bank, "qwen_t", q[0].question_id, 0) is None
+    rows = T.panel(bank, "qwen_t", q[0].question_id, 1)
+    assert [int(r["agent"]) for r in rows] == [3, 4, 5]
+    assert T.panel(bank, "qwen_t", q[0].question_id, 2) is None
+    sel = T.select_panels(bank, q[:1], {q[0].question_id: "dev"}, "dev", "qwen_t", None, seed=0)
+    assert sel == [(q[0].question_id, 1)]
+    reqs = T.b_requests(q[0], "qwen_t", rows, "debate", triple=1)
+    assert [r.agent for r in reqs] == [3, 4, 5] and reqs[0].meta["triple"] == 1
+    assert json.loads(reqs[0].meta["shown_sources"]) == [4, 5]
+    last = reqs[0].messages[-1]["content"]  # peers labelled by panel position, not bank sample index
+    assert "Panel member 2" in last and "Panel member 3" in last and "Panel member 5" not in last
+    assert len({r.request_id for r in reqs}) == 3 and all("|1|" in r.request_id for r in reqs)
 
 
 def test_stub_end_to_end_bank_then_chooser(qs):

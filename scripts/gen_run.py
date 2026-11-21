@@ -138,6 +138,8 @@ def main(argv=None) -> int:
     ap.add_argument("--arms", nargs="+", choices=T.B_ARMS)
     ap.add_argument("--plan", default=str(ROOT / "artifacts/expab/plan"))
     ap.add_argument("--split", default="all", choices=["dev", "heldout", "all"])
+    ap.add_argument("--set", default="all", choices=["all", "original", "extension"],
+                    help="question set: the original 1,500, the 2,000-question held-out extension, or both")
     ap.add_argument("--limit", type=int, default=None, help="first N questions of the split (smoke)")
     ap.add_argument("--samples", type=int, default=None, help="bank: samples per question (default: the plan's)")
     ap.add_argument("--n-panels", type=int, default=None)
@@ -155,9 +157,10 @@ def main(argv=None) -> int:
     a = ap.parse_args(argv)
     out = Path(a.out_root)
     out.mkdir(parents=True, exist_ok=True)
-    qs, assign, manifest = T.load_questions(a.plan)
+    qs, assign, manifest = T.load_questions(a.plan, which=a.set)
     qsel = select(qs, assign, a.split, a.limit)
-    plan_info = {"question_ids_sha256": manifest["question_ids_sha256"], "split": a.split, "limit": a.limit,
+    plan_info = {"question_ids_sha256": manifest["question_ids_sha256"], "question_sets": manifest["sets"],
+                 "set": a.set, "split": a.split, "limit": a.limit,
                  "visible_rationale": bool(a.visible_rationale)}
     pid = out / f"{a.job}.pid"
     if not pid.exists():
@@ -190,7 +193,7 @@ def main(argv=None) -> int:
         ids = T.select_panels(bank, qs, assign, a.split, a.mode, a.n_panels, a.panel_seed)
         byq = {q.question_id: q for q in qs}
         for arm in a.arms:
-            reqs = [T.b_requests(byq[i], a.mode, T.panel(bank, a.mode, i), arm, a.visible_rationale) for i in ids]
+            reqs = [T.b_requests(byq[q], a.mode, T.panel(bank, a.mode, q, t), arm, a.visible_rationale, t) for q, t in ids]
             batches = [[r for g in c for r in g] for c in chunks(reqs, a.chunk)]
             run_part(a, out, a.job, part_name(f"b_{a.mode}_{arm}", a.split, a.tag), E.MODES[a.mode], batches,
                      {**plan_info, "arm": arm, "panels": len(ids), "panel_seed": a.panel_seed})
