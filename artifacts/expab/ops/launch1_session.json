@@ -1,0 +1,44 @@
+{
+ "note": "Launch 1 (cap 38): prompt-id gate; bank on the original 1,500 (Qwen non-thinking x10, Qwen thinking x10 with the visible rationale, Gemma x10) + the judge confirmation (303 events x 2 orders, 3 thinking own answers on 149 questions) and its HF readouts. Ordered so a cap stop loses the least: judge first, Gemma bank last.",
+ "steps": [
+  {
+   "name": "prompt_check",
+   "env": "vllm",
+   "script": "prompt_check.py",
+   "args": []
+  },
+  {
+   "name": "qwen",
+   "env": "vllm",
+   "script": "multi_step.py",
+   "args": [
+    "--module",
+    "gen_run",
+    "--steps",
+    "[[\"--task\", \"judge\", \"--chunk\", \"50\"], [\"--task\", \"bank\", \"--mode\", \"qwen_nt\", \"--set\", \"original\", \"--split\", \"all\", \"--chunk\", \"50\", \"--tag\", \"orig\"], [\"--task\", \"bank\", \"--mode\", \"qwen_t\", \"--set\", \"original\", \"--split\", \"all\", \"--chunk\", \"50\", \"--tag\", \"orig\"]]"
+   ]
+  },
+  {
+   "name": "judge_readouts",
+   "env": "hf",
+   "script": "multi_step.py",
+   "args": [
+    "--module",
+    "hf_readouts",
+    "--steps",
+    "[[\"--task\", \"judge\"], [\"--task\", \"own\"]]"
+   ]
+  },
+  {
+   "name": "gemma",
+   "env": "vllm",
+   "script": "multi_step.py",
+   "args": [
+    "--module",
+    "gen_run",
+    "--steps",
+    "[[\"--task\", \"bank\", \"--mode\", \"gemma\", \"--set\", \"original\", \"--split\", \"all\", \"--chunk\", \"50\", \"--tag\", \"orig\"]]"
+   ]
+  }
+ ]
+}
