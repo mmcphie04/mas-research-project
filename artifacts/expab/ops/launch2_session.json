@@ -1,0 +1,27 @@
+{
+ "note": "Launch 2 (cap 6): B pilot on development -- up to 100 disputed panels per mode (disjoint triples of the launch-1 bank, staged onto the runtime first), arms debate + alone; HF readouts (commitment, activations at A and B, curves) and the positive control (50 contexts per mode).",
+ "steps": [
+  {
+   "name": "qwen_pilot",
+   "env": "vllm",
+   "script": "multi_step.py",
+   "args": [
+    "--module",
+    "gen_run",
+    "--steps",
+    "[[\"--task\", \"b\", \"--mode\", \"qwen_nt\", \"--arms\", \"debate\", \"alone\", \"--split\", \"dev\", \"--n-panels\", \"100\", \"--chunk\", \"25\", \"--tag\", \"pilot\"], [\"--task\", \"b\", \"--mode\", \"qwen_t\", \"--arms\", \"debate\", \"alone\", \"--split\", \"dev\", \"--n-panels\", \"100\", \"--chunk\", \"25\", \"--tag\", \"pilot\"]]"
+   ]
+  },
+  {
+   "name": "pilot_readouts",
+   "env": "hf",
+   "script": "multi_step.py",
+   "args": [
+    "--module",
+    "hf_readouts",
+    "--steps",
+    "[[\"--task\", \"b\", \"--parts\", \"b_qwen_nt_debate__dev_pilot\", \"b_qwen_nt_alone__dev_pilot\", \"b_qwen_t_debate__dev_pilot\", \"b_qwen_t_alone__dev_pilot\"], [\"--task\", \"posctl\", \"--mode\", \"qwen_t\", \"--n-posctl\", \"50\"], [\"--task\", \"posctl\", \"--mode\", \"qwen_nt\", \"--n-posctl\", \"50\"]]"
+   ]
+  }
+ ]
+}

@@ -133,3 +133,10 @@ down (~09:50); the runtime job was unaffected, but nothing would have stopped an
 | 16:34–16:40 | attempt 2: session `smoke2`; vLLM 0.33.0 environment with FlashInfer kernels installed; launched 16:40 |
 | 16:40–16:55 | gemma step 268 s (peak 33.6 GB; KV cache 8.4 GiB), qwen step 522 s (peak 34.7 GB; KV 16.6 GiB), HF readouts 43 s (peak 17.1 GB): all exit 0; every chunk backed up, verified locally and on Google Drive; **runtime stopped** 16:55:37; nothing incomplete |
 | 16:57 | balance 244.12: smoke total **2.95 units** of the 4-unit cap (both attempts) |
+
+## 2026-11-20: Experiments A/B launch 1 (bank on the original 1,500 + judge confirmation; cap 38, stop line 206.12)
+
+| time | event |
+|---|---|
+| 22:43 | `colab new` for an A100 failed (Service Unavailable): nothing created or launched; a supervisor started by the same command was stopped (no runtime existed); balance unchanged 244.12 |
+| 22:57 | retry: A100 session `l1` granted at 22:49 (two more Service Unavailable first); setup at `31799ed`; vLLM environment; launched; supervisor started |
