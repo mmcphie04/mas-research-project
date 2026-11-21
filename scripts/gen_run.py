@@ -144,6 +144,9 @@ def main(argv=None) -> int:
     ap.add_argument("--limit", type=int, default=None, help="first N questions of the split (smoke)")
     ap.add_argument("--samples", type=int, default=None, help="bank: samples per question (default: the plan's)")
     ap.add_argument("--n-panels", type=int, default=None)
+    ap.add_argument("--panel-start", type=int, default=0,
+                    help="b: skip the first K panels of the seeded order (launch 5: the extra alone panels "
+                         "follow the panels shared by all four arms, so the two sets are disjoint)")
     ap.add_argument("--panel-seed", type=int, default=20261122)
     ap.add_argument("--out-root", required=True)
     ap.add_argument("--job", required=True)
@@ -191,13 +194,14 @@ def main(argv=None) -> int:
                      {**plan_info, "arm": arm, "pool": spec, "questions_with_disagreement": len(reqs)}, post=post)
     elif a.task == "b":
         bank = T.bank_index(A.read_rows(a.bank_root or out, a.bank_job or a.job, "bank_*"))  # bank parts only
-        ids = T.select_panels(bank, qs, assign, a.split, a.mode, a.n_panels, a.panel_seed)
+        ids = T.select_panels(bank, qs, assign, a.split, a.mode, None, a.panel_seed)
+        ids = ids[a.panel_start:] if a.n_panels is None else ids[a.panel_start:a.panel_start + a.n_panels]
         byq = {q.question_id: q for q in qs}
         for arm in a.arms:
             reqs = [T.b_requests(byq[q], a.mode, T.panel(bank, a.mode, q, t), arm, a.visible_rationale, t) for q, t in ids]
             batches = [[r for g in c for r in g] for c in chunks(reqs, a.chunk)]
             run_part(a, out, a.job, part_name(f"b_{a.mode}_{arm}", a.split, a.tag), E.MODES[a.mode], batches,
-                     {**plan_info, "arm": arm, "panels": len(ids), "panel_seed": a.panel_seed})
+                     {**plan_info, "arm": arm, "panels": len(ids), "panel_seed": a.panel_seed, "panel_start": a.panel_start})
     elif a.task == "sanity":
         # vLLM on questions that already have HF-generated answers under the same protocol (the judge
         # run's own answers: same system prompt, persona, 250 words, question block): a like-for-like check

@@ -94,3 +94,24 @@ def test_sanity_main250_uses_the_bank_protocol_on_main250_questions(tmp_path):
                    "--limit", "3", "--samples", "2", "--chunk", "3"]) == 0
     r = A.read_rows(tmp_path, "m", "sanity_main250_gemma")
     assert len(r) == 6 and r.meta_gold.between(0, 9).all()
+
+
+def test_launch5_layout_shared_panels_plus_extra_alone(tmp_path):
+    """All arms on the first N panels; alone alone on the next ones. Contrasts pair only on the shared
+    panels; the alone arm's summary covers both parts."""
+    G = _gen()
+    spec = importlib.util.spec_from_file_location("expb_analysis", ROOT / "scripts" / "expb_analysis.py")
+    B = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(B)
+    base = ["--out-root", str(tmp_path), "--job", "k", "--engine", "stub", "--split", "dev", "--limit", "40", "--chunk", "20"]
+    assert G.main(["--task", "bank", "--mode", "qwen_nt", *base]) == 0
+    assert G.main(["--task", "b", "--mode", "qwen_nt", "--arms", "debate", "alone", "--n-panels", "6", "--tag", "full", *base]) == 0
+    assert G.main(["--task", "b", "--mode", "qwen_nt", "--arms", "alone", "--panel-start", "6", "--n-panels", "5",
+                   "--tag", "fullx", *base]) == 0
+    df, calls = B.load(tmp_path, "k")
+    alone, debate = set(df[df.b_arm == "alone"].panel), set(df[df.b_arm == "debate"].panel)
+    assert len(debate) == 6 and debate < alone and len(alone - debate) == 5
+    s = B.summary(df, calls, 6.7)
+    assert s["qwen_nt alone"]["panels"] == 11 and s["qwen_nt debate"]["panels"] == 6
+    c = B.contrasts(df)["qwen_nt: debate - alone"]["changed"]
+    assert c["n"] == 6

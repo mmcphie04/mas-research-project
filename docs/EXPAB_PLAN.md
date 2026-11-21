@@ -518,7 +518,7 @@ panels per question.
 - So the letter is not linearly readable at A from these activations, and the A-position probe
   analysis is not validated by its own positive control.
 
-**Proposed amendment (pending review; nothing launched depends on it before launch 5):**
+**Amendment (proposed 2026-11-21; approved at the review of launches 1–2, 2026-11-21):**
 
 - Also store the residual stream at **position R, the readout position** (the last token of
   prompt + `Final answer: (`). It comes from the same forward pass as the commitment readout, so
@@ -572,3 +572,30 @@ Options:
 
 Spent so far: 29.07 units (launches 1–2). With launches 3 and 4 at their estimates, about 87 units
 are used, which leaves about 99 of the ~186.
+
+## Review of launches 1–2 (2026-11-21): decisions
+
+1. **Position R approved.**
+   - Activations are stored as [A, B, R], plus the 200-context positive-control rerun (in launch 3).
+   - Pass rule, unchanged from the plan: readout recovery ≥ 0.9 and best probe accuracy ≥ 0.8, per
+     position.
+   - If R passes its control and A does not, B's probes are reported at R and B, with A shown as
+     failing.
+2. **Launch 4** (cap 40) runs every chooser arm on all 3,500 questions (`artifacts/expab/ops/launch4_session.json`).
+   - It runs after launch 3 if the launch-3 report shows no surprises.
+3. **Launch 5 = option 2** (cap 50; `artifacts/expab/ops/launch5_session.json`).
+   - All four arms on the first **440** (non-thinking) / **393** (thinking) held-out disputed panels
+     of the seeded order (tag `full`). The paired contrasts use these panels.
+   - Then reconsider-alone on the **following** panels of the same order (`gen_run --panel-start`;
+     tag `fullx`), up to about 400 helpful+harmful events at the pilot's rate: 1,913 more
+     non-thinking and 1,146 more thinking, or fewer if the supply runs out.
+   - The two sets are disjoint by construction. Debate − alone stays paired on the shared panels;
+     the extra alone panels feed only the per-arm alone estimates.
+   - HF readouts follow each half, so the shared panels are complete first.
+4. **The like-for-like Gemma check.** This rule is committed before its data were seen.
+   - **Data:** Gemma ×10 under the bank protocol on main250's own 200 questions (vLLM), against
+     main250's HF pool (10 samples per question).
+   - **Statistic:** the per-question accuracy difference (vLLM − HF), with a 95% bootstrap CI that
+     resamples questions (`expab_launch_report.main250_like_for_like`).
+   - **Rule:** **a real gap = that CI excludes zero.** A real gap stops the work for review before
+     launch 4. Otherwise launch 4 then launch 5 run.

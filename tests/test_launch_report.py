@@ -30,3 +30,16 @@ def test_launch_report_on_the_stub(tmp_path):
     s = r["disputed_panel_supply"]["qwen_t dev"]
     assert s["disputed_panels"] == sum(int(k) * v for k, v in s["panels_per_question"].items())
     assert 0 <= r["gemma_accuracy_check"]["vllm_bank_accuracy"] <= 1
+
+
+def test_main250_like_for_like_check(tmp_path):
+    import pytest
+
+    if not (ROOT / "runs/main250/main250-pool/agent_states.parquet").exists():
+        pytest.skip("needs the main250 archive (runs/main250)")
+    G, R = _load("gen_run"), _load("expab_launch_report")
+    assert G.main(["--task", "sanity_main250", "--mode", "gemma", "--out-root", str(tmp_path), "--job", "m",
+                   "--engine", "stub", "--samples", "2", "--chunk", "100"]) == 0
+    r = R.main250_like_for_like(tmp_path, "m")
+    assert r["questions"] == 200 and r["vllm_samples"] == 400 and 0.5 < r["hf_accuracy"] < 0.8
+    assert r["ci95"][0] <= r["difference_vllm_minus_hf"] <= r["ci95"][1] and isinstance(r["real_gap"], bool)

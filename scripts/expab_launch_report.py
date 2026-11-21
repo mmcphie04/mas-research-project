@@ -72,6 +72,29 @@ def gemma_accuracy(bank: pd.DataFrame) -> dict:
             "note": "different questions (main250 positions 321-520 vs these); same protocol"}
 
 
+def main250_like_for_like(root: Path, job: str) -> dict:
+    """Gemma's vLLM bank protocol on main250's own 200 questions (part sanity_main250_gemma) against
+    main250's HF pool (10 samples per question, phase pre). Paired by question; 95% bootstrap CI of
+    the difference (vLLM - HF), resampling questions. Rule committed before the data were seen
+    (docs/EXPAB_PLAN.md): a real gap = that CI excludes zero."""
+    v = A.read_rows(root, job, "sanity_main250_gemma")
+    p = ROOT / "runs/main250/main250-pool/agent_states.parquet"
+    if not len(v) or not p.exists():
+        return {}
+    m = pd.read_parquet(p, columns=["phase", "question_id", "correct"])
+    hf = m[m.phase == "pre"].groupby("question_id").correct.mean()
+    vq = (v.answer == v.meta_gold).astype(float).groupby(v.question_id).mean()
+    qs = sorted(set(vq.index) & set(hf.index))
+    d = (vq.loc[qs] - hf.loc[qs]).to_numpy()
+    b = d[np.random.default_rng(0).integers(0, len(d), (10000, len(d)))].mean(1)
+    lo, hi = float(np.quantile(b, .025)), float(np.quantile(b, .975))
+    return {"questions": len(qs), "vllm_samples": len(v), "vllm_accuracy": float(vq.loc[qs].mean()),
+            "hf_accuracy": float(hf.loc[qs].mean()), "difference_vllm_minus_hf": float(d.mean()), "ci95": [lo, hi],
+            "real_gap": bool(lo > 0 or hi < 0), "vllm_parse_rate": float(v.parsed.mean()),
+            "vllm_answer_cap_rate": float((v.answer_finish == "length").mean()),
+            "vllm_mean_generated_tokens": float(v.generated_tokens.mean())}
+
+
 def disagreement(bank: pd.DataFrame, assign: dict) -> dict:
     idx = T.bank_index(bank)
     qs = sorted(set(bank.question_id))
@@ -102,7 +125,8 @@ def main(argv=None) -> int:
     a = ap.parse_args(argv)
     _, assign, _ = T.load_questions(ROOT / "artifacts/expab/plan")
     modes, bank = per_mode(Path(a.root), a.job, a.tag)
-    r = {"bank": modes, "gemma_accuracy_check": gemma_accuracy(bank), **disagreement(bank, assign)}
+    r = {"bank": modes, "gemma_accuracy_check": gemma_accuracy(bank),
+         "gemma_main250_like_for_like": main250_like_for_like(Path(a.root), a.job), **disagreement(bank, assign)}
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
     (out / "launch_report.json").write_text(json.dumps(r, indent=1, default=str))

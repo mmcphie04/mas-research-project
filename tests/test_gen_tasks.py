@@ -158,3 +158,13 @@ def test_visible_rationale_switch_only_touches_thinking_mode(qs):
     rows = T.panel(bank, "qwen_t", q[0].question_id)
     b_on = T.b_requests(q[0], "qwen_t", rows, "debate", visible_rationale=True)
     assert b_on[0].messages[0]["content"] == on  # the B prompt reuses the bank's round-0 prompt
+
+
+def test_panel_start_gives_the_next_panels_in_the_same_order(qs):
+    q, _ = qs
+    bank = T.bank_index(bank_rows(q, "qwen_nt", 10, letters=lambda i, a: [0, 1, 0, 2, 2, 1, 0, 0, 1, 3][a]))
+    asg = {x.question_id: "heldout" for x in q}
+    allp = T.select_panels(bank, q, asg, "heldout", "qwen_nt", None, seed=5)
+    assert T.select_panels(bank, q, asg, "heldout", "qwen_nt", 7, seed=5) == allp[:7]
+    shared, extra = allp[:7], allp[7:7 + 10]  # gen_run --panel-start 7 --n-panels 10
+    assert not set(shared) & set(extra) and len(extra) == min(10, len(allp) - 7)

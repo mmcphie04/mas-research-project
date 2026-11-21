@@ -1,0 +1,55 @@
+{
+ "note": "Launch 5 (cap 50): Experiment B full run on held-out disputed panels (original + extension banks, staged). All four arms on the first 440 (non-thinking) / 393 (thinking) panels of the seeded order (tag full; paired contrasts on these); then reconsider-alone on the following panels up to ~400 helpful+harmful events at the pilot's rate: 1,913 more non-thinking, 1,146 more thinking (tag fullx; per-arm estimates only; fewer if the supply runs out). HF readouts (activations at A, B, R) after each half, so the shared panels are complete first.",
+ "steps": [
+  {
+   "name": "prompt_check",
+   "env": "vllm",
+   "script": "prompt_check.py",
+   "args": []
+  },
+  {
+   "name": "qwen_shared",
+   "env": "vllm",
+   "script": "multi_step.py",
+   "args": [
+    "--module",
+    "gen_run",
+    "--steps",
+    "[[\"--task\", \"b\", \"--mode\", \"qwen_nt\", \"--arms\", \"debate\", \"alone\", \"dissent\", \"anon\", \"--n-panels\", \"440\", \"--tag\", \"full\", \"--set\", \"all\", \"--split\", \"heldout\", \"--chunk\", \"50\"], [\"--task\", \"b\", \"--mode\", \"qwen_t\", \"--arms\", \"debate\", \"alone\", \"dissent\", \"anon\", \"--n-panels\", \"393\", \"--tag\", \"full\", \"--set\", \"all\", \"--split\", \"heldout\", \"--chunk\", \"50\"]]"
+   ]
+  },
+  {
+   "name": "readouts_shared",
+   "env": "hf",
+   "script": "multi_step.py",
+   "args": [
+    "--module",
+    "hf_readouts",
+    "--steps",
+    "[[\"--task\", \"b\", \"--parts\", \"b_qwen_nt_debate__heldout_full\", \"b_qwen_nt_alone__heldout_full\", \"b_qwen_nt_dissent__heldout_full\", \"b_qwen_nt_anon__heldout_full\", \"b_qwen_t_debate__heldout_full\", \"b_qwen_t_alone__heldout_full\", \"b_qwen_t_dissent__heldout_full\", \"b_qwen_t_anon__heldout_full\"]]"
+   ]
+  },
+  {
+   "name": "qwen_extra_alone",
+   "env": "vllm",
+   "script": "multi_step.py",
+   "args": [
+    "--module",
+    "gen_run",
+    "--steps",
+    "[[\"--task\", \"b\", \"--mode\", \"qwen_nt\", \"--arms\", \"alone\", \"--panel-start\", \"440\", \"--n-panels\", \"1913\", \"--tag\", \"fullx\", \"--set\", \"all\", \"--split\", \"heldout\", \"--chunk\", \"50\"], [\"--task\", \"b\", \"--mode\", \"qwen_t\", \"--arms\", \"alone\", \"--panel-start\", \"393\", \"--n-panels\", \"1146\", \"--tag\", \"fullx\", \"--set\", \"all\", \"--split\", \"heldout\", \"--chunk\", \"50\"]]"
+   ]
+  },
+  {
+   "name": "readouts_extra",
+   "env": "hf",
+   "script": "multi_step.py",
+   "args": [
+    "--module",
+    "hf_readouts",
+    "--steps",
+    "[[\"--task\", \"b\", \"--parts\", \"b_qwen_nt_alone__heldout_fullx\", \"b_qwen_t_alone__heldout_fullx\"]]"
+   ]
+  }
+ ]
+}

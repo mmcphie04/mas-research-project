@@ -1,0 +1,33 @@
+{
+ "note": "Launch 4 (cap 40): every chooser arm on all 3,500 questions (development and held-out), from the staged banks (original + extension). Chunks of 150 questions (up to 450 requests) for batching. No held-out choosing outcome is looked at; those are analysed once, as committed.",
+ "steps": [
+  {
+   "name": "prompt_check",
+   "env": "vllm",
+   "script": "prompt_check.py",
+   "args": []
+  },
+  {
+   "name": "qwen",
+   "env": "vllm",
+   "script": "multi_step.py",
+   "args": [
+    "--module",
+    "gen_run",
+    "--steps",
+    "[[\"--task\", \"choose\", \"--arm\", \"A3\", \"A2_5\", \"A2_10\", \"A1_qt5\", \"A1_qnt5\", \"A1_qnt10\", \"--set\", \"all\", \"--split\", \"all\", \"--chunk\", \"150\"]]"
+   ]
+  },
+  {
+   "name": "gemma",
+   "env": "vllm",
+   "script": "multi_step.py",
+   "args": [
+    "--module",
+    "gen_run",
+    "--steps",
+    "[[\"--task\", \"choose\", \"--arm\", \"A1_g5\", \"A1_g10\", \"--set\", \"all\", \"--split\", \"all\", \"--chunk\", \"150\"]]"
+   ]
+  }
+ ]
+}
