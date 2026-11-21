@@ -159,3 +159,13 @@ down (~09:50); the runtime job was unaffected, but nothing would have stopped an
 | 08:17–08:26 | the job process exited at 08:17 but stayed a zombie (`<defunct>`, not reaped by the Colab kernel), and `ps -p` counts a zombie as running, so the supervisor still saw the job alive. It was gone by 08:25, possibly reaped as a side effect of diagnostic commands in the same kernel (mechanism not confirmed); a planned PID-file workaround was not applied (its precondition check stopped it first). About 9 minutes / ~1 unit idle |
 | 08:26 | supervisor: final backup, local archive verified, **runtime stopped** 08:26:31, Drive verified; nothing incomplete. Balance **182.20**: launch 3 **32.85 units** of 42 |
 | 08:30 | fix: the supervisor's alive check now treats a zombie as exited (`colab_backup.ColabRemote.process_alive`) |
+
+## 2026-11-21: launch 4 (every chooser arm on all 3,500 questions; cap 40, stop line 142.20)
+
+| time | event |
+|---|---|
+| 08:39–08:49 | five A100 requests refused (Service Unavailable); nothing created |
+| 08:49–09:11 | retry loop: session `l4` granted 08:52; setup at `43dd746`; vLLM environment; **staging failed** (cause not captured: the launch script kept only the last line); script stopped the runtime 09:11; nothing launched. Balance 180.52 (**1.68 units** toward launch 4's cap) |
+| 09:13 | launch script now logs staging in full and retries it up to 3 times (staging resumes: chunks complete on the runtime are skipped); second attempt, session `l4b` |
+| 09:12–10:14 | second attempt: session `l4b` granted 09:23 (two Service Unavailable first); setup at `fccdc70`; staging stalled 3 times: a `colab exec` install call hung past its own timeout at a different chunk each time (c003, c004, c012 of the Gemma extension bank), while the runtime answered at once on the next attempt. 12 chunks staged. Script stopped the runtime 10:14; nothing launched. Balance 174.94 (**5.58 units**; launch 4 so far **7.26 units**, nothing run) |
+| 10:20 | fix: staging in ~40 MB batches (about 5 uploads instead of ~420 calls), short per-call timeouts, and idempotent retries that re-send only chunks the runtime does not have; tested with stalling fakes. Staging in the launch script bounded at 25 minutes. Third attempt |
