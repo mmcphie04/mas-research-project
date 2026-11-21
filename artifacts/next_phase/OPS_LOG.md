@@ -155,3 +155,7 @@ down (~09:50); the runtime job was unaffected, but nothing would have stopped an
 | time | event |
 |---|---|
 | 03:28–03:36 | A100 session `l3` (one Service Unavailable first); setup at `d3a68dd`; vLLM environment; launched; supervisor started |
+| 03:37–08:17 | prompt gate 13 s; qwen step 11,746 s (banks qwen_nt and qwen_t on the 2,000-question extension); gemma step 5,027 s (main250 like-for-like check, then the Gemma extension bank); positive-control rerun 84 s; all exit 0; peak 35.5 GB |
+| 08:17–08:26 | the job process exited at 08:17 but stayed a zombie (`<defunct>`, not reaped by the Colab kernel), and `ps -p` counts a zombie as running, so the supervisor still saw the job alive. It was gone by 08:25, possibly reaped as a side effect of diagnostic commands in the same kernel (mechanism not confirmed); a planned PID-file workaround was not applied (its precondition check stopped it first). About 9 minutes / ~1 unit idle |
+| 08:26 | supervisor: final backup, local archive verified, **runtime stopped** 08:26:31, Drive verified; nothing incomplete. Balance **182.20**: launch 3 **32.85 units** of 42 |
+| 08:30 | fix: the supervisor's alive check now treats a zombie as exited (`colab_backup.ColabRemote.process_alive`) |

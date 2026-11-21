@@ -99,8 +99,11 @@ class ColabRemote(B.Remote):
         return self._exec(body, timeout=150)
 
     def process_alive(self):
+        # a zombie (exited, not yet reaped by the kernel that started it) counts as exited: launch 3's
+        # job process sat as <defunct> for ~9 minutes after finishing and kept the runtime running
         body = (f"import subprocess\npid = int(open({self.root + '/' + self.job + '.pid'!r}).read())\n"
-                f"print({MARK!r} + json.dumps(subprocess.run(['ps', '-p', str(pid)], capture_output=True).returncode == 0))")
+                f"st = subprocess.run(['ps', '-p', str(pid), '-o', 'stat='], capture_output=True, text=True).stdout.strip()\n"
+                f"print({MARK!r} + json.dumps(bool(st) and not st.startswith('Z')))")
         return bool(self._exec(body, timeout=150))
 
     def prepare(self, prefix):
