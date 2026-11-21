@@ -57,6 +57,12 @@ class ColabChunkStager:
         body = (f"from pathlib import Path\nroot = Path({self.root!r}); root.mkdir(parents=True, exist_ok=True)\n"
                 f"with tarfile.open('/content/stage_chunk.tar') as t: t.extractall(root, filter='data')\n"
                 f"_check_hashes(root / {name!r})\nos.remove('/content/stage_chunk.tar')\n"
+                # the runtime's backup state: a staged chunk is already on the laptop -- acknowledge it
+                # (stamp = sha256 of its completion record, as mad.cli_backup) so it is not sent back
+                f"import hashlib\nst = Path('/content/backup_state'); st.mkdir(parents=True, exist_ok=True)\n"
+                f"p = st / 'acked.json'\nak = json.load(open(p)) if p.exists() else {{}}\n"
+                f"ak[{name!r}] = hashlib.sha256(open(root / {name!r} / 'completion.json', 'rb').read()).hexdigest()\n"
+                f"json.dump(ak, open(p, 'w'))\n"
                 f"print({MARK!r} + json.dumps('ok'))")
         return self._run(body)
 
