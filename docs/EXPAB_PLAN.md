@@ -527,3 +527,48 @@ panels per question.
   launch 3's session; exploratory, about 3 minutes).
 - If R passes and A does not, the B probes would be reported at R (and B), with A shown as failing
   its control.
+
+### Re-pricing of launches 3–5 (after launch 1 and the pilot; estimates, not measurements)
+
+Sources:
+
+- Launch 1's full-scale throughput.
+- The pilot's measured seconds per panel: generation plus HF readouts at batch size 1 (the pilot's
+  25-panel chunks; larger chunks may batch generation better).
+- The smoke test's chooser tokens per request (6–15 requests per arm, so uncertain).
+- Units at 6.7 per A100-hour; ~1.5–2 units per launch for setup, staging and model loads.
+
+| launch | basis | estimate | cap |
+|---|---|---|---|
+| 3 | 22,000 Gemma + 20,000 Qwen non-thinking + 20,000 Qwen thinking requests at launch-1 tokens/request and tokens/s | ~31 | 42 |
+| 4 | chooser requests = disagreement rate × 3,500 × 3 orders, at smoke tokens/request (A1_qt5 0.66 h, A2_5 0.85, A2_10 0.69, A3 0.98, the rest 0.6 together) | ~27 (range ~25–35) | 58 |
+| 5 | see the options below | 26–43 | 30 |
+
+**Launch 5 (B full).**
+
+- Four arms per mode, contrasts paired by panel. Dissent and anon were not piloted, so they are
+  priced as debate.
+- Seconds per panel (generation + readouts):
+  - non-thinking: debate 1.56, alone 1.06;
+  - thinking: debate 6.78, alone 5.93.
+- Panels needed for 400 helpful+harmful events, at the pilot's event rates:
+
+  | mode | debate | alone |
+  |---|---|---|
+  | non-thinking | 440 | 2,353 |
+  | thinking | 393 | 1,539 |
+
+Options:
+
+1. **All four arms on the debate-sized panels** (440 non-thinking, 393 thinking): **~26 units**.
+   - Alone then gets about 75 (non-thinking) and 100 (thinking) helpful+harmful events, not 400.
+2. **Option 1 plus alone on further panels up to its target**: **~43 units**.
+   - Above the 30 cap, but within the ~186 total.
+   - The debate − alone contrast stays paired on the first 440 / 393 panels; the extra alone panels
+     feed only the per-arm alone estimates.
+   - It uses nearly all of the projected held-out supply for non-thinking (~2,500 disputed panels
+     after launch 3; to be measured).
+3. **All four arms on the alone-sized panels**: **~100 units**. Not affordable.
+
+Spent so far: 29.07 units (launches 1–2). With launches 3 and 4 at their estimates, about 87 units
+are used, which leaves about 99 of the ~186.

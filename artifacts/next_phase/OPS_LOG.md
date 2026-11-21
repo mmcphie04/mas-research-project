@@ -148,3 +148,10 @@ down (~09:50); the runtime job was unaffected, but nothing would have stopped an
 | time | event |
 |---|---|
 | 02:42–02:51 | A100 session `l2` (one Service Unavailable first); setup at `c12a279`; vLLM environment; 60 Qwen bank chunks staged and hash-checked (93 s, pre-acknowledged); pilot launched; supervisor started |
+| 02:51–03:21 | pilot: 100 disputed development panels per mode, debate and alone, both modes, with HF readouts and the 50-context positive control; every chunk backed up and on Google Drive; **runtime stopped** 03:21:52; nothing incomplete. Balance 215.05: launch 2 **4.02 units** of 6. Positive control fails at position A (`d3a68dd`) |
+
+## 2026-11-21: launch 3 (bank on the 2,000-question extension + main250 Gemma check + positive-control rerun; cap 42, stop line 173.05)
+
+| time | event |
+|---|---|
+| 03:28–03:36 | A100 session `l3` (one Service Unavailable first); setup at `d3a68dd`; vLLM environment; launched; supervisor started |

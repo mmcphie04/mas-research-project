@@ -8,8 +8,10 @@ harmful (right -> wrong), wrong_wrong; an unparsed revision is counted separatel
 never as a change.
 
 Pilot (arms debate and alone): change rate, helpful/harmful counts and ratio per mode x arm, and
-the sizing of the full run: panels needed so each mode x arm has >= 150 helpful + harmful events
-(= ceil(150 / (helpful+harmful per panel))), with the measured GPU-seconds per panel.
+the sizing of the full run: panels needed so each mode x arm has >= TARGET_HH helpful + harmful
+events (= ceil(TARGET_HH / (helpful+harmful per panel))), with the measured seconds per panel:
+generation (vLLM calls) and HF readouts (the ``_ro`` part) separately. Model loading and setup are
+not included.
 Measures (full run): the same per mode x arm, paired arm contrasts on the same panels (panel
 bootstrap), the order effect (changed agents whose two shown peers differ and whose new answer is
 one of them: last-shown vs first-shown adopted), the commitment readout (probability on the
@@ -84,6 +86,7 @@ def summary(df: pd.DataFrame, calls: pd.DataFrame, units_per_hour: float) -> dic
         panels = g.panel.nunique()
         hh = int(k.get("helpful", 0) + k.get("harmful", 0))
         secs = float(calls[calls.part.isin(set(g._part))].seconds.sum()) if len(calls) else 0.0
+        ro_secs = float(calls[calls.part.isin({f"{p}_ro" for p in set(g._part)})].seconds.sum()) if len(calls) else 0.0
         valid = g[g.kind != "unparsed"]
         per_panel_hh = hh / panels if panels else 0.0
         need = math.ceil(TARGET_HH / per_panel_hh) if per_panel_hh else None
@@ -95,9 +98,10 @@ def summary(df: pd.DataFrame, calls: pd.DataFrame, units_per_hour: float) -> dic
             "change_rate": boot_groups((valid.kind != "unchanged").astype(float), valid.question_id),
             "helpful": int(k.get("helpful", 0)), "harmful": int(k.get("harmful", 0)), "wrong_wrong": int(k.get("wrong_wrong", 0)),
             "helpful_harmful_ratio": (int(k.get("helpful", 0)) / int(k.get("harmful", 0))) if k.get("harmful", 0) else None,
-            "helpful_harmful_per_panel": per_panel_hh, "panels_needed_for_150": need,
-            "gpu_seconds_per_panel": secs / panels if panels else None,
-            "units_for_150": (need * secs / panels / 3600 * units_per_hour) if need and panels else None,
+            "helpful_harmful_per_panel": per_panel_hh, "target_helpful_harmful": TARGET_HH, "panels_needed_for_target": need,
+            "generation_seconds_per_panel": secs / panels if panels else None,
+            "readout_seconds_per_panel": ro_secs / panels if panels else None,
+            "units_for_target": (need * (secs + ro_secs) / panels / 3600 * units_per_hour) if need and panels else None,
             "thinking_capped_rate": float(g.thinking_capped.mean()) if "thinking_capped" in g else None}
     return out
 
