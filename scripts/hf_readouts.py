@@ -87,6 +87,7 @@ def main(argv=None) -> int:
     ap.add_argument("--n-posctl", type=int, default=50)
     ap.add_argument("--plan", default=str(ROOT / "artifacts/expab/plan"))
     ap.add_argument("--fake", action="store_true")
+    ap.add_argument("--tag", default=None, help="posctl: part-name suffix (a rerun never overwrites an earlier one)")
     a = ap.parse_args(argv)
     out = Path(a.out_root)
     if a.fake:
@@ -97,8 +98,8 @@ def main(argv=None) -> int:
 
     if a.task == "posctl":
         qs, assign, _ = T.load_questions(a.plan)
-        dev = [q for q in qs if assign[q.question_id] == "dev"][: a.n_posctl]
-        rng = np.random.default_rng(20261123)
+        dev = [q for q in qs if assign[q.question_id] == "dev"][: a.n_posctl]  # development only
+        rng = np.random.default_rng(20261123 if not a.tag else 20261123 + sum(map(ord, a.tag)))
         mode = MODES[a.mode]
         rows, acts = [], []
         t0 = time.time()
@@ -111,7 +112,10 @@ def main(argv=None) -> int:
             rec, act = RO.b_row(R, tok, row, thinking=mode.thinking, curves=False)
             rows.append({**rec, "question_id": q.question_id, "instructed": "ABCDEFGHIJ".index(letter)})
             acts.append(act)
-        A.write_chunk(out, a.job, f"posctl_{a.mode}", 0, rows, [{"seconds": round(time.time() - t0, 2), "requests": len(rows)}],
+        part = f"posctl_{a.mode}" + (f"__{a.tag}" if a.tag else "")
+        if A.chunk_dir(out, a.job, part, 0).exists():
+            raise SystemExit(f"{part} exists; use another --tag")
+        A.write_chunk(out, a.job, part, 0, rows, [{"seconds": round(time.time() - t0, 2), "requests": len(rows)}],
                       {"layers": list(RO.LAYERS), "model_commit": commit}, arrays={"acts": np.stack(acts)})
         return 0
     parts = a.parts or {"judge": ["judge_traces"], "own": ["judge_own"]}.get(a.task)

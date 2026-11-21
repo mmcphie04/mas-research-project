@@ -74,29 +74,32 @@ def load_acts(root: Path, job: str, part: str) -> tuple[pd.DataFrame, np.ndarray
     return (pd.concat(frames, ignore_index=True), np.concatenate(arrs)) if frames else (pd.DataFrame(), np.zeros((0,)))
 
 
-def positive_control(root, job) -> dict:
+def positive_control(root, job, part_suffix: str = "") -> dict:
     from sklearn.linear_model import LogisticRegression
     from sklearn.model_selection import StratifiedKFold, cross_val_predict
 
     out = {}
     for mode in ("qwen_t", "qwen_nt"):
-        rows, acts = load_acts(root, job, f"posctl_{mode}")
+        rows, acts = load_acts(root, job, f"posctl_{mode}{part_suffix}")
         if not len(rows):
             continue
         y = rows.instructed.to_numpy()
         readout = float(np.mean([int(np.argmax(lp)) == t for lp, t in zip(rows.commit_logprobs, y, strict=True)]))
-        probe = {}
         folds = StratifiedKFold(n_splits=5, shuffle=True, random_state=0)
-        for li, layer in enumerate(RO.LAYERS):
-            X = acts[:, 0, li, :]
-            try:
-                pred = cross_val_predict(LogisticRegression(max_iter=2000), X, y, cv=folds)
-                probe[layer] = float(np.mean(pred == y))
-            except ValueError:  # too few examples per letter for CV
-                probe[layer] = None
-        best = max((v for v in probe.values() if v is not None), default=None)
-        out[mode] = {"contexts": len(rows), "readout_recovery": readout, "probe_accuracy_by_layer": probe,
-                     "passed": bool(readout >= 0.9 and best is not None and best >= 0.8)}
+        by_pos = {}
+        for pi, pname in [(0, "A"), (2, "R")][: acts.shape[1] - 1 if acts.shape[1] == 3 else 1]:
+            probe = {}
+            for li, layer in enumerate(RO.LAYERS):
+                X = acts[:, pi, li, :]
+                try:
+                    pred = cross_val_predict(LogisticRegression(max_iter=2000), X, y, cv=folds)
+                    probe[layer] = float(np.mean(pred == y))
+                except ValueError:  # too few examples per letter for CV
+                    probe[layer] = None
+            by_pos[pname] = probe
+        best = {p: max((v for v in d.values() if v is not None), default=None) for p, d in by_pos.items()}
+        out[mode] = {"contexts": len(rows), "readout_recovery": readout, "probe_accuracy_by_position_layer": by_pos,
+                     "passed_by_position": {p: bool(readout >= 0.9 and b is not None and b >= 0.8) for p, b in best.items()}}
     return out
 
 
@@ -127,7 +130,7 @@ def probes(root, job, assign) -> dict:
         for tname, sel in targets.items():
             d = df[sel & (df["mode"] == mode)]
             y = (d.changed if tname == "will_change_from_A" else d.helpful).to_numpy()
-            positions = [0] if tname == "will_change_from_A" else [0, 1]
+            positions = ([0] if tname == "will_change_from_A" else [0, 1]) + ([2] if X.shape[1] == 3 else [])  # + R
             dev, held = d.split == "dev", d.split == "heldout"
             best, scores = None, {}
             for pos in positions:
@@ -144,7 +147,7 @@ def probes(root, job, assign) -> dict:
                             continue
                         pred[te] = LogisticRegression(max_iter=2000, C=0.1).fit(Xs[m][tr], y[m][tr]).predict_proba(Xs[m][te])[:, 1]
                     n, den = within_q_auroc(pred, y[m], g)
-                    scores[f"pos{'AB'[pos]}_L{layer}"] = n / den if den else None
+                    scores[f"pos{'ABR'[pos]}_L{layer}"] = n / den if den else None
                     if den and (best is None or n / den > best[0]):
                         best = (n / den, pos, li, layer)
             res = {"dev_within_question_auroc": scores, "chosen": None, "heldout": None}
@@ -153,7 +156,7 @@ def probes(root, job, assign) -> dict:
                 Xs = X[d.index][:, pos, li, :]
                 ok = ~np.isnan(Xs).any(1)
                 m_dev, m_held = dev.to_numpy() & ok, held.to_numpy() & ok
-                res["chosen"] = f"pos{'AB'[pos]}_L{layer}"
+                res["chosen"] = f"pos{'ABR'[pos]}_L{layer}"
                 if m_held.sum() and len(set(y[m_dev])) == 2:
                     clf = LogisticRegression(max_iter=2000, C=0.1).fit(Xs[m_dev], y[m_dev])
                     s = clf.predict_proba(Xs[m_held])[:, 1]

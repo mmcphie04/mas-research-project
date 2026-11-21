@@ -142,3 +142,9 @@ down (~09:50); the runtime job was unaffected, but nothing would have stopped an
 | 22:57 | retry: A100 session `l1` granted at 22:49 (two more Service Unavailable first); setup at `31799ed`; vLLM environment; launched; supervisor started |
 | 22:57–02:35 | prompt gate passed on the runtime (12 s); qwen step 9,190 s (judge 606 traces + 447 own; banks qwen_nt and qwen_t on 1,500), judge readouts 197 s, gemma bank 3,493 s; peak 35.0 GB; every chunk backed up and on Google Drive; **runtime stopped** 02:35:47; nothing incomplete |
 | 02:37 | balance 219.07: launch 1 **25.05 units** of 38. Judge confirmation analysed as committed (`3ad6038`): decision bar not met |
+
+## 2026-11-21: launch 2 (B pilot on development; cap 6, stop line 213.07)
+
+| time | event |
+|---|---|
+| 02:42–02:51 | A100 session `l2` (one Service Unavailable first); setup at `c12a279`; vLLM environment; 60 Qwen bank chunks staged and hash-checked (93 s, pre-acknowledged); pilot launched; supervisor started |

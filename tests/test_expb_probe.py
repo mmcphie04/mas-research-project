@@ -37,5 +37,7 @@ def test_probe_pipeline_runs(tmp_path):
     assert P.main(["--root", str(tmp_path), "--job", "x", "--out", str(tmp_path / "an")]) == 0
     r = json.loads((tmp_path / "an" / "expb_probes.json").read_text())
     pc = r["positive_control"]["qwen_t"]
-    assert pc["contexts"] == 50 and set(pc["probe_accuracy_by_layer"]) == {"14", "22", "31"} and pc["passed"] is False
+    assert pc["contexts"] == 50 and set(pc["probe_accuracy_by_position_layer"]) == {"A", "R"}
+    assert set(pc["probe_accuracy_by_position_layer"]["R"]) == {"14", "22", "31"}
+    assert set(pc["passed_by_position"]) == {"A", "R"}
     assert "qwen_t will_change_from_A" in r["probes"]

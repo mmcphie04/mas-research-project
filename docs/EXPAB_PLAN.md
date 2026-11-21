@@ -481,3 +481,49 @@ GPU time):
 Launches 1–3 may run back to back. Launches 2–5 are re-priced from launch 1's measured throughput
 (total ≤ ~186 units). **No held-out choosing outcome is looked at before its one committed
 analysis.**
+
+## Launch 1 and the pilot (2026-11-21) — and a proposed amendment (pending review)
+
+**Launch 1** (25.05 units of 38).
+
+- Bank on the original 1,500:
+  - parse 98.9% (Gemma), 99.9% (Qwen non-thinking), 99.9% (Qwen thinking);
+  - thinking-cap 4.1%; answer-cap 1.1% / 0 / 0.2%.
+- Gemma's vLLM bank: mean length 321 tokens (main250 HF 311), stated-answer rate 98.9% (99.15%),
+  capped 1.1% (0.85%).
+  - Accuracy 0.588 [0.567, 0.610], against 0.643 for main250's HF answers, which are **different
+    questions**.
+  - A like-for-like check (Gemma ×10 on main250's own 200 questions) is added to launch 3.
+- **The judge confirmation does not meet its committed bar.** On the 303 new events, accuracy is
+  0.746 [0.642, 0.838] and the own-answer rule scores 0.792 (`artifacts/revision_gate/judge/confirmation_results.json`).
+- Full-scale throughput (generated tokens/s): Gemma 1,472; Qwen non-thinking 4,060; Qwen thinking
+  2,250.
+
+**Launch 2: the B pilot** (4.02 units of 6). On development: 100 disputed panels per mode, 1.1–1.2
+panels per question.
+
+| mode × arm | change rate | helpful / harmful | helpful+harmful per panel |
+|---|---|---|---|
+| non-thinking, debate | 0.55 | 52 / 39 | 0.91 |
+| non-thinking, alone | 0.10 | 14 / 3 | 0.17 |
+| thinking, debate | 0.48 | 71 / 31 | 1.02 |
+| thinking, alone | 0.12 | 20 / 6 | 0.26 |
+
+**The positive control fails at position A.**
+
+- The commitment readout recovers the instructed letter in 100% of the 50 contexts per mode.
+- Linear probes on the activations at position A (the last token of the natural context) reach
+  only 0.36–0.48 (thinking) and 0.20–0.32 (non-thinking), against chance 0.25. Standardized and
+  regularized probes, at C from 0.001 to 1, are no better.
+- So the letter is not linearly readable at A from these activations, and the A-position probe
+  analysis is not validated by its own positive control.
+
+**Proposed amendment (pending review; nothing launched depends on it before launch 5):**
+
+- Also store the residual stream at **position R, the readout position** (the last token of
+  prompt + `Final answer: (`). It comes from the same forward pass as the commitment readout, so
+  it costs nothing extra; activations become [A, B, R].
+- Rerun the positive control with **200 development contexts per mode** (tag `rerun200`, added to
+  launch 3's session; exploratory, about 3 minutes).
+- If R passes and A does not, the B probes would be reported at R (and B), with A shown as failing
+  its control.

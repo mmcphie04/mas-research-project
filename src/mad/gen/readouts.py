@@ -95,14 +95,18 @@ def letters_after_answer(R, tok, row) -> dict:
 
 def b_row(R, tok, row, thinking: bool, layers=LAYERS, curves: bool | None = None) -> tuple[dict, np.ndarray]:
     """Commitment readouts + activations at A and B, and (thinking) the answer-prediction curve.
-    Returns (record, activations[2, len(layers), d]); missing B (no stated answer) is NaN.
+    Returns (record, activations[3, len(layers), d]) at positions [A, B, R]; missing B (no stated
+    answer) is NaN.
 
     Commitment: ``commit_closed_logprobs`` -- the prompt + a CLOSED empty think block + READOUT_SUFFIX
     (for non-thinking rows the template already ends with that block) -- is the primary cross-mode
     measure; ``commit_logprobs`` (thinking rows: the OPEN think block, "at the start of the
     thinking"; non-thinking rows: identical to the closed one) is secondary."""
     prompt = open_think(tok, row["prompt_ids"]) if thinking else list(row["prompt_ids"])
-    acts_a, final = R.forward(prompt + enc(tok, READOUT_SUFFIX), [len(prompt) - 1], layers)
+    seq_r = prompt + enc(tok, READOUT_SUFFIX)
+    # A: last token of the natural context; R (proposed after the pilot's positive control): the
+    # readout position itself -- both from this one forward pass
+    acts_a, final = R.forward(seq_r, [len(prompt) - 1, len(seq_r) - 1], layers)
     commit = R.letters(final, row["n_options"])
     if thinking:
         _, fin_c = R.forward(list(row["prompt_ids"]) + enc(tok, CLOSED_EMPTY) + enc(tok, READOUT_SUFFIX), [], [])
@@ -119,6 +123,7 @@ def b_row(R, tok, row, thinking: bool, layers=LAYERS, curves: bool | None = None
         pre = list(row["prompt_ids"]) + gen[: len(gen) - n_ans + k]
         acts_b, _ = R.forward(pre, [len(pre) - 1], layers)
         vec_b = np.stack([acts_b[len(pre) - 1][layer] for layer in layers])
+    vec_r = np.stack([acts_a[len(seq_r) - 1][layer] for layer in layers])
     rec = {"request_id": row["request_id"], "commit_logprobs": [round(float(x), 5) for x in commit],
            "commit_closed_logprobs": [round(float(x), 5) for x in commit_closed],
            "b_letter_offset": k, "b_letter_aligned": bool(aligned)}
@@ -137,7 +142,7 @@ def b_row(R, tok, row, thinking: bool, layers=LAYERS, curves: bool | None = None
             mentioned.append(bool(MENTION_RE.search(tok.decode(body[:kf], skip_special_tokens=True))))
         rec.update({"curve_fractions": list(FRACTIONS), "curve_logprobs": curve, "curve_letter_mentioned": mentioned,
                     "trace_began_with_think": len(body) != len(trace)})
-    return rec, np.stack([vec_a, vec_b]).astype(np.float16)
+    return rec, np.stack([vec_a, vec_b, vec_r]).astype(np.float16)
 
 
 def positive_control_messages(base: list[dict], letter: str) -> list[dict]:

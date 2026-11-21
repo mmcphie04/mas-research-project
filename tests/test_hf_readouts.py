@@ -56,7 +56,7 @@ def test_readouts_end_to_end_on_the_stub(tmp_path):
     assert ro_t.b_letter_aligned.all() and (ro_t.b_letter_offset > 0).all()
     d = next(tmp_path.glob("x-b_qwen_t_debate__dev_ro-c*"))
     acts = np.load(d / "acts.npy")
-    assert acts.shape == (len(pd.read_parquet(d / "rows.parquet")), 2, 3, 8)  # one per row: [A, B] x 3 layers
+    assert acts.shape == (len(pd.read_parquet(d / "rows.parquet")), 3, 3, 8)  # one per row: [A, B, R] x 3 layers
     assert acts.dtype == np.float16 and A.verify_job(tmp_path, "x")["missing"] == []
     # resume: nothing recomputed
     n = len(list(tmp_path.glob("x-b_qwen_t_debate__dev_ro-c*")))
@@ -127,3 +127,15 @@ def test_nonthinking_commitments_coincide():
     rec, _ = RO.b_row(R, tok, {"request_id": "r", "prompt_ids": prompt, "gen_ids": answer, "answer_tokens": len(answer),
                                "thinking_tokens": 0, "n_options": 4}, thinking=False)
     assert rec["commit_closed_logprobs"] == rec["commit_logprobs"] and "curve_logprobs" not in rec
+
+
+def test_positive_control_reruns_never_overwrite(tmp_path):
+    import pytest
+
+    H = _load("hf_readouts")
+    args = ["--task", "posctl", "--out-root", str(tmp_path), "--job", "x", "--fake", "--n-posctl", "8"]
+    assert H.main(args) == 0
+    with pytest.raises(SystemExit, match="exists"):
+        H.main(args)
+    assert H.main([*args, "--tag", "rerun"]) == 0
+    assert (tmp_path / "x-posctl_qwen_t__rerun-c000").exists() and (tmp_path / "x-posctl_qwen_t-c000").exists()

@@ -1,5 +1,5 @@
 {
- "note": "Launch 3 (cap 42): bank on the 2,000-question held-out extension (Qwen non-thinking x10, Qwen thinking x10 with the visible rationale, Gemma x10), plus a like-for-like vLLM-vs-HF check: Gemma x10 on main250's own 200 questions (bank protocol) against main250's HF pool (~1 unit).",
+ "note": "Launch 3 (cap 42): bank on the 2,000-question held-out extension (Qwen non-thinking x10, Qwen thinking x10 with the visible rationale, Gemma x10), plus a like-for-like vLLM-vs-HF check: Gemma x10 on main250's own 200 questions (bank protocol) against main250's HF pool (~1 unit). Plus (proposal pending review, exploratory, ~3 min): the positive control rerun with 200 development contexts per mode and activations at the readout position R as well as A.",
  "steps": [
   {
    "name": "prompt_check",
@@ -27,6 +27,17 @@
     "gen_run",
     "--steps",
     "[[\"--task\", \"sanity_main250\", \"--mode\", \"gemma\", \"--samples\", \"10\", \"--chunk\", \"50\"], [\"--task\", \"bank\", \"--mode\", \"gemma\", \"--set\", \"extension\", \"--split\", \"all\", \"--chunk\", \"50\", \"--tag\", \"ext\"]]"
+   ]
+  },
+  {
+   "name": "posctl_rerun",
+   "env": "hf",
+   "script": "multi_step.py",
+   "args": [
+    "--module",
+    "hf_readouts",
+    "--steps",
+    "[[\"--task\", \"posctl\", \"--mode\", \"qwen_t\", \"--n-posctl\", \"200\", \"--tag\", \"rerun200\"], [\"--task\", \"posctl\", \"--mode\", \"qwen_nt\", \"--n-posctl\", \"200\", \"--tag\", \"rerun200\"]]"
    ]
   }
  ]
