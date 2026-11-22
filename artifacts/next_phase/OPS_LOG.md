@@ -172,3 +172,9 @@ down (~09:50); the runtime job was unaffected, but nothing would have stopped an
 | 10:16–10:27 | third attempt: session `l4c` granted 10:16 (first try); setup at `519a270`; staging 210 chunks in 6 batches, 352 s (the first batch stalled once and its retry succeeded); launched 10:26; supervisor started (stop line 142.20) |
 | 10:27–15:09 | chooser runs: A3 complete (2,114 questions, 6,342 requests; 12,289 GPU-s), A2_5 5 of 9 chunks (750 of 1,334 questions); every chunk backed up and on Google Drive |
 | 15:09 | **stop line reached** (wind-down at 142.26 vs 142.20): final backup, local archive verified, **runtime stopped** 15:09:42; incomplete: A2_5 c005–, and A2_10, A1_qt5, A1_qnt5, A1_qnt10, A1_g5, A1_g10 not started. Launch 4 **39.94 units** of 40 (7.26 of them the two failed staging attempts). Cause of the overrun: chooser tokens per request 1.3–1.7× the smoke's (6–15 requests per arm) and throughput ~1,100–1,250 tokens/s vs the bank's 2,250 (prompts ~1,100–1,400 tokens; 19–28% of traces at the 4,096 thinking cap) |
+
+## 2026-11-21: launch 4b (unfinished chooser arms in priority order; cap 58, stop line 84.26)
+
+| time | event |
+|---|---|
+| 19:10–19:19 | amendment committed (`aad5105`); A100 session `l4d` granted on the first request; setup at `aad5105`; staging 215 chunks (banks + A2_5's 5 complete chunks) in 5 batches, 31 s, no stalls; launched 19:18; supervisor started (stop line 84.26; balance at launch 141.43) |
