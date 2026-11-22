@@ -60,3 +60,17 @@ def test_choose_report_is_outcome_blind(tmp_path):
     assert all(0 <= v["pick_parse_rate"] <= 1 and v["requests"] == 3 * v["questions"] for v in r.values())
     assert "meta_gold" in set().union(*seen)  # the rows carry gold ...
     assert not any(k for v in r.values() for k in v if "acc" in k or "correct" in k)  # ... the report never uses it
+
+
+def test_b_ops_report_is_outcome_blind(tmp_path):
+    G, B = _load("gen_run"), _load("expb_ops_report")
+    base = ["--out-root", str(tmp_path), "--job", "k", "--engine", "stub", "--split", "dev", "--limit", "40", "--chunk", "20"]
+    assert G.main(["--task", "bank", "--mode", "qwen_nt", *base]) == 0
+    assert G.main(["--task", "b", "--mode", "qwen_nt", "--arms", "debate", "alone", "--n-panels", "6", "--tag", "full", *base]) == 0
+    assert G.main(["--task", "b", "--mode", "qwen_nt", "--arms", "alone", "--panel-start", "6", "--n-panels", "5",
+                   "--tag", "fullx", *base]) == 0
+    r = B.report(tmp_path, "k")
+    assert set(r) == {"b_qwen_nt_debate__dev_full", "b_qwen_nt_alone__dev_full", "b_qwen_nt_alone__dev_fullx"}
+    assert r["b_qwen_nt_debate__dev_full"]["panels"] == 6 and r["b_qwen_nt_alone__dev_fullx"]["panels"] == 5
+    assert all(v["chunks_done"] == v["chunks_expected"] and v["readouts"]["rows"] == 0 for v in r.values())
+    assert not any(k for v in r.values() for k in v if any(w in k for w in ("acc", "correct", "change", "helpful", "harmful")))
