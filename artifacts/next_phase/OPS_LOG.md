@@ -180,3 +180,10 @@ down (~09:50); the runtime job was unaffected, but nothing would have stopped an
 | 19:10–19:19 | amendment committed (`aad5105`); A100 session `l4d` granted on the first request; setup at `aad5105`; staging 215 chunks (banks + A2_5's 5 complete chunks) in 5 batches, 31 s, no stalls; launched 19:18; supervisor started (stop line 84.26; balance at launch 141.43) |
 | 19:18–02:12 | qwen_1 8,295 s (A2_5 c005–c008, A1_qt5, A1_qnt5), gemma_1 2,954 s (A1_g5), qwen_2 9,916 s (A2_10, A1_qnt10), gemma_2 3,540 s (A1_g10); all exit 0; peak 35.5 GB; every chunk backed up and on Google Drive |
 | 02:12 | job exited; local archive verified; **runtime stopped** 02:12:25; Drive verified; nothing incomplete. Balance **95.45**: launch 4b **46.81 units** of 58. All eight chooser arms complete |
+
+## 2026-11-22: launch 5 (Experiment B full run, option 2; cap 50, stop line 45.45)
+
+| time | event |
+|---|---|
+| 02:16 | launch script started at `408c27d`: A100 request with backoff, setup, staging (Qwen banks, original + extension), launch, supervisor |
+| 02:16–02:27 | one Service Unavailable, then session `l5` granted 02:21; setup at `408c27d`; staging 140 Qwen bank chunks in 4 batches, 18 s, no stalls; launched 02:27; supervisor started (stop line 45.45; balance at launch 95.28) |
