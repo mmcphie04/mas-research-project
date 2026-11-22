@@ -4,7 +4,7 @@ those are analysed once, as committed (scripts/expa_analysis.py).
 
     python scripts/expab_choose_report.py --root runs/expab --job expab --out artifacts/expab/launch4
 
-Per arm: questions with a disagreeing pool (chooser invoked), requests, pick-parse rate (a valid
+Per arm: completion (complete / partial k of n chunks / not run); questions with a disagreeing pool (chooser invoked), requests, pick-parse rate (a valid
 "Best candidate: N"), thinking-cap and answer-cap rates, context refusals, mean generated tokens,
 GPU-seconds and tokens/s.
 """
@@ -51,7 +51,10 @@ def main(argv=None) -> int:
     ap.add_argument("--tag", default=None)
     ap.add_argument("--out", required=True)
     a = ap.parse_args(argv)
-    r = report(Path(a.root), a.job, a.tag)
+    sys.path.insert(0, str(ROOT / "scripts"))
+    from expa_analysis import arm_completion  # noqa: PLC0415 -- reads the job record only
+
+    r = {"arm_completion": arm_completion(Path(a.root), a.job), "arms": report(Path(a.root), a.job, a.tag)}
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
     (out / "choose_report.json").write_text(json.dumps(r, indent=1))

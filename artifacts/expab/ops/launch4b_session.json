@@ -1,0 +1,55 @@
+{
+ "note": "Launch 4b (cap 58): the chooser arms launch 4 did not finish, in the reviewed priority order, each arm completing before the next starts: A2_5 (resumes at c005), A1_qt5, A1_qnt5, A1_g5, A2_10, A1_qnt10, A1_g10. Protocol exactly as launch 4 (including the 4,096 thinking cap). Steps follow the priority order even where that reloads a model. A3 is complete from launch 4.",
+ "steps": [
+  {
+   "name": "prompt_check",
+   "env": "vllm",
+   "script": "prompt_check.py",
+   "args": []
+  },
+  {
+   "name": "qwen_1",
+   "env": "vllm",
+   "script": "multi_step.py",
+   "args": [
+    "--module",
+    "gen_run",
+    "--steps",
+    "[[\"--task\", \"choose\", \"--arm\", \"A2_5\", \"--set\", \"all\", \"--split\", \"all\", \"--chunk\", \"150\"], [\"--task\", \"choose\", \"--arm\", \"A1_qt5\", \"--set\", \"all\", \"--split\", \"all\", \"--chunk\", \"150\"], [\"--task\", \"choose\", \"--arm\", \"A1_qnt5\", \"--set\", \"all\", \"--split\", \"all\", \"--chunk\", \"150\"]]"
+   ]
+  },
+  {
+   "name": "gemma_1",
+   "env": "vllm",
+   "script": "multi_step.py",
+   "args": [
+    "--module",
+    "gen_run",
+    "--steps",
+    "[[\"--task\", \"choose\", \"--arm\", \"A1_g5\", \"--set\", \"all\", \"--split\", \"all\", \"--chunk\", \"150\"]]"
+   ]
+  },
+  {
+   "name": "qwen_2",
+   "env": "vllm",
+   "script": "multi_step.py",
+   "args": [
+    "--module",
+    "gen_run",
+    "--steps",
+    "[[\"--task\", \"choose\", \"--arm\", \"A2_10\", \"--set\", \"all\", \"--split\", \"all\", \"--chunk\", \"150\"], [\"--task\", \"choose\", \"--arm\", \"A1_qnt10\", \"--set\", \"all\", \"--split\", \"all\", \"--chunk\", \"150\"]]"
+   ]
+  },
+  {
+   "name": "gemma_2",
+   "env": "vllm",
+   "script": "multi_step.py",
+   "args": [
+    "--module",
+    "gen_run",
+    "--steps",
+    "[[\"--task\", \"choose\", \"--arm\", \"A1_g10\", \"--set\", \"all\", \"--split\", \"all\", \"--chunk\", \"150\"]]"
+   ]
+  }
+ ]
+}

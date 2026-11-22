@@ -645,3 +645,51 @@ alive (fixed in `43dd746`). Results are in `artifacts/expab/launch3/`.
 | thinking | 1,852 | 393 + 1,146 = 1,539 |
 
 Development supply: 524 non-thinking and 355 thinking.
+
+## Launch 4 results and the launch 4b amendment (review of launches 3–4, 2026-11-21)
+
+**Launch 4** stopped at its stop line (39.94 units of 40, including 7.26 lost to two failed staging
+attempts).
+
+- **A3 complete:** 2,114 questions, 6,342 requests.
+- **A2_5 partial:** 5 of 9 chunks.
+- Not started: A2_10, A1_qt5, A1_qnt5, A1_qnt10, A1_g5, A1_g10.
+- Outcome-blind operational stats (`artifacts/expab/launch4/choose_report.json`):
+
+  | arm | picks parsed | thinking-cap rate | tokens per request | tokens/s |
+  |---|---|---|---|---|
+  | A3 | 99.9% | 18.6% | 2,096 | 1,083 |
+  | A2_5 | 99.8% | 27.7% | 2,365 | 1,256 |
+
+  Answer-cap rates are 0.1–0.2%, and no requests were refused for context.
+- **Why it overran:** the smoke-based estimate missed by about 3.5×. Tokens per request were
+  1.3–1.7× the smoke's, and throughput was about half the bank's.
+
+**Launch 4b (cap 58) — committed before it runs:**
+
+1. **Order.** The unfinished arms run in this priority order: finish A2_5; then A1_qt5, A1_qnt5,
+   A1_g5, A2_10, A1_qnt10, A1_g10 (`artifacts/expab/ops/launch4b_session.json`).
+   - Each arm completes before the next starts; the first failing step ends the session.
+   - So the cap can cut only the lowest-priority arms.
+2. **Protocol.** Every setting is as in launch 4, including the 4,096 thinking cap and chunks of
+   150 questions (A2_5 resumes into its own chunks).
+3. **If any arm is not run, or is cut part-way:**
+   - The **headline rule applies to the completed arms only**: the arm with the largest
+     development P1 gain among them, evaluated once on held-out.
+   - A partial arm is never analysed.
+   - The omission is reported: which arms, and how many chunks each completed.
+   - Implemented in `expa_analysis.arm_completion` / `run`: `arms_analysed`, `arms_omitted`.
+4. **Report after the launch:**
+   - completion per arm;
+   - units;
+   - outcome-blind operational stats per chooser arm, including the **thinking-cap rate**
+     (`scripts/expab_choose_report.py`).
+   - No held-out outcome is looked at before the committed analysis.
+
+**Then launch 5** (B full, option 2), cap 50, as committed above.
+
+**Operations:**
+
+- If GPU requests keep failing with Service Unavailable, back off and retry.
+- If setup (including staging) fails twice for a launch, stop and report rather than spend units on
+  further attempts.

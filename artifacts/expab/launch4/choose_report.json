@@ -1,26 +1,58 @@
 {
- "A2_5": {
-  "questions": 750,
-  "requests": 2250,
-  "pick_parse_rate": 0.9977777777777778,
-  "thinking_cap_rate": 0.2773333333333333,
-  "answer_cap_rate": 0.0017777777777777779,
-  "refused_context": 0,
-  "mean_prompt_tokens": 1068.1773333333333,
-  "mean_generated_tokens": 2365.485777777778,
-  "gpu_seconds": 4240.160599999999,
-  "tokens_per_second": 1256.135203935436
+ "arm_completion": {
+  "A1_qt5": {
+   "status": "not run"
+  },
+  "A1_qnt5": {
+   "status": "not run"
+  },
+  "A1_qnt10": {
+   "status": "not run"
+  },
+  "A1_g5": {
+   "status": "not run"
+  },
+  "A1_g10": {
+   "status": "not run"
+  },
+  "A2_5": {
+   "status": "partial",
+   "chunks_done": 5,
+   "chunks_expected": 9
+  },
+  "A2_10": {
+   "status": "not run"
+  },
+  "A3": {
+   "status": "complete",
+   "chunks_done": 15,
+   "chunks_expected": 15
+  }
  },
- "A3": {
-  "questions": 2114,
-  "requests": 6342,
-  "pick_parse_rate": 0.9988962472406181,
-  "thinking_cap_rate": 0.1859035004730369,
-  "answer_cap_rate": 0.001261431725007884,
-  "refused_context": 0,
-  "mean_prompt_tokens": 1365.6173131504258,
-  "mean_generated_tokens": 2095.9550614947966,
-  "gpu_seconds": 12289.3784,
-  "tokens_per_second": 1082.5644362940277
+ "arms": {
+  "A2_5": {
+   "questions": 750,
+   "requests": 2250,
+   "pick_parse_rate": 0.9977777777777778,
+   "thinking_cap_rate": 0.2773333333333333,
+   "answer_cap_rate": 0.0017777777777777779,
+   "refused_context": 0,
+   "mean_prompt_tokens": 1068.1773333333333,
+   "mean_generated_tokens": 2365.485777777778,
+   "gpu_seconds": 4240.160599999999,
+   "tokens_per_second": 1256.135203935436
+  },
+  "A3": {
+   "questions": 2114,
+   "requests": 6342,
+   "pick_parse_rate": 0.9988962472406181,
+   "thinking_cap_rate": 0.1859035004730369,
+   "answer_cap_rate": 0.001261431725007884,
+   "refused_context": 0,
+   "mean_prompt_tokens": 1365.6173131504258,
+   "mean_generated_tokens": 2095.9550614947966,
+   "gpu_seconds": 12289.3784,
+   "tokens_per_second": 1082.5644362940277
+  }
  }
 }

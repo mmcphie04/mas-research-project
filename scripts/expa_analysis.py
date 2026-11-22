@@ -43,6 +43,7 @@ import pandas as pd  # noqa: E402
 from mad.analysis.actions import expected_vote  # noqa: E402
 from mad.gen import archive as A  # noqa: E402
 from mad.gen import tasks as T  # noqa: E402
+from mad.provenance import is_complete  # noqa: E402
 
 N_BOOT, LABEL = 10000, "PRE-REGISTERED (docs/EXPAB_PLAN.md)"
 CHOOSER_MODE = {arm: spec[0] for arm, spec in T.ARMS.items()}
@@ -186,14 +187,36 @@ def load(root: Path, job: str):
     return bank, choose, costs(calls, allr)
 
 
+def arm_completion(root: Path, job: str) -> dict:
+    """Per arm: complete (every chunk the job record expects is complete), partial (k of n chunks),
+    or not run. Launch 4b amendment (docs/EXPAB_PLAN.md): only complete arms are analysed; the
+    headline rule applies to the completed arms only, and any omission is reported."""
+    p = Path(root) / f"{job}-job.json"
+    parts = json.loads(p.read_text())["parts"] if p.exists() else {}
+    out = {}
+    for arm in T.ARMS:
+        n = parts.get(f"choose_{arm}")
+        if not n:
+            out[arm] = {"status": "not run"}
+            continue
+        done = sum(is_complete(A.chunk_dir(root, job, f"choose_{arm}", i)) for i in range(n))
+        out[arm] = {"status": "complete" if done == n else "partial", "chunks_done": done, "chunks_expected": n}
+    return out
+
+
 def run(root: Path, job: str, plan: Path) -> dict:
     _, assign, manifest = T.load_questions(plan)
     bank, choose, cost = load(root, job)
+    completion = arm_completion(root, job)
+    complete = {a for a, v in completion.items() if v["status"] == "complete"}
+    choose = choose[choose.meta_arm.isin(complete)] if len(choose) else choose  # partial arms are never analysed
+    omitted = {a: v for a, v in completion.items() if a not in complete}
     dev = analyze(bank, choose, cost, assign, "dev")
     held = analyze(bank, choose, cost, assign, "heldout")
     headline = max(dev, key=lambda a: dev[a]["P1_minus_pool_plurality"]["mean"]) if dev else None
     return {"label": LABEL, "question_ids_sha256": manifest["question_ids_sha256"], "costs": cost,
-            "headline_rule": "largest development P1 gain", "headline_arm": headline,
+            "headline_rule": "largest development P1 gain, among the completed arms only", "headline_arm": headline,
+            "arm_completion": completion, "arms_analysed": sorted(complete), "arms_omitted": omitted,
             "development_P1": {a: v["P1_minus_pool_plurality"] for a, v in dev.items()},
             "heldout": held, "heldout_headline": held.get(headline) if headline else None,
             "self_consistency_heldout": sc_table(bank, cost, assign, "heldout")}

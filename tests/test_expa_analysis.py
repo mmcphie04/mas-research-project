@@ -49,3 +49,24 @@ def test_analysis_invariants_on_the_stub(tmp_path):
     sc = r["self_consistency_heldout"]
     assert len(sc["gemma"]["accuracy"]) == 10 and len(sc["qwen_t"]["accuracy"]) == 10  # thinking bank: 10
     assert set(r["costs"]) >= {"bank_gemma", "bank_qwen_nt", "bank_qwen_t", "choose_A3"}
+
+
+def test_only_completed_arms_are_analysed_and_omissions_reported(tmp_path):
+    """Launch 4b amendment: an arm the cap cut part-way (or never ran) is not analysed, the headline
+    is chosen among the completed arms, and every omission is reported."""
+    import shutil
+
+    G, X = _load("gen_run"), _load("expa_analysis")
+    base = ["--out-root", str(tmp_path), "--job", "x", "--engine", "stub", "--split", "all", "--limit", "30"]
+    for mode in ("gemma", "qwen_nt", "qwen_t"):
+        assert G.main(["--task", "bank", "--mode", mode, *base, "--chunk", "10"]) == 0
+    for arm in ("A3", "A2_5"):
+        assert G.main(["--task", "choose", "--arm", arm, *base, "--chunk", "3"]) == 0
+    last = sorted(tmp_path.glob("x-choose_A2_5-c*"))[-1]
+    shutil.rmtree(last)  # the cap stopped A2_5 before its last chunk
+    r = X.run(tmp_path, "x", ROOT / "artifacts/expab/plan")
+    assert r["arms_analysed"] == ["A3"] and r["headline_arm"] == "A3"
+    assert r["arms_omitted"]["A2_5"]["status"] == "partial"
+    assert r["arms_omitted"]["A2_5"]["chunks_done"] == r["arms_omitted"]["A2_5"]["chunks_expected"] - 1
+    assert r["arms_omitted"]["A1_g10"] == {"status": "not run"}
+    assert set(r["heldout"]) == {"A3"} and set(r["development_P1"]) == {"A3"}
