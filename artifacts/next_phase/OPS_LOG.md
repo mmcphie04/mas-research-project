@@ -187,3 +187,5 @@ down (~09:50); the runtime job was unaffected, but nothing would have stopped an
 |---|---|
 | 02:16 | launch script started at `408c27d`: A100 request with backoff, setup, staging (Qwen banks, original + extension), launch, supervisor |
 | 02:16–02:27 | one Service Unavailable, then session `l5` granted 02:21; setup at `408c27d`; staging 140 Qwen bank chunks in 4 batches, 18 s, no stalls; launched 02:27; supervisor started (stop line 45.45; balance at launch 95.28) |
+| 02:27–08:21 | qwen_shared 5,318 s (four arms on 440 non-thinking / 393 thinking held-out panels), readouts_shared 6,420 s, qwen_extra_alone 3,517 s (alone on the next 1,913 / 1,146 panels), readouts_extra 4,038 s; all exit 0; peak 35.6 GB; every chunk backed up and on Google Drive |
+| 08:23 | job exited; local archive verified; **runtime stopped** 08:23:51; Drive verified; nothing incomplete. Balance **54.90**: launch 5 **40.55 units** of 50. All B parts complete at their planned sizes, readouts for every agent |
