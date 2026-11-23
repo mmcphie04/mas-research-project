@@ -34,6 +34,7 @@ import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 
 from mad.gen import archive as A  # noqa: E402
+from mad.gen import tasks as T  # noqa: E402
 
 TARGET_HH = 400  # helpful + harmful events per mode x arm (review of Stop 2; was 150)
 N_BOOT = 10000
@@ -181,9 +182,17 @@ def main(argv=None) -> int:
     ap.add_argument("--out", required=True)
     ap.add_argument("--units-per-hour", type=float, default=6.73)
     ap.add_argument("--pilot", action="store_true")
+    ap.add_argument("--plan", default=str(ROOT / "artifacts/expab/plan"))
+    ap.add_argument("--split", default=None, choices=["dev", "heldout"],
+                    help="questions analysed; default: dev for --pilot, heldout for the full run (plan D5: "
+                         "pilot on development, full run on held-out -- the job holds both)")
     a = ap.parse_args(argv)
     df, calls = load(Path(a.root), a.job)
-    r = {"summary": summary(df, calls, a.units_per_hour)}
+    split = a.split or ("dev" if a.pilot else "heldout")
+    _, assign, _ = T.load_questions(a.plan)
+    if len(df):
+        df = df[df.question_id.map(assign) == split].reset_index(drop=True)
+    r = {"split": split, "parts": sorted(set(df._part)) if len(df) else [], "summary": summary(df, calls, a.units_per_hour)}
     if not a.pilot:
         r.update({"contrasts": contrasts(df), "order_effect": order_effect(df), "commitment": commitment(df), "curves": curves(df)})
     out = Path(a.out)

@@ -115,3 +115,24 @@ def test_launch5_layout_shared_panels_plus_extra_alone(tmp_path):
     assert s["qwen_nt alone"]["panels"] == 11 and s["qwen_nt debate"]["panels"] == 6
     c = B.contrasts(df)["qwen_nt: debate - alone"]["changed"]
     assert c["n"] == 6
+
+
+def test_b_full_run_analysis_excludes_the_development_pilot(tmp_path):
+    G = _gen()
+    spec = importlib.util.spec_from_file_location("expb_analysis", ROOT / "scripts" / "expb_analysis.py")
+    B = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(B)
+    common = ["--out-root", str(tmp_path), "--job", "k", "--engine", "stub", "--chunk", "20"]
+    for split in ("dev", "heldout"):
+        assert G.main(["--task", "bank", "--mode", "qwen_nt", "--split", split, "--limit", "40", *common]) == 0
+    assert G.main(["--task", "b", "--mode", "qwen_nt", "--arms", "debate", "alone", "--split", "dev", "--n-panels", "4",
+                   "--tag", "pilot", *common]) == 0
+    assert G.main(["--task", "b", "--mode", "qwen_nt", "--arms", "debate", "alone", "--split", "heldout", "--n-panels", "6",
+                   "--tag", "full", *common]) == 0
+    assert B.main(["--root", str(tmp_path), "--job", "k", "--out", str(tmp_path / "o")]) == 0
+    r = json.loads((tmp_path / "o" / "expb_results.json").read_text())
+    assert r["split"] == "heldout" and all("heldout_full" in p for p in r["parts"])
+    assert r["summary"]["qwen_nt debate"]["panels"] == 6
+    assert B.main(["--root", str(tmp_path), "--job", "k", "--out", str(tmp_path / "p"), "--pilot"]) == 0
+    p = json.loads((tmp_path / "p" / "expb_pilot.json").read_text())
+    assert p["split"] == "dev" and p["summary"]["qwen_nt alone"]["panels"] == 4
