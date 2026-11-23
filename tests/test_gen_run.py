@@ -136,3 +136,24 @@ def test_b_full_run_analysis_excludes_the_development_pilot(tmp_path):
     assert B.main(["--root", str(tmp_path), "--job", "k", "--out", str(tmp_path / "p"), "--pilot"]) == 0
     p = json.loads((tmp_path / "p" / "expb_pilot.json").read_text())
     assert p["split"] == "dev" and p["summary"]["qwen_nt alone"]["panels"] == 4
+
+
+def test_panel_effect_is_paired_on_shared_panels(tmp_path):
+    G = _gen()
+    spec = importlib.util.spec_from_file_location("expb_panel_effect", ROOT / "scripts" / "expb_panel_effect.py")
+    P = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(P)
+    base = ["--out-root", str(tmp_path), "--job", "k", "--engine", "stub", "--split", "heldout", "--limit", "60", "--chunk", "20"]
+    assert G.main(["--task", "bank", "--mode", "qwen_nt", *base]) == 0
+    assert G.main(["--task", "b", "--mode", "qwen_nt", "--arms", "debate", "alone", "--n-panels", "8", "--tag", "full", *base]) == 0
+    assert G.main(["--task", "b", "--mode", "qwen_nt", "--arms", "alone", "--panel-start", "8", "--n-panels", "6",
+                   "--tag", "fullx", *base]) == 0
+    assert P.main(["--root", str(tmp_path), "--job", "k", "--out", str(tmp_path / "o")]) == 0
+    r = json.loads((tmp_path / "o" / "expb_panel_effect.json").read_text())
+    pa = r["per_arm"]
+    assert pa["qwen_nt alone (shared panels)"]["panels"] == 8 and pa["qwen_nt alone (all panels)"]["panels"] == 14
+    assert pa["qwen_nt debate"]["before"]["mean"] == pa["qwen_nt alone (shared panels)"]["before"]["mean"]  # same bank answers
+    c = r["paired_vs_alone_shared_panels"]["qwen_nt: debate - alone"]
+    assert c["n"] == 8
+    assert abs(c["mean"] - (pa["qwen_nt debate"]["after"]["mean"] - pa["qwen_nt alone (shared panels)"]["after"]["mean"])) < 1e-12
+    assert set(r["agent_rates"]["qwen_nt debate"]) == {"helpful", "harmful"}
