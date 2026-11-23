@@ -6,8 +6,11 @@
    answer): the commitment readout's argmax must recover the instructed letter, and a probe on the
    activations at position A (multinomial logistic, 5-fold CV) must recover it at some layer.
    Passed iff readout recovery >= 0.9 and the best layer's probe accuracy >= 0.8.
-2. Probes on Experiment B rows (activations at A and B, layers 14/22/31): targets "will change"
-   (all agents in peer arms, from A) and "helpful vs harmful" (changed agents, from A and from B).
+2. Probes on Experiment B rows (layers 14/22/31): targets "will change" (all agents in peer arms)
+   and "helpful vs harmful" (changed agents). Amendment of 2026-11-21: position A failed its
+   positive control and is excluded; the probes use R (the readout position, which passed) and B.
+   R exists only in launch-5 (held-out) rows, so where the layer must be chosen on development
+   it is reported as not computable as committed.
    L2 logistic. The layer x position is chosen on DEVELOPMENT questions by grouped-CV
    within-question AUROC; the probe trained on all development rows is evaluated once on held-out.
    Primary measure: within-question AUROC (every positive-negative pair from the same question;
@@ -103,65 +106,107 @@ def positive_control(root, job, part_suffix: str = "") -> dict:
     return out
 
 
-def probes(root, job, assign) -> dict:
-    from sklearn.linear_model import LogisticRegression
-    from sklearn.model_selection import GroupKFold
+POS = {"A": 0, "B": 1, "R": 2}
+EXCLUDED = {"A": "failed its positive control (200 development contexts; amendment of 2026-11-21)"}
+TARGET_POSITIONS = {"will_change": ["R"], "helpful_vs_harmful": ["B", "R"]}  # A excluded (EXCLUDED)
 
-    rows, acts = [], []
+
+class Acts:
+    """Activations of every B readout chunk, memory-mapped; one (position, layer) slice at a time.
+    Pilot chunks hold [A, B]; launch-5 chunks hold [A, B, R]. A missing position reads as NaN."""
+
+    def __init__(self, files: list[tuple[Path, int]]):
+        self.files = files
+
+    def slice(self, pos: int, li: int) -> np.ndarray:
+        out = []
+        for f, n in self.files:
+            a = np.load(f, mmap_mode="r")
+            out.append(np.asarray(a[:, pos, li, :], np.float32) if a.shape[1] > pos else np.full((n, a.shape[-1]), np.nan, np.float32))
+        return np.concatenate(out)
+
+
+def load_b(root: Path, job: str) -> tuple[pd.DataFrame, Acts]:
+    rows, files = [], []
     calls = A.read_calls(root, job)
     for part in sorted(p for p in set(calls.part) if p.startswith("b_") and p.endswith("_ro")):
-        r, x = load_acts(root, job, part)
-        if not len(r):
-            continue
         gen = A.read_rows(root, job, part[:-3])[["request_id", "answer", "parsed", "meta_before", "meta_gold", "meta_arm", "question_id", "mode"]]
-        r = r.merge(gen, on="request_id", how="left")
-        rows.append(r)
-        acts.append(x)
-    if not rows:
+        for d in sorted(root.glob(f"{job}-{part}-c*")):
+            if d.is_dir() and is_complete(d) and (d / "acts.npy").exists():
+                r = pd.read_parquet(d / "rows.parquet")[["request_id"]].merge(gen, on="request_id", how="left")
+                rows.append(r.assign(_part=part))
+                files.append((d / "acts.npy", len(r)))
+    return (pd.concat(rows, ignore_index=True) if rows else pd.DataFrame()), Acts(files)
+
+
+def probes(root, job, assign) -> dict:
+    """Layer x position chosen on DEVELOPMENT by grouped-CV within-question AUROC; the probe trained on
+    all development rows is evaluated once on held-out. Positions: B, and R where development rows
+    have it; A is excluded (failed its positive control)."""
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.metrics import roc_auc_score
+    from sklearn.model_selection import GroupKFold
+
+    df, acts = load_b(Path(root), job)
+    if not len(df):
         return {}
-    df, X = pd.concat(rows, ignore_index=True), np.concatenate(acts)
     df["split"] = df.question_id.map(assign)
     df["changed"] = (df.parsed & (df.answer != df.meta_before)).astype(int)
     df["helpful"] = (df.answer == df.meta_gold).astype(int)
-    out = {}
-    targets = {"will_change_from_A": (df.meta_arm != "alone") & df.parsed, "helpful_vs_harmful": df.changed.astype(bool) &
-               ((df.answer == df.meta_gold) | (df.meta_before == df.meta_gold))}
+    sel = {"will_change": (df.meta_arm != "alone") & df.parsed,
+           "helpful_vs_harmful": df.changed.astype(bool) & ((df.answer == df.meta_gold) | (df.meta_before == df.meta_gold))}
+    cache: dict = {}
+
+    def X(pos, li):
+        if (pos, li) not in cache:
+            cache.clear()  # one slice in memory at a time
+            cache[(pos, li)] = acts.slice(pos, li)
+        return cache[(pos, li)]
+
+    out = {"excluded_positions": EXCLUDED}
     for mode in sorted(set(df["mode"])):
-        for tname, sel in targets.items():
-            d = df[sel & (df["mode"] == mode)]
-            y = (d.changed if tname == "will_change_from_A" else d.helpful).to_numpy()
-            positions = ([0] if tname == "will_change_from_A" else [0, 1]) + ([2] if X.shape[1] == 3 else [])  # + R
-            dev, held = d.split == "dev", d.split == "heldout"
-            best, scores = None, {}
-            for pos in positions:
+        for tname, mask in sel.items():
+            d = df[mask & (df["mode"] == mode)]
+            y = (d.changed if tname == "will_change" else d.helpful).to_numpy()
+            dev, held = (d.split == "dev").to_numpy(), (d.split == "heldout").to_numpy()
+            g_all = d.question_id.to_numpy()
+            best, scores, notes = None, {}, {}
+            for pname in TARGET_POSITIONS[tname]:
+                pos = POS[pname]
                 for li, layer in enumerate(RO.LAYERS):
-                    Xs = X[d.index][:, pos, li, :]
+                    Xs = X(pos, li)[d.index]
                     ok = ~np.isnan(Xs).any(1)
-                    m = dev.to_numpy() & ok
+                    m = dev & ok
+                    if not m.any():
+                        notes[pname] = ("not computable as committed: no development row has this position "
+                                        "(the development pilot's readouts predate R)")
+                        break
                     if m.sum() < 20 or len(set(y[m])) < 2:
+                        notes[pname] = f"too few development rows ({int(m.sum())}) or one class"
                         continue
-                    pred = np.zeros(m.sum())
-                    g = d.question_id.to_numpy()[m]
+                    pred, g = np.zeros(m.sum()), g_all[m]
                     for tr, te in GroupKFold(n_splits=min(5, len(set(g)))).split(Xs[m], y[m], g):
                         if len(set(y[m][tr])) < 2:
                             continue
                         pred[te] = LogisticRegression(max_iter=2000, C=0.1).fit(Xs[m][tr], y[m][tr]).predict_proba(Xs[m][te])[:, 1]
                     n, den = within_q_auroc(pred, y[m], g)
-                    scores[f"pos{'ABR'[pos]}_L{layer}"] = n / den if den else None
+                    scores[f"pos{pname}_L{layer}"] = n / den if den else None
                     if den and (best is None or n / den > best[0]):
-                        best = (n / den, pos, li, layer)
-            res = {"dev_within_question_auroc": scores, "chosen": None, "heldout": None}
+                        best = (n / den, pos, pname, li, layer)
+            res = {"positions_considered": TARGET_POSITIONS[tname], "position_notes": notes,
+                   "dev_rows": int(dev.sum()), "dev_within_question_auroc": scores, "chosen": None, "heldout": None}
             if best:
-                _, pos, li, layer = best
-                Xs = X[d.index][:, pos, li, :]
+                _, pos, pname, li, layer = best
+                Xs = X(pos, li)[d.index]
                 ok = ~np.isnan(Xs).any(1)
-                m_dev, m_held = dev.to_numpy() & ok, held.to_numpy() & ok
-                res["chosen"] = f"pos{'ABR'[pos]}_L{layer}"
+                m_dev, m_held = dev & ok, held & ok
+                res["chosen"] = f"pos{pname}_L{layer}"
                 if m_held.sum() and len(set(y[m_dev])) == 2:
                     clf = LogisticRegression(max_iter=2000, C=0.1).fit(Xs[m_dev], y[m_dev])
-                    s = clf.predict_proba(Xs[m_held])[:, 1]
-                    res["heldout"] = {"within_question_auroc": wq_boot(s, y[m_held], d.question_id.to_numpy()[m_held]),
-                                      "rows": int(m_held.sum())}
+                    s_ = clf.predict_proba(Xs[m_held])[:, 1]
+                    res["heldout"] = {"within_question_auroc": wq_boot(s_, y[m_held], g_all[m_held]),
+                                      "ordinary_auroc": float(roc_auc_score(y[m_held], s_)) if len(set(y[m_held])) == 2 else None,
+                                      "rows": int(m_held.sum()), "positives": int(y[m_held].sum())}
             out[f"{mode} {tname}"] = res
     return out
 
@@ -174,7 +219,9 @@ def main(argv=None) -> int:
     ap.add_argument("--out", required=True)
     a = ap.parse_args(argv)
     _, assign, _ = T.load_questions(a.plan)
-    r = {"label": "EXPLORATORY", "positive_control": positive_control(Path(a.root), a.job),
+    r = {"label": "EXPLORATORY",
+         "positive_control": {"decision_rerun200": positive_control(Path(a.root), a.job, "__rerun200"),
+                              "original_50": positive_control(Path(a.root), a.job)},
          "probes": probes(Path(a.root), a.job, assign)}
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)

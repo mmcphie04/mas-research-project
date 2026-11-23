@@ -36,8 +36,25 @@ def test_probe_pipeline_runs(tmp_path):
     assert H.main(["--task", "posctl", "--out-root", str(tmp_path), "--job", "x", "--fake", "--n-posctl", "50"]) == 0
     assert P.main(["--root", str(tmp_path), "--job", "x", "--out", str(tmp_path / "an")]) == 0
     r = json.loads((tmp_path / "an" / "expb_probes.json").read_text())
-    pc = r["positive_control"]["qwen_t"]
+    pc = r["positive_control"]["original_50"]["qwen_t"]
     assert pc["contexts"] == 50 and set(pc["probe_accuracy_by_position_layer"]) == {"A", "R"}
     assert set(pc["probe_accuracy_by_position_layer"]["R"]) == {"14", "22", "31"}
     assert set(pc["passed_by_position"]) == {"A", "R"}
-    assert "qwen_t will_change_from_A" in r["probes"]
+    pr = r["probes"]
+    assert "A" in pr["excluded_positions"] and pr["qwen_t helpful_vs_harmful"]["positions_considered"] == ["B", "R"]
+    assert pr["qwen_t will_change"]["positions_considered"] == ["R"]
+    assert not any(k.startswith("posA") for v in pr.values() if isinstance(v, dict) for k in v.get("dev_within_question_auroc", {}))
+
+    # as in the real data: development (pilot) readouts hold [A, B] only, held-out ones [A, B, R]
+    import numpy as np
+
+    for d in tmp_path.glob("x-b_qwen_t_*__dev_ro-c*"):
+        a = np.load(d / "acts.npy")
+        np.save(d / "acts.npy", a[:, :2])
+    assert P.main(["--root", str(tmp_path), "--job", "x", "--out", str(tmp_path / "an2")]) == 0
+    pr2 = json.loads((tmp_path / "an2" / "expb_probes.json").read_text())["probes"]
+    wc = pr2["qwen_t will_change"]
+    assert "not computable as committed" in wc["position_notes"]["R"] and wc["chosen"] is None
+    hh = pr2["qwen_t helpful_vs_harmful"]
+    assert "not computable as committed" in hh["position_notes"]["R"]
+    assert all(k.startswith("posB") for k in hh["dev_within_question_auroc"])
