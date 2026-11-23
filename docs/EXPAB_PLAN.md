@@ -693,3 +693,31 @@ attempts).
 - If GPU requests keep failing with Service Unavailable, back off and retry.
 - If setup (including staging) fails twice for a launch, stop and report rather than spend units on
   further attempts.
+
+## Committed analyses: run log (2026-11-23)
+
+Each analysis was run once, from code committed before it ran. Outputs are in
+`artifacts/expab/analysis/`.
+
+- **Experiment A:** `expa_analysis.py` on held-out (2,900 questions).
+  - All 8 arms are complete; none was omitted.
+  - The development headline arm is **A2_10**.
+  - Then the exploratory `expa_neff.py`.
+- **Experiment B:** `expb_analysis.py`.
+  - Fix before the run (`de5d0c1`): the full-run analysis now uses held-out questions only (D5).
+    The job also holds the development pilot, which would otherwise have been merged into the
+    full-run results. The pilot output is unchanged by the fix.
+- **Probes:** `expb_probe.py`, exploratory (`aa06bfe`).
+  - A is excluded: it failed its positive control.
+  - Probes are at B as committed: the layer is chosen on development by grouped-CV
+    within-question AUROC, then evaluated once on held-out.
+  - **R is not computable as committed.** The development rows come from the pilot, whose
+    readouts predate R. R exists only on held-out, where choosing the layer would need a different
+    design (or new development readouts on the GPU). It is reported as not computed.
+  - "Will change" had only R as an admissible position, so it is not computed.
+  - Helpful-vs-harmful at B, held-out within-question AUROC:
+    - non-thinking: 0.509 [0.418, 0.603] (layer 31, 164 questions);
+    - thinking: 0.489 [0.429, 0.550] (layer 14, 151 questions).
+- **Exploratory, requested at the review:** `expb_panel_effect.py`, the panel-level effect against
+  reconsider-alone on shared panels. Every interval includes zero.
+- **Figures:** `figures/part2/` (`scripts/make_part2_figures.py`), from the committed JSON only.

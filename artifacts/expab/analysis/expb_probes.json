@@ -1,0 +1,162 @@
+{
+ "label": "EXPLORATORY",
+ "positive_control": {
+  "decision_rerun200": {
+   "qwen_t": {
+    "contexts": 200,
+    "readout_recovery": 1.0,
+    "probe_accuracy_by_position_layer": {
+     "A": {
+      "14": 0.63,
+      "22": 0.765,
+      "31": 0.7
+     },
+     "R": {
+      "14": 0.97,
+      "22": 0.965,
+      "31": 1.0
+     }
+    },
+    "passed_by_position": {
+     "A": false,
+     "R": true
+    }
+   },
+   "qwen_nt": {
+    "contexts": 200,
+    "readout_recovery": 1.0,
+    "probe_accuracy_by_position_layer": {
+     "A": {
+      "14": 0.48,
+      "22": 0.73,
+      "31": 0.375
+     },
+     "R": {
+      "14": 0.985,
+      "22": 0.96,
+      "31": 1.0
+     }
+    },
+    "passed_by_position": {
+     "A": false,
+     "R": true
+    }
+   }
+  },
+  "original_50": {
+   "qwen_t": {
+    "contexts": 50,
+    "readout_recovery": 1.0,
+    "probe_accuracy_by_position_layer": {
+     "A": {
+      "14": 0.36,
+      "22": 0.48,
+      "31": 0.46
+     }
+    },
+    "passed_by_position": {
+     "A": false
+    }
+   },
+   "qwen_nt": {
+    "contexts": 50,
+    "readout_recovery": 1.0,
+    "probe_accuracy_by_position_layer": {
+     "A": {
+      "14": 0.2,
+      "22": 0.32,
+      "31": 0.22
+     }
+    },
+    "passed_by_position": {
+     "A": false
+    }
+   }
+  }
+ },
+ "probes": {
+  "excluded_positions": {
+   "A": "failed its positive control (200 development contexts; amendment of 2026-11-21)"
+  },
+  "qwen_nt will_change": {
+   "positions_considered": [
+    "R"
+   ],
+   "position_notes": {
+    "R": "not computable as committed: no development row has this position (the development pilot's readouts predate R)"
+   },
+   "dev_rows": 300,
+   "dev_within_question_auroc": {},
+   "chosen": null,
+   "heldout": null
+  },
+  "qwen_nt helpful_vs_harmful": {
+   "positions_considered": [
+    "B",
+    "R"
+   ],
+   "position_notes": {
+    "R": "not computable as committed: no development row has this position (the development pilot's readouts predate R)"
+   },
+   "dev_rows": 108,
+   "dev_within_question_auroc": {
+    "posB_L14": 0.4864864864864865,
+    "posB_L22": 0.5135135135135135,
+    "posB_L31": 0.5405405405405406
+   },
+   "chosen": "posB_L31",
+   "heldout": {
+    "within_question_auroc": {
+     "questions": 164,
+     "pairs": 1142,
+     "mean": 0.5087565674255692,
+     "lo": 0.4182675881105566,
+     "hi": 0.6034357945662113
+    },
+    "ordinary_auroc": 0.5585721706731631,
+    "rows": 1572,
+    "positives": 1030
+   }
+  },
+  "qwen_t will_change": {
+   "positions_considered": [
+    "R"
+   ],
+   "position_notes": {
+    "R": "not computable as committed: no development row has this position (the development pilot's readouts predate R)"
+   },
+   "dev_rows": 300,
+   "dev_within_question_auroc": {},
+   "chosen": null,
+   "heldout": null
+  },
+  "qwen_t helpful_vs_harmful": {
+   "positions_considered": [
+    "B",
+    "R"
+   ],
+   "position_notes": {
+    "R": "not computable as committed: no development row has this position (the development pilot's readouts predate R)"
+   },
+   "dev_rows": 128,
+   "dev_within_question_auroc": {
+    "posB_L14": 0.5102040816326531,
+    "posB_L22": 0.5102040816326531,
+    "posB_L31": 0.4897959183673469
+   },
+   "chosen": "posB_L14",
+   "heldout": {
+    "within_question_auroc": {
+     "questions": 151,
+     "pairs": 1222,
+     "mean": 0.48936170212765956,
+     "lo": 0.42869403413195534,
+     "hi": 0.5504674608682242
+    },
+    "ordinary_auroc": 0.4859677756852898,
+    "rows": 1431,
+    "positives": 900
+   }
+  }
+ }
+}
